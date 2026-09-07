@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    /* ── Main styles ── */
+    /* ── Main styles (same as before) ── */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -467,6 +467,7 @@
 
           <!-- ===== TOOLBAR ===== -->
           <div class="dashboard-toolbar">
+            <!-- Wallet is now optional – you can keep it for future -->
             <div class="wallet-pill"><span class="wallet-label">Wallet</span><i class="fas fa-wallet"></i><span class="balance" id="walletBalanceDisplay">0</span> UGX<button id="topupBtn" class="ml-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-0.5 rounded-full transition">+ Top Up</button></div>
             <button id="refreshWalletBtn" class="toolbar-btn" style="background:#334155;color:white;"><i class="fas fa-sync-alt"></i></button>
             <button id="dashboardEditProfileBtn" class="toolbar-btn"><i class="fas fa-user-edit"></i> Edit Profile</button>
@@ -500,7 +501,10 @@
               </div>
               <div class="md:col-span-2 flex items-center gap-3 mt-2"><input type="checkbox" id="addRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" /><label for="addRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label><span class="text-xs text-slate-400">(You'll provide details later)</span></div>
               <div id="addVerificationInfo" class="verification-info-panel"><p class="font-medium">🔍 Verification Process</p><ul><li>After saving, go to the Verification panel to submit required documents.</li><li>We'll review your property and approve it.</li><li>Verified properties rank higher.</li></ul></div>
-              <div class="md:col-span-2"><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-plus mr-2"></i> Add Property</button><p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle"></i> Verified properties rank higher. Build your reputation with good reviews to earn a "Trusted" badge.</p></div>
+              <div class="md:col-span-2">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-plus mr-2"></i> Add Property</button>
+                <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle"></i> Verified properties rank higher. Build your reputation with good reviews.</p>
+              </div>
             </form>
             <div id="uploadStatus" class="mt-3 text-sm text-slate-600"></div>
           </div>
@@ -546,7 +550,7 @@
   </div>
 
   <!-- ============================================================
-  JAVASCRIPT – COMPLETE APP
+  JAVASCRIPT – COMPLETE APP (No tier limits)
   ============================================================ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
   </script>
@@ -1311,16 +1315,17 @@
                              lead.status === 'pending' ? '⏳ Pending' :
                              lead.status === 'rejected' ? '❌ Rejected' : '⏰ Expired';
 
-          const canUnlock = lead.status === 'pending' && lead.calculated_cost > 0;
+          // No cost – free unlock
+          const canUnlock = lead.status === 'pending';
 
           html += `
             <div class="verification-property-item">
               <div class="property-title">${lead.property?.title || 'Unknown'} <span class="text-xs text-slate-400">(${lead.lead_type})</span></div>
               <div><span class="property-status ${statusClass}">${statusLabel}</span></div>
               <div>
-                ${canUnlock ? `<button class="unlock-lead-btn text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-full transition" data-lead-id="${lead.id}" data-cost="${lead.calculated_cost}">Unlock (${lead.calculated_cost.toLocaleString()} UGX)</button>` :
+                ${canUnlock ? `<button class="unlock-lead-btn text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-full transition" data-lead-id="${lead.id}">Unlock</button>` :
                 lead.status === 'approved' ? `<button class="view-lead-details text-xs text-blue-600 hover:underline" data-lead-id="${lead.id}">View Contact</button>` :
-                `<span class="text-xs text-slate-400">${lead.calculated_cost > 0 ? lead.calculated_cost.toLocaleString() + ' UGX' : 'Free'}</span>`}
+                `<span class="text-xs text-slate-400">Free</span>`}
               </div>
             </div>
           `;
@@ -1330,15 +1335,14 @@
         list.querySelectorAll('.unlock-lead-btn').forEach(btn => {
           btn.addEventListener('click', async function() {
             const leadId = this.dataset.leadId;
-            const cost = parseInt(this.dataset.cost);
-            if (!confirm(`Pay ${cost.toLocaleString()} UGX to unlock this lead? (Simulated)`)) return;
+            if (!confirm('Unlock this lead? (Free)')) return;
             try {
               const { data, error } = await supabase.functions.invoke('handle-lead-decision', {
                 body: { token: leadId, decision: 'approve' }
               });
               if (error) throw error;
               if (!data.success) {
-                alert('Payment failed: ' + data.error);
+                alert('Failed to unlock lead: ' + data.error);
                 return;
               }
               alert(`✅ Lead unlocked!\n\nName: ${data.visitor_name}\nEmail: ${data.visitor_email}\nWhatsApp: ${data.visitor_whatsapp}`);
