@@ -23,7 +23,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    /* ── All styles (same as before) ── */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -356,7 +355,7 @@
           </div>
           <div class="flex items-center gap-3">
             <span id="propertyCount" class="bg-slate-100 px-3 py-1 rounded-full text-slate-700 font-medium text-xs">0 listings</span>
-            <!-- Notification Bell -->
+            <!-- Notification Bell (optional) -->
             <button id="notificationBell" class="relative text-slate-600 hover:text-slate-800 transition">
               <i class="fas fa-bell text-lg"></i>
               <span id="notificationCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
@@ -483,7 +482,7 @@
             <div id="profileStatus" class="mt-3 text-sm text-slate-600"></div>
           </div>
 
-          <!-- ===== ADD PROPERTY FORM (NO TIER) ===== -->
+          <!-- ===== ADD PROPERTY FORM ===== -->
           <div id="addPropertyContainer" class="add-property-container">
             <h4 class="font-semibold text-slate-700 mb-3">➕ Add New Property</h4>
             <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -546,7 +545,7 @@
   </div>
 
   <!-- ============================================================
-  JAVASCRIPT – COMPLETE AND FULLY FUNCTIONAL
+  JAVASCRIPT – COMPLETE WITH `delete` FIX
   ============================================================ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
   </script>
@@ -577,7 +576,7 @@
 
       let supabase;
 
-      // ─── DOM Helpers (safe) ──────────────────────────────────────────────
+      // ─── DOM Helpers ──────────────────────────────────────────────────────
       function $(sel) { return document.querySelector(sel); }
       function $$(sel) { return document.querySelectorAll(sel); }
 
@@ -1017,6 +1016,8 @@
             media_urls: currentImages, is_verified: isVerified,
             verification_status: verificationStatus,
           };
+          // SAFETY: remove tier if present
+          delete updateData.tier;
           try {
             const { error } = await supabase.from('properties').update(updateData).eq('id', id);
             if (error) throw error;
@@ -1338,6 +1339,8 @@
             verification_status: verificationStatus,
             owner_id: state.currentUser.id,
           };
+          // SAFETY: remove tier if present
+          delete insertData.tier;
 
           try {
             const { error } = await supabase.from('properties').insert(insertData);
