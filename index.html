@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    /* (same styles as before – kept for brevity) */
+    /* (All styles remain unchanged – as provided earlier) */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -186,1743 +186,2310 @@
 </head>
 <body>
 
-  <!-- ===== loading overlay, security notification, all modals (same as before) ===== -->
-  <!-- (Keep all HTML exactly as in previous version – no changes needed) -->
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay">
+    <div class="loader"></div>
+    <p class="text-slate-600 text-sm">Loading Property Hub…</p>
+  </div>
 
-  <!-- ===== JavaScript section with the fix ===== -->
+  <!-- ===== SECURITY NOTIFICATION ===== -->
+  <div id="securityNotification" class="security-notification">
+    <div class="flex items-start gap-3">
+      <i class="fas fa-shield-alt text-emerald-400 text-xl mt-0.5"></i>
+      <div class="flex-1 text-sm">
+        <p class="font-semibold">🔒 Verified &amp; Trusted Properties</p>
+        <p class="text-slate-300 text-xs">Look for the <span class="text-emerald-400 font-medium">Verified</span> badge (property reviewed) and the <span class="text-amber-400 font-medium">Trusted</span> badge (broker with great reputation).</p>
+      </div>
+      <button id="closeSecurityNotification" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+
+  <!-- ===== REVIEW MODAL ===== -->
+  <div id="reviewModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">⭐ Reviews</h2>
+        <button id="closeReviewModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm text-slate-500">What others say</span>
+        <button id="toggleWriteReview" class="write-review-toggle">
+          <i class="fas fa-pen"></i> Write a Review
+        </button>
+      </div>
+      <div id="reviewFormContainer" class="hidden mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <form id="reviewForm">
+          <input type="hidden" id="reviewBrokerId" />
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Name (optional)</label>
+            <input type="text" id="reviewClientName" placeholder="e.g. John Doe" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" />
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Rating</label>
+            <div id="starSelector" class="star-rating flex gap-1">
+              <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span>
+              <span class="star" data-value="3">★</span><span class="star" data-value="4">★</span>
+              <span class="star" data-value="5">★</span>
+            </div>
+            <input type="hidden" id="reviewRating" value="5" />
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Review</label>
+            <textarea id="reviewComment" rows="3" placeholder="Share your experience with this broker..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">
+            <i class="fas fa-paper-plane mr-2"></i> Submit Review
+          </button>
+        </form>
+      </div>
+      <div id="reviewsList" class="space-y-3 max-h-64 overflow-y-auto"><p class="text-slate-500 text-sm">Loading reviews...</p></div>
+      <div id="noReviewsMessage" class="hidden text-slate-500 text-sm text-center py-4">No reviews yet. Be the first to leave a review!</div>
+    </div>
+  </div>
+
+  <!-- ===== EDIT PROPERTY MODAL ===== -->
+  <div id="editModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">✏️ Edit Property</h2>
+        <button id="closeEditModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <form id="editPropertyForm" class="space-y-4">
+        <input type="hidden" id="editPropertyId" />
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Title *</label><input type="text" id="editTitle" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Price (UGX) *</label><input type="number" id="editPrice" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Property Type *</label><select id="editType" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm bg-white"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Address *</label><input type="text" id="editAddress" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Images</label><div id="editImagePreviews" class="flex flex-wrap gap-2 mb-2"></div><input type="file" id="editImageInput" accept="image/*" multiple class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" /></div>
+        <div class="flex items-center gap-3 mt-2">
+          <input type="checkbox" id="editRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+          <label for="editRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label>
+          <span class="text-xs text-slate-400">(You'll provide details later)</span>
+        </div>
+        <div id="editVerificationInfo" class="verification-info-panel"><p class="font-medium">🔍 Verification Process</p><ul><li>After saving, go to the Verification panel to submit required documents.</li><li>We'll review your property and approve it.</li><li>Verified properties rank higher.</li></ul></div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-save mr-2"></i> Update Property</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== PROPERTY VERIFICATION MODAL ===== -->
+  <div id="propertyVerificationModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">📋 Property Verification</h2>
+        <button id="closeVerificationModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <form id="propertyVerificationForm" class="space-y-4">
+        <input type="hidden" id="verifPropertyId" />
+        <input type="hidden" id="verifPropertyType" />
+        <p class="text-sm text-slate-600">Please provide the required information based on the property type. All fields are required unless marked optional.</p>
+        <div id="verifDynamicFields"></div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">
+          <i class="fas fa-paper-plane mr-2"></i> Submit Verification Request
+        </button>
+      </form>
+      <div id="verifStatus" class="mt-3 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- ===== BROKER VERIFICATION DETAIL MODAL ===== -->
+  <div id="brokerVerificationDetailModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">📄 Verification Details</h2>
+        <button id="closeBrokerDetailModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <div id="brokerDetailContent" class="space-y-2"><p class="text-slate-500 text-sm">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ / CONNECT MODAL ===== -->
+  <div id="quizModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">📞 Connect with Broker</h2>
+        <button id="closeQuizModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <form id="quizForm">
+        <input type="hidden" id="quizPropertyId" />
+        <div id="quizStep1">
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Full Name *</label><input type="text" id="quizName" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address *</label><input type="email" id="quizEmail" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Number *</label><input type="text" id="quizWhatsapp" required placeholder="e.g. 256700123456" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+          <button type="button" id="quizNextBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">Next: Quiz Questions →</button>
+        </div>
+        <div id="quizStep2" class="hidden">
+          <div id="quizQuestionsContainer" class="space-y-4">
+            <div class="mb-4"><p class="font-medium text-slate-700 text-sm mb-1">1. When do you plan to move in or buy?</p><div class="flex flex-wrap gap-2"><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q1" value="1" required /> More than 6 months</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q1" value="2" /> 1 – 6 months</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q1" value="3" /> Less than 1 month / ASAP</label></div></div>
+            <div class="mb-4"><p class="font-medium text-slate-700 text-sm mb-1">2. What is your budget range?</p><div class="flex flex-wrap gap-2"><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q2" value="1" required /> Below property price</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q2" value="2" /> Matches property price</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q2" value="3" /> Above property price</label></div></div>
+          </div>
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm mt-4"><i class="fas fa-paper-plane mr-2"></i> Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== WAITING ROOM ===== -->
+  <div id="waitingModal" class="modal-backdrop hidden"><div class="modal-content text-center max-w-md"><div class="py-8"><i class="fas fa-hourglass-half text-5xl text-indigo-400 mb-4 animate-pulse"></i><h3 class="text-xl font-bold text-slate-800">⏳ Waiting for Broker</h3><p class="text-slate-500 text-sm mt-2">Your request has been sent. The broker will review it shortly.</p><p class="text-xs text-slate-400 mt-1">You'll be notified here once they respond.</p><div id="waitingStatus" class="mt-4 text-sm text-slate-600"></div><button id="cancelWaitBtn" class="mt-6 text-sm text-red-500 hover:text-red-700">Cancel Request</button></div></div></div>
+
+  <!-- ===== OTP MODAL ===== -->
+  <div id="otpModal" class="modal-backdrop hidden"><div class="modal-content max-w-sm"><h3 class="text-xl font-bold text-slate-800 mb-2">🔐 Verify Your Identity</h3><p class="text-slate-500 text-sm">We've sent a one‑time password to your email and WhatsApp. Enter it below to reveal the broker's contact.</p><form id="otpForm" class="mt-4"><input type="hidden" id="otpRequestId" /><div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">OTP Code</label><input type="text" id="otpInput" placeholder="6-digit code" maxlength="6" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-center" /></div><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">Verify & Reveal WhatsApp</button></form><p id="otpError" class="text-red-500 text-xs mt-2 hidden"></p></div></div>
+
+  <!-- ===== TOP-UP MODAL ===== -->
+  <div id="topupModal" class="modal-backdrop hidden"><div class="modal-content max-w-sm"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-800">💰 Top Up Wallet</h2><button id="closeTopupModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><p class="text-slate-500 text-sm mb-4">Deposit real money (UGX) into your wallet.</p><form id="topupForm"><div class="mb-4"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Amount (UGX)</label><input type="number" id="topupAmount" required min="1000" step="1000" placeholder="e.g. 10000" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div><button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-plus-circle mr-2"></i> Deposit</button></form><div id="topupStatus" class="mt-3 text-sm text-slate-600"></div></div></div>
+
+  <!-- ===== REPORT MODAL ===== -->
+  <div id="reportModal" class="modal-backdrop hidden"><div class="modal-content max-w-sm"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-800">🚨 Report Broker</h2><button id="closeReportModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><p class="text-slate-500 text-sm mb-4">Report suspicious behavior or fraudulent activity.</p><form id="reportForm"><input type="hidden" id="reportBrokerId" /><div class="mb-4"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Reason *</label><select id="reportReason" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm bg-white"><option value="">Select a reason</option><option value="fraud">Fraud / Scam</option><option value="fake_listing">Fake Listing</option><option value="harassment">Harassment</option><option value="spam">Spam</option><option value="misleading">Misleading Information</option><option value="other">Other</option></select></div><div class="mb-4"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description *</label><textarea id="reportDescription" rows="3" required placeholder="Describe the issue..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm"></textarea></div><button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-flag mr-2"></i> Submit Report</button></form><div id="reportStatus" class="mt-3 text-sm text-slate-600"></div></div></div>
+
+  <!-- ===== TERMS OF SERVICE MODAL ===== -->
+  <div id="termsModal" class="modal-backdrop hidden"><div class="modal-content max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-800">📜 Terms of Service</h2><button id="closeTermsModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><div class="max-h-96 overflow-y-auto text-sm text-slate-600 space-y-3"><h3 class="font-bold text-slate-800">1. Platform Use</h3><p>Property Hub Uganda is a marketplace connecting property seekers with brokers. We do not own or manage any properties listed on this platform.</p><h3 class="font-bold text-slate-800">2. Visitor Safety</h3><p>Always verify properties in person before making any payments. Never send money to a broker without viewing the property first. Report suspicious activity immediately.</p><h3 class="font-bold text-slate-800">3. Broker Responsibilities</h3><p>Brokers must provide accurate property information. Misleading or fraudulent listings will result in account termination and legal action.</p><h3 class="font-bold text-slate-800">4. Liability</h3><p>Property Hub Uganda is not liable for any disputes between visitors and brokers. We provide a platform for connection – all transactions are between the visitor and the broker.</p><h3 class="font-bold text-slate-800">5. Reporting Fraud</h3><p>If you suspect fraud, report the broker immediately using the "Report Broker" button on their profile. We will investigate and take appropriate action.</p><h3 class="font-bold text-slate-800">6. Account Termination</h3><p>We reserve the right to terminate accounts that violate our terms of service or engage in fraudulent activity.</p></div><div class="mt-4 flex justify-end"><button id="acceptTermsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-xl transition"><i class="fas fa-check mr-2"></i> I Agree</button></div></div></div>
+
+  <div id="app" class="min-h-screen">
+
+    <!-- ===== TOP NAV ===== -->
+    <header class="bg-white/90 backdrop-blur-sm border-b border-slate-200/60 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl font-bold text-slate-800 tracking-tight">🏠 Property<span class="text-indigo-600">Hub</span></span>
+            <span class="hidden sm:inline text-xs font-medium bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full">UGX</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="propertyCount" class="bg-slate-100 px-3 py-1 rounded-full text-slate-700 font-medium text-xs">0 listings</span>
+            <!-- Notification Bell -->
+            <button id="notificationBell" class="relative text-slate-600 hover:text-slate-800 transition">
+              <i class="fas fa-bell text-lg"></i>
+              <span id="notificationCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <button id="brokerPortalBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition shadow-sm hover:shadow flex items-center gap-2">
+              <i class="fas fa-user-tie"></i> <span id="portalBtnLabel">Broker Portal</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- ===== DISCOVERY VIEW ===== -->
+      <section id="discoveryView" class="view view-visible">
+        <div class="relative bg-slate-900 text-white overflow-hidden">
+          <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80')] bg-cover bg-center opacity-30"></div>
+          <div class="absolute inset-0 hero-gradient"></div>
+          <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+            <div class="max-w-2xl">
+              <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Find your <span class="text-indigo-300">perfect</span> space</h1>
+              <p class="mt-3 text-slate-300 text-lg max-w-xl">Explore homes, rentals, and lodges from trusted brokers across Uganda.</p>
+              <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                  <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                  <input id="searchInput" type="text" placeholder="Search by address, city, or area…" class="w-full pl-10 pr-4 py-3 rounded-xl border-0 shadow-lg text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" />
+                </div>
+                <button id="clearSearchBtn" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-5 py-3 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 border border-white/10"><i class="fas fa-times"></i><span class="clear-btn-text">Clear</span><span class="clear-btn-icon">×</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4">
+          <div class="safety-banner"><i class="fas fa-shield-alt text-amber-500 text-lg mt-0.5"></i><div><p class="text-sm font-semibold text-amber-800">🔒 Verified &amp; Trusted Properties</p><p class="text-xs text-amber-700">Look for the <span class="font-bold text-emerald-600">Verified</span> badge (property reviewed) and the <span class="font-bold text-amber-600">Trusted</span> badge (broker with great reputation).</p></div></div>
+        </div>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6">
+            <button class="filter-pill active px-5 py-2 rounded-full border border-slate-200 bg-slate-900 text-white text-sm font-medium whitespace-nowrap" data-filter="all"><i class="fas fa-th-large mr-1.5"></i> All</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="rental"><i class="fas fa-key mr-1.5"></i> Rentals</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="property"><i class="fas fa-building mr-1.5"></i> Properties</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="lodge"><i class="fas fa-bed mr-1.5"></i> Lodges</button>
+            <span class="text-xs text-slate-400 ml-2 hidden sm:inline"><i class="fas fa-arrow-right mr-1"></i> Ranked by trust</span>
+          </div>
+          <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+          <div id="emptyState" class="hidden text-center py-20"><i class="fas fa-home text-5xl text-slate-300 mb-4"></i><p class="text-slate-500 text-lg">No properties match your criteria.</p><p class="text-slate-400 text-sm mt-1">Try adjusting the search or filters.</p></div>
+          <div id="loadingSkeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div></div>
+        </section>
+      </section>
+
+      <!-- ===== BROKER PROFILE VIEW ===== -->
+      <section id="brokerView" class="view view-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <button id="backToDiscovery" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"><i class="fas fa-arrow-left"></i> Back to discovery</button>
+          <div id="brokerHeader" class="broker-header rounded-2xl p-6 md:p-8 mb-8 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-3"><h2 id="brokerBusinessName" class="text-2xl md:text-3xl font-bold text-slate-800">Broker Name</h2><span id="brokerTrustedBadge" class="badge-trusted hidden"><i class="fas fa-star"></i> Trusted</span></div>
+                <div id="brokerRatingDisplay" class="mt-2 flex items-center gap-2 text-sm"><span class="stars" id="brokerStars"></span><span class="text-slate-600" id="brokerReviewCount">(0 reviews)</span><span class="badge-lead" id="brokerLeadScore">⚡ 0</span></div>
+                <div id="brokerReviewStats" class="review-stats mt-1"><span class="stat"><span class="value" id="statTotalReviews">0</span> <span class="label">reviews</span></span><span class="stat"><span class="value" id="statAvgRating">0.0</span> <span class="label">avg rating</span></span></div>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <button id="rateBrokerBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-star"></i> Rate</button>
+                <button id="viewReviewsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-comment"></i> Reviews</button>
+                <button id="reportBrokerBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-flag"></i> Report</button>
+                <a id="brokerWhatsAppLink" href="#" target="_blank" class="btn-whatsapp px-6 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-md hover:shadow-lg transition hidden"><i class="fab fa-whatsapp text-lg"></i> Chat on WhatsApp</a>
+              </div>
+            </div>
+            <p id="brokerBio" class="mt-3 text-slate-600 text-sm max-w-2xl"><i class="fas fa-store mr-1.5 text-slate-400"></i><span class="italic">Browse all properties listed by this broker.</span></p>
+            <div id="brokerReportNotice" class="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 hidden"><i class="fas fa-exclamation-triangle mr-1"></i><span class="font-medium">⚠️ This broker has reported issues.</span><span> Proceed with caution.</span></div>
+          </div>
+          <div id="brokerListingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+          <div id="brokerEmptyState" class="hidden text-center py-20"><i class="fas fa-box-open text-5xl text-slate-300 mb-4"></i><p class="text-slate-500 text-lg">This broker has no listings yet.</p></div>
+        </div>
+      </section>
+
+      <!-- ===== AUTH VIEW ===== -->
+      <section id="authView" class="view view-hidden max-w-md mx-auto my-12 px-4">
+        <div class="auth-card p-8">
+          <div class="flex rounded-xl bg-slate-100 p-1 mb-8 border border-slate-200/50">
+            <button id="toggleSignIn" class="auth-toggle-btn active w-1/2 text-center py-2.5 rounded-lg text-sm font-semibold border border-transparent shadow-none">Sign In</button>
+            <button id="toggleSignUp" class="auth-toggle-btn w-1/2 text-center py-2.5 rounded-lg text-sm font-semibold border border-transparent shadow-none">Create Account</button>
+          </div>
+          <h2 id="formTitle" class="text-2xl font-bold text-slate-800 tracking-tight mb-6">Welcome Back</h2>
+          <form id="authForm" class="space-y-4">
+            <div id="signUpFields" class="hidden space-y-4">
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Business / Brand Name</label><input type="text" id="bizNameInput" placeholder="e.g. Sunshine Estates Uganda" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800 bg-white"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="lodge_owner">Lodge Operator / Manager</option></select></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Business Phone</label><input type="text" id="phoneInput" placeholder="e.g. 256700123456" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            </div>
+            <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address</label><input type="email" id="emailInput" required placeholder="name@example.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Password</label><input type="password" id="passwordInput" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            <button type="submit" id="submitAuthBtn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-200 text-sm transition-all duration-150">Access Dashboard</button>
+            <button type="button" id="backToSearchBtn" class="w-full text-center text-xs font-medium text-slate-400 hover:text-slate-600 mt-2">← Back to public search listings</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===== DASHBOARD VIEW ===== -->
+      <section id="dashboardView" class="view view-hidden">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl md:text-2xl font-bold text-slate-800">📋 My Properties</h2>
+            <button id="logoutBtn" class="text-sm text-red-500 hover:text-red-700 font-medium transition"><i class="fas fa-sign-out-alt mr-1"></i> Sign Out</button>
+          </div>
+
+          <!-- ===== TOOLBAR ===== -->
+          <div class="dashboard-toolbar">
+            <div class="wallet-pill"><span class="wallet-label">Wallet</span><i class="fas fa-wallet"></i><span class="balance" id="walletBalanceDisplay">0</span> UGX<button id="topupBtn" class="ml-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-0.5 rounded-full transition">+ Top Up</button></div>
+            <button id="refreshWalletBtn" class="toolbar-btn" style="background:#334155;color:white;"><i class="fas fa-sync-alt"></i></button>
+            <button id="dashboardEditProfileBtn" class="toolbar-btn"><i class="fas fa-user-edit"></i> Edit Profile</button>
+            <button id="dashboardAddPropertyBtn" class="toolbar-btn primary"><i class="fas fa-plus-circle"></i> Add Property</button>
+            <button id="dashboardPropertyVerificationBtn" class="toolbar-btn amber"><i class="fas fa-shield-alt"></i> Property Verification</button>
+            <button id="dashboardLeadsBtn" class="toolbar-btn green"><i class="fas fa-users"></i> Leads</button>
+          </div>
+
+          <!-- ===== PROFILE FORM ===== -->
+          <div id="profileFormContainer" class="profile-form-container">
+            <h4 class="font-semibold text-slate-700 mb-3">⚙️ Edit Profile</h4>
+            <form id="profileSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Business Name</label><input type="text" id="settingsBusinessName" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Phone</label><input type="text" id="settingsPhone" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" placeholder="+256 700 000 000" /></div>
+              <div class="md:col-span-2"><button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded-xl transition shadow-sm"><i class="fas fa-save mr-2"></i> Save Profile</button><button type="button" id="cancelProfileEditBtn" class="ml-2 text-sm text-slate-500 hover:text-slate-700">Cancel</button></div>
+            </form>
+            <div id="profileStatus" class="mt-3 text-sm text-slate-600"></div>
+          </div>
+
+          <!-- ===== ADD PROPERTY FORM (NO TIER) ===== -->
+          <div id="addPropertyContainer" class="add-property-container">
+            <h4 class="font-semibold text-slate-700 mb-3">➕ Add New Property</h4>
+            <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Title *</label><input type="text" id="propTitle" required placeholder="e.g. Modern 3-Bedroom Villa" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Price (UGX) *</label><input type="number" id="propPrice" required placeholder="e.g. 250000000" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm bg-white"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Address *</label><input type="text" id="propAddress" required placeholder="e.g. Kampala, Uganda" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Images</label>
+                <input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                <div id="propImagePreviews" class="flex flex-wrap gap-2 mt-2"></div>
+              </div>
+              <div class="md:col-span-2 flex items-center gap-3 mt-2"><input type="checkbox" id="addRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" /><label for="addRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label><span class="text-xs text-slate-400">(You'll provide details later)</span></div>
+              <div id="addVerificationInfo" class="verification-info-panel"><p class="font-medium">🔍 Verification Process</p><ul><li>After saving, go to the Verification panel to submit required documents.</li><li>We'll review your property and approve it.</li><li>Verified properties rank higher.</li></ul></div>
+              <div class="md:col-span-2">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-plus mr-2"></i> Add Property</button>
+                <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle"></i> Verified properties rank higher. Build your reputation with good reviews.</p>
+              </div>
+            </form>
+            <div id="uploadStatus" class="mt-3 text-sm text-slate-600"></div>
+          </div>
+
+          <!-- ===== PROPERTY VERIFICATION PANEL ===== -->
+          <div id="propertyVerificationContainer" class="verification-form-container">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-semibold text-slate-700">🛡️ Property Verification</h4>
+              <span id="verificationInfoBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-200 text-slate-600">Manage verifications</span>
+            </div>
+            <div class="verification-info-panel visible mb-4">
+              <p class="font-medium">🔍 Verification Process</p>
+              <ul>
+                <li>Request verification for any of your properties.</li>
+                <li>Provide the required documents and contacts based on the property type.</li>
+                <li>Our admin team will review and approve if everything is correct.</li>
+                <li>Once approved, your property gets a <span class="badge-verified">Verified</span> badge.</li>
+                <li>Verified properties rank higher and attract more trust.</li>
+              </ul>
+            </div>
+            <div id="propertyVerificationList"><p class="text-slate-500 text-sm">Loading your properties...</p></div>
+            <div id="propertyVerificationEmpty" class="hidden text-center py-4 text-slate-400 text-sm">
+              You don't have any properties yet. <a href="#" id="gotoAddPropertyFromVerification" class="text-indigo-600 hover:underline">Add a property</a> to request verification.
+            </div>
+          </div>
+
+          <!-- ===== LEADS PANEL ===== -->
+          <div id="leadsContainer" class="verification-form-container">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-semibold text-slate-700">📨 My Leads</h4>
+              <span id="leadsBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-200 text-slate-600">Manage leads</span>
+            </div>
+            <div id="leadsList"><p class="text-slate-500 text-sm">Loading leads...</p></div>
+            <div id="noLeads" class="hidden text-center py-8 text-slate-400 text-sm">No leads yet. When visitors connect, they'll appear here.</div>
+          </div>
+
+          <!-- ===== MY PROPERTIES LIST ===== -->
+          <div id="myPropertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          <div id="myPropertiesEmpty" class="text-center py-16 text-slate-400 hidden"><i class="fas fa-home text-4xl mb-3 text-slate-300"></i><p class="text-lg font-medium text-slate-500">No properties yet</p><p class="text-sm text-slate-400">Click "Add Property" to list your first property.</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============================================================
+  JAVASCRIPT – COMPLETE FIXED VERSION
+  ============================================================ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
   </script>
 
   <script>
-    // ─── Supabase Config ──────────────────────────────────────────────
-    const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
-
-    // ─── State ──────────────────────────────────────────────────────────
-    const state = {
-      allProperties: [],
-      filteredProperties: [],
-      currentFilter: 'all',
-      searchQuery: '',
-      currentBrokerId: null,
-      isLoading: false,
-      currentUser: null,
-      isSignUpMode: false,
-      myProperties: [],
-      profilesMap: {},
-      walletBalance: 0,
-      isAdmin: false,
-    };
-
-    let supabase;
-
-    // ─── DOM refs ──────────────────────────────────────────────────────
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => document.querySelectorAll(sel);
-
-    const discoveryView = $('#discoveryView');
-    const brokerView = $('#brokerView');
-    const authView = $('#authView');
-    const dashboardView = $('#dashboardView');
-
-    const listingsGrid = $('#listingsGrid');
-    const loadingSkeleton = $('#loadingSkeleton');
-    const emptyState = $('#emptyState');
-    const propertyCount = $('#propertyCount');
-    const searchInput = $('#searchInput');
-    const clearSearchBtn = $('#clearSearchBtn');
-    const filterPills = $$('.filter-pill');
-
-    // ─── Helper Functions ─────────────────────────────────────────────
-    function formatPrice(amount) { return Number(amount).toLocaleString('en-UG') + ' UGX'; }
-
-    function getImageArray(property) {
-      const val = property.media_urls;
-      if (!val) return [];
-      if (Array.isArray(val)) return val;
-      if (typeof val === 'string') return [val];
-      return [];
-    }
-
-    function getImageUrl(property) {
-      const arr = getImageArray(property);
-      return arr.length > 0 ? arr[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center';
-    }
-
-    function renderStars(rating) {
-      const full = Math.floor(rating);
-      const half = rating % 1 >= 0.5 ? 1 : 0;
-      const empty = 5 - full - half;
-      let html = '';
-      for (let i = 0; i < full; i++) html += '<i class="fas fa-star"></i>';
-      if (half) html += '<i class="fas fa-star-half-alt"></i>';
-      for (let i = 0; i < empty; i++) html += '<i class="far fa-star empty"></i>';
-      return html;
-    }
-
-    function renderStarsSmall(rating) {
-      const full = Math.floor(rating);
-      const empty = 5 - full;
-      let html = '';
-      for (let i = 0; i < full; i++) html += '<i class="fas fa-star text-amber-400 text-xs"></i>';
-      for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-slate-300 text-xs"></i>';
-      return html;
-    }
-
-    function navigateTo(url, replace = false) {
-      if (replace) window.history.replaceState(null, '', url);
-      else window.history.pushState(null, '', url);
-      handleRoute();
-    }
-
-    function getCurrentPath() { return window.location.pathname + window.location.search; }
-
-    function showView(view) {
-      [discoveryView, brokerView, authView, dashboardView].forEach(v => {
-        v.classList.remove('view-visible');
-        v.classList.add('view-hidden');
-      });
-      view.classList.remove('view-hidden');
-      view.classList.add('view-visible');
-    }
-
-    function setAuthMode(signUpModeActive) {
-      state.isSignUpMode = signUpModeActive;
-      if (signUpModeActive) {
-        $('#toggleSignUp').classList.add('active');
-        $('#toggleSignIn').classList.remove('active');
-        $('#signUpFields').classList.remove('hidden');
-        $('#formTitle').innerText = "Create Hub Space";
-        $('#submitAuthBtn').innerText = "Register Business Hub";
-      } else {
-        $('#toggleSignIn').classList.add('active');
-        $('#toggleSignUp').classList.remove('active');
-        $('#signUpFields').classList.add('hidden');
-        $('#formTitle').innerText = "Welcome Back";
-        $('#submitAuthBtn').innerText = "Access Dashboard";
-      }
-    }
-
-    // ─── Wallet ─────────────────────────────────────────────────────
-    async function loadWallet() {
-      if (!state.currentUser) return;
-      try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('wallet_balance')
-          .eq('id', state.currentUser.id)
-          .single();
-        if (error) throw error;
-        state.walletBalance = profile?.wallet_balance || 0;
-        $('#walletBalanceDisplay').textContent = state.walletBalance.toLocaleString();
-      } catch (err) {
-        console.error('Error loading wallet:', err);
-      }
-    }
-
-    async function depositWalletSimulated(amount) {
-      if (!state.currentUser) return false;
-      try {
-        const { data, error } = await supabase.functions.invoke('deposit-wallet', {
-          body: { amount }
-        });
-        if (error) throw error;
-        await loadWallet();
-        return true;
-      } catch (err) {
-        console.error('Deposit error:', err);
-        alert('Error: ' + err.message);
-        return false;
-      }
-    }
-
-    // ─── Notifications ────────────────────────────────────────────────
-    async function loadNotifications() {
-      if (!state.currentUser) return;
-      try {
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('*')
-          .eq('user_id', state.currentUser.id)
-          .eq('read', false)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        const count = data?.length || 0;
-        const badge = $('#notificationCount');
-        if (count > 0) {
-          badge.textContent = count > 9 ? '9+' : count;
-          badge.classList.remove('hidden');
-        } else {
-          badge.classList.add('hidden');
-        }
-      } catch (err) {
-        console.error('Error loading notifications:', err);
-      }
-    }
-
-    $('#notificationBell').addEventListener('click', async function() {
-      if (!state.currentUser) return;
-      await supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('user_id', state.currentUser.id)
-        .eq('read', false);
-      $('#notificationCount').classList.add('hidden');
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', state.currentUser.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-      if (error) return;
-      if (data.length === 0) { alert('No notifications.'); return; }
-      let msg = '📬 Recent Notifications:\n\n';
-      data.forEach(n => {
-        msg += `📌 ${new Date(n.created_at).toLocaleString()}\n${n.title}: ${n.message}\n\n`;
-      });
-      alert(msg);
-    });
-
-    // ─── Top-up ────────────────────────────────────────────────────────
-    $('#topupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const amount = parseInt($('#topupAmount').value);
-      if (!amount || amount < 1000) {
-        $('#topupStatus').textContent = 'Please enter a valid amount (min 1000 UGX).';
-        $('#topupStatus').className = 'mt-3 text-sm text-red-600';
-        return;
-      }
-      $('#topupStatus').textContent = 'Processing...';
-      $('#topupStatus').className = 'mt-3 text-sm text-indigo-600';
-      const success = await depositWalletSimulated(amount);
-      if (success) {
-        $('#topupStatus').textContent = `✅ Deposited ${amount.toLocaleString()} UGX!`;
-        $('#topupStatus').className = 'mt-3 text-sm text-emerald-600';
-        setTimeout(() => $('#topupModal').classList.add('hidden'), 1500);
-      } else {
-        $('#topupStatus').textContent = '❌ Deposit failed. Please try again.';
-        $('#topupStatus').className = 'mt-3 text-sm text-red-600';
-      }
-    });
-
-    $('#topupBtn').addEventListener('click', () => {
-      $('#topupAmount').value = '';
-      $('#topupStatus').textContent = '';
-      $('#topupModal').classList.remove('hidden');
-    });
-    $('#closeTopupModal').addEventListener('click', () => $('#topupModal').classList.add('hidden'));
-    $('#topupModal').addEventListener('click', (e) => { if (e.target === $('#topupModal')) $('#topupModal').classList.add('hidden'); });
-    $('#refreshWalletBtn').addEventListener('click', loadWallet);
-
-    // ─── Reviews ────────────────────────────────────────────────────────
-    $('#toggleWriteReview').addEventListener('click', function() {
-      const container = $('#reviewFormContainer');
-      const isHidden = container.classList.contains('hidden');
-      if (isHidden) {
-        container.classList.remove('hidden');
-        this.innerHTML = '<i class="fas fa-times"></i> Cancel';
-      } else {
-        container.classList.add('hidden');
-        this.innerHTML = '<i class="fas fa-pen"></i> Write a Review';
-      }
-    });
-
-    async function loadReviewsForModal(brokerId) {
-      const reviewsList = $('#reviewsList');
-      reviewsList.innerHTML = '<p class="text-slate-500 text-sm">Loading reviews...</p>';
-      $('#noReviewsMessage').classList.add('hidden');
-      try {
-        const { data, error } = await supabase
-          .from('reviews')
-          .select('*')
-          .eq('broker_id', brokerId)
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        if (!data || data.length === 0) {
-          reviewsList.innerHTML = '';
-          $('#noReviewsMessage').classList.remove('hidden');
-          return;
-        }
-        let html = '';
-        data.forEach(review => {
-          const stars = renderStarsSmall(review.rating);
-          const date = new Date(review.created_at).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' });
-          const reviewer = review.client_name || 'Guest';
-          html += `
-            <div class="review-item">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="font-medium text-slate-700">${reviewer}</span>
-                  <span class="stars-small">${stars}</span>
-                </div>
-                <span class="review-meta">${date}</span>
-              </div>
-              ${review.comment ? `<p class="review-text mt-1">${review.comment}</p>` : ''}
-            </div>
-          `;
-        });
-        reviewsList.innerHTML = html;
-      } catch (err) {
-        reviewsList.innerHTML = `<p class="text-red-500 text-sm">Error loading reviews: ${err.message}</p>`;
-      }
-    }
-
-    async function openReviewModal(brokerId) {
-      $('#reviewBrokerId').value = brokerId;
-      $('#reviewRating').value = 5;
-      $('#reviewComment').value = '';
-      $('#reviewClientName').value = '';
-      updateStarUI(5);
-      $('#reviewFormContainer').classList.add('hidden');
-      $('#toggleWriteReview').innerHTML = '<i class="fas fa-pen"></i> Write a Review';
-      $('#reviewModal').classList.remove('hidden');
-      await loadReviewsForModal(brokerId);
-    }
-
-    // ─── Star selector ────────────────────────────────────────────────
-    const starSelector = $('#starSelector');
-    starSelector.querySelectorAll('.star').forEach(star => {
-      star.addEventListener('click', () => {
-        const val = parseInt(star.dataset.value);
-        $('#reviewRating').value = val;
-        updateStarUI(val);
-      });
-      star.addEventListener('mouseenter', () => {
-        const val = parseInt(star.dataset.value);
-        updateStarUI(val);
-      });
-      star.addEventListener('mouseleave', () => {
-        const current = parseInt($('#reviewRating').value) || 5;
-        updateStarUI(current);
-      });
-    });
-
-    function updateStarUI(active) {
-      starSelector.querySelectorAll('.star').forEach(el => {
-        const val = parseInt(el.dataset.value);
-        el.classList.toggle('active', val <= active);
-      });
-    }
-
-    $('#reviewForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!state.currentUser) {
-        alert('Please sign in to leave a review.');
-        return;
-      }
-      const brokerId = $('#reviewBrokerId').value;
-      const rating = parseInt($('#reviewRating').value);
-      const comment = $('#reviewComment').value.trim();
-      const clientName = $('#reviewClientName').value.trim() || null;
-      if (!rating || rating < 1 || rating > 5) {
-        alert('Please select a rating (1-5 stars).');
-        return;
-      }
-      try {
-        const { error } = await supabase.from('reviews').insert({
-          broker_id: brokerId,
-          rating: rating,
-          comment: comment || null,
-          client_name: clientName,
-        });
-        if (error) throw error;
-        alert('✅ Review submitted! Thank you.');
-        await loadReviewsForModal(brokerId);
-        $('#reviewForm').reset();
-        $('#reviewRating').value = 5;
-        updateStarUI(5);
-        $('#reviewFormContainer').classList.add('hidden');
-        $('#toggleWriteReview').innerHTML = '<i class="fas fa-pen"></i> Write a Review';
-        await fetchAllData();
-        if (state.currentBrokerId) {
-          await loadBrokerProfile(state.currentBrokerId);
-        }
-      } catch (err) {
-        alert('Error submitting review: ' + err.message);
-      }
-    });
-
-    $('#closeReviewModal').addEventListener('click', () => $('#reviewModal').classList.add('hidden'));
-    $('#reviewModal').addEventListener('click', (e) => { if (e.target === $('#reviewModal')) $('#reviewModal').classList.add('hidden'); });
-
-    async function openViewReviewsModal(brokerId) {
-      $('#reviewBrokerId').value = brokerId;
-      $('#reviewFormContainer').classList.add('hidden');
-      $('#toggleWriteReview').innerHTML = '<i class="fas fa-pen"></i> Write a Review';
-      $('#reviewModal').classList.remove('hidden');
-      await loadReviewsForModal(brokerId);
-    }
-
-    // ─── Report ──────────────────────────────────────────────────────
-    function openReportModal(brokerId) {
-      $('#reportBrokerId').value = brokerId;
-      $('#reportReason').value = '';
-      $('#reportDescription').value = '';
-      $('#reportStatus').textContent = '';
-      $('#reportModal').classList.remove('hidden');
-    }
-
-    $('#closeReportModal').addEventListener('click', () => $('#reportModal').classList.add('hidden'));
-    $('#reportModal').addEventListener('click', (e) => { if (e.target === $('#reportModal')) $('#reportModal').classList.add('hidden'); });
-
-    $('#reportForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!state.currentUser) {
-        alert('Please sign in to report.');
-        return;
-      }
-      const brokerId = $('#reportBrokerId').value;
-      const reason = $('#reportReason').value;
-      const description = $('#reportDescription').value.trim();
-      if (!reason || !description) {
-        $('#reportStatus').textContent = 'Please fill in all fields.';
-        $('#reportStatus').className = 'mt-3 text-sm text-red-600';
-        return;
-      }
-      $('#reportStatus').textContent = 'Submitting report...';
-      $('#reportStatus').className = 'mt-3 text-sm text-indigo-600';
-      try {
-        const { error } = await supabase.from('reports').insert({
-          reporter_id: state.currentUser.id,
-          broker_id: brokerId,
-          reason: reason,
-          description: description,
-          status: 'pending',
-        });
-        if (error) throw error;
-        $('#reportStatus').textContent = '✅ Report submitted! We will investigate.';
-        $('#reportStatus').className = 'mt-3 text-sm text-emerald-600';
-        setTimeout(() => $('#reportModal').classList.add('hidden'), 2000);
-      } catch (err) {
-        $('#reportStatus').textContent = '❌ Failed to submit report: ' + err.message;
-        $('#reportStatus').className = 'mt-3 text-sm text-red-600';
-      }
-    });
-
-    // ─── Terms ──────────────────────────────────────────────────────
-    $('#closeTermsModal').addEventListener('click', () => $('#termsModal').classList.add('hidden'));
-    $('#termsModal').addEventListener('click', (e) => { if (e.target === $('#termsModal')) $('#termsModal').classList.add('hidden'); });
-    $('#acceptTermsBtn').addEventListener('click', async () => {
-      if (!state.currentUser) {
-        alert('Please sign in first.');
-        return;
-      }
-      try {
-        await supabase
-          .from('profiles')
-          .update({
-            terms_agreed: true,
-            terms_agreed_at: new Date().toISOString(),
-          })
-          .eq('id', state.currentUser.id);
-        $('#termsModal').classList.add('hidden');
-        alert('✅ Thank you for accepting the Terms of Service.');
-      } catch (err) {
-        alert('Error: ' + err.message);
-      }
-    });
-
-    // ─── Ranking ────────────────────────────────────────────────────
-    function isTrustedBroker(broker) {
-      if (!broker) return false;
-      const rating = broker.average_rating || 0;
-      const reviewCount = broker.review_count || 0;
-      const leadScore = broker.lead_score || 0;
-      const reportCount = broker.report_count || 0;
-      return rating >= 4.0 && reviewCount >= 10 && leadScore >= 20 && reportCount < 3;
-    }
-
-    function calculateRankScore(property, broker, reportCount = 0) {
-      let score = 0;
-      if (property.verification_status === 'approved') {
-        score += 100;
-      } else if (property.verification_status === 'pending') {
-        score += 30;
-      }
-      if (broker) {
-        const rating = broker.average_rating || 0;
-        const reviewCount = broker.review_count || 0;
-        score += rating * 10;
-        score += Math.min(reviewCount, 50) * 0.5;
-        if (isTrustedBroker(broker)) {
-          score += 20;
-        }
-        const leadScore = broker.lead_score || 0;
-        score += leadScore / 2;
-        score -= (reportCount || 0) * 5;
-      }
-      return Math.round(score);
-    }
-
-    // ─── Property card ──────────────────────────────────────────────
-    function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
-      const article = document.createElement('article');
-      article.className = 'property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/70 flex flex-col';
-
-      const imageUrl = getImageUrl(property);
-      const rating = broker?.average_rating || 0;
-      const reviewCount = broker?.review_count || 0;
-      const leadScore = broker?.lead_score || 0;
-      const isOwner = state.currentUser && broker && state.currentUser.id === broker.id;
-
-      const verificationStatus = property.verification_status || 'pending';
-      const isVerified = verificationStatus === 'approved';
-      const isTrusted = broker ? isTrustedBroker(broker) : false;
-      const reportCount = broker?.report_count || 0;
-      const rankScore = property.rankScore || calculateRankScore(property, broker, reportCount);
-
-      let badgeHtml = '';
-      if (isVerified) {
-        badgeHtml = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>`;
-      } else if (verificationStatus === 'pending') {
-        badgeHtml = `<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>`;
-      } else if (verificationStatus === 'rejected') {
-        badgeHtml = `<span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>`;
-      }
-
-      let trustedHtml = '';
-      if (isTrusted) {
-        trustedHtml = `<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>`;
-      }
-
-      let actionsHtml = '';
-      if (showEdit) actionsHtml += `<button class="edit-btn text-xs text-indigo-600 hover:text-indigo-800 font-medium" data-id="${property.id}"><i class="fas fa-edit mr-1"></i>Edit</button>`;
-
-      let boostHtml = '';
-      if (showEdit && state.currentUser) {
-        boostHtml = `<button class="boost-btn text-xs text-emerald-600 hover:text-emerald-800 font-medium ml-2" data-broker-id="${state.currentUser.id}"><i class="fas fa-rocket mr-1"></i>Boost</button>`;
-      }
-
-      let rateHtml = '';
-      if (state.currentUser && broker && !isOwner) {
-        rateHtml = `<button class="rate-btn text-xs text-yellow-600 hover:text-yellow-800 font-medium" data-broker-id="${broker.id}"><i class="fas fa-star mr-1"></i>Rate</button>`;
-      }
-
-      article.innerHTML = `
-        <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
-          <img src="${imageUrl}" alt="${property.title || 'Property'}" 
-               class="w-full h-full object-cover" loading="lazy"
-               onerror="this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center'"/>
-          <span class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-            ${property.property_type || 'Property'}
-          </span>
-          ${!showEdit && isVerified ? `<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full shadow-md"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>` : ''}
-        </div>
-        <div class="p-4 flex flex-col flex-1">
-          <div class="flex items-center justify-between flex-wrap gap-1">
-            <h3 class="font-semibold text-slate-800 text-base leading-snug line-clamp-1">${property.title || 'Untitled'}</h3>
-            <div class="flex items-center gap-1">
-              ${!showEdit ? badgeHtml : ''}
-              ${!showEdit && isTrusted ? trustedHtml : ''}
-            </div>
-          </div>
-          <p class="text-indigo-700 font-bold text-sm mt-0.5">${formatPrice(property.price_amount)}</p>
-          <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5">
-            <i class="fas fa-map-pin text-slate-400 text-[10px]"></i>
-            <span class="line-clamp-1">${property.address || 'Location not specified'}</span>
-          </p>
-          <div class="mt-2 flex items-center gap-2 text-xs">
-            <span class="stars text-xs">${renderStars(rating)}</span>
-            <span class="text-slate-500">(${reviewCount})</span>
-            <span class="badge-lead">⚡ ${leadScore}</span>
-          </div>
-          ${!showEdit ? `<div class="mt-1 flex items-center gap-2 text-xs text-slate-400"><span>Rank Score: ${rankScore}</span>${reportCount > 0 ? `<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> ${reportCount} report${reportCount > 1 ? 's' : ''}</span>` : ''}</div>` : ''}
-          <div class="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 flex-wrap">
-            ${showBrokerLink ? `<button class="broker-name-link text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1 cursor-pointer" data-broker-id="${broker?.id || ''}">
-              <i class="fas fa-user-circle text-slate-400"></i> ${broker?.business_name || 'Unknown Broker'}
-              ${isTrusted ? `<span class="text-amber-500 text-[10px]"><i class="fas fa-star"></i></span>` : ''}
-            </button>` : `<span class="text-xs text-slate-500 flex items-center gap-1"><i class="fas fa-user-circle text-slate-400"></i> ${broker?.business_name || 'Broker'}</span>`}
-            <div class="flex gap-2">
-              ${actionsHtml}
-              ${boostHtml}
-              ${rateHtml}
-              <button class="connect-btn bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition" data-property-id="${property.id}">
-                <i class="fas fa-handshake"></i> Connect
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // ─── Event Listeners ──────────────────────────────────────────
-      article.querySelector('.edit-btn')?.addEventListener('click', e => {
-        e.stopPropagation();
-        openEditModal(property.id);
-      });
-
-      article.querySelector('.boost-btn')?.addEventListener('click', async e => {
-        e.stopPropagation();
-        const brokerId = e.currentTarget.dataset.brokerId;
-        try {
-          const { error } = await supabase.rpc('increment_lead_score', { broker_id: brokerId, amount: 5 });
-          if (error) throw error;
-          alert('✅ Lead score boosted by 5!');
-          await fetchAllData();
-          if (state.currentUser) await loadMyProperties();
-        } catch (err) { alert('Error boosting lead score: ' + err.message); }
-      });
-
-      article.querySelector('.rate-btn')?.addEventListener('click', e => {
-        e.stopPropagation();
-        const brokerId = e.currentTarget.dataset.brokerId;
-        openReviewModal(brokerId);
-      });
-
-      article.querySelector('.broker-name-link')?.addEventListener('click', e => {
-        e.stopPropagation();
-        const brokerId = e.currentTarget.dataset.brokerId;
-        if (brokerId) navigateToBroker(brokerId);
-      });
-
-      article.querySelector('.connect-btn')?.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const propertyId = this.dataset.propertyId;
-        if (!state.currentUser) {
-          alert('Please sign in to connect with a broker.');
-          navigateToAuth();
-          return;
-        }
-        openQuizModal(propertyId);
-      });
-
-      return article;
-    }
-
-    // ─── Render functions ─────────────────────────────────────────
-    function renderListings(properties) {
-      listingsGrid.innerHTML = '';
-      if (!properties || properties.length === 0) {
-        emptyState.classList.remove('hidden');
-        propertyCount.textContent = '0 listings';
-        return;
-      }
-      emptyState.classList.add('hidden');
-      propertyCount.textContent = `${properties.length} listing${properties.length > 1 ? 's' : ''}`;
-      properties.forEach(prop => {
-        const broker = prop.broker || state.profilesMap[prop.owner_id] || null;
-        const card = createPropertyCard(prop, broker, true, false);
-        listingsGrid.appendChild(card);
-      });
-    }
-
-    function renderMyProperties() {
-      const list = $('#myPropertiesList');
-      list.innerHTML = '';
-      if (state.myProperties.length === 0) {
-        $('#myPropertiesEmpty').classList.remove('hidden');
-        return;
-      }
-      $('#myPropertiesEmpty').classList.add('hidden');
-      state.myProperties.forEach(prop => {
-        const broker = state.currentUser;
-        const card = createPropertyCard(prop, broker, false, true);
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'mt-2 text-xs text-red-500 hover:text-red-700 font-medium';
-        deleteBtn.innerHTML = '<i class="fas fa-trash mr-1"></i> Remove';
-        deleteBtn.addEventListener('click', async () => {
-          if (confirm('Delete this property?')) {
-            await deleteProperty(prop.id);
-          }
-        });
-        card.querySelector('.p-4').appendChild(deleteBtn);
-        list.appendChild(card);
-      });
-    }
-
-    // ─── Property Verification ──────────────────────────────────────
-    async function loadPropertyVerificationList() {
-      if (!state.currentUser) return;
-      try {
-        const { data: properties, error: pErr } = await supabase
-          .from('properties')
-          .select(`
-            *,
-            verification_requests:property_verification_requests (
-              id, status, submitted_data, created_at
-            )
-          `)
-          .eq('owner_id', state.currentUser.id)
-          .order('created_at', { ascending: false });
-
-        if (pErr) throw pErr;
-
-        const list = $('#propertyVerificationList');
-        const empty = $('#propertyVerificationEmpty');
-
-        if (!properties || properties.length === 0) {
-          list.innerHTML = '';
-          empty.classList.remove('hidden');
-          return;
-        }
-        empty.classList.add('hidden');
-
-        let html = '';
-        properties.forEach(prop => {
-          const req = prop.verification_requests?.[0] || null;
-          const status = req ? req.status : 'Not requested';
-          const statusClass = status === 'approved' ? 'approved' :
-                             status === 'pending' ? 'pending' :
-                             status === 'rejected' ? 'rejected' : 'unverified';
-          const statusLabel = status === 'approved' ? '✅ Approved' :
-                             status === 'pending' ? '⏳ Pending' :
-                             status === 'rejected' ? '❌ Rejected' : 'Not requested';
-
-          const canRequest = (!req || req.status === 'rejected') && status !== 'pending';
-
-          html += `
-            <div class="verification-property-item">
-              <div class="property-title">${prop.title || 'Untitled'}</div>
-              <div><span class="property-status ${statusClass}">${statusLabel}</span></div>
-              <div>
-                ${canRequest ? `<button class="request-verification-btn text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-full transition" data-property-id="${prop.id}">Request Verification</button>` :
-                `<span class="text-xs text-slate-400">${status === 'approved' ? 'Verified' : 'In progress'}</span>`}
-                ${req ? `<button class="view-verification-details text-xs text-blue-600 hover:underline ml-2" data-request-id="${req.id}">Details</button>` : ''}
-              </div>
-            </div>
-          `;
-        });
-        list.innerHTML = html;
-
-        list.querySelectorAll('.request-verification-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            openPropertyVerificationModal(this.dataset.propertyId);
-          });
-        });
-
-        list.querySelectorAll('.view-verification-details').forEach(btn => {
-          btn.addEventListener('click', async function() {
-            const requestId = this.dataset.requestId;
-            const { data: req, error } = await supabase
-              .from('property_verification_requests')
-              .select('submitted_data, status, created_at')
-              .eq('id', requestId)
-              .single();
-            if (error) {
-              alert('Error loading details.');
-              return;
-            }
-            const data = req.submitted_data;
-            let msg = `Status: ${req.status}\nSubmitted: ${new Date(req.created_at).toLocaleString()}\n\n`;
-            for (const [key, value] of Object.entries(data)) {
-              msg += `${key}: ${value}\n`;
-            }
-            alert(msg);
-          });
-        });
-
-      } catch (err) {
-        console.error('Error loading property verifications:', err);
-        $('#propertyVerificationList').innerHTML = `<p class="text-red-500 text-sm">Error loading: ${err.message}</p>`;
-      }
-    }
-
-    async function openPropertyVerificationModal(propertyId) {
-      alert('Property verification request will open here. In production, this would show a form with document upload fields.');
-    }
-
-    // ─── Leads ──────────────────────────────────────────────────────
-    async function loadLeads() {
-      if (!state.currentUser) return;
-      try {
-        const { data, error } = await supabase
-          .from('lead_requests')
-          .select('*, property:property_id (title, price_amount, property_type, address)')
-          .eq('broker_id', state.currentUser.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        const list = $('#leadsList');
-        const noMsg = $('#noLeads');
-
-        if (!data || data.length === 0) {
-          list.innerHTML = '';
-          noMsg.classList.remove('hidden');
-          return;
-        }
-        noMsg.classList.add('hidden');
-
-        let html = '';
-        data.forEach(lead => {
-          const statusClass = lead.status === 'approved' ? 'approved' :
-                             lead.status === 'pending' ? 'pending' :
-                             lead.status === 'rejected' ? 'rejected' : 'expired';
-          const statusLabel = lead.status === 'approved' ? '✅ Unlocked' :
-                             lead.status === 'pending' ? '⏳ Pending' :
-                             lead.status === 'rejected' ? '❌ Rejected' : '⏰ Expired';
-
-          const canUnlock = lead.status === 'pending';
-
-          html += `
-            <div class="verification-property-item">
-              <div class="property-title">${lead.property?.title || 'Unknown'} <span class="text-xs text-slate-400">(${lead.lead_type})</span></div>
-              <div><span class="property-status ${statusClass}">${statusLabel}</span></div>
-              <div>
-                ${canUnlock ? `<button class="unlock-lead-btn text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-full transition" data-lead-id="${lead.id}">Unlock</button>` :
-                lead.status === 'approved' ? `<button class="view-lead-details text-xs text-blue-600 hover:underline" data-lead-id="${lead.id}">View Contact</button>` :
-                `<span class="text-xs text-slate-400">Free</span>`}
-              </div>
-            </div>
-          `;
-        });
-        list.innerHTML = html;
-
-        list.querySelectorAll('.unlock-lead-btn').forEach(btn => {
-          btn.addEventListener('click', async function() {
-            const leadId = this.dataset.leadId;
-            if (!confirm('Unlock this lead? (Free)')) return;
-            try {
-              const { data, error } = await supabase.functions.invoke('handle-lead-decision', {
-                body: { token: leadId, decision: 'approve' }
-              });
-              if (error) throw error;
-              if (!data.success) {
-                alert('Failed to unlock lead: ' + data.error);
-                return;
-              }
-              alert(`✅ Lead unlocked!\n\nName: ${data.visitor_name}\nEmail: ${data.visitor_email}\nWhatsApp: ${data.visitor_whatsapp}`);
-              loadLeads();
-              loadWallet();
-              loadNotifications();
-            } catch (err) {
-              alert('Error: ' + err.message);
-            }
-          });
-        });
-
-        list.querySelectorAll('.view-lead-details').forEach(btn => {
-          btn.addEventListener('click', async function() {
-            const leadId = this.dataset.leadId;
-            const { data: lead, error } = await supabase
-              .from('lead_requests')
-              .select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at')
-              .eq('id', leadId)
-              .single();
-            if (error) { alert('Error loading details'); return; }
-            alert(`Contact Details:\n\nName: ${lead.visitor_name}\nEmail: ${lead.visitor_email}\nWhatsApp: ${lead.visitor_whatsapp}\nUnlocked: ${new Date(lead.unlocked_at).toLocaleString()}`);
-          });
-        });
-
-      } catch (err) {
-        console.error('Error loading leads:', err);
-        $('#leadsList').innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>';
-      }
-    }
-
-    // ─── Dashboard toggles ────────────────────────────────────────
-    function toggleProfileForm() {
-      const container = $('#profileFormContainer');
-      const isVisible = container.classList.contains('visible');
-      if (isVisible) {
-        container.classList.remove('visible');
-      } else {
-        container.classList.add('visible');
-        $('#addPropertyContainer').classList.remove('visible');
-        $('#propertyVerificationContainer').classList.remove('visible');
-        $('#leadsContainer').classList.remove('visible');
-      }
-    }
-
-    function toggleAddPropertyForm() {
-      const container = $('#addPropertyContainer');
-      const isVisible = container.classList.contains('visible');
-      if (isVisible) {
-        container.classList.remove('visible');
-      } else {
-        container.classList.add('visible');
-        $('#profileFormContainer').classList.remove('visible');
-        $('#propertyVerificationContainer').classList.remove('visible');
-        $('#leadsContainer').classList.remove('visible');
-      }
-    }
-
-    function togglePropertyVerificationForm() {
-      const container = $('#propertyVerificationContainer');
-      const isVisible = container.classList.contains('visible');
-      if (isVisible) {
-        container.classList.remove('visible');
-      } else {
-        container.classList.add('visible');
-        $('#profileFormContainer').classList.remove('visible');
-        $('#addPropertyContainer').classList.remove('visible');
-        $('#leadsContainer').classList.remove('visible');
-        loadPropertyVerificationList();
-      }
-    }
-
-    function toggleLeadsPanel() {
-      const container = $('#leadsContainer');
-      const isVisible = container.classList.contains('visible');
-      if (isVisible) {
-        container.classList.remove('visible');
-      } else {
-        container.classList.add('visible');
-        $('#profileFormContainer').classList.remove('visible');
-        $('#addPropertyContainer').classList.remove('visible');
-        $('#propertyVerificationContainer').classList.remove('visible');
-        loadLeads();
-      }
-    }
-
-    $('#dashboardEditProfileBtn').addEventListener('click', toggleProfileForm);
-    $('#dashboardAddPropertyBtn').addEventListener('click', toggleAddPropertyForm);
-    $('#dashboardPropertyVerificationBtn').addEventListener('click', togglePropertyVerificationForm);
-    $('#dashboardLeadsBtn').addEventListener('click', toggleLeadsPanel);
-    $('#cancelProfileEditBtn').addEventListener('click', () => {
-      $('#profileFormContainer').classList.remove('visible');
-    });
-    $('#gotoAddPropertyFromVerification').addEventListener('click', (e) => {
-      e.preventDefault();
-      toggleAddPropertyForm();
-    });
-
-    // ─── Image upload preview for Add Property ─────────────────────
-    $('#propImage').addEventListener('change', function() {
-      const previewContainer = $('#propImagePreviews');
-      previewContainer.innerHTML = '';
-      const files = this.files;
-      if (!files || files.length === 0) return;
-      for (const file of files) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.className = 'w-20 h-20 object-cover rounded border border-slate-200';
-          previewContainer.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // ─── CRUD ──────────────────────────────────────────────────────
-    async function deleteProperty(propId) {
-      try {
-        const { error } = await supabase.from('properties').delete().eq('id', propId);
-        if (error) throw error;
-        state.myProperties = state.myProperties.filter(p => p.id !== propId);
-        renderMyProperties();
-        await fetchAllData();
-      } catch (err) { alert('Delete failed: ' + err.message); }
-    }
-
-    async function openEditModal(propertyId) {
-      const prop = state.myProperties.find(p => p.id === propertyId);
-      if (!prop) return;
-      $('#editPropertyId').value = propertyId;
-      $('#editTitle').value = prop.title || '';
-      $('#editPrice').value = prop.price_amount || '';
-      const dbType = prop.property_type || '';
-      let formType = 'Rentals';
-      if (dbType === 'property') formType = 'Properties';
-      else if (dbType === 'lodge') formType = 'Lodges';
-      else if (dbType === 'rental') formType = 'Rentals';
-      $('#editType').value = formType;
-      $('#editAddress').value = prop.address || '';
-
-      const images = getImageArray(prop);
-      renderEditImagePreviews(images);
-      $('#editModal')._currentImages = images;
-      $('#editModal')._currentProperty = prop;
-
-      $('#editRequestVerification').checked = prop.is_verified === true || prop.verification_status === 'pending';
-      if ($('#editRequestVerification').checked) {
-        $('#editVerificationInfo').classList.add('visible');
-      } else {
-        $('#editVerificationInfo').classList.remove('visible');
-      }
-      $('#editModal').classList.remove('hidden');
-    }
-
-    function renderEditImagePreviews(images) {
-      const container = $('#editImagePreviews');
-      container.innerHTML = '';
-      images.forEach((url, index) => {
-        const div = document.createElement('div');
-        div.className = 'image-thumb';
-        div.innerHTML = `
-          <img src="${url}" alt="Property image" />
-          <button class="remove-img" data-index="${index}">&times;</button>
-        `;
-        div.querySelector('.remove-img').addEventListener('click', () => {
-          const current = $('#editModal')._currentImages || [];
-          current.splice(index, 1);
-          renderEditImagePreviews(current);
-          $('#editModal')._currentImages = current;
-        });
-        container.appendChild(div);
-      });
-    }
-
-    $('#editPropertyForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = $('#editPropertyId').value;
-      if (!id) return;
-      const title = $('#editTitle').value.trim();
-      const price = parseFloat($('#editPrice').value);
-      const type = $('#editType').value;
-      const address = $('#editAddress').value.trim();
-      if (!title || !price || !address) {
-        alert('Please fill in all required fields.');
-        return;
-      }
-      let currentImages = $('#editModal')._currentImages || [];
-      const files = $('#editImageInput').files;
-      if (files && files.length > 0) {
-        for (const file of files) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.${fileExt}`;
-          const filePath = `${state.currentUser.id}/${fileName}`;
-          const { error: uploadError } = await supabase.storage
-            .from('property-media')
-            .upload(filePath, file);
-          if (uploadError) {
-            alert('Image upload failed: ' + uploadError.message);
-            return;
-          }
-          const { data: urlData } = supabase.storage
-            .from('property-media')
-            .getPublicUrl(filePath);
-          currentImages.push(urlData.publicUrl);
-        }
-        $('#editImageInput').value = '';
-      }
-
-      const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
-      const requestVerification = $('#editRequestVerification').checked;
-      let verificationStatus = 'unverified';
-      let isVerified = false;
-      if (requestVerification) {
-        verificationStatus = 'pending';
-        isVerified = false;
-      }
-
-      // 🔥 FIXED: No "tier" column here either
-      const updateData = {
-        title,
-        price_amount: price,
-        property_type: dbType,
-        address,
-        media_urls: currentImages,
-        is_verified: isVerified,
-        verification_status: verificationStatus,
+    (function() {
+      // ─── Supabase Config ──────────────────────────────────────────────
+      const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+
+      // ─── State ──────────────────────────────────────────────────────────
+      const state = {
+        allProperties: [],
+        filteredProperties: [],
+        currentFilter: 'all',
+        searchQuery: '',
+        currentBrokerId: null,
+        isLoading: false,
+        currentUser: null,
+        isSignUpMode: false,
+        myProperties: [],
+        profilesMap: {},
+        walletBalance: 0,
+        isAdmin: false,
       };
 
-      try {
-        const { error } = await supabase.from('properties').update(updateData).eq('id', id);
-        if (error) throw error;
-        alert(requestVerification ? '✅ Property updated! Verification requested.' : '✅ Property updated!');
-        $('#editModal').classList.add('hidden');
-        await loadMyProperties();
-        await fetchAllData();
-      } catch (err) { alert('Update failed: ' + err.message); }
-    });
+      let supabase;
 
-    $('#closeEditModal').addEventListener('click', () => $('#editModal').classList.add('hidden'));
-    $('#editModal').addEventListener('click', (e) => { if (e.target === $('#editModal')) $('#editModal').classList.add('hidden'); });
+      // ─── DOM refs ──────────────────────────────────────────────────────
+      const $ = (sel) => document.querySelector(sel);
+      const $$ = (sel) => document.querySelectorAll(sel);
 
-    // ─── Profile ────────────────────────────────────────────────────
-    async function loadProfileSettings() {
-      if (!state.currentUser) return;
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('business_name, phone, is_admin')
-          .eq('id', state.currentUser.id)
-          .single();
-        if (error) throw error;
-        $('#settingsBusinessName').value = data.business_name || '';
-        $('#settingsPhone').value = data.phone || '';
-        state.isAdmin = data.is_admin || false;
-      } catch (err) {
-        console.error('Error loading profile:', err);
-      }
-    }
+      // ─── Helper Functions ─────────────────────────────────────────────
+      function formatPrice(amount) { return Number(amount).toLocaleString('en-UG') + ' UGX'; }
 
-    $('#profileSettingsForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!state.currentUser) return;
-      const businessName = $('#settingsBusinessName').value.trim();
-      const phone = $('#settingsPhone').value.trim();
-      try {
-        const { error } = await supabase
-          .from('profiles')
-          .update({ business_name: businessName, phone: phone })
-          .eq('id', state.currentUser.id);
-        if (error) throw error;
-        $('#profileStatus').textContent = '✅ Profile updated successfully!';
-        $('#profileStatus').className = 'mt-3 text-sm text-emerald-600';
-        if (state.currentUser) {
-          state.currentUser.business_name = businessName;
-          state.currentUser.phone = phone;
-        }
-        await fetchAllData();
-        if (state.currentUser) await loadMyProperties();
-      } catch (err) {
-        $('#profileStatus').textContent = '❌ Update failed: ' + err.message;
-        $('#profileStatus').className = 'mt-3 text-sm text-red-600';
-      }
-    });
-
-    // ─── Fetch all data ──────────────────────────────────────────────
-    async function fetchAllData() {
-      state.isLoading = true;
-      loadingSkeleton.style.display = 'grid';
-      listingsGrid.innerHTML = '';
-      emptyState.classList.add('hidden');
-
-      try {
-        const { data: properties, error: propError } = await supabase
-          .from('properties')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (propError) throw propError;
-
-        if (!properties || properties.length === 0) {
-          loadingSkeleton.style.display = 'none';
-          state.allProperties = [];
-          state.filteredProperties = [];
-          renderListings([]);
-          state.isLoading = false;
-          return;
-        }
-
-        // Get profiles for brokers
-        const ownerIds = [...new Set(properties.map(p => p.owner_id).filter(id => id))];
-        let profilesMap = {};
-        if (ownerIds.length > 0) {
-          const { data: profiles, error: profError } = await supabase
-            .from('profiles')
-            .select('*')
-            .in('id', ownerIds);
-          if (!profError && profiles) {
-            profilesMap = Object.fromEntries(profiles.map(p => [p.id, p]));
-          }
-        }
-        state.profilesMap = profilesMap;
-
-        // Get reports count
-        const { data: reports } = await supabase
-          .from('reports')
-          .select('broker_id, status')
-          .eq('status', 'pending');
-
-        if (reports) {
-          const reportCounts = {};
-          reports.forEach(r => {
-            reportCounts[r.broker_id] = (reportCounts[r.broker_id] || 0) + 1;
-          });
-          Object.keys(profilesMap).forEach(id => {
-            profilesMap[id].report_count = reportCounts[id] || 0;
-          });
-        }
-
-        const enriched = properties.map(prop => {
-          const broker = profilesMap[prop.owner_id] || null;
-          const reportCount = broker?.report_count || 0;
-          const rankScore = calculateRankScore(prop, broker, reportCount);
-          return { ...prop, broker, rankScore };
-        });
-
-        enriched.sort((a, b) => b.rankScore - a.rankScore);
-
-        state.allProperties = enriched;
-        state.filteredProperties = [...enriched];
-        applyFiltersAndSearch();
-      } catch (err) {
-        console.error('❌ Error fetching data:', err);
-        listingsGrid.innerHTML = `
-          <div class="col-span-full text-center py-12 text-slate-500">
-            <i class="fas fa-exclamation-triangle text-3xl text-amber-400 mb-3"></i>
-            <p>Failed to load properties.</p>
-            <p class="text-xs text-slate-400 mt-1">${err.message}</p>
-          </div>
-        `;
-      } finally {
-        state.isLoading = false;
-        loadingSkeleton.style.display = 'none';
-      }
-    }
-
-    function applyFiltersAndSearch() {
-      const filter = state.currentFilter;
-      const query = state.searchQuery.trim().toLowerCase();
-      let result = [...state.allProperties];
-
-      if (filter !== 'all') {
-        result = result.filter(p => {
-          const dbType = (p.property_type || '').toLowerCase();
-          return dbType === filter;
-        });
+      function getImageArray(property) {
+        const val = property.media_urls;
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string') return [val];
+        return [];
       }
 
-      if (query) {
-        result = result.filter(p => {
-          const address = (p.address || '').toLowerCase();
-          const title = (p.title || '').toLowerCase();
-          return address.includes(query) || title.includes(query);
-        });
+      function getImageUrl(property) {
+        const arr = getImageArray(property);
+        return arr.length > 0 ? arr[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center';
       }
 
-      state.filteredProperties = result;
-      renderListings(result);
-    }
-
-    // ─── Navigation ────────────────────────────────────────────────
-    async function navigateToBroker(brokerId) {
-      if (!brokerId) return;
-      state.currentBrokerId = brokerId;
-      showView(brokerView);
-      navigateTo(`/broker/${brokerId}`);
-      await loadBrokerProfile(brokerId);
-    }
-
-    async function loadBrokerProfile(brokerId) {
-      const grid = $('#brokerListingsGrid');
-      grid.innerHTML = `
-        <div class="col-span-full flex justify-center py-12">
-          <div class="text-slate-400 flex items-center gap-3">
-            <i class="fas fa-spinner fa-spin text-xl"></i> Loading broker profile…
-          </div>
-        </div>
-      `;
-      $('#brokerEmptyState').classList.add('hidden');
-
-      try {
-        const { data: broker, error: brokerError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', brokerId)
-          .single();
-        if (brokerError) throw brokerError;
-        if (!broker) {
-          grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">Broker not found.</div>`;
-          return;
-        }
-
-        $('#brokerBusinessName').textContent = broker.business_name || 'Unnamed Broker';
-
-        const isTrusted = isTrustedBroker(broker);
-        if (isTrusted) {
-          $('#brokerTrustedBadge').classList.remove('hidden');
-        } else {
-          $('#brokerTrustedBadge').classList.add('hidden');
-        }
-
-        const reportCount = broker.report_count || 0;
-        if (reportCount > 0) {
-          const notice = $('#brokerReportNotice');
-          notice.classList.remove('hidden');
-          notice.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i>
-            <span class="font-medium">⚠️ This broker has ${reportCount} report${reportCount > 1 ? 's' : ''}.</span>
-            <span> Proceed with caution.</span>`;
-        } else {
-          $('#brokerReportNotice').classList.add('hidden');
-        }
-
-        $('#brokerWhatsAppLink').style.display = 'none';
-
-        const rating = broker.average_rating || 0;
-        const reviewCount = broker.review_count || 0;
-        const leadScore = broker.lead_score || 0;
-        $('#brokerStars').innerHTML = renderStars(rating);
-        $('#brokerReviewCount').textContent = `(${reviewCount} reviews)`;
-        $('#brokerLeadScore').textContent = `⚡ ${leadScore}`;
-
-        $('#statTotalReviews').textContent = reviewCount;
-        $('#statAvgRating').textContent = rating.toFixed(1);
-
-        if (state.currentUser && state.currentUser.id !== brokerId) {
-          $('#rateBrokerBtn').classList.remove('hidden');
-          $('#rateBrokerBtn').onclick = () => openReviewModal(brokerId);
-          $('#viewReviewsBtn').classList.remove('hidden');
-          $('#viewReviewsBtn').onclick = () => openViewReviewsModal(brokerId);
-          $('#reportBrokerBtn').classList.remove('hidden');
-          $('#reportBrokerBtn').onclick = () => openReportModal(brokerId);
-        } else {
-          $('#rateBrokerBtn').classList.add('hidden');
-          $('#reportBrokerBtn').classList.add('hidden');
-          $('#viewReviewsBtn').classList.remove('hidden');
-          $('#viewReviewsBtn').onclick = () => openViewReviewsModal(brokerId);
-        }
-
-        const { data: props, error: propsError } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('owner_id', brokerId)
-          .order('created_at', { ascending: false });
-        if (propsError) throw propsError;
-
-        if (!props || props.length === 0) {
-          grid.innerHTML = '';
-          $('#brokerEmptyState').classList.remove('hidden');
-          return;
-        }
-
-        $('#brokerEmptyState').classList.add('hidden');
-        grid.innerHTML = '';
-        props.forEach(prop => {
-          const card = createPropertyCard(prop, broker, false, false);
-          grid.appendChild(card);
-        });
-      } catch (err) {
-        console.error('❌ Error loading broker profile:', err);
-        grid.innerHTML = `
-          <div class="col-span-full text-center py-12 text-slate-500">
-            <i class="fas fa-exclamation-triangle text-3xl text-amber-400 mb-3"></i>
-            <p>Could not load broker profile.</p>
-            <p class="text-xs text-slate-400 mt-1">${err.message}</p>
-          </div>
-        `;
-      }
-    }
-
-    function navigateToAuth() {
-      showView(authView);
-      navigateTo('/auth');
-      setAuthMode(false);
-      $('#authForm').reset();
-    }
-
-    function goToDiscovery() {
-      showView(discoveryView);
-      state.currentBrokerId = null;
-      navigateTo('/');
-      applyFiltersAndSearch();
-    }
-
-    $('#backToDiscovery').addEventListener('click', goToDiscovery);
-    $('#backToSearchBtn').addEventListener('click', goToDiscovery);
-
-    // ─── Dashboard ──────────────────────────────────────────────────
-    async function loadMyProperties() {
-      if (!state.currentUser) return;
-      try {
-        const { data, error } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('owner_id', state.currentUser.id)
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        state.myProperties = data || [];
-        renderMyProperties();
-      } catch (err) {
-        console.error('Error loading my properties:', err);
-        $('#myPropertiesList').innerHTML = `
-          <div class="col-span-full text-center py-8 text-slate-500">
-            Could not load your properties.
-          </div>
-        `;
-      }
-    }
-
-    // ─── Add Property ──────────────────────────────────────────────
-    // 🔥 FIXED: "tier" column removed from insertData
-    $('#addPropertyForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!state.currentUser) {
-        alert('Please sign in first.');
-        return;
+      function renderStars(rating) {
+        const full = Math.floor(rating);
+        const half = rating % 1 >= 0.5 ? 1 : 0;
+        const empty = 5 - full - half;
+        let html = '';
+        for (let i = 0; i < full; i++) html += '<i class="fas fa-star"></i>';
+        if (half) html += '<i class="fas fa-star-half-alt"></i>';
+        for (let i = 0; i < empty; i++) html += '<i class="far fa-star empty"></i>';
+        return html;
       }
 
-      const title = $('#propTitle').value.trim();
-      const price = parseFloat($('#propPrice').value);
-      const type = $('#propType').value;
-      const address = $('#propAddress').value.trim();
-      const imageFiles = $('#propImage').files;
-      const requestVerification = $('#addRequestVerification').checked;
-
-      if (!title || !price || !address) {
-        alert('Please fill in all required fields.');
-        return;
+      function renderStarsSmall(rating) {
+        const full = Math.floor(rating);
+        const empty = 5 - full;
+        let html = '';
+        for (let i = 0; i < full; i++) html += '<i class="fas fa-star text-amber-400 text-xs"></i>';
+        for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-slate-300 text-xs"></i>';
+        return html;
       }
 
-      const statusEl = $('#uploadStatus');
-      statusEl.textContent = 'Uploading images...';
-      statusEl.className = 'mt-3 text-sm text-indigo-600';
-
-      const imageUrls = [];
-      if (imageFiles && imageFiles.length > 0) {
-        for (const file of imageFiles) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.${fileExt}`;
-          const filePath = `${state.currentUser.id}/${fileName}`;
-          const { error: uploadError } = await supabase.storage
-            .from('property-media')
-            .upload(filePath, file);
-          if (uploadError) {
-            statusEl.textContent = '❌ Image upload failed: ' + uploadError.message;
-            statusEl.className = 'mt-3 text-sm text-red-600';
-            return;
-          }
-          const { data: urlData } = supabase.storage
-            .from('property-media')
-            .getPublicUrl(filePath);
-          imageUrls.push(urlData.publicUrl);
-        }
-      }
-
-      const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
-
-      let verificationStatus = 'unverified';
-      let isVerified = false;
-      if (requestVerification) {
-        verificationStatus = 'pending';
-        isVerified = false;
-      }
-
-      // 🔥 FIXED: No "tier" column
-      const insertData = {
-        title,
-        price_amount: price,
-        property_type: dbType,
-        address,
-        media_urls: imageUrls,
-        is_verified: isVerified,
-        verification_status: verificationStatus,
-        owner_id: state.currentUser.id,
-      };
-
-      try {
-        const { error } = await supabase.from('properties').insert(insertData);
-        if (error) throw error;
-        statusEl.textContent = requestVerification ? '✅ Property added! Verification requested.' : '✅ Property added!';
-        statusEl.className = 'mt-3 text-sm text-emerald-600';
-        $('#addPropertyForm').reset();
-        $('#addRequestVerification').checked = false;
-        $('#addVerificationInfo').classList.remove('visible');
-        $('#propImage').value = '';
-        $('#propImagePreviews').innerHTML = '';
-        await loadMyProperties();
-        await fetchAllData();
-        $('#addPropertyContainer').classList.remove('visible');
-      } catch (err) {
-        statusEl.textContent = '❌ Failed to add property: ' + err.message;
-        statusEl.className = 'mt-3 text-sm text-red-600';
-      }
-    });
-
-    // ─── Auth ──────────────────────────────────────────────────────
-    async function handleAuthSubmit(e) {
-      e.preventDefault();
-      const email = $('#emailInput').value.trim();
-      const password = $('#passwordInput').value;
-
-      if (state.isSignUpMode) {
-        const businessName = $('#bizNameInput').value.trim();
-        const accountType = $('#accTypeSelect').value;
-        const phone = $('#phoneInput').value.trim();
-
-        if (!businessName) {
-          alert('Please enter your Business / Brand Name.');
-          return;
-        }
-
-        try {
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                business_name: businessName,
-                account_type: accountType,
-                phone: phone,
-              }
-            }
-          });
-          if (error) throw error;
-          alert('✅ Account created! Please check your email to verify your account.');
-          setAuthMode(false);
-          $('#authForm').reset();
-        } catch (err) {
-          alert('❌ Registration failed: ' + err.message);
-        }
-      } else {
-        try {
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) throw error;
-          state.currentUser = data.user;
-          alert('✅ Signed in successfully!');
-          showView(dashboardView);
-          navigateTo('/dashboard');
-          $('#portalBtnLabel').textContent = 'Dashboard';
-          await loadProfileSettings();
-          await loadMyProperties();
-          await loadWallet();
-          await fetchAllData();
-          loadNotifications();
-          loadLeads();
-        } catch (err) {
-          alert('❌ Sign in failed: ' + err.message);
-        }
-      }
-    }
-
-    async function handleLogout() {
-      await supabase.auth.signOut();
-      state.currentUser = null;
-      $('#portalBtnLabel').textContent = 'Broker Portal';
-      goToDiscovery();
-    }
-
-    $('#logoutBtn').addEventListener('click', handleLogout);
-
-    // ─── Route ──────────────────────────────────────────────────────
-    async function handleRoute() {
-      const path = getCurrentPath();
-      if (path.startsWith('/broker/')) {
-        const brokerId = path.split('/')[2];
-        if (brokerId && brokerId !== state.currentBrokerId) {
-          if (brokerView.classList.contains('view-hidden')) {
-            showView(brokerView);
-            await loadBrokerProfile(brokerId);
-          }
-        }
-      } else if (path === '/auth') {
-        if (authView.classList.contains('view-hidden')) {
-          showView(authView);
-          setAuthMode(false);
-          $('#authForm').reset();
-        }
-      } else if (path === '/dashboard') {
-        if (state.currentUser) {
-          if (dashboardView.classList.contains('view-hidden')) {
-            showView(dashboardView);
-            await loadMyProperties();
-            await loadWallet();
-            loadNotifications();
-            loadLeads();
-          }
-        } else {
-          navigateTo('/auth', true);
-          handleRoute();
-        }
-      } else if (path === '/') {
-        if (!discoveryView.classList.contains('view-visible')) {
-          showView(discoveryView);
-          applyFiltersAndSearch();
-        }
-      } else {
-        navigateTo('/', true);
+      function navigateTo(url, replace = false) {
+        if (replace) window.history.replaceState(null, '', url);
+        else window.history.pushState(null, '', url);
         handleRoute();
       }
-    }
 
-    // ─── Quiz ──────────────────────────────────────────────────────
-    async function openQuizModal(propertyId) {
-      $('#quizPropertyId').value = propertyId;
-      $('#quizStep1').classList.remove('hidden');
-      $('#quizStep2').classList.add('hidden');
-      $('#quizForm').reset();
-      $('#quizModal').classList.remove('hidden');
-    }
+      function getCurrentPath() { return window.location.pathname + window.location.search; }
 
-    $('#quizNextBtn').addEventListener('click', function() {
-      const name = $('#quizName').value.trim();
-      const email = $('#quizEmail').value.trim();
-      const whatsapp = $('#quizWhatsapp').value.trim();
-      if (!name || !email || !whatsapp) {
-        alert('Please fill in all contact fields.');
-        return;
-      }
-      $('#quizStep1').classList.add('hidden');
-      $('#quizStep2').classList.remove('hidden');
-    });
-
-    $('#quizForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const propertyId = $('#quizPropertyId').value;
-      const name = $('#quizName').value.trim();
-      const email = $('#quizEmail').value.trim();
-      const whatsapp = $('#quizWhatsapp').value.trim();
-
-      const q1 = document.querySelector('input[name="q1"]:checked');
-      const q2 = document.querySelector('input[name="q2"]:checked');
-      if (!q1 || !q2) {
-        alert('Please answer both quiz questions.');
-        return;
+      function showView(view) {
+        [discoveryView, brokerView, authView, dashboardView].forEach(v => {
+          v.classList.remove('view-visible');
+          v.classList.add('view-hidden');
+        });
+        view.classList.remove('view-hidden');
+        view.classList.add('view-visible');
       }
 
-      const score1 = parseInt(q1.value);
-      const score2 = parseInt(q2.value);
-      const totalScore = score1 + score2;
-      let leadType = 'cold';
-      if (totalScore >= 7) leadType = 'hot';
-      else if (totalScore >= 4) leadType = 'warm';
+      function setAuthMode(signUpModeActive) {
+        state.isSignUpMode = signUpModeActive;
+        if (signUpModeActive) {
+          $('#toggleSignUp').classList.add('active');
+          $('#toggleSignIn').classList.remove('active');
+          $('#signUpFields').classList.remove('hidden');
+          $('#formTitle').innerText = "Create Hub Space";
+          $('#submitAuthBtn').innerText = "Register Business Hub";
+        } else {
+          $('#toggleSignIn').classList.add('active');
+          $('#toggleSignUp').classList.remove('active');
+          $('#signUpFields').classList.add('hidden');
+          $('#formTitle').innerText = "Welcome Back";
+          $('#submitAuthBtn').innerText = "Access Dashboard";
+        }
+      }
 
-      const answers = { q1: score1, q2: score2 };
+      // ─── Wallet ─────────────────────────────────────────────────────
+      async function loadWallet() {
+        if (!state.currentUser) return;
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('wallet_balance')
+            .eq('id', state.currentUser.id)
+            .single();
+          if (error) throw error;
+          state.walletBalance = profile?.wallet_balance || 0;
+          const el = $('#walletBalanceDisplay');
+          if (el) el.textContent = state.walletBalance.toLocaleString();
+        } catch (err) {
+          console.error('Error loading wallet:', err);
+        }
+      }
 
-      try {
-        const { data, error } = await supabase.functions.invoke('request-lead', {
-          body: {
-            property_id: propertyId,
-            visitor_name: name,
-            visitor_email: email,
-            visitor_whatsapp: whatsapp,
-            quiz_answers: answers,
-            total_score: totalScore,
-            lead_type: leadType
+      async function depositWalletSimulated(amount) {
+        if (!state.currentUser) return false;
+        try {
+          const { data, error } = await supabase.functions.invoke('deposit-wallet', {
+            body: { amount }
+          });
+          if (error) throw error;
+          await loadWallet();
+          return true;
+        } catch (err) {
+          console.error('Deposit error:', err);
+          alert('Error: ' + err.message);
+          return false;
+        }
+      }
+
+      // ─── Notifications ────────────────────────────────────────────────
+      async function loadNotifications() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', state.currentUser.id)
+            .eq('read', false)
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+          const count = data?.length || 0;
+          const badge = $('#notificationCount');
+          if (badge) {
+            if (count > 0) {
+              badge.textContent = count > 9 ? '9+' : count;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+        } catch (err) {
+          console.error('Error loading notifications:', err);
+        }
+      }
+
+      // ─── Top-up ────────────────────────────────────────────────────────
+      const topupBtn = $('#topupBtn');
+      if (topupBtn) {
+        topupBtn.addEventListener('click', () => {
+          const modal = $('#topupModal');
+          if (modal) {
+            $('#topupAmount').value = '';
+            $('#topupStatus').textContent = '';
+            modal.classList.remove('hidden');
           }
         });
-        if (error) throw error;
-
-        $('#quizModal').classList.add('hidden');
-        $('#waitingModal').classList.remove('hidden');
-        $('#waitingStatus').textContent = 'Request sent. Waiting for broker...';
-
-        const requestId = data.lead_id;
-        subscribeToLeadRequest(requestId);
-      } catch (err) {
-        alert('Error submitting request: ' + err.message);
       }
-    });
 
-    function subscribeToLeadRequest(requestId) {
-      const interval = setInterval(async () => {
-        const { data, error } = await supabase
-          .from('lead_requests')
-          .select('status')
-          .eq('id', requestId)
-          .single();
-        if (error) return;
-        if (data.status === 'approved') {
-          clearInterval(interval);
-          $('#waitingModal').classList.add('hidden');
-          alert('✅ Lead approved! The broker will contact you shortly.');
-          loadNotifications();
-        } else if (data.status === 'rejected') {
-          clearInterval(interval);
-          $('#waitingModal').classList.add('hidden');
-          alert('❌ The broker declined this request.');
+      const closeTopupModal = $('#closeTopupModal');
+      if (closeTopupModal) {
+        closeTopupModal.addEventListener('click', () => {
+          const modal = $('#topupModal');
+          if (modal) modal.classList.add('hidden');
+        });
+      }
+
+      const topupModal = $('#topupModal');
+      if (topupModal) {
+        topupModal.addEventListener('click', (e) => {
+          if (e.target === topupModal) topupModal.classList.add('hidden');
+        });
+      }
+
+      const topupForm = $('#topupForm');
+      if (topupForm) {
+        topupForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const amount = parseInt($('#topupAmount').value);
+          if (!amount || amount < 1000) {
+            $('#topupStatus').textContent = 'Please enter a valid amount (min 1000 UGX).';
+            $('#topupStatus').className = 'mt-3 text-sm text-red-600';
+            return;
+          }
+          $('#topupStatus').textContent = 'Processing...';
+          $('#topupStatus').className = 'mt-3 text-sm text-indigo-600';
+          const success = await depositWalletSimulated(amount);
+          if (success) {
+            $('#topupStatus').textContent = `✅ Deposited ${amount.toLocaleString()} UGX!`;
+            $('#topupStatus').className = 'mt-3 text-sm text-emerald-600';
+            setTimeout(() => {
+              const modal = $('#topupModal');
+              if (modal) modal.classList.add('hidden');
+            }, 1500);
+          } else {
+            $('#topupStatus').textContent = '❌ Deposit failed. Please try again.';
+            $('#topupStatus').className = 'mt-3 text-sm text-red-600';
+          }
+        });
+      }
+
+      const refreshWalletBtn = $('#refreshWalletBtn');
+      if (refreshWalletBtn) refreshWalletBtn.addEventListener('click', loadWallet);
+
+      // ─── Reviews ────────────────────────────────────────────────────────
+      const toggleWriteReview = $('#toggleWriteReview');
+      if (toggleWriteReview) {
+        toggleWriteReview.addEventListener('click', function() {
+          const container = $('#reviewFormContainer');
+          if (!container) return;
+          const isHidden = container.classList.contains('hidden');
+          if (isHidden) {
+            container.classList.remove('hidden');
+            this.innerHTML = '<i class="fas fa-times"></i> Cancel';
+          } else {
+            container.classList.add('hidden');
+            this.innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+          }
+        });
+      }
+
+      async function loadReviewsForModal(brokerId) {
+        const reviewsList = $('#reviewsList');
+        if (!reviewsList) return;
+        reviewsList.innerHTML = '<p class="text-slate-500 text-sm">Loading reviews...</p>';
+        const noMsg = $('#noReviewsMessage');
+        if (noMsg) noMsg.classList.add('hidden');
+        try {
+          const { data, error } = await supabase
+            .from('reviews')
+            .select('*')
+            .eq('broker_id', brokerId)
+            .order('created_at', { ascending: false });
+          if (error) throw error;
+          if (!data || data.length === 0) {
+            reviewsList.innerHTML = '';
+            if (noMsg) noMsg.classList.remove('hidden');
+            return;
+          }
+          let html = '';
+          data.forEach(review => {
+            const stars = renderStarsSmall(review.rating);
+            const date = new Date(review.created_at).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' });
+            const reviewer = review.client_name || 'Guest';
+            html += `
+              <div class="review-item">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="font-medium text-slate-700">${reviewer}</span>
+                    <span class="stars-small">${stars}</span>
+                  </div>
+                  <span class="review-meta">${date}</span>
+                </div>
+                ${review.comment ? `<p class="review-text mt-1">${review.comment}</p>` : ''}
+              </div>
+            `;
+          });
+          reviewsList.innerHTML = html;
+        } catch (err) {
+          reviewsList.innerHTML = `<p class="text-red-500 text-sm">Error loading reviews: ${err.message}</p>`;
         }
-      }, 3000);
-    }
-
-    $('#cancelWaitBtn').addEventListener('click', function() {
-      if (confirm('Cancel this request?')) {
-        $('#waitingModal').classList.add('hidden');
       }
-    });
 
-    $('#closeQuizModal').addEventListener('click', () => $('#quizModal').classList.add('hidden'));
-    $('#quizModal').addEventListener('click', (e) => { if (e.target === $('#quizModal')) $('#quizModal').classList.add('hidden'); });
-
-    // ─── Event Binding ─────────────────────────────────────────────
-    $('#searchInput').addEventListener('input', (e) => {
-      state.searchQuery = e.target.value;
-      applyFiltersAndSearch();
-    });
-    $('#clearSearchBtn').addEventListener('click', () => {
-      $('#searchInput').value = '';
-      state.searchQuery = '';
-      applyFiltersAndSearch();
-      $('#searchInput').focus();
-    });
-
-    filterPills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        filterPills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        state.currentFilter = pill.dataset.filter;
-        applyFiltersAndSearch();
-      });
-    });
-
-    $('#brokerPortalBtn').addEventListener('click', () => {
-      if (state.currentUser) {
-        showView(dashboardView);
-        navigateTo('/dashboard');
-        loadMyProperties();
-        loadWallet();
-        loadNotifications();
-        loadLeads();
-      } else {
-        navigateToAuth();
+      async function openReviewModal(brokerId) {
+        const reviewBrokerId = $('#reviewBrokerId');
+        if (!reviewBrokerId) return;
+        reviewBrokerId.value = brokerId;
+        const reviewRating = $('#reviewRating');
+        if (reviewRating) reviewRating.value = 5;
+        const reviewComment = $('#reviewComment');
+        if (reviewComment) reviewComment.value = '';
+        const reviewClientName = $('#reviewClientName');
+        if (reviewClientName) reviewClientName.value = '';
+        updateStarUI(5);
+        const container = $('#reviewFormContainer');
+        if (container) container.classList.add('hidden');
+        const toggle = $('#toggleWriteReview');
+        if (toggle) toggle.innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+        const modal = $('#reviewModal');
+        if (modal) modal.classList.remove('hidden');
+        await loadReviewsForModal(brokerId);
       }
-    });
 
-    $('#toggleSignIn').addEventListener('click', () => setAuthMode(false));
-    $('#toggleSignUp').addEventListener('click', () => setAuthMode(true));
-    $('#authForm').addEventListener('submit', handleAuthSubmit);
-    window.addEventListener('popstate', handleRoute);
+      // ─── Star selector ────────────────────────────────────────────────
+      const starSelector = $('#starSelector');
+      if (starSelector) {
+        starSelector.querySelectorAll('.star').forEach(star => {
+          star.addEventListener('click', () => {
+            const val = parseInt(star.dataset.value);
+            const rating = $('#reviewRating');
+            if (rating) rating.value = val;
+            updateStarUI(val);
+          });
+          star.addEventListener('mouseenter', () => {
+            const val = parseInt(star.dataset.value);
+            updateStarUI(val);
+          });
+          star.addEventListener('mouseleave', () => {
+            const current = parseInt($('#reviewRating').value) || 5;
+            updateStarUI(current);
+          });
+        });
+      }
 
-    // ─── Init ────────────────────────────────────────────────────────
-    async function init() {
-      const hash = window.location.hash;
-      if (hash && hash.includes('access_token')) {
-        const params = new URLSearchParams(hash.substring(1));
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        if (accessToken && refreshToken) {
+      function updateStarUI(active) {
+        if (!starSelector) return;
+        starSelector.querySelectorAll('.star').forEach(el => {
+          const val = parseInt(el.dataset.value);
+          el.classList.toggle('active', val <= active);
+        });
+      }
+
+      const reviewForm = $('#reviewForm');
+      if (reviewForm) {
+        reviewForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) {
+            alert('Please sign in to leave a review.');
+            return;
+          }
+          const brokerId = $('#reviewBrokerId').value;
+          const rating = parseInt($('#reviewRating').value);
+          const comment = $('#reviewComment').value.trim();
+          const clientName = $('#reviewClientName').value.trim() || null;
+          if (!rating || rating < 1 || rating > 5) {
+            alert('Please select a rating (1-5 stars).');
+            return;
+          }
           try {
-            const { data, error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
+            const { error } = await supabase.from('reviews').insert({
+              broker_id: brokerId,
+              rating: rating,
+              comment: comment || null,
+              client_name: clientName,
             });
             if (error) throw error;
-            if (data.user) {
-              state.currentUser = data.user;
-              $('#portalBtnLabel').textContent = 'Dashboard';
-              window.history.replaceState(null, '', '/');
-              showView(dashboardView);
-              navigateTo('/dashboard');
-              await loadProfileSettings();
-              await loadMyProperties();
-              await loadWallet();
-              await fetchAllData();
-              loadNotifications();
-              loadLeads();
-              alert('✅ Email verified! Welcome to your dashboard.');
-              return;
+            alert('✅ Review submitted! Thank you.');
+            await loadReviewsForModal(brokerId);
+            reviewForm.reset();
+            const ratingInput = $('#reviewRating');
+            if (ratingInput) ratingInput.value = 5;
+            updateStarUI(5);
+            const container = $('#reviewFormContainer');
+            if (container) container.classList.add('hidden');
+            const toggle = $('#toggleWriteReview');
+            if (toggle) toggle.innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+            await fetchAllData();
+            if (state.currentBrokerId) {
+              await loadBrokerProfile(state.currentBrokerId);
             }
           } catch (err) {
-            console.error('Session set error:', err);
-            alert('❌ Verification failed: ' + err.message);
+            alert('Error submitting review: ' + err.message);
+          }
+        });
+      }
+
+      const closeReviewModal = $('#closeReviewModal');
+      if (closeReviewModal) {
+        closeReviewModal.addEventListener('click', () => {
+          const modal = $('#reviewModal');
+          if (modal) modal.classList.add('hidden');
+        });
+      }
+      const reviewModal = $('#reviewModal');
+      if (reviewModal) {
+        reviewModal.addEventListener('click', (e) => {
+          if (e.target === reviewModal) reviewModal.classList.add('hidden');
+        });
+      }
+
+      async function openViewReviewsModal(brokerId) {
+        const reviewBrokerId = $('#reviewBrokerId');
+        if (!reviewBrokerId) return;
+        reviewBrokerId.value = brokerId;
+        const container = $('#reviewFormContainer');
+        if (container) container.classList.add('hidden');
+        const toggle = $('#toggleWriteReview');
+        if (toggle) toggle.innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+        const modal = $('#reviewModal');
+        if (modal) modal.classList.remove('hidden');
+        await loadReviewsForModal(brokerId);
+      }
+
+      // ─── Report ──────────────────────────────────────────────────────
+      function openReportModal(brokerId) {
+        const reportBrokerId = $('#reportBrokerId');
+        if (reportBrokerId) reportBrokerId.value = brokerId;
+        const reason = $('#reportReason');
+        if (reason) reason.value = '';
+        const desc = $('#reportDescription');
+        if (desc) desc.value = '';
+        const status = $('#reportStatus');
+        if (status) status.textContent = '';
+        const modal = $('#reportModal');
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      const closeReportModal = $('#closeReportModal');
+      if (closeReportModal) {
+        closeReportModal.addEventListener('click', () => {
+          const modal = $('#reportModal');
+          if (modal) modal.classList.add('hidden');
+        });
+      }
+      const reportModal = $('#reportModal');
+      if (reportModal) {
+        reportModal.addEventListener('click', (e) => {
+          if (e.target === reportModal) reportModal.classList.add('hidden');
+        });
+      }
+
+      const reportForm = $('#reportForm');
+      if (reportForm) {
+        reportForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) {
+            alert('Please sign in to report.');
+            return;
+          }
+          const brokerId = $('#reportBrokerId').value;
+          const reason = $('#reportReason').value;
+          const description = $('#reportDescription').value.trim();
+          if (!reason || !description) {
+            const status = $('#reportStatus');
+            if (status) {
+              status.textContent = 'Please fill in all fields.';
+              status.className = 'mt-3 text-sm text-red-600';
+            }
+            return;
+          }
+          const status = $('#reportStatus');
+          if (status) {
+            status.textContent = 'Submitting report...';
+            status.className = 'mt-3 text-sm text-indigo-600';
+          }
+          try {
+            const { error } = await supabase.from('reports').insert({
+              reporter_id: state.currentUser.id,
+              broker_id: brokerId,
+              reason: reason,
+              description: description,
+              status: 'pending',
+            });
+            if (error) throw error;
+            if (status) {
+              status.textContent = '✅ Report submitted! We will investigate.';
+              status.className = 'mt-3 text-sm text-emerald-600';
+            }
+            setTimeout(() => {
+              const modal = $('#reportModal');
+              if (modal) modal.classList.add('hidden');
+            }, 2000);
+          } catch (err) {
+            if (status) {
+              status.textContent = '❌ Failed to submit report: ' + err.message;
+              status.className = 'mt-3 text-sm text-red-600';
+            }
+          }
+        });
+      }
+
+      // ─── Terms ──────────────────────────────────────────────────────
+      const closeTermsModal = $('#closeTermsModal');
+      if (closeTermsModal) {
+        closeTermsModal.addEventListener('click', () => {
+          const modal = $('#termsModal');
+          if (modal) modal.classList.add('hidden');
+        });
+      }
+      const termsModal = $('#termsModal');
+      if (termsModal) {
+        termsModal.addEventListener('click', (e) => {
+          if (e.target === termsModal) termsModal.classList.add('hidden');
+        });
+      }
+      const acceptTermsBtn = $('#acceptTermsBtn');
+      if (acceptTermsBtn) {
+        acceptTermsBtn.addEventListener('click', async () => {
+          if (!state.currentUser) {
+            alert('Please sign in first.');
+            return;
+          }
+          try {
+            await supabase
+              .from('profiles')
+              .update({
+                terms_agreed: true,
+                terms_agreed_at: new Date().toISOString(),
+              })
+              .eq('id', state.currentUser.id);
+            const modal = $('#termsModal');
+            if (modal) modal.classList.add('hidden');
+            alert('✅ Thank you for accepting the Terms of Service.');
+          } catch (err) {
+            alert('Error: ' + err.message);
+          }
+        });
+      }
+
+      // ─── Ranking ────────────────────────────────────────────────────
+      function isTrustedBroker(broker) {
+        if (!broker) return false;
+        const rating = broker.average_rating || 0;
+        const reviewCount = broker.review_count || 0;
+        const leadScore = broker.lead_score || 0;
+        const reportCount = broker.report_count || 0;
+        return rating >= 4.0 && reviewCount >= 10 && leadScore >= 20 && reportCount < 3;
+      }
+
+      function calculateRankScore(property, broker, reportCount = 0) {
+        let score = 0;
+        if (property.verification_status === 'approved') {
+          score += 100;
+        } else if (property.verification_status === 'pending') {
+          score += 30;
+        }
+        if (broker) {
+          const rating = broker.average_rating || 0;
+          const reviewCount = broker.review_count || 0;
+          score += rating * 10;
+          score += Math.min(reviewCount, 50) * 0.5;
+          if (isTrustedBroker(broker)) {
+            score += 20;
+          }
+          const leadScore = broker.lead_score || 0;
+          score += leadScore / 2;
+          score -= (reportCount || 0) * 5;
+        }
+        return Math.round(score);
+      }
+
+      // ─── Property card ──────────────────────────────────────────────
+      function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
+        const article = document.createElement('article');
+        article.className = 'property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/70 flex flex-col';
+
+        const imageUrl = getImageUrl(property);
+        const rating = broker?.average_rating || 0;
+        const reviewCount = broker?.review_count || 0;
+        const leadScore = broker?.lead_score || 0;
+        const isOwner = state.currentUser && broker && state.currentUser.id === broker.id;
+
+        const verificationStatus = property.verification_status || 'pending';
+        const isVerified = verificationStatus === 'approved';
+        const isTrusted = broker ? isTrustedBroker(broker) : false;
+        const reportCount = broker?.report_count || 0;
+        const rankScore = property.rankScore || calculateRankScore(property, broker, reportCount);
+
+        let badgeHtml = '';
+        if (isVerified) {
+          badgeHtml = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>`;
+        } else if (verificationStatus === 'pending') {
+          badgeHtml = `<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>`;
+        } else if (verificationStatus === 'rejected') {
+          badgeHtml = `<span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>`;
+        }
+
+        let trustedHtml = '';
+        if (isTrusted) {
+          trustedHtml = `<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>`;
+        }
+
+        let actionsHtml = '';
+        if (showEdit) actionsHtml += `<button class="edit-btn text-xs text-indigo-600 hover:text-indigo-800 font-medium" data-id="${property.id}"><i class="fas fa-edit mr-1"></i>Edit</button>`;
+
+        let boostHtml = '';
+        if (showEdit && state.currentUser) {
+          boostHtml = `<button class="boost-btn text-xs text-emerald-600 hover:text-emerald-800 font-medium ml-2" data-broker-id="${state.currentUser.id}"><i class="fas fa-rocket mr-1"></i>Boost</button>`;
+        }
+
+        let rateHtml = '';
+        if (state.currentUser && broker && !isOwner) {
+          rateHtml = `<button class="rate-btn text-xs text-yellow-600 hover:text-yellow-800 font-medium" data-broker-id="${broker.id}"><i class="fas fa-star mr-1"></i>Rate</button>`;
+        }
+
+        article.innerHTML = `
+          <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
+            <img src="${imageUrl}" alt="${property.title || 'Property'}" 
+                 class="w-full h-full object-cover" loading="lazy"
+                 onerror="this.src='https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center'"/>
+            <span class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+              ${property.property_type || 'Property'}
+            </span>
+            ${!showEdit && isVerified ? `<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full shadow-md"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>` : ''}
+          </div>
+          <div class="p-4 flex flex-col flex-1">
+            <div class="flex items-center justify-between flex-wrap gap-1">
+              <h3 class="font-semibold text-slate-800 text-base leading-snug line-clamp-1">${property.title || 'Untitled'}</h3>
+              <div class="flex items-center gap-1">
+                ${!showEdit ? badgeHtml : ''}
+                ${!showEdit && isTrusted ? trustedHtml : ''}
+              </div>
+            </div>
+            <p class="text-indigo-700 font-bold text-sm mt-0.5">${formatPrice(property.price_amount)}</p>
+            <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5">
+              <i class="fas fa-map-pin text-slate-400 text-[10px]"></i>
+              <span class="line-clamp-1">${property.address || 'Location not specified'}</span>
+            </p>
+            <div class="mt-2 flex items-center gap-2 text-xs">
+              <span class="stars text-xs">${renderStars(rating)}</span>
+              <span class="text-slate-500">(${reviewCount})</span>
+              <span class="badge-lead">⚡ ${leadScore}</span>
+            </div>
+            ${!showEdit ? `<div class="mt-1 flex items-center gap-2 text-xs text-slate-400"><span>Rank Score: ${rankScore}</span>${reportCount > 0 ? `<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> ${reportCount} report${reportCount > 1 ? 's' : ''}</span>` : ''}</div>` : ''}
+            <div class="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 flex-wrap">
+              ${showBrokerLink ? `<button class="broker-name-link text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1 cursor-pointer" data-broker-id="${broker?.id || ''}">
+                <i class="fas fa-user-circle text-slate-400"></i> ${broker?.business_name || 'Unknown Broker'}
+                ${isTrusted ? `<span class="text-amber-500 text-[10px]"><i class="fas fa-star"></i></span>` : ''}
+              </button>` : `<span class="text-xs text-slate-500 flex items-center gap-1"><i class="fas fa-user-circle text-slate-400"></i> ${broker?.business_name || 'Broker'}</span>`}
+              <div class="flex gap-2">
+                ${actionsHtml}
+                ${boostHtml}
+                ${rateHtml}
+                <button class="connect-btn bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow transition" data-property-id="${property.id}">
+                  <i class="fas fa-handshake"></i> Connect
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // ─── Event Listeners (with null checks) ──────────────────────
+        const editBtn = article.querySelector('.edit-btn');
+        if (editBtn) {
+          editBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            openEditModal(property.id);
+          });
+        }
+
+        const boostBtn = article.querySelector('.boost-btn');
+        if (boostBtn) {
+          boostBtn.addEventListener('click', async e => {
+            e.stopPropagation();
+            const brokerId = e.currentTarget.dataset.brokerId;
+            try {
+              const { error } = await supabase.rpc('increment_lead_score', { broker_id: brokerId, amount: 5 });
+              if (error) throw error;
+              alert('✅ Lead score boosted by 5!');
+              await fetchAllData();
+              if (state.currentUser) await loadMyProperties();
+            } catch (err) { alert('Error boosting lead score: ' + err.message); }
+          });
+        }
+
+        const rateBtn = article.querySelector('.rate-btn');
+        if (rateBtn) {
+          rateBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            const brokerId = e.currentTarget.dataset.brokerId;
+            openReviewModal(brokerId);
+          });
+        }
+
+        const nameLink = article.querySelector('.broker-name-link');
+        if (nameLink) {
+          nameLink.addEventListener('click', e => {
+            e.stopPropagation();
+            const brokerId = e.currentTarget.dataset.brokerId;
+            if (brokerId) navigateToBroker(brokerId);
+          });
+        }
+
+        const connectBtn = article.querySelector('.connect-btn');
+        if (connectBtn) {
+          connectBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const propertyId = this.dataset.propertyId;
+            if (!state.currentUser) {
+              alert('Please sign in to connect with a broker.');
+              navigateToAuth();
+              return;
+            }
+            openQuizModal(propertyId);
+          });
+        }
+
+        return article;
+      }
+
+      // ─── Render functions ─────────────────────────────────────────
+      function renderListings(properties) {
+        const grid = $('#listingsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        if (!properties || properties.length === 0) {
+          const empty = $('#emptyState');
+          if (empty) empty.classList.remove('hidden');
+          const count = $('#propertyCount');
+          if (count) count.textContent = '0 listings';
+          return;
+        }
+        const empty = $('#emptyState');
+        if (empty) empty.classList.add('hidden');
+        const count = $('#propertyCount');
+        if (count) count.textContent = `${properties.length} listing${properties.length > 1 ? 's' : ''}`;
+        properties.forEach(prop => {
+          const broker = prop.broker || state.profilesMap[prop.owner_id] || null;
+          const card = createPropertyCard(prop, broker, true, false);
+          grid.appendChild(card);
+        });
+      }
+
+      function renderMyProperties() {
+        const list = $('#myPropertiesList');
+        if (!list) return;
+        list.innerHTML = '';
+        if (state.myProperties.length === 0) {
+          const empty = $('#myPropertiesEmpty');
+          if (empty) empty.classList.remove('hidden');
+          return;
+        }
+        const empty = $('#myPropertiesEmpty');
+        if (empty) empty.classList.add('hidden');
+        state.myProperties.forEach(prop => {
+          const broker = state.currentUser;
+          const card = createPropertyCard(prop, broker, false, true);
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'mt-2 text-xs text-red-500 hover:text-red-700 font-medium';
+          deleteBtn.innerHTML = '<i class="fas fa-trash mr-1"></i> Remove';
+          deleteBtn.addEventListener('click', async () => {
+            if (confirm('Delete this property?')) {
+              await deleteProperty(prop.id);
+            }
+          });
+          card.querySelector('.p-4').appendChild(deleteBtn);
+          list.appendChild(card);
+        });
+      }
+
+      // ─── Property Verification ──────────────────────────────────────
+      async function loadPropertyVerificationList() {
+        if (!state.currentUser) return;
+        try {
+          const { data: properties, error: pErr } = await supabase
+            .from('properties')
+            .select(`
+              *,
+              verification_requests:property_verification_requests (
+                id, status, submitted_data, created_at
+              )
+            `)
+            .eq('owner_id', state.currentUser.id)
+            .order('created_at', { ascending: false });
+
+          if (pErr) throw pErr;
+
+          const list = $('#propertyVerificationList');
+          const empty = $('#propertyVerificationEmpty');
+          if (!list || !empty) return;
+
+          if (!properties || properties.length === 0) {
+            list.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+          }
+          empty.classList.add('hidden');
+
+          let html = '';
+          properties.forEach(prop => {
+            const req = prop.verification_requests?.[0] || null;
+            const status = req ? req.status : 'Not requested';
+            const statusClass = status === 'approved' ? 'approved' :
+                               status === 'pending' ? 'pending' :
+                               status === 'rejected' ? 'rejected' : 'unverified';
+            const statusLabel = status === 'approved' ? '✅ Approved' :
+                               status === 'pending' ? '⏳ Pending' :
+                               status === 'rejected' ? '❌ Rejected' : 'Not requested';
+
+            const canRequest = (!req || req.status === 'rejected') && status !== 'pending';
+
+            html += `
+              <div class="verification-property-item">
+                <div class="property-title">${prop.title || 'Untitled'}</div>
+                <div><span class="property-status ${statusClass}">${statusLabel}</span></div>
+                <div>
+                  ${canRequest ? `<button class="request-verification-btn text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-full transition" data-property-id="${prop.id}">Request Verification</button>` :
+                  `<span class="text-xs text-slate-400">${status === 'approved' ? 'Verified' : 'In progress'}</span>`}
+                  ${req ? `<button class="view-verification-details text-xs text-blue-600 hover:underline ml-2" data-request-id="${req.id}">Details</button>` : ''}
+                </div>
+              </div>
+            `;
+          });
+          list.innerHTML = html;
+
+          list.querySelectorAll('.request-verification-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+              openPropertyVerificationModal(this.dataset.propertyId);
+            });
+          });
+
+          list.querySelectorAll('.view-verification-details').forEach(btn => {
+            btn.addEventListener('click', async function() {
+              const requestId = this.dataset.requestId;
+              const { data: req, error } = await supabase
+                .from('property_verification_requests')
+                .select('submitted_data, status, created_at')
+                .eq('id', requestId)
+                .single();
+              if (error) {
+                alert('Error loading details.');
+                return;
+              }
+              const data = req.submitted_data;
+              let msg = `Status: ${req.status}\nSubmitted: ${new Date(req.created_at).toLocaleString()}\n\n`;
+              for (const [key, value] of Object.entries(data)) {
+                msg += `${key}: ${value}\n`;
+              }
+              alert(msg);
+            });
+          });
+
+        } catch (err) {
+          console.error('Error loading property verifications:', err);
+          const list = $('#propertyVerificationList');
+          if (list) list.innerHTML = `<p class="text-red-500 text-sm">Error loading: ${err.message}</p>`;
+        }
+      }
+
+      async function openPropertyVerificationModal(propertyId) {
+        alert('Property verification request will open here. In production, this would show a form with document upload fields.');
+      }
+
+      // ─── Leads ──────────────────────────────────────────────────────
+      async function loadLeads() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase
+            .from('lead_requests')
+            .select('*, property:property_id (title, price_amount, property_type, address)')
+            .eq('broker_id', state.currentUser.id)
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+
+          const list = $('#leadsList');
+          const noMsg = $('#noLeads');
+          if (!list || !noMsg) return;
+
+          if (!data || data.length === 0) {
+            list.innerHTML = '';
+            noMsg.classList.remove('hidden');
+            return;
+          }
+          noMsg.classList.add('hidden');
+
+          let html = '';
+          data.forEach(lead => {
+            const statusClass = lead.status === 'approved' ? 'approved' :
+                               lead.status === 'pending' ? 'pending' :
+                               lead.status === 'rejected' ? 'rejected' : 'expired';
+            const statusLabel = lead.status === 'approved' ? '✅ Unlocked' :
+                               lead.status === 'pending' ? '⏳ Pending' :
+                               lead.status === 'rejected' ? '❌ Rejected' : '⏰ Expired';
+
+            const canUnlock = lead.status === 'pending';
+
+            html += `
+              <div class="verification-property-item">
+                <div class="property-title">${lead.property?.title || 'Unknown'} <span class="text-xs text-slate-400">(${lead.lead_type})</span></div>
+                <div><span class="property-status ${statusClass}">${statusLabel}</span></div>
+                <div>
+                  ${canUnlock ? `<button class="unlock-lead-btn text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-full transition" data-lead-id="${lead.id}">Unlock</button>` :
+                  lead.status === 'approved' ? `<button class="view-lead-details text-xs text-blue-600 hover:underline" data-lead-id="${lead.id}">View Contact</button>` :
+                  `<span class="text-xs text-slate-400">Free</span>`}
+                </div>
+              </div>
+            `;
+          });
+          list.innerHTML = html;
+
+          list.querySelectorAll('.unlock-lead-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+              const leadId = this.dataset.leadId;
+              if (!confirm('Unlock this lead? (Free)')) return;
+              try {
+                const { data, error } = await supabase.functions.invoke('handle-lead-decision', {
+                  body: { token: leadId, decision: 'approve' }
+                });
+                if (error) throw error;
+                if (!data.success) {
+                  alert('Failed to unlock lead: ' + data.error);
+                  return;
+                }
+                alert(`✅ Lead unlocked!\n\nName: ${data.visitor_name}\nEmail: ${data.visitor_email}\nWhatsApp: ${data.visitor_whatsapp}`);
+                loadLeads();
+                loadWallet();
+                loadNotifications();
+              } catch (err) {
+                alert('Error: ' + err.message);
+              }
+            });
+          });
+
+          list.querySelectorAll('.view-lead-details').forEach(btn => {
+            btn.addEventListener('click', async function() {
+              const leadId = this.dataset.leadId;
+              const { data: lead, error } = await supabase
+                .from('lead_requests')
+                .select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at')
+                .eq('id', leadId)
+                .single();
+              if (error) { alert('Error loading details'); return; }
+              alert(`Contact Details:\n\nName: ${lead.visitor_name}\nEmail: ${lead.visitor_email}\nWhatsApp: ${lead.visitor_whatsapp}\nUnlocked: ${new Date(lead.unlocked_at).toLocaleString()}`);
+            });
+          });
+
+        } catch (err) {
+          console.error('Error loading leads:', err);
+          const list = $('#leadsList');
+          if (list) list.innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>';
+        }
+      }
+
+      // ─── Dashboard toggles ────────────────────────────────────────
+      function toggleProfileForm() {
+        const container = $('#profileFormContainer');
+        if (!container) return;
+        const isVisible = container.classList.contains('visible');
+        if (isVisible) {
+          container.classList.remove('visible');
+        } else {
+          container.classList.add('visible');
+          const add = $('#addPropertyContainer');
+          if (add) add.classList.remove('visible');
+          const ver = $('#propertyVerificationContainer');
+          if (ver) ver.classList.remove('visible');
+          const leads = $('#leadsContainer');
+          if (leads) leads.classList.remove('visible');
+        }
+      }
+
+      function toggleAddPropertyForm() {
+        const container = $('#addPropertyContainer');
+        if (!container) return;
+        const isVisible = container.classList.contains('visible');
+        if (isVisible) {
+          container.classList.remove('visible');
+        } else {
+          container.classList.add('visible');
+          const profile = $('#profileFormContainer');
+          if (profile) profile.classList.remove('visible');
+          const ver = $('#propertyVerificationContainer');
+          if (ver) ver.classList.remove('visible');
+          const leads = $('#leadsContainer');
+          if (leads) leads.classList.remove('visible');
+        }
+      }
+
+      function togglePropertyVerificationForm() {
+        const container = $('#propertyVerificationContainer');
+        if (!container) return;
+        const isVisible = container.classList.contains('visible');
+        if (isVisible) {
+          container.classList.remove('visible');
+        } else {
+          container.classList.add('visible');
+          const profile = $('#profileFormContainer');
+          if (profile) profile.classList.remove('visible');
+          const add = $('#addPropertyContainer');
+          if (add) add.classList.remove('visible');
+          const leads = $('#leadsContainer');
+          if (leads) leads.classList.remove('visible');
+          loadPropertyVerificationList();
+        }
+      }
+
+      function toggleLeadsPanel() {
+        const container = $('#leadsContainer');
+        if (!container) return;
+        const isVisible = container.classList.contains('visible');
+        if (isVisible) {
+          container.classList.remove('visible');
+        } else {
+          container.classList.add('visible');
+          const profile = $('#profileFormContainer');
+          if (profile) profile.classList.remove('visible');
+          const add = $('#addPropertyContainer');
+          if (add) add.classList.remove('visible');
+          const ver = $('#propertyVerificationContainer');
+          if (ver) ver.classList.remove('visible');
+          loadLeads();
+        }
+      }
+
+      // ─── Wire up dashboard toolbar buttons ──────────────────────
+      const editProfileBtn = $('#dashboardEditProfileBtn');
+      if (editProfileBtn) editProfileBtn.addEventListener('click', toggleProfileForm);
+
+      const addPropertyBtn = $('#dashboardAddPropertyBtn');
+      if (addPropertyBtn) addPropertyBtn.addEventListener('click', toggleAddPropertyForm);
+
+      const verificationBtn = $('#dashboardPropertyVerificationBtn');
+      if (verificationBtn) verificationBtn.addEventListener('click', togglePropertyVerificationForm);
+
+      const leadsBtn = $('#dashboardLeadsBtn');
+      if (leadsBtn) leadsBtn.addEventListener('click', toggleLeadsPanel);
+
+      const cancelProfileEdit = $('#cancelProfileEditBtn');
+      if (cancelProfileEdit) {
+        cancelProfileEdit.addEventListener('click', () => {
+          const container = $('#profileFormContainer');
+          if (container) container.classList.remove('visible');
+        });
+      }
+
+      const gotoAddFromVerification = $('#gotoAddPropertyFromVerification');
+      if (gotoAddFromVerification) {
+        gotoAddFromVerification.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleAddPropertyForm();
+        });
+      }
+
+      // ─── Image upload preview ─────────────────────────────────────
+      const propImageInput = $('#propImage');
+      if (propImageInput) {
+        propImageInput.addEventListener('change', function() {
+          const previewContainer = $('#propImagePreviews');
+          if (!previewContainer) return;
+          previewContainer.innerHTML = '';
+          const files = this.files;
+          if (!files || files.length === 0) return;
+          for (const file of files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = 'w-20 h-20 object-cover rounded border border-slate-200';
+              previewContainer.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // ─── CRUD ──────────────────────────────────────────────────────
+      async function deleteProperty(propId) {
+        try {
+          const { error } = await supabase.from('properties').delete().eq('id', propId);
+          if (error) throw error;
+          state.myProperties = state.myProperties.filter(p => p.id !== propId);
+          renderMyProperties();
+          await fetchAllData();
+        } catch (err) { alert('Delete failed: ' + err.message); }
+      }
+
+      async function openEditModal(propertyId) {
+        const prop = state.myProperties.find(p => p.id === propertyId);
+        if (!prop) return;
+        const editId = $('#editPropertyId');
+        if (editId) editId.value = propertyId;
+        const title = $('#editTitle');
+        if (title) title.value = prop.title || '';
+        const price = $('#editPrice');
+        if (price) price.value = prop.price_amount || '';
+        const type = $('#editType');
+        if (type) {
+          const dbType = prop.property_type || '';
+          let formType = 'Rentals';
+          if (dbType === 'property') formType = 'Properties';
+          else if (dbType === 'lodge') formType = 'Lodges';
+          else if (dbType === 'rental') formType = 'Rentals';
+          type.value = formType;
+        }
+        const address = $('#editAddress');
+        if (address) address.value = prop.address || '';
+
+        const images = getImageArray(prop);
+        renderEditImagePreviews(images);
+        const modal = $('#editModal');
+        if (modal) {
+          modal._currentImages = images;
+          modal._currentProperty = prop;
+        }
+
+        const verifyCheck = $('#editRequestVerification');
+        if (verifyCheck) {
+          verifyCheck.checked = prop.is_verified === true || prop.verification_status === 'pending';
+          const info = $('#editVerificationInfo');
+          if (info) {
+            if (verifyCheck.checked) info.classList.add('visible');
+            else info.classList.remove('visible');
+          }
+        }
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      function renderEditImagePreviews(images) {
+        const container = $('#editImagePreviews');
+        if (!container) return;
+        container.innerHTML = '';
+        images.forEach((url, index) => {
+          const div = document.createElement('div');
+          div.className = 'image-thumb';
+          div.innerHTML = `
+            <img src="${url}" alt="Property image" />
+            <button class="remove-img" data-index="${index}">&times;</button>
+          `;
+          div.querySelector('.remove-img').addEventListener('click', () => {
+            const modal = $('#editModal');
+            const current = modal ? modal._currentImages || [] : [];
+            current.splice(index, 1);
+            renderEditImagePreviews(current);
+            if (modal) modal._currentImages = current;
+          });
+          container.appendChild(div);
+        });
+      }
+
+      const editPropertyForm = $('#editPropertyForm');
+      if (editPropertyForm) {
+        editPropertyForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = $('#editPropertyId').value;
+          if (!id) return;
+          const title = $('#editTitle').value.trim();
+          const price = parseFloat($('#editPrice').value);
+          const type = $('#editType').value;
+          const address = $('#editAddress').value.trim();
+          if (!title || !price || !address) {
+            alert('Please fill in all required fields.');
+            return;
+          }
+          let currentImages = $('#editModal')._currentImages || [];
+          const files = $('#editImageInput').files;
+          if (files && files.length > 0) {
+            for (const file of files) {
+              const fileExt = file.name.split('.').pop();
+              const fileName = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.${fileExt}`;
+              const filePath = `${state.currentUser.id}/${fileName}`;
+              const { error: uploadError } = await supabase.storage
+                .from('property-media')
+                .upload(filePath, file);
+              if (uploadError) {
+                alert('Image upload failed: ' + uploadError.message);
+                return;
+              }
+              const { data: urlData } = supabase.storage
+                .from('property-media')
+                .getPublicUrl(filePath);
+              currentImages.push(urlData.publicUrl);
+            }
+            $('#editImageInput').value = '';
+          }
+
+          const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
+          const requestVerification = $('#editRequestVerification').checked;
+          let verificationStatus = 'unverified';
+          let isVerified = false;
+          if (requestVerification) {
+            verificationStatus = 'pending';
+            isVerified = false;
+          }
+
+          // ✅ No tier column
+          const updateData = {
+            title,
+            price_amount: price,
+            property_type: dbType,
+            address,
+            media_urls: currentImages,
+            is_verified: isVerified,
+            verification_status: verificationStatus,
+          };
+
+          try {
+            const { error } = await supabase.from('properties').update(updateData).eq('id', id);
+            if (error) throw error;
+            alert(requestVerification ? '✅ Property updated! Verification requested.' : '✅ Property updated!');
+            const modal = $('#editModal');
+            if (modal) modal.classList.add('hidden');
+            await loadMyProperties();
+            await fetchAllData();
+          } catch (err) { alert('Update failed: ' + err.message); }
+        });
+      }
+
+      const closeEditModal = $('#closeEditModal');
+      if (closeEditModal) {
+        closeEditModal.addEventListener('click', () => {
+          const modal = $('#editModal');
+          if (modal) modal.classList.add('hidden');
+        });
+      }
+      const editModal = $('#editModal');
+      if (editModal) {
+        editModal.addEventListener('click', (e) => {
+          if (e.target === editModal) editModal.classList.add('hidden');
+        });
+      }
+
+      // ─── Profile ────────────────────────────────────────────────────
+      async function loadProfileSettings() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('business_name, phone, is_admin')
+            .eq('id', state.currentUser.id)
+            .single();
+          if (error) throw error;
+          const name = $('#settingsBusinessName');
+          if (name) name.value = data.business_name || '';
+          const phone = $('#settingsPhone');
+          if (phone) phone.value = data.phone || '';
+          state.isAdmin = data.is_admin || false;
+        } catch (err) {
+          console.error('Error loading profile:', err);
+        }
+      }
+
+      const profileSettingsForm = $('#profileSettingsForm');
+      if (profileSettingsForm) {
+        profileSettingsForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) return;
+          const businessName = $('#settingsBusinessName').value.trim();
+          const phone = $('#settingsPhone').value.trim();
+          try {
+            const { error } = await supabase
+              .from('profiles')
+              .update({ business_name: businessName, phone: phone })
+              .eq('id', state.currentUser.id);
+            if (error) throw error;
+            const status = $('#profileStatus');
+            if (status) {
+              status.textContent = '✅ Profile updated successfully!';
+              status.className = 'mt-3 text-sm text-emerald-600';
+            }
+            if (state.currentUser) {
+              state.currentUser.business_name = businessName;
+              state.currentUser.phone = phone;
+            }
+            await fetchAllData();
+            if (state.currentUser) await loadMyProperties();
+          } catch (err) {
+            const status = $('#profileStatus');
+            if (status) {
+              status.textContent = '❌ Update failed: ' + err.message;
+              status.className = 'mt-3 text-sm text-red-600';
+            }
+          }
+        });
+      }
+
+      // ─── Fetch all data ──────────────────────────────────────────────
+      async function fetchAllData() {
+        state.isLoading = true;
+        const skeleton = $('#loadingSkeleton');
+        if (skeleton) skeleton.style.display = 'grid';
+        const grid = $('#listingsGrid');
+        if (grid) grid.innerHTML = '';
+        const empty = $('#emptyState');
+        if (empty) empty.classList.add('hidden');
+
+        try {
+          const { data: properties, error: propError } = await supabase
+            .from('properties')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (propError) throw propError;
+
+          if (!properties || properties.length === 0) {
+            if (skeleton) skeleton.style.display = 'none';
+            state.allProperties = [];
+            state.filteredProperties = [];
+            renderListings([]);
+            state.isLoading = false;
+            return;
+          }
+
+          // Get profiles for brokers
+          const ownerIds = [...new Set(properties.map(p => p.owner_id).filter(id => id))];
+          let profilesMap = {};
+          if (ownerIds.length > 0) {
+            const { data: profiles, error: profError } = await supabase
+              .from('profiles')
+              .select('*')
+              .in('id', ownerIds);
+            if (!profError && profiles) {
+              profilesMap = Object.fromEntries(profiles.map(p => [p.id, p]));
+            }
+          }
+          state.profilesMap = profilesMap;
+
+          // Get reports count
+          const { data: reports } = await supabase
+            .from('reports')
+            .select('broker_id, status')
+            .eq('status', 'pending');
+
+          if (reports) {
+            const reportCounts = {};
+            reports.forEach(r => {
+              reportCounts[r.broker_id] = (reportCounts[r.broker_id] || 0) + 1;
+            });
+            Object.keys(profilesMap).forEach(id => {
+              profilesMap[id].report_count = reportCounts[id] || 0;
+            });
+          }
+
+          const enriched = properties.map(prop => {
+            const broker = profilesMap[prop.owner_id] || null;
+            const reportCount = broker?.report_count || 0;
+            const rankScore = calculateRankScore(prop, broker, reportCount);
+            return { ...prop, broker, rankScore };
+          });
+
+          enriched.sort((a, b) => b.rankScore - a.rankScore);
+
+          state.allProperties = enriched;
+          state.filteredProperties = [...enriched];
+          applyFiltersAndSearch();
+        } catch (err) {
+          console.error('❌ Error fetching data:', err);
+          if (grid) {
+            grid.innerHTML = `
+              <div class="col-span-full text-center py-12 text-slate-500">
+                <i class="fas fa-exclamation-triangle text-3xl text-amber-400 mb-3"></i>
+                <p>Failed to load properties.</p>
+                <p class="text-xs text-slate-400 mt-1">${err.message}</p>
+              </div>
+            `;
+          }
+        } finally {
+          state.isLoading = false;
+          if (skeleton) skeleton.style.display = 'none';
+        }
+      }
+
+      function applyFiltersAndSearch() {
+        const filter = state.currentFilter;
+        const query = state.searchQuery.trim().toLowerCase();
+        let result = [...state.allProperties];
+
+        if (filter !== 'all') {
+          result = result.filter(p => {
+            const dbType = (p.property_type || '').toLowerCase();
+            return dbType === filter;
+          });
+        }
+
+        if (query) {
+          result = result.filter(p => {
+            const address = (p.address || '').toLowerCase();
+            const title = (p.title || '').toLowerCase();
+            return address.includes(query) || title.includes(query);
+          });
+        }
+
+        state.filteredProperties = result;
+        renderListings(result);
+      }
+
+      // ─── Navigation ────────────────────────────────────────────────
+      async function navigateToBroker(brokerId) {
+        if (!brokerId) return;
+        state.currentBrokerId = brokerId;
+        showView($('#brokerView'));
+        navigateTo(`/broker/${brokerId}`);
+        await loadBrokerProfile(brokerId);
+      }
+
+      async function loadBrokerProfile(brokerId) {
+        const grid = $('#brokerListingsGrid');
+        if (!grid) return;
+        grid.innerHTML = `
+          <div class="col-span-full flex justify-center py-12">
+            <div class="text-slate-400 flex items-center gap-3">
+              <i class="fas fa-spinner fa-spin text-xl"></i> Loading broker profile…
+            </div>
+          </div>
+        `;
+        const empty = $('#brokerEmptyState');
+        if (empty) empty.classList.add('hidden');
+
+        try {
+          const { data: broker, error: brokerError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', brokerId)
+            .single();
+          if (brokerError) throw brokerError;
+          if (!broker) {
+            grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">Broker not found.</div>`;
+            return;
+          }
+
+          const name = $('#brokerBusinessName');
+          if (name) name.textContent = broker.business_name || 'Unnamed Broker';
+
+          const isTrusted = isTrustedBroker(broker);
+          const trustedBadge = $('#brokerTrustedBadge');
+          if (trustedBadge) {
+            if (isTrusted) trustedBadge.classList.remove('hidden');
+            else trustedBadge.classList.add('hidden');
+          }
+
+          const reportCount = broker.report_count || 0;
+          const notice = $('#brokerReportNotice');
+          if (notice) {
+            if (reportCount > 0) {
+              notice.classList.remove('hidden');
+              notice.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i>
+                <span class="font-medium">⚠️ This broker has ${reportCount} report${reportCount > 1 ? 's' : ''}.</span>
+                <span> Proceed with caution.</span>`;
+            } else {
+              notice.classList.add('hidden');
+            }
+          }
+
+          const waLink = $('#brokerWhatsAppLink');
+          if (waLink) waLink.style.display = 'none';
+
+          const rating = broker.average_rating || 0;
+          const reviewCount = broker.review_count || 0;
+          const leadScore = broker.lead_score || 0;
+          const stars = $('#brokerStars');
+          if (stars) stars.innerHTML = renderStars(rating);
+          const reviewCountEl = $('#brokerReviewCount');
+          if (reviewCountEl) reviewCountEl.textContent = `(${reviewCount} reviews)`;
+          const leadScoreEl = $('#brokerLeadScore');
+          if (leadScoreEl) leadScoreEl.textContent = `⚡ ${leadScore}`;
+
+          const totalReviews = $('#statTotalReviews');
+          if (totalReviews) totalReviews.textContent = reviewCount;
+          const avgRating = $('#statAvgRating');
+          if (avgRating) avgRating.textContent = rating.toFixed(1);
+
+          if (state.currentUser && state.currentUser.id !== brokerId) {
+            const rateBtn = $('#rateBrokerBtn');
+            if (rateBtn) {
+              rateBtn.classList.remove('hidden');
+              rateBtn.onclick = () => openReviewModal(brokerId);
+            }
+            const viewBtn = $('#viewReviewsBtn');
+            if (viewBtn) {
+              viewBtn.classList.remove('hidden');
+              viewBtn.onclick = () => openViewReviewsModal(brokerId);
+            }
+            const reportBtn = $('#reportBrokerBtn');
+            if (reportBtn) {
+              reportBtn.classList.remove('hidden');
+              reportBtn.onclick = () => openReportModal(brokerId);
+            }
+          } else {
+            const rateBtn = $('#rateBrokerBtn');
+            if (rateBtn) rateBtn.classList.add('hidden');
+            const reportBtn = $('#reportBrokerBtn');
+            if (reportBtn) reportBtn.classList.add('hidden');
+            const viewBtn = $('#viewReviewsBtn');
+            if (viewBtn) {
+              viewBtn.classList.remove('hidden');
+              viewBtn.onclick = () => openViewReviewsModal(brokerId);
+            }
+          }
+
+          const { data: props, error: propsError } = await supabase
+            .from('properties')
+            .select('*')
+            .eq('owner_id', brokerId)
+            .order('created_at', { ascending: false });
+          if (propsError) throw propsError;
+
+          if (!props || props.length === 0) {
+            grid.innerHTML = '';
+            if (empty) empty.classList.remove('hidden');
+            return;
+          }
+
+          if (empty) empty.classList.add('hidden');
+          grid.innerHTML = '';
+          props.forEach(prop => {
+            const card = createPropertyCard(prop, broker, false, false);
+            grid.appendChild(card);
+          });
+        } catch (err) {
+          console.error('❌ Error loading broker profile:', err);
+          grid.innerHTML = `
+            <div class="col-span-full text-center py-12 text-slate-500">
+              <i class="fas fa-exclamation-triangle text-3xl text-amber-400 mb-3"></i>
+              <p>Could not load broker profile.</p>
+              <p class="text-xs text-slate-400 mt-1">${err.message}</p>
+            </div>
+          `;
+        }
+      }
+
+      function navigateToAuth() {
+        showView($('#authView'));
+        navigateTo('/auth');
+        setAuthMode(false);
+        const form = $('#authForm');
+        if (form) form.reset();
+      }
+
+      function goToDiscovery() {
+        showView($('#discoveryView'));
+        state.currentBrokerId = null;
+        navigateTo('/');
+        applyFiltersAndSearch();
+      }
+
+      const backToDiscovery = $('#backToDiscovery');
+      if (backToDiscovery) backToDiscovery.addEventListener('click', goToDiscovery);
+      const backToSearch = $('#backToSearchBtn');
+      if (backToSearch) backToSearch.addEventListener('click', goToDiscovery);
+
+      // ─── Dashboard ──────────────────────────────────────────────────
+      async function loadMyProperties() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase
+            .from('properties')
+            .select('*')
+            .eq('owner_id', state.currentUser.id)
+            .order('created_at', { ascending: false });
+          if (error) throw error;
+          state.myProperties = data || [];
+          renderMyProperties();
+        } catch (err) {
+          console.error('Error loading my properties:', err);
+          const list = $('#myPropertiesList');
+          if (list) {
+            list.innerHTML = `
+              <div class="col-span-full text-center py-8 text-slate-500">
+                Could not load your properties.
+              </div>
+            `;
           }
         }
       }
 
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          state.currentUser = user;
-          $('#portalBtnLabel').textContent = 'Dashboard';
-          await loadProfileSettings();
-          await loadWallet();
-        }
-      } catch (err) {
-        console.log('No active session (403 is normal).');
+      // ─── Add Property ──────────────────────────────────────────────
+      const addPropertyForm = $('#addPropertyForm');
+      if (addPropertyForm) {
+        addPropertyForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) {
+            alert('Please sign in first.');
+            return;
+          }
+
+          const title = $('#propTitle').value.trim();
+          const price = parseFloat($('#propPrice').value);
+          const type = $('#propType').value;
+          const address = $('#propAddress').value.trim();
+          const imageFiles = $('#propImage').files;
+          const requestVerification = $('#addRequestVerification').checked;
+
+          if (!title || !price || !address) {
+            alert('Please fill in all required fields.');
+            return;
+          }
+
+          const statusEl = $('#uploadStatus');
+          if (statusEl) {
+            statusEl.textContent = 'Uploading images...';
+            statusEl.className = 'mt-3 text-sm text-indigo-600';
+          }
+
+          const imageUrls = [];
+          if (imageFiles && imageFiles.length > 0) {
+            for (const file of imageFiles) {
+              const fileExt = file.name.split('.').pop();
+              const fileName = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.${fileExt}`;
+              const filePath = `${state.currentUser.id}/${fileName}`;
+              const { error: uploadError } = await supabase.storage
+                .from('property-media')
+                .upload(filePath, file);
+              if (uploadError) {
+                if (statusEl) {
+                  statusEl.textContent = '❌ Image upload failed: ' + uploadError.message;
+                  statusEl.className = 'mt-3 text-sm text-red-600';
+                }
+                return;
+              }
+              const { data: urlData } = supabase.storage
+                .from('property-media')
+                .getPublicUrl(filePath);
+              imageUrls.push(urlData.publicUrl);
+            }
+          }
+
+          const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
+
+          let verificationStatus = 'unverified';
+          let isVerified = false;
+          if (requestVerification) {
+            verificationStatus = 'pending';
+            isVerified = false;
+          }
+
+          // ✅ No tier column
+          const insertData = {
+            title,
+            price_amount: price,
+            property_type: dbType,
+            address,
+            media_urls: imageUrls,
+            is_verified: isVerified,
+            verification_status: verificationStatus,
+            owner_id: state.currentUser.id,
+          };
+
+          try {
+            const { error } = await supabase.from('properties').insert(insertData);
+            if (error) throw error;
+            if (statusEl) {
+              statusEl.textContent = requestVerification ? '✅ Property added! Verification requested.' : '✅ Property added!';
+              statusEl.className = 'mt-3 text-sm text-emerald-600';
+            }
+            addPropertyForm.reset();
+            $('#addRequestVerification').checked = false;
+            const info = $('#addVerificationInfo');
+            if (info) info.classList.remove('visible');
+            $('#propImage').value = '';
+            const preview = $('#propImagePreviews');
+            if (preview) preview.innerHTML = '';
+            await loadMyProperties();
+            await fetchAllData();
+            const container = $('#addPropertyContainer');
+            if (container) container.classList.remove('visible');
+          } catch (err) {
+            if (statusEl) {
+              statusEl.textContent = '❌ Failed to add property: ' + err.message;
+              statusEl.className = 'mt-3 text-sm text-red-600';
+            }
+          }
+        });
       }
 
-      await handleRoute();
-      await fetchAllData();
+      // ─── Auth ──────────────────────────────────────────────────────
+      async function handleAuthSubmit(e) {
+        e.preventDefault();
+        const email = $('#emailInput').value.trim();
+        const password = $('#passwordInput').value;
 
-      setTimeout(() => {
-        $('#securityNotification').style.display = 'block';
-      }, 3000);
+        if (state.isSignUpMode) {
+          const businessName = $('#bizNameInput').value.trim();
+          const accountType = $('#accTypeSelect').value;
+          const phone = $('#phoneInput').value.trim();
 
-      $('#closeSecurityNotification').addEventListener('click', () => {
-        $('#securityNotification').style.display = 'none';
+          if (!businessName) {
+            alert('Please enter your Business / Brand Name.');
+            return;
+          }
+
+          try {
+            const { data, error } = await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  business_name: businessName,
+                  account_type: accountType,
+                  phone: phone,
+                }
+              }
+            });
+            if (error) throw error;
+            alert('✅ Account created! Please check your email to verify your account.');
+            setAuthMode(false);
+            const form = $('#authForm');
+            if (form) form.reset();
+          } catch (err) {
+            alert('❌ Registration failed: ' + err.message);
+          }
+        } else {
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            state.currentUser = data.user;
+            alert('✅ Signed in successfully!');
+            showView($('#dashboardView'));
+            navigateTo('/dashboard');
+            const label = $('#portalBtnLabel');
+            if (label) label.textContent = 'Dashboard';
+            await loadProfileSettings();
+            await loadMyProperties();
+            await loadWallet();
+            await fetchAllData();
+            loadNotifications();
+            loadLeads();
+          } catch (err) {
+            alert('❌ Sign in failed: ' + err.message);
+          }
+        }
+      }
+
+      async function handleLogout() {
+        await supabase.auth.signOut();
+        state.currentUser = null;
+        const label = $('#portalBtnLabel');
+        if (label) label.textContent = 'Broker Portal';
+        goToDiscovery();
+      }
+
+      const logoutBtn = $('#logoutBtn');
+      if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+
+      // ─── Route ──────────────────────────────────────────────────────
+      async function handleRoute() {
+        const path = getCurrentPath();
+        if (path.startsWith('/broker/')) {
+          const brokerId = path.split('/')[2];
+          if (brokerId && brokerId !== state.currentBrokerId) {
+            if ($('#brokerView').classList.contains('view-hidden')) {
+              showView($('#brokerView'));
+              await loadBrokerProfile(brokerId);
+            }
+          }
+        } else if (path === '/auth') {
+          if ($('#authView').classList.contains('view-hidden')) {
+            showView($('#authView'));
+            setAuthMode(false);
+            const form = $('#authForm');
+            if (form) form.reset();
+          }
+        } else if (path === '/dashboard') {
+          if (state.currentUser) {
+            if ($('#dashboardView').classList.contains('view-hidden')) {
+              showView($('#dashboardView'));
+              await loadMyProperties();
+              await loadWallet();
+              loadNotifications();
+              loadLeads();
+            }
+          } else {
+            navigateTo('/auth', true);
+            handleRoute();
+          }
+        } else if (path === '/') {
+          if (!$('#discoveryView').classList.contains('view-visible')) {
+            showView($('#discoveryView'));
+            applyFiltersAndSearch();
+          }
+        } else {
+          navigateTo('/', true);
+          handleRoute();
+        }
+      }
+
+      // ─── Quiz ──────────────────────────────────────────────────────
+      async function openQuizModal(propertyId) {
+        const idInput = $('#quizPropertyId');
+        if (idInput) idInput.value = propertyId;
+        const step1 = $('#quizStep1');
+        const step2 = $('#quizStep2');
+        if (step1) step1.classList.remove('hidden');
+        if (step2) step2.classList.add('hidden');
+        const form = $('#quizForm');
+        if (form) form.reset();
+        const modal = $('#quizModal');
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      const quizNextBtn = $('#quizNextBtn');
+      if (quizNextBtn) {
+        quizNextBtn.addEventListener('click', function() {
+          const name = $('#quizName').value.trim();
+          const email = $('#quizEmail').value.trim();
+          const whatsapp = $('#quizWhatsapp').value.trim();
+          if (!name || !email || !whatsapp) {
+            alert('Please fill in all contact fields.');
+            return;
+          }
+          const step1 = $('#quizStep1');
+          const step2 = $('#quizStep2');
+          if (step1) step1.classList.add('hidden');
+          if (step2) step2.classList.remove('hidden');
+        });
+      }
+
+      const quizForm = $('#quizForm');
+      if (quizForm) {
+        quizForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const propertyId = $('#quizPropertyId').value;
+          const name = $('#quizName').value.trim();
+          const email = $('#quizEmail').value.trim();
+          const whatsapp = $('#quizWhatsapp').value.trim();
+
+          const q1 = document.querySelector('input[name="q1"]:checked');
+          const q2 = document.querySelector('input[name="q2"]:checked');
+          if (!q1 || !q2) {
+            alert('Please answer both quiz questions.');
+            return;
+          }
+
+          const score1 = parseInt(q1.value);
+          const score2 = parseInt(q2.value);
+          const totalScore = score1 + score2;
+          let leadType = 'cold';
+          if (totalScore >= 7) leadType = 'hot';
+          else if (totalScore >= 4) leadType = 'warm';
+
+          const answers = { q1: score1, q2: score2 };
+
+          try {
+            const { data, error } = await supabase.functions.invoke('request-lead', {
+              body: {
+                property_id: propertyId,
+                visitor_name: name,
+                visitor_email: email,
+                visitor_whatsapp: whatsapp,
+                quiz_answers: answers,
+                total_score: totalScore,
+                lead_type: leadType
+              }
+            });
+            if (error) throw error;
+
+            const modal = $('#quizModal');
+            if (modal) modal.classList.add('hidden');
+            const waiting = $('#waitingModal');
+            if (waiting) waiting.classList.remove('hidden');
+            const status = $('#waitingStatus');
+            if (status) status.textContent = 'Request sent. Waiting for broker...';
+
+            const requestId = data.lead_id;
+            subscribeToLeadRequest(requestId);
+          } catch (err) {
+            alert('Error submitting request: ' + err.message);
+          }
+        });
+      }
+
+      function subscribeToLeadRequest(requestId) {
+        const interval = setInterval(async () => {
+          const { data, error } = await supabase
+            .from('lead_requests')
+            .select('status')
+            .eq('id', requestId)
+            .single();
+          if (error) return;
+          if (data.status === 'approved') {
+            clearInterval(interval);
+            const waiting = $('#waitingModal');
+            if (waiting) waiting.classList.add('hidden');
+            alert('✅ Lead approved! The broker will contact you shortly.');
+            loadNotifications();
+          } else if (data.status === 'rejected') {
+            clearInterval(interval);
+            const waiting = $('#waitingModal');
+            if (waiting) waiting.classList.add('hidden');
+            alert('❌ The broker declined this request.');
+          }
+        }, 3000);
+      }
+
+      const cancelWaitBtn = $('#cancelWaitBtn');
+      if (cancelWaitBtn) {
+        cancelWaitBtn.addEventListener('click', function() {
+          if (confirm('Cancel this request?')) {
+            const waiting = $('#waitingModal');
+            if (waiting) waiting.classList.add('hidden');
+          }
+        });
+      }
+
+      const closeQuizModal = $('#closeQuizModal');
+      if (closeQuizModal) {
+        closeQuizModal.addEventListener('click', () => {
+          const modal = $('#quizModal');
+          if (modal) modal.classList.add('hidden');
+        });
+      }
+      const quizModal = $('#quizModal');
+      if (quizModal) {
+        quizModal.addEventListener('click', (e) => {
+          if (e.target === quizModal) quizModal.classList.add('hidden');
+        });
+      }
+
+      // ─── Event Binding ─────────────────────────────────────────────
+      const searchInput = $('#searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          state.searchQuery = e.target.value;
+          applyFiltersAndSearch();
+        });
+      }
+
+      const clearSearchBtn = $('#clearSearchBtn');
+      if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+          if (searchInput) {
+            searchInput.value = '';
+            state.searchQuery = '';
+            applyFiltersAndSearch();
+            searchInput.focus();
+          }
+        });
+      }
+
+      filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          filterPills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          state.currentFilter = pill.dataset.filter;
+          applyFiltersAndSearch();
+        });
       });
 
-      hideLoading();
-    }
+      const brokerPortalBtn = $('#brokerPortalBtn');
+      if (brokerPortalBtn) {
+        brokerPortalBtn.addEventListener('click', () => {
+          if (state.currentUser) {
+            showView($('#dashboardView'));
+            navigateTo('/dashboard');
+            loadMyProperties();
+            loadWallet();
+            loadNotifications();
+            loadLeads();
+          } else {
+            navigateToAuth();
+          }
+        });
+      }
 
-    function hideLoading() {
-      $('#loadingOverlay').classList.add('hidden');
-    }
+      const toggleSignIn = $('#toggleSignIn');
+      if (toggleSignIn) toggleSignIn.addEventListener('click', () => setAuthMode(false));
+      const toggleSignUp = $('#toggleSignUp');
+      if (toggleSignUp) toggleSignUp.addEventListener('click', () => setAuthMode(true));
 
-    // ─── Start ──────────────────────────────────────────────────────
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', async () => {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        await init();
-      });
-    } else {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      init();
-    }
-  </script>
-</body>
-</html>
+      const auth
