@@ -356,7 +356,7 @@
           </div>
           <div class="flex items-center gap-3">
             <span id="propertyCount" class="bg-slate-100 px-3 py-1 rounded-full text-slate-700 font-medium text-xs">0 listings</span>
-            <!-- Notification button removed as requested -->
+            <!-- Notification bell removed as requested -->
             <button id="brokerPortalBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition shadow-sm hover:shadow flex items-center gap-2">
               <i class="fas fa-user-tie"></i> <span id="portalBtnLabel">Broker Portal</span>
             </button>
@@ -542,7 +542,7 @@
   </div>
 
   <!-- ============================================================
-  JAVASCRIPT – Notifications removed, no 'tier' references
+  JAVASCRIPT – CLEANED, NO TIER, NO NOTIFICATION BELL
   ============================================================ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
   </script>
@@ -984,7 +984,7 @@
           let verificationStatus = 'unverified', isVerified = false;
           if (requestVerification) { verificationStatus = 'pending'; isVerified = false; }
 
-          // ✅ No tier column
+          // ✅ NO TIER COLUMN – this object has only the required fields.
           const updateData = {
             title, price_amount: price, property_type: dbType, address,
             media_urls: currentImages, is_verified: isVerified,
@@ -1305,7 +1305,7 @@
           let verificationStatus = 'unverified', isVerified = false;
           if (requestVerification) { verificationStatus = 'pending'; isVerified = false; }
 
-          // ✅ No tier column
+          // ✅ NO TIER COLUMN – insert only these fields.
           const insertData = {
             title, price_amount: price, property_type: dbType, address,
             media_urls: imageUrls, is_verified: isVerified,
