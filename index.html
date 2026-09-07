@@ -2492,4 +2492,126 @@
       const toggleSignUp = $('#toggleSignUp');
       if (toggleSignUp) toggleSignUp.addEventListener('click', () => setAuthMode(true));
 
-      const auth
+      const authForm = $('#authForm');
+      if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
+
+      window.addEventListener('popstate', handleRoute);
+
+      // ─── Security notification ──────────────────────────────────────
+      const closeSecurity = $('#closeSecurityNotification');
+      if (closeSecurity) {
+        closeSecurity.addEventListener('click', () => {
+          const notif = $('#securityNotification');
+          if (notif) notif.style.display = 'none';
+        });
+      }
+
+      // ─── Notification bell ──────────────────────────────────────────
+      const notificationBell = $('#notificationBell');
+      if (notificationBell) {
+        notificationBell.addEventListener('click', async function() {
+          if (!state.currentUser) return;
+          await supabase
+            .from('notifications')
+            .update({ read: true })
+            .eq('user_id', state.currentUser.id)
+            .eq('read', false);
+          const badge = $('#notificationCount');
+          if (badge) badge.classList.add('hidden');
+          const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', state.currentUser.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+          if (error) return;
+          if (data.length === 0) { alert('No notifications.'); return; }
+          let msg = '📬 Recent Notifications:\n\n';
+          data.forEach(n => {
+            msg += `📌 ${new Date(n.created_at).toLocaleString()}\n${n.title}: ${n.message}\n\n`;
+          });
+          alert(msg);
+        });
+      }
+
+      // ─── Init ────────────────────────────────────────────────────────
+      async function init() {
+        const hash = window.location.hash;
+        if (hash && hash.includes('access_token')) {
+          const params = new URLSearchParams(hash.substring(1));
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+          if (accessToken && refreshToken) {
+            try {
+              const { data, error } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              });
+              if (error) throw error;
+              if (data.user) {
+                state.currentUser = data.user;
+                const label = $('#portalBtnLabel');
+                if (label) label.textContent = 'Dashboard';
+                window.history.replaceState(null, '', '/');
+                showView($('#dashboardView'));
+                navigateTo('/dashboard');
+                await loadProfileSettings();
+                await loadMyProperties();
+                await loadWallet();
+                await fetchAllData();
+                loadNotifications();
+                loadLeads();
+                alert('✅ Email verified! Welcome to your dashboard.');
+                return;
+              }
+            } catch (err) {
+              console.error('Session set error:', err);
+              alert('❌ Verification failed: ' + err.message);
+            }
+          }
+        }
+
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            state.currentUser = user;
+            const label = $('#portalBtnLabel');
+            if (label) label.textContent = 'Dashboard';
+            await loadProfileSettings();
+            await loadWallet();
+          }
+        } catch (err) {
+          console.log('No active session (403 is normal).');
+        }
+
+        await handleRoute();
+        await fetchAllData();
+
+        // Show security notification after 3 seconds
+        setTimeout(() => {
+          const notif = $('#securityNotification');
+          if (notif) notif.style.display = 'block';
+        }, 3000);
+
+        // Hide loading overlay
+        const loading = $('#loadingOverlay');
+        if (loading) loading.classList.add('hidden');
+      }
+
+      // ─── Start ──────────────────────────────────────────────────────
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', async () => {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          await init();
+        });
+      } else {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        init();
+      }
+
+      // Expose state for debugging
+      window.__state = state;
+    })();
+  </script>
+</body>
+</html>
