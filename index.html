@@ -356,10 +356,7 @@
           </div>
           <div class="flex items-center gap-3">
             <span id="propertyCount" class="bg-slate-100 px-3 py-1 rounded-full text-slate-700 font-medium text-xs">0 listings</span>
-            <button id="notificationBell" class="relative text-slate-600 hover:text-slate-800 transition">
-              <i class="fas fa-bell text-lg"></i>
-              <span id="notificationCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
-            </button>
+            <!-- Notification button removed as requested -->
             <button id="brokerPortalBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition shadow-sm hover:shadow flex items-center gap-2">
               <i class="fas fa-user-tie"></i> <span id="portalBtnLabel">Broker Portal</span>
             </button>
@@ -545,7 +542,7 @@
   </div>
 
   <!-- ============================================================
-  JAVASCRIPT – COMPLETE WITH `tier` REMOVED
+  JAVASCRIPT – Notifications removed, no 'tier' references
   ============================================================ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
   </script>
@@ -692,30 +689,6 @@
           alert('Error: ' + err.message);
           return false;
         }
-      }
-
-      // ─── Notifications ──────────────────────────────────────────────────
-      async function loadNotifications() {
-        if (!state.currentUser) return;
-        try {
-          const { data, error } = await supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_id', state.currentUser.id)
-            .eq('read', false)
-            .order('created_at', { ascending: false });
-          if (error) throw error;
-          const count = data?.length || 0;
-          const badge = document.getElementById('notificationCount');
-          if (badge) {
-            if (count > 0) {
-              badge.textContent = count > 9 ? '9+' : count;
-              badge.classList.remove('hidden');
-            } else {
-              badge.classList.add('hidden');
-            }
-          }
-        } catch (err) { console.error('Notifications load error:', err); }
       }
 
       // ─── Ranking ─────────────────────────────────────────────────────────
@@ -1011,7 +984,7 @@
           let verificationStatus = 'unverified', isVerified = false;
           if (requestVerification) { verificationStatus = 'pending'; isVerified = false; }
 
-          // ✅ NO TIER COLUMN
+          // ✅ No tier column
           const updateData = {
             title, price_amount: price, property_type: dbType, address,
             media_urls: currentImages, is_verified: isVerified,
@@ -1332,7 +1305,7 @@
           let verificationStatus = 'unverified', isVerified = false;
           if (requestVerification) { verificationStatus = 'pending'; isVerified = false; }
 
-          // ✅ NO TIER COLUMN
+          // ✅ No tier column
           const insertData = {
             title, price_amount: price, property_type: dbType, address,
             media_urls: imageUrls, is_verified: isVerified,
@@ -1633,7 +1606,6 @@
             clearInterval(interval);
             document.getElementById('waitingModal').classList.add('hidden');
             alert('✅ Lead approved! The broker will contact you shortly.');
-            loadNotifications();
           } else if (data.status === 'rejected') {
             clearInterval(interval);
             document.getElementById('waitingModal').classList.add('hidden');
@@ -1810,7 +1782,6 @@
                 alert(`✅ Lead unlocked!\n\nName: ${data.visitor_name}\nEmail: ${data.visitor_email}\nWhatsApp: ${data.visitor_whatsapp}`);
                 loadLeads();
                 loadWallet();
-                loadNotifications();
               } catch (err) { alert('Error: ' + err.message); }
             });
           });
@@ -1975,7 +1946,6 @@
             await loadMyProperties();
             await loadWallet();
             await fetchAllData();
-            loadNotifications();
             loadLeads();
           } catch (err) { alert('❌ Sign in failed: ' + err.message); }
         }
@@ -2011,7 +1981,6 @@
               showView(document.getElementById('dashboardView'));
               await loadMyProperties();
               await loadWallet();
-              loadNotifications();
               loadLeads();
             }
           } else {
@@ -2048,7 +2017,6 @@
             state.currentUser = user;
             document.getElementById('portalBtnLabel').textContent = 'Dashboard';
             await loadWallet();
-            await loadNotifications();
           }
         } catch (err) { console.log('No active session.'); }
 
@@ -2089,7 +2057,6 @@
               navigateTo('/dashboard');
               loadMyProperties();
               loadWallet();
-              loadNotifications();
               loadLeads();
             } else {
               navigateToAuth();
@@ -2113,33 +2080,6 @@
 
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
-
-        // ─── Notification bell ──────────────────────────────────────────
-        const bell = document.getElementById('notificationBell');
-        if (bell) {
-          bell.addEventListener('click', async function() {
-            if (!state.currentUser) return;
-            await supabase
-              .from('notifications')
-              .update({ read: true })
-              .eq('user_id', state.currentUser.id)
-              .eq('read', false);
-            document.getElementById('notificationCount').classList.add('hidden');
-            const { data, error } = await supabase
-              .from('notifications')
-              .select('*')
-              .eq('user_id', state.currentUser.id)
-              .order('created_at', { ascending: false })
-              .limit(10);
-            if (error) return;
-            if (data.length === 0) { alert('No notifications.'); return; }
-            let msg = '📬 Recent Notifications:\n\n';
-            data.forEach(n => {
-              msg += `📌 ${new Date(n.created_at).toLocaleString()}\n${n.title}: ${n.message}\n\n`;
-            });
-            alert(msg);
-          });
-        }
 
         // ─── Security notification ──────────────────────────────────────
         const closeSec = document.getElementById('closeSecurityNotification');
