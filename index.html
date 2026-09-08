@@ -7,11 +7,13 @@
   <meta name="description" content="Discover the best properties, rentals, and lodges across Uganda." />
   <link rel="canonical" href="https://yourdomain.com/" />
   <meta name="robots" content="index, follow" />
+
   <meta property="og:title" content="Property Hub Uganda" />
   <meta property="og:description" content="Find your perfect property in Uganda – from rentals to luxury lodges." />
   <meta property="og:image" content="https://yourdomain.com/og-image.jpg" />
   <meta property="og:url" content="https://yourdomain.com/" />
   <meta property="og:type" content="website" />
+
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Property Hub Uganda" />
   <meta name="twitter:description" content="Find your perfect property in Uganda." />
@@ -21,7 +23,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    /* ─── All original styles ─── */
+    /* ─── All styles unchanged ─── */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -45,6 +47,7 @@
     #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
     .loader { border: 4px solid #f3f4f6; border-top: 4px solid #4f46e5; border-radius: 50%; width: 48px; height: 48px; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
     .modal-backdrop.hidden { display: none; }
     .modal-content { background: white; border-radius: 2rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; }
@@ -52,22 +55,28 @@
     .image-thumb img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
     .image-thumb .remove-img { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: none; }
     .image-thumb .remove-img:hover { background: #dc2626; }
+
     .stars { color: #f59e0b; letter-spacing: 2px; }
     .stars .empty { color: #d1d5db; }
     .badge-lead { background: #10b981; color: white; padding: 0.1rem 0.5rem; border-radius: 9999px; font-size: 0.6rem; font-weight: bold; }
+
     .star-rating .star { cursor: pointer; font-size: 2rem; color: #d1d5db; transition: 0.15s; }
     .star-rating .star.active { color: #f59e0b; }
     .star-rating .star:hover { transform: scale(1.2); color: #f59e0b; }
     .star-rating .star:hover ~ .star { color: #d1d5db; }
+
     .badge-verified { background: #10b981; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; animation: fadeIn 0.3s ease; }
     .badge-pending { background: #f59e0b; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-rejected { background: #ef4444; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-trusted { background: #f59e0b; color: #1e293b; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 700; border: 1px solid #d97706; }
+
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
     .dashboard-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; background: white; padding: 1rem 1.25rem; border-radius: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
     .wallet-pill { background: #1e293b; color: white; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .wallet-pill .balance { color: #34d399; }
     .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
     .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; }
     .dashboard-toolbar .toolbar-btn:hover { background: #e2e8f0; }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
@@ -76,26 +85,33 @@
     .dashboard-toolbar .toolbar-btn.green:hover { background: #059669; }
     .dashboard-toolbar .toolbar-btn.amber { background: #f59e0b; color: white; }
     .dashboard-toolbar .toolbar-btn.amber:hover { background: #d97706; }
+
     .profile-form-container, .add-property-container, .verification-form-container { background: white; border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); display: none; }
     .profile-form-container.visible, .add-property-container.visible, .verification-form-container.visible { display: block; }
+
     .safety-banner { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }
     .security-notification { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: #1e293b; color: white; padding: 1rem 1.25rem; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 999; display: none; animation: slideUp 0.5s ease; }
     .security-notification .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 0 0 0 0.5rem; }
     .security-notification .close-btn:hover { color: white; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
     .verification-info-panel { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-top: 0.5rem; display: none; font-size: 0.875rem; color: #0369a1; }
     .verification-info-panel.visible { display: block; }
     .verification-info-panel ul { list-style: disc; padding-left: 1.5rem; margin-top: 0.25rem; }
+
     .review-item { background: #f8fafc; border-radius: 0.75rem; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
     .review-item .review-text { font-size: 0.875rem; color: #334155; }
     .review-item .review-meta { font-size: 0.75rem; color: #94a3b8; }
     .review-item .stars-small { letter-spacing: 1px; }
+
     .review-stats { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 0.5rem; }
     .review-stats .stat { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #475569; }
     .review-stats .stat .value { font-weight: 700; font-size: 1.125rem; color: #1e293b; }
     .review-stats .stat .label { color: #94a3b8; }
+
     .write-review-toggle { cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; color: #4f46e5; font-weight: 500; transition: 0.2s; }
     .write-review-toggle:hover { color: #4338ca; }
+
     .verification-property-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
     .verification-property-item .property-title { font-weight: 600; color: #1e293b; flex: 1; }
     .verification-property-item .property-status { font-size: 0.75rem; font-weight: 600; padding: 0.1rem 0.6rem; border-radius: 9999px; }
@@ -103,13 +119,16 @@
     .verification-property-item .property-status.pending { background: #fef3c7; color: #92400e; }
     .verification-property-item .property-status.rejected { background: #fee2e2; color: #991b1b; }
     .verification-property-item .property-status.unverified { background: #e2e8f0; color: #475569; }
+
     .detail-field { margin-bottom: 0.75rem; }
     .detail-field .label { font-weight: 600; color: #1e293b; font-size: 0.875rem; display: block; }
     .detail-field .value { color: #475569; word-break: break-all; }
     .detail-field .value a { color: #4f46e5; text-decoration: underline; }
+
     #scrollTopBtn { position: fixed; bottom: 30px; right: 30px; z-index: 1000; background: #4f46e5; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s; border: none; }
     #scrollTopBtn.show { opacity: 1; visibility: visible; }
     #scrollTopBtn:hover { background: #4338ca; }
+
     @media (max-width: 640px) {
       .dashboard-toolbar { flex-direction: column; align-items: stretch; padding: 0.75rem; }
       .dashboard-toolbar .wallet-pill { justify-content: center; }
@@ -143,50 +162,146 @@
     </div>
   </div>
 
-  <!-- Modals (Keep existing modal HTML exactly as before) -->
   <!-- Review Modal -->
   <div id="reviewModal" class="modal-backdrop hidden">
-    <!-- ... (full review modal content) ... -->
-  </div>
-  <!-- Edit Property Modal -->
-  <div id="editModal" class="modal-backdrop hidden">
-    <!-- ... (full edit modal content) ... -->
-  </div>
-  <!-- Property Verification Modal -->
-  <div id="propertyVerificationModal" class="modal-backdrop hidden">
-    <!-- ... -->
-  </div>
-  <!-- Broker Verification Detail Modal -->
-  <div id="brokerVerificationDetailModal" class="modal-backdrop hidden">
-    <!-- ... -->
-  </div>
-  <!-- Quiz/Connect Modal -->
-  <div id="quizModal" class="modal-backdrop hidden">
-    <!-- ... -->
-  </div>
-  <!-- Waiting Room Modal -->
-  <div id="waitingModal" class="modal-backdrop hidden">
-    <!-- ... -->
-  </div>
-  <!-- OTP Modal -->
-  <div id="otpModal" class="modal-backdrop hidden">
-    <!-- ... -->
-  </div>
-  <!-- Top-up Modal -->
-  <div id="topupModal" class="modal-backdrop hidden">
-    <!-- ... -->
-  </div>
-  <!-- Report Modal -->
-  <div id="reportModal" class="modal-backdrop hidden">
-    <!-- ... -->
-  </div>
-  <!-- Terms Modal -->
-  <div id="termsModal" class="modal-backdrop hidden">
-    <!-- ... -->
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">⭐ Reviews</h2>
+        <button id="closeReviewModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm text-slate-500">What others say</span>
+        <button id="toggleWriteReview" class="write-review-toggle"><i class="fas fa-pen"></i> Write a Review</button>
+      </div>
+      <div id="reviewFormContainer" class="hidden mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <form id="reviewForm">
+          <input type="hidden" id="reviewBrokerId" />
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Name (optional)</label>
+            <input type="text" id="reviewClientName" placeholder="e.g. John Doe" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" />
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Rating</label>
+            <div id="starSelector" class="star-rating flex gap-1">
+              <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span>
+              <span class="star" data-value="3">★</span><span class="star" data-value="4">★</span>
+              <span class="star" data-value="5">★</span>
+            </div>
+            <input type="hidden" id="reviewRating" value="5" />
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Review</label>
+            <textarea id="reviewComment" rows="3" placeholder="Share your experience with this broker..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">
+            <i class="fas fa-paper-plane mr-2"></i> Submit Review
+          </button>
+        </form>
+      </div>
+      <div id="reviewsList" class="space-y-3 max-h-64 overflow-y-auto"><p class="text-slate-500 text-sm">Loading reviews...</p></div>
+      <div id="noReviewsMessage" class="hidden text-slate-500 text-sm text-center py-4">No reviews yet. Be the first to leave a review!</div>
+    </div>
   </div>
 
-  <!-- Main App Structure -->
+  <!-- Edit Property Modal -->
+  <div id="editModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">✏️ Edit Property</h2>
+        <button id="closeEditModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <form id="editPropertyForm" class="space-y-4">
+        <input type="hidden" id="editPropertyId" />
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Title *</label><input type="text" id="editTitle" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Price (UGX) *</label><input type="number" id="editPrice" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Property Type *</label><select id="editType" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm bg-white"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Address *</label><input type="text" id="editAddress" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+        <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Images</label><div id="editImagePreviews" class="flex flex-wrap gap-2 mb-2"></div><input type="file" id="editImageInput" accept="image/*" multiple class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" /></div>
+        <div class="flex items-center gap-3 mt-2">
+          <input type="checkbox" id="editRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+          <label for="editRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label>
+          <span class="text-xs text-slate-400">(You'll provide details later)</span>
+        </div>
+        <div id="editVerificationInfo" class="verification-info-panel"><p class="font-medium">🔍 Verification Process</p><ul><li>After saving, go to the Verification panel to submit required documents.</li><li>We'll review your property and approve it.</li><li>Verified properties rank higher.</li></ul></div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-save mr-2"></i> Update Property</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Property Verification Modal -->
+  <div id="propertyVerificationModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">📋 Property Verification</h2>
+        <button id="closeVerificationModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <form id="propertyVerificationForm" class="space-y-4">
+        <input type="hidden" id="verifPropertyId" />
+        <input type="hidden" id="verifPropertyType" />
+        <p class="text-sm text-slate-600">Please provide the required information based on the property type. All fields are required unless marked optional.</p>
+        <div id="verifDynamicFields"></div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">
+          <i class="fas fa-paper-plane mr-2"></i> Submit Verification Request
+        </button>
+      </form>
+      <div id="verifStatus" class="mt-3 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- Broker Verification Detail Modal -->
+  <div id="brokerVerificationDetailModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">📄 Verification Details</h2>
+        <button id="closeBrokerDetailModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <div id="brokerDetailContent" class="space-y-2"><p class="text-slate-500 text-sm">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- Quiz / Connect Modal -->
+  <div id="quizModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">📞 Connect with Broker</h2>
+        <button id="closeQuizModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <form id="quizForm">
+        <input type="hidden" id="quizPropertyId" />
+        <div id="quizStep1">
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Your Full Name *</label><input type="text" id="quizName" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address *</label><input type="email" id="quizEmail" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Number *</label><input type="text" id="quizWhatsapp" required placeholder="e.g. 256700123456" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+          <button type="button" id="quizNextBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">Next: Quiz Questions →</button>
+        </div>
+        <div id="quizStep2" class="hidden">
+          <div id="quizQuestionsContainer" class="space-y-4">
+            <div class="mb-4"><p class="font-medium text-slate-700 text-sm mb-1">1. When do you plan to move in or buy?</p><div class="flex flex-wrap gap-2"><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q1" value="1" required /> More than 6 months</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q1" value="2" /> 1 – 6 months</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q1" value="3" /> Less than 1 month / ASAP</label></div></div>
+            <div class="mb-4"><p class="font-medium text-slate-700 text-sm mb-1">2. What is your budget range?</p><div class="flex flex-wrap gap-2"><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q2" value="1" required /> Below property price</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q2" value="2" /> Matches property price</label><label class="flex items-center gap-1.5 text-sm bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 hover:border-indigo-300 cursor-pointer"><input type="radio" name="q2" value="3" /> Above property price</label></div></div>
+          </div>
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm mt-4"><i class="fas fa-paper-plane mr-2"></i> Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Waiting Room Modal -->
+  <div id="waitingModal" class="modal-backdrop hidden"><div class="modal-content text-center max-w-md"><div class="py-8"><i class="fas fa-hourglass-half text-5xl text-indigo-400 mb-4 animate-pulse"></i><h3 class="text-xl font-bold text-slate-800">⏳ Waiting for Broker</h3><p class="text-slate-500 text-sm mt-2">Your request has been sent. The broker will review it shortly.</p><p class="text-xs text-slate-400 mt-1">You'll be notified here once they respond.</p><div id="waitingStatus" class="mt-4 text-sm text-slate-600"></div><button id="cancelWaitBtn" class="mt-6 text-sm text-red-500 hover:text-red-700">Cancel Request</button></div></div></div>
+
+  <!-- OTP Modal -->
+  <div id="otpModal" class="modal-backdrop hidden"><div class="modal-content max-w-sm"><h3 class="text-xl font-bold text-slate-800 mb-2">🔐 Verify Your Identity</h3><p class="text-slate-500 text-sm">We've sent a one‑time password to your email and WhatsApp. Enter it below to reveal the broker's contact.</p><form id="otpForm" class="mt-4"><input type="hidden" id="otpRequestId" /><div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">OTP Code</label><input type="text" id="otpInput" placeholder="6-digit code" maxlength="6" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-center" /></div><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">Verify & Reveal WhatsApp</button></form><p id="otpError" class="text-red-500 text-xs mt-2 hidden"></p></div></div>
+
+  <!-- Top-up Modal -->
+  <div id="topupModal" class="modal-backdrop hidden"><div class="modal-content max-w-sm"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-800">💰 Top Up Wallet</h2><button id="closeTopupModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><p class="text-slate-500 text-sm mb-4">Deposit real money (UGX) into your wallet.</p><form id="topupForm"><div class="mb-4"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Amount (UGX)</label><input type="number" id="topupAmount" required min="1000" step="1000" placeholder="e.g. 10000" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div><button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-plus-circle mr-2"></i> Deposit</button></form><div id="topupStatus" class="mt-3 text-sm text-slate-600"></div></div></div>
+
+  <!-- Report Modal -->
+  <div id="reportModal" class="modal-backdrop hidden"><div class="modal-content max-w-sm"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-800">🚨 Report Broker</h2><button id="closeReportModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><p class="text-slate-500 text-sm mb-4">Report suspicious behavior or fraudulent activity.</p><form id="reportForm"><input type="hidden" id="reportBrokerId" /><div class="mb-4"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Reason *</label><select id="reportReason" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm bg-white"><option value="">Select a reason</option><option value="fraud">Fraud / Scam</option><option value="fake_listing">Fake Listing</option><option value="harassment">Harassment</option><option value="spam">Spam</option><option value="misleading">Misleading Information</option><option value="other">Other</option></select></div><div class="mb-4"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description *</label><textarea id="reportDescription" rows="3" required placeholder="Describe the issue..." class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm"></textarea></div><button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-flag mr-2"></i> Submit Report</button></form><div id="reportStatus" class="mt-3 text-sm text-slate-600"></div></div></div>
+
+  <!-- Terms Modal -->
+  <div id="termsModal" class="modal-backdrop hidden"><div class="modal-content max-w-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-800">📜 Terms of Service</h2><button id="closeTermsModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button></div><div class="max-h-96 overflow-y-auto text-sm text-slate-600 space-y-3"><h3 class="font-bold text-slate-800">1. Platform Use</h3><p>Property Hub Uganda is a marketplace connecting property seekers with brokers. We do not own or manage any properties listed on this platform.</p><h3 class="font-bold text-slate-800">2. Visitor Safety</h3><p>Always verify properties in person before making any payments. Never send money to a broker without viewing the property first. Report suspicious activity immediately.</p><h3 class="font-bold text-slate-800">3. Broker Responsibilities</h3><p>Brokers must provide accurate property information. Misleading or fraudulent listings will result in account termination and legal action.</p><h3 class="font-bold text-slate-800">4. Liability</h3><p>Property Hub Uganda is not liable for any disputes between visitors and brokers. We provide a platform for connection – all transactions are between the visitor and the broker.</p><h3 class="font-bold text-slate-800">5. Reporting Fraud</h3><p>If you suspect fraud, report the broker immediately using the "Report Broker" button on their profile. We will investigate and take appropriate action.</p><h3 class="font-bold text-slate-800">6. Account Termination</h3><p>We reserve the right to terminate accounts that violate our terms of service or engage in fraudulent activity.</p></div><div class="mt-4 flex justify-end"><button id="acceptTermsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-xl transition"><i class="fas fa-check mr-2"></i> I Agree</button></div></div></div>
+
   <div id="app" class="min-h-screen">
+
     <!-- Top Nav -->
     <header class="bg-white/90 backdrop-blur-sm border-b border-slate-200/60 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -208,23 +323,169 @@
     <main>
       <!-- Discovery View -->
       <section id="discoveryView" class="view view-visible">
-        <!-- Hero, safety banner, filters, listings grid, empty state, loading skeleton -->
-        <!-- ... full content ... -->
+        <div class="relative bg-slate-900 text-white overflow-hidden">
+          <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80')] bg-cover bg-center opacity-30"></div>
+          <div class="absolute inset-0 hero-gradient"></div>
+          <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+            <div class="max-w-2xl">
+              <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Find your <span class="text-indigo-300">perfect</span> space</h1>
+              <p class="mt-3 text-slate-300 text-lg max-w-xl">Explore homes, rentals, and lodges from trusted brokers across Uganda.</p>
+              <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                  <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                  <input id="searchInput" type="text" placeholder="Search by address, city, or area…" class="w-full pl-10 pr-4 py-3 rounded-xl border-0 shadow-lg text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" />
+                </div>
+                <button id="clearSearchBtn" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-5 py-3 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 border border-white/10"><i class="fas fa-times"></i><span class="clear-btn-text">Clear</span><span class="clear-btn-icon">×</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4">
+          <div class="safety-banner"><i class="fas fa-shield-alt text-amber-500 text-lg mt-0.5"></i><div><p class="text-sm font-semibold text-amber-800">🔒 Verified &amp; Trusted Properties</p><p class="text-xs text-amber-700">Look for the <span class="font-bold text-emerald-600">Verified</span> badge (property reviewed) and the <span class="font-bold text-amber-600">Trusted</span> badge (broker with great reputation).</p></div></div>
+        </div>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6">
+            <button class="filter-pill active px-5 py-2 rounded-full border border-slate-200 bg-slate-900 text-white text-sm font-medium whitespace-nowrap" data-filter="all"><i class="fas fa-th-large mr-1.5"></i> All</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="rental"><i class="fas fa-key mr-1.5"></i> Rentals</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="property"><i class="fas fa-building mr-1.5"></i> Properties</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="lodge"><i class="fas fa-bed mr-1.5"></i> Lodges</button>
+            <span class="text-xs text-slate-400 ml-2 hidden sm:inline"><i class="fas fa-arrow-right mr-1"></i> Ranked by trust</span>
+          </div>
+          <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+          <div id="emptyState" class="hidden text-center py-20"><i class="fas fa-home text-5xl text-slate-300 mb-4"></i><p class="text-slate-500 text-lg">No properties match your criteria.</p><p class="text-slate-400 text-sm mt-1">Try adjusting the search or filters.</p></div>
+          <div id="loadingSkeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div></div>
+        </section>
       </section>
 
       <!-- Broker Profile View -->
       <section id="brokerView" class="view view-hidden">
-        <!-- Back button, broker header, broker listings grid, empty state -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <button id="backToDiscovery" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"><i class="fas fa-arrow-left"></i> Back to discovery</button>
+          <div id="brokerHeader" class="broker-header rounded-2xl p-6 md:p-8 mb-8 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-3"><h2 id="brokerBusinessName" class="text-2xl md:text-3xl font-bold text-slate-800">Broker Name</h2><span id="brokerTrustedBadge" class="badge-trusted hidden"><i class="fas fa-star"></i> Trusted</span></div>
+                <div id="brokerRatingDisplay" class="mt-2 flex items-center gap-2 text-sm"><span class="stars" id="brokerStars"></span><span class="text-slate-600" id="brokerReviewCount">(0 reviews)</span><span class="badge-lead" id="brokerLeadScore">⚡ 0</span></div>
+                <div id="brokerReviewStats" class="review-stats mt-1"><span class="stat"><span class="value" id="statTotalReviews">0</span> <span class="label">reviews</span></span><span class="stat"><span class="value" id="statAvgRating">0.0</span> <span class="label">avg rating</span></span></div>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <button id="rateBrokerBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-star"></i> Rate</button>
+                <button id="viewReviewsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-comment"></i> Reviews</button>
+                <button id="reportBrokerBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-flag"></i> Report</button>
+                <a id="brokerWhatsAppLink" href="#" target="_blank" class="btn-whatsapp px-6 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-md hover:shadow-lg transition hidden"><i class="fab fa-whatsapp text-lg"></i> Chat on WhatsApp</a>
+              </div>
+            </div>
+            <p id="brokerBio" class="mt-3 text-slate-600 text-sm max-w-2xl"><i class="fas fa-store mr-1.5 text-slate-400"></i><span class="italic">Browse all properties listed by this broker.</span></p>
+            <div id="brokerReportNotice" class="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 hidden"><i class="fas fa-exclamation-triangle mr-1"></i><span class="font-medium">⚠️ This broker has reported issues.</span><span> Proceed with caution.</span></div>
+          </div>
+          <div id="brokerListingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+          <div id="brokerEmptyState" class="hidden text-center py-20"><i class="fas fa-box-open text-5xl text-slate-300 mb-4"></i><p class="text-slate-500 text-lg">This broker has no listings yet.</p></div>
+        </div>
       </section>
 
       <!-- Auth View -->
       <section id="authView" class="view view-hidden max-w-md mx-auto my-12 px-4">
-        <!-- Auth card with sign-in/sign-up toggles, form fields, submit button, back to search -->
+        <div class="auth-card p-8">
+          <div class="flex rounded-xl bg-slate-100 p-1 mb-8 border border-slate-200/50">
+            <button id="toggleSignIn" class="auth-toggle-btn active w-1/2 text-center py-2.5 rounded-lg text-sm font-semibold border border-transparent shadow-none">Sign In</button>
+            <button id="toggleSignUp" class="auth-toggle-btn w-1/2 text-center py-2.5 rounded-lg text-sm font-semibold border border-transparent shadow-none">Create Account</button>
+          </div>
+          <h2 id="formTitle" class="text-2xl font-bold text-slate-800 tracking-tight mb-6">Welcome Back</h2>
+          <form id="authForm" class="space-y-4">
+            <div id="signUpFields" class="hidden space-y-4">
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Business / Brand Name</label><input type="text" id="bizNameInput" placeholder="e.g. Sunshine Estates Uganda" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800 bg-white"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="lodge_owner">Lodge Operator / Manager</option></select></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Business Phone</label><input type="text" id="phoneInput" placeholder="e.g. 256700123456" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            </div>
+            <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address</label><input type="email" id="emailInput" required placeholder="name@example.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Password</label><input type="password" id="passwordInput" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            <button type="submit" id="submitAuthBtn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-200 text-sm transition-all duration-150">Access Dashboard</button>
+            <button type="button" id="backToSearchBtn" class="w-full text-center text-xs font-medium text-slate-400 hover:text-slate-600 mt-2">← Back to public search listings</button>
+          </form>
+        </div>
       </section>
 
       <!-- Dashboard View -->
       <section id="dashboardView" class="view view-hidden">
-        <!-- Toolbar, profile form, add property form, verification panel, leads panel, my properties list -->
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl md:text-2xl font-bold text-slate-800">📋 My Properties</h2>
+            <button id="logoutBtn" class="text-sm text-red-500 hover:text-red-700 font-medium transition"><i class="fas fa-sign-out-alt mr-1"></i> Sign Out</button>
+          </div>
+
+          <div class="dashboard-toolbar">
+            <div class="wallet-pill"><span class="wallet-label">Wallet</span><i class="fas fa-wallet"></i><span class="balance" id="walletBalanceDisplay">0</span> UGX<button id="topupBtn" class="ml-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-0.5 rounded-full transition">+ Top Up</button></div>
+            <button id="refreshWalletBtn" class="toolbar-btn" style="background:#334155;color:white;"><i class="fas fa-sync-alt"></i></button>
+            <button id="dashboardEditProfileBtn" class="toolbar-btn"><i class="fas fa-user-edit"></i> Edit Profile</button>
+            <button id="dashboardAddPropertyBtn" class="toolbar-btn primary"><i class="fas fa-plus-circle"></i> Add Property</button>
+            <button id="dashboardPropertyVerificationBtn" class="toolbar-btn amber"><i class="fas fa-shield-alt"></i> Property Verification</button>
+            <button id="dashboardLeadsBtn" class="toolbar-btn green"><i class="fas fa-users"></i> Leads</button>
+          </div>
+
+          <div id="profileFormContainer" class="profile-form-container">
+            <h4 class="font-semibold text-slate-700 mb-3">⚙️ Edit Profile</h4>
+            <form id="profileSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Business Name</label><input type="text" id="settingsBusinessName" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Phone</label><input type="text" id="settingsPhone" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" placeholder="+256 700 000 000" /></div>
+              <div class="md:col-span-2"><button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded-xl transition shadow-sm"><i class="fas fa-save mr-2"></i> Save Profile</button><button type="button" id="cancelProfileEditBtn" class="ml-2 text-sm text-slate-500 hover:text-slate-700">Cancel</button></div>
+            </form>
+            <div id="profileStatus" class="mt-3 text-sm text-slate-600"></div>
+          </div>
+
+          <div id="addPropertyContainer" class="add-property-container">
+            <h4 class="font-semibold text-slate-700 mb-3">➕ Add New Property</h4>
+            <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Title *</label><input type="text" id="propTitle" required placeholder="e.g. Modern 3-Bedroom Villa" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Price (UGX) *</label><input type="number" id="propPrice" required placeholder="e.g. 250000000" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm bg-white"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Address *</label><input type="text" id="propAddress" required placeholder="e.g. Kampala, Uganda" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm" /></div>
+              <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Images</label>
+                <input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                <div id="propImagePreviews" class="flex flex-wrap gap-2 mt-2"></div>
+              </div>
+              <div class="md:col-span-2 flex items-center gap-3 mt-2"><input type="checkbox" id="addRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" /><label for="addRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label><span class="text-xs text-slate-400">(You'll provide details later)</span></div>
+              <div id="addVerificationInfo" class="verification-info-panel"><p class="font-medium">🔍 Verification Process</p><ul><li>After saving, go to the Verification panel to submit required documents.</li><li>We'll review your property and approve it.</li><li>Verified properties rank higher.</li></ul></div>
+              <div class="md:col-span-2">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm"><i class="fas fa-plus mr-2"></i> Add Property</button>
+                <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle"></i> Verified properties rank higher. Build your reputation with good reviews.</p>
+              </div>
+            </form>
+            <div id="uploadStatus" class="mt-3 text-sm text-slate-600"></div>
+          </div>
+
+          <div id="propertyVerificationContainer" class="verification-form-container">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-semibold text-slate-700">🛡️ Property Verification</h4>
+              <span id="verificationInfoBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-200 text-slate-600">Manage verifications</span>
+            </div>
+            <div class="verification-info-panel visible mb-4">
+              <p class="font-medium">🔍 Verification Process</p>
+              <ul>
+                <li>Request verification for any of your properties.</li>
+                <li>Provide the required documents and contacts based on the property type.</li>
+                <li>Our admin team will review and approve if everything is correct.</li>
+                <li>Once approved, your property gets a <span class="badge-verified">Verified</span> badge.</li>
+                <li>Verified properties rank higher and attract more trust.</li>
+              </ul>
+            </div>
+            <div id="propertyVerificationList"><p class="text-slate-500 text-sm">Loading your properties...</p></div>
+            <div id="propertyVerificationEmpty" class="hidden text-center py-4 text-slate-400 text-sm">
+              You don't have any properties yet. <a href="#" id="gotoAddPropertyFromVerification" class="text-indigo-600 hover:underline">Add a property</a> to request verification.
+            </div>
+          </div>
+
+          <div id="leadsContainer" class="verification-form-container">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-semibold text-slate-700">📨 My Leads</h4>
+              <span id="leadsBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-200 text-slate-600">Manage leads</span>
+            </div>
+            <div id="leadsList"><p class="text-slate-500 text-sm">Loading leads...</p></div>
+            <div id="noLeads" class="hidden text-center py-8 text-slate-400 text-sm">No leads yet. When visitors connect, they'll appear here.</div>
+          </div>
+
+          <div id="myPropertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          <div id="myPropertiesEmpty" class="text-center py-16 text-slate-400 hidden"><i class="fas fa-home text-4xl mb-3 text-slate-300"></i><p class="text-lg font-medium text-slate-500">No properties yet</p><p class="text-sm text-slate-400">Click "Add Property" to list your first property.</p></div>
+        </div>
       </section>
     </main>
   </div>
@@ -235,7 +496,6 @@
     (function() {
       'use strict';
 
-      // Config
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const WEB3FORMS_ACCESS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
@@ -595,13 +855,136 @@
         }, 3000);
       }
 
-      async function loadLeads() { /* unchanged */ }
-      async function loadPropertyVerificationList() { /* unchanged */ }
-      async function openPropertyVerificationModal(propertyId) { /* unchanged */ }
-      async function loadBrokerProfile(brokerId) { /* unchanged */ }
-      function goToDiscovery() { showView($('#discoveryView')); state.currentBrokerId = null; navigateTo('/'); applyFiltersAndSearch(); }
-      function navigateToAuth() { showView($('#authView')); navigateTo('/auth'); setAuthMode(false); $('#authForm').reset(); }
-      async function handleRoute() { /* unchanged */ }
+      async function loadLeads() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase.from('lead_requests').select('*, property:property_id (title)').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
+          if (error) throw error;
+          const list = $('#leadsList');
+          const noMsg = $('#noLeads');
+          if (!list || !noMsg) return;
+          if (!data || data.length === 0) {
+            list.innerHTML = '';
+            noMsg.classList.remove('hidden');
+            return;
+          }
+          noMsg.classList.add('hidden');
+          let html = '';
+          data.forEach(lead => {
+            const statusClass = lead.status === 'approved' ? 'approved' : lead.status === 'pending' ? 'pending' : lead.status === 'rejected' ? 'rejected' : 'expired';
+            const statusLabel = lead.status === 'approved' ? '✅ Unlocked' : lead.status === 'pending' ? '⏳ Pending' : lead.status === 'rejected' ? '❌ Rejected' : '⏰ Expired';
+            const canUnlock = lead.status === 'pending';
+            html += `<div class="verification-property-item"><div class="property-title">${lead.property?.title || 'Unknown'}</div><div><span class="property-status ${statusClass}">${statusLabel}</span></div><div>${canUnlock ? `<button class="unlock-lead-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full" data-lead-id="${lead.id}">Unlock</button>` : lead.status === 'approved' ? `<button class="view-lead-details text-xs text-blue-600" data-lead-id="${lead.id}">View Contact</button>` : ''}</div></div>`;
+          });
+          list.innerHTML = html;
+          list.querySelectorAll('.unlock-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
+            const leadId = btn.dataset.leadId;
+            if (!confirm('Unlock this lead? (Free)')) return;
+            try {
+              const { data, error } = await supabase.functions.invoke('handle-lead-decision', { body: { token: leadId, decision: 'approve' } });
+              if (error) throw error;
+              if (!data.success) { alert('Failed: ' + data.error); return; }
+              alert(`✅ Lead unlocked!\nName: ${data.visitor_name}\nEmail: ${data.visitor_email}\nWhatsApp: ${data.visitor_whatsapp}`);
+              loadLeads(); loadWallet();
+            } catch (err) { alert('Error: ' + err.message); }
+          }));
+          list.querySelectorAll('.view-lead-details').forEach(btn => btn.addEventListener('click', async () => {
+            const leadId = btn.dataset.leadId;
+            const { data: lead, error } = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', leadId).single();
+            if (error) { alert('Error'); return; }
+            alert(`Contact Details:\nName: ${lead.visitor_name}\nEmail: ${lead.visitor_email}\nWhatsApp: ${lead.visitor_whatsapp}\nUnlocked: ${new Date(lead.unlocked_at).toLocaleString()}`);
+          }));
+        } catch (err) { console.error('Leads load error:', err); }
+      }
+
+      async function loadPropertyVerificationList() {
+        if (!state.currentUser) return;
+        try {
+          const { data: properties, error } = await supabase.from('properties').select('id, title, verification_status').eq('owner_id', state.currentUser.id);
+          if (error) throw error;
+          const list = $('#propertyVerificationList');
+          if (!list) return;
+          list.innerHTML = '';
+          if (!properties || properties.length === 0) {
+            list.innerHTML = '<p class="text-slate-500">You have no properties.</p>';
+            return;
+          }
+          properties.forEach(prop => {
+            const status = prop.verification_status || 'unverified';
+            const statusLabel = status === 'approved' ? '✅ Approved' : status === 'pending' ? '⏳ Pending' : status === 'rejected' ? '❌ Rejected' : 'Not requested';
+            const canRequest = status !== 'pending';
+            list.innerHTML += `<div class="verification-property-item"><span>${prop.title}</span><span>${statusLabel}</span><button class="request-verification-btn" data-property-id="${prop.id}">Request</button></div>`;
+          });
+          list.querySelectorAll('.request-verification-btn').forEach(btn => btn.addEventListener('click', () => openPropertyVerificationModal(btn.dataset.propertyId)));
+        } catch (err) { console.error(err); }
+      }
+
+      async function openPropertyVerificationModal(propertyId) {
+        $('#verifPropertyId').value = propertyId;
+        $('#verifStatus').textContent = '';
+        $('#propertyVerificationModal').classList.remove('hidden');
+      }
+
+      async function loadBrokerProfile(brokerId) {
+        const grid = $('#brokerListingsGrid');
+        if (!grid) return;
+        grid.innerHTML = '<div class="text-center py-12">Loading...</div>';
+        try {
+          const { data: broker, error } = await supabase.from('profiles').select('*').eq('id', brokerId).single();
+          if (error) throw error;
+          $('#brokerBusinessName').textContent = broker.business_name || 'Broker';
+          const isTrusted = isTrustedBroker(broker);
+          $('#brokerTrustedBadge').classList.toggle('hidden', !isTrusted);
+          const rating = broker.average_rating || 0;
+          const reviewCount = broker.review_count || 0;
+          $('#brokerStars').innerHTML = renderStars(rating);
+          $('#brokerReviewCount').textContent = `(${reviewCount} reviews)`;
+          $('#brokerLeadScore').textContent = `⚡ ${broker.lead_score || 0}`;
+          $('#statTotalReviews').textContent = reviewCount;
+          $('#statAvgRating').textContent = rating.toFixed(1);
+          const { data: props, error: propErr } = await supabase.from('properties').select('*').eq('owner_id', brokerId).eq('is_paused', false).order('created_at', { ascending: false });
+          if (propErr) throw propErr;
+          grid.innerHTML = '';
+          if (!props || props.length === 0) {
+            $('#brokerEmptyState').classList.remove('hidden');
+            return;
+          }
+          $('#brokerEmptyState').classList.add('hidden');
+          props.forEach(prop => grid.appendChild(createPropertyCard(prop, broker, false, false)));
+        } catch (err) {
+          console.error('Broker profile error:', err);
+          grid.innerHTML = '<div class="text-center py-12 text-red-500">Error loading profile.</div>';
+        }
+      }
+
+      function goToDiscovery() {
+        showView($('#discoveryView'));
+        state.currentBrokerId = null;
+        navigateTo('/');
+        applyFiltersAndSearch();
+      }
+
+      function navigateToAuth() {
+        showView($('#authView'));
+        navigateTo('/auth');
+        setAuthMode(false);
+        $('#authForm').reset();
+      }
+
+      async function handleRoute() {
+        const path = getCurrentPath();
+        if (path.startsWith('/broker/')) {
+          const brokerId = path.split('/')[2];
+          if (brokerId) { showView($('#brokerView')); await loadBrokerProfile(brokerId); }
+        } else if (path === '/auth') {
+          showView($('#authView')); setAuthMode(false);
+        } else if (path === '/dashboard') {
+          if (state.currentUser) { showView($('#dashboardView')); await loadMyProperties(); await loadWallet(); loadLeads(); }
+          else { navigateTo('/auth', true); handleRoute(); }
+        } else {
+          showView($('#discoveryView')); applyFiltersAndSearch();
+        }
+      }
 
       async function init() {
         console.log('🚀 Initializing...');
