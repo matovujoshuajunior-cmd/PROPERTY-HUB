@@ -191,13 +191,13 @@
   <!-- Scroll to top button -->
   <button id="scrollTopBtn" title="Back to top"><i class="fas fa-arrow-up"></i></button>
 
-  <!-- Security Notification (hidden initially) -->
+  <!-- Security Notification -->
   <div id="securityNotification" class="security-notification">
     <div class="flex items-start gap-3">
       <i class="fas fa-shield-alt text-emerald-400 text-xl mt-0.5"></i>
       <div class="flex-1 text-sm">
         <p class="font-semibold">🔒 Verified &amp; Trusted Properties</p>
-        <p class="text-slate-300 text-xs">Look for the <span class="text-emerald-400 font-medium">Verified</span> badge (property reviewed) and the <span class="text-amber-400 font-medium">Trusted</span> badge (broker with great reputation).</p>
+        <p class="text-slate-300 text-xs">Look for the <span class="text-emerald-400 font-medium">Verified</span> badge and <span class="text-amber-400 font-medium">Trusted</span> badge.</p>
       </div>
       <button id="closeSecurityNotification" class="close-btn"><i class="fas fa-times"></i></button>
     </div>
@@ -366,82 +366,86 @@
         </div>
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6">
-            <button class="filter-pill active" data-filter="all"><i class="fas fa-th-large mr-1.5"></i> All</button>
-            <button class="filter-pill" data-filter="rental"><i class="fas fa-key mr-1.5"></i> Rentals</button>
-            <button class="filter-pill" data-filter="property"><i class="fas fa-building mr-1.5"></i> Properties</button>
-            <button class="filter-pill" data-filter="lodge"><i class="fas fa-bed mr-1.5"></i> Lodges</button>
+            <button class="filter-pill active px-5 py-2 rounded-full border border-slate-200 bg-slate-900 text-white text-sm font-medium whitespace-nowrap" data-filter="all"><i class="fas fa-th-large mr-1.5"></i> All</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="rental"><i class="fas fa-key mr-1.5"></i> Rentals</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="property"><i class="fas fa-building mr-1.5"></i> Properties</button>
+            <button class="filter-pill px-5 py-2 rounded-full border border-slate-200 bg-white text-slate-700 text-sm font-medium whitespace-nowrap hover:bg-slate-50" data-filter="lodge"><i class="fas fa-bed mr-1.5"></i> Lodges</button>
           </div>
           <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-          <div id="emptyState" class="hidden text-center py-20">No properties found.</div>
-          <div id="loadingSkeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">Loading...</div>
+          <div id="emptyState" class="hidden text-center py-20"><i class="fas fa-home text-5xl text-slate-300 mb-4"></i><p class="text-slate-500 text-lg">No properties match your criteria.</p><p class="text-slate-400 text-sm mt-1">Try adjusting the search or filters.</p></div>
+          <div id="loadingSkeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div><div class="skeleton-card" style="display:block;">&nbsp;</div></div>
         </section>
       </section>
 
       <!-- Broker Profile View -->
       <section id="brokerView" class="view view-hidden">
-        <div class="max-w-7xl mx-auto px-4 py-8">
-          <button id="backToDiscovery" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 mb-6"><i class="fas fa-arrow-left"></i> Back</button>
-          <div id="brokerHeader" class="broker-header rounded-2xl p-6 mb-8 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <button id="backToDiscovery" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"><i class="fas fa-arrow-left"></i> Back to discovery</button>
+          <div id="brokerHeader" class="broker-header rounded-2xl p-6 md:p-8 mb-8 shadow-sm">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <div class="flex items-center gap-3"><h2 id="brokerBusinessName" class="text-2xl font-bold">Broker</h2><span id="brokerTrustedBadge" class="badge-trusted hidden">Trusted</span></div>
-                <div id="brokerRatingDisplay" class="mt-2 flex items-center gap-2"><span id="brokerStars"></span><span id="brokerReviewCount">0 reviews</span><span class="badge-lead" id="brokerLeadScore">⚡ 0</span></div>
-                <div id="brokerReviewStats" class="review-stats mt-1"></div>
+                <div class="flex items-center gap-3"><h2 id="brokerBusinessName" class="text-2xl md:text-3xl font-bold text-slate-800">Broker Name</h2><span id="brokerTrustedBadge" class="badge-trusted hidden"><i class="fas fa-star"></i> Trusted</span></div>
+                <div id="brokerRatingDisplay" class="mt-2 flex items-center gap-2 text-sm"><span class="stars" id="brokerStars"></span><span class="text-slate-600" id="brokerReviewCount">(0 reviews)</span><span class="badge-lead" id="brokerLeadScore">⚡ 0</span></div>
+                <div id="brokerReviewStats" class="review-stats mt-1"><span class="stat"><span class="value" id="statTotalReviews">0</span> <span class="label">reviews</span></span><span class="stat"><span class="value" id="statAvgRating">0.0</span> <span class="label">avg rating</span></span></div>
               </div>
-              <div class="flex gap-3 flex-wrap">
-                <button id="rateBrokerBtn" class="hidden">Rate</button>
-                <button id="viewReviewsBtn" class="hidden">Reviews</button>
-                <button id="reportBrokerBtn" class="hidden">Report</button>
-                <a id="brokerWhatsAppLink" href="#" target="_blank" class="hidden">WhatsApp</a>
+              <div class="flex items-center gap-3 flex-wrap">
+                <button id="rateBrokerBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-star"></i> Rate</button>
+                <button id="viewReviewsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-comment"></i> Reviews</button>
+                <button id="reportBrokerBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-flag"></i> Report</button>
+                <a id="brokerWhatsAppLink" href="#" target="_blank" class="btn-whatsapp px-6 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-md hover:shadow-lg transition hidden"><i class="fab fa-whatsapp text-lg"></i> Chat on WhatsApp</a>
               </div>
             </div>
-            <p id="brokerBio" class="mt-3"></p>
+            <p id="brokerBio" class="mt-3 text-slate-600 text-sm max-w-2xl"><i class="fas fa-store mr-1.5 text-slate-400"></i><span class="italic">Browse all properties listed by this broker.</span></p>
+            <div id="brokerReportNotice" class="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 hidden"><i class="fas fa-exclamation-triangle mr-1"></i><span class="font-medium">⚠️ This broker has reported issues.</span><span> Proceed with caution.</span></div>
           </div>
           <div id="brokerListingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-          <div id="brokerEmptyState" class="hidden text-center py-20">No listings.</div>
+          <div id="brokerEmptyState" class="hidden text-center py-20"><i class="fas fa-box-open text-5xl text-slate-300 mb-4"></i><p class="text-slate-500 text-lg">This broker has no listings yet.</p></div>
         </div>
       </section>
 
       <!-- Auth View -->
       <section id="authView" class="view view-hidden max-w-md mx-auto my-12 px-4">
         <div class="auth-card p-8">
-          <div class="flex rounded-xl bg-slate-100 p-1 mb-8">
-            <button id="toggleSignIn" class="auth-toggle-btn active w-1/2 py-2.5 rounded-lg">Sign In</button>
-            <button id="toggleSignUp" class="auth-toggle-btn w-1/2 py-2.5 rounded-lg">Create Account</button>
+          <div class="flex rounded-xl bg-slate-100 p-1 mb-8 border border-slate-200/50">
+            <button id="toggleSignIn" class="auth-toggle-btn active w-1/2 text-center py-2.5 rounded-lg text-sm font-semibold border border-transparent shadow-none">Sign In</button>
+            <button id="toggleSignUp" class="auth-toggle-btn w-1/2 text-center py-2.5 rounded-lg text-sm font-semibold border border-transparent shadow-none">Create Account</button>
           </div>
-          <h2 id="formTitle" class="text-2xl font-bold mb-6">Welcome Back</h2>
+          <h2 id="formTitle" class="text-2xl font-bold text-slate-800 tracking-tight mb-6">Welcome Back</h2>
           <form id="authForm" class="space-y-4">
             <div id="signUpFields" class="hidden space-y-4">
-              <div><label>Business Name</label><input type="text" id="bizNameInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
-              <div><label>Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border"><option value="broker">Broker</option></select></div>
-              <div><label>WhatsApp</label><input type="text" id="phoneInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Business / Brand Name</label><input type="text" id="bizNameInput" placeholder="e.g. Sunshine Estates Uganda" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800 bg-white"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="lodge_owner">Lodge Operator / Manager</option></select></div>
+              <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Business Phone</label><input type="text" id="phoneInput" placeholder="e.g. 256700123456" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
             </div>
-            <div><label>Email</label><input type="email" id="emailInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
-            <div><label>Password</label><input type="password" id="passwordInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
-            <button type="submit" id="submitAuthBtn" class="w-full bg-indigo-600 text-white py-3 rounded-xl">Access Dashboard</button>
-            <button type="button" id="backToSearchBtn" class="w-full text-center text-xs">← Back to public search</button>
+            <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address</label><input type="email" id="emailInput" required placeholder="name@example.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Password</label><input type="password" id="passwordInput" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none text-sm text-slate-800" /></div>
+            <button type="submit" id="submitAuthBtn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-200 text-sm transition-all duration-150">Access Dashboard</button>
+            <button type="button" id="backToSearchBtn" class="w-full text-center text-xs font-medium text-slate-400 hover:text-slate-600 mt-2">← Back to public search listings</button>
           </form>
         </div>
       </section>
 
       <!-- Dashboard View -->
       <section id="dashboardView" class="view view-hidden">
-        <div class="max-w-5xl mx-auto px-4 py-8">
-          <div class="flex justify-between mb-6"><h2 class="text-xl font-bold">📋 My Properties</h2><button id="logoutBtn" class="text-red-500">Sign Out</button></div>
-          <div class="dashboard-toolbar">
-            <div class="wallet-pill"><span>Wallet</span><span id="walletBalanceDisplay">0</span> UGX<button id="topupBtn">+ Top Up</button></div>
-            <button id="refreshWalletBtn"><i class="fas fa-sync-alt"></i></button>
-            <button id="dashboardEditProfileBtn">Edit Profile</button>
-            <button id="dashboardAddPropertyBtn">Add Property</button>
-            <button id="dashboardPropertyVerificationBtn">Verification</button>
-            <button id="dashboardLeadsBtn">Leads</button>
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl md:text-2xl font-bold text-slate-800">📋 My Properties</h2>
+            <button id="logoutBtn" class="text-sm text-red-500 hover:text-red-700 font-medium transition"><i class="fas fa-sign-out-alt mr-1"></i> Sign Out</button>
           </div>
-          <div id="profileFormContainer" class="profile-form-container">Profile form...</div>
-          <div id="addPropertyContainer" class="add-property-container">Add property form...</div>
-          <div id="propertyVerificationContainer" class="verification-form-container">Verification panel...</div>
-          <div id="leadsContainer" class="verification-form-container">Leads panel...</div>
+          <div class="dashboard-toolbar">
+            <div class="wallet-pill"><span class="wallet-label">Wallet</span><i class="fas fa-wallet"></i><span class="balance" id="walletBalanceDisplay">0</span> UGX<button id="topupBtn" class="ml-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-0.5 rounded-full transition">+ Top Up</button></div>
+            <button id="refreshWalletBtn" class="toolbar-btn" style="background:#334155;color:white;"><i class="fas fa-sync-alt"></i></button>
+            <button id="dashboardEditProfileBtn" class="toolbar-btn"><i class="fas fa-user-edit"></i> Edit Profile</button>
+            <button id="dashboardAddPropertyBtn" class="toolbar-btn primary"><i class="fas fa-plus-circle"></i> Add Property</button>
+            <button id="dashboardPropertyVerificationBtn" class="toolbar-btn amber"><i class="fas fa-shield-alt"></i> Property Verification</button>
+            <button id="dashboardLeadsBtn" class="toolbar-btn green"><i class="fas fa-users"></i> Leads</button>
+          </div>
+          <div id="profileFormContainer" class="profile-form-container">... profile form ...</div>
+          <div id="addPropertyContainer" class="add-property-container">... add property form ...</div>
+          <div id="propertyVerificationContainer" class="verification-form-container">... verification panel ...</div>
+          <div id="leadsContainer" class="verification-form-container">... leads panel ...</div>
           <div id="myPropertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-          <div id="myPropertiesEmpty" class="hidden text-center py-16">No properties yet.</div>
+          <div id="myPropertiesEmpty" class="hidden text-center py-16 text-slate-400"><i class="fas fa-home text-4xl mb-3 text-slate-300"></i><p class="text-lg font-medium text-slate-500">No properties yet</p><p class="text-sm text-slate-400">Click "Add Property" to list your first property.</p></div>
         </div>
       </section>
     </main>
@@ -453,11 +457,9 @@
     (function() {
       'use strict';
 
-      // ─── Config ──────────────────────────────────────────────────────────
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
-      // Web3Forms direct key (exposed; replace with Edge Function for production)
-      const WEB3FORMS_ACCESS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
+      const WEB3FORMS_ACCESS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6'; // ⚠️ Exposed – for testing only
 
       const state = {
         allProperties: [],
@@ -469,6 +471,7 @@
         myProperties: [],
         profilesMap: {},
         walletBalance: 0,
+        isSignUpMode: false,
       };
 
       let supabase;
@@ -477,46 +480,12 @@
       function $$(sel) { return document.querySelectorAll(sel); }
 
       function formatPrice(amount) { return Number(amount).toLocaleString('en-UG') + ' UGX'; }
+      function getImageArray(property) { const val = property.media_urls; if (!val) return []; if (Array.isArray(val)) return val; if (typeof val === 'string') return [val]; return []; }
+      function getImageUrl(property) { const arr = getImageArray(property); return arr.length > 0 ? arr[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center'; }
+      function renderStars(rating) { const full = Math.floor(rating); const half = rating % 1 >= 0.5 ? 1 : 0; const empty = 5 - full - half; let html = ''; for (let i = 0; i < full; i++) html += '<i class="fas fa-star"></i>'; if (half) html += '<i class="fas fa-star-half-alt"></i>'; for (let i = 0; i < empty; i++) html += '<i class="far fa-star empty"></i>'; return html; }
+      function renderStarsSmall(rating) { const full = Math.floor(rating); const empty = 5 - full; let html = ''; for (let i = 0; i < full; i++) html += '<i class="fas fa-star text-amber-400 text-xs"></i>'; for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-slate-300 text-xs"></i>'; return html; }
 
-      function getImageArray(property) {
-        const val = property.media_urls;
-        if (!val) return [];
-        if (Array.isArray(val)) return val;
-        if (typeof val === 'string') return [val];
-        return [];
-      }
-
-      function getImageUrl(property) {
-        const arr = getImageArray(property);
-        return arr.length > 0 ? arr[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center';
-      }
-
-      function renderStars(rating) {
-        const full = Math.floor(rating);
-        const half = rating % 1 >= 0.5 ? 1 : 0;
-        const empty = 5 - full - half;
-        let html = '';
-        for (let i = 0; i < full; i++) html += '<i class="fas fa-star"></i>';
-        if (half) html += '<i class="fas fa-star-half-alt"></i>';
-        for (let i = 0; i < empty; i++) html += '<i class="far fa-star empty"></i>';
-        return html;
-      }
-
-      function renderStarsSmall(rating) {
-        const full = Math.floor(rating);
-        const empty = 5 - full;
-        let html = '';
-        for (let i = 0; i < full; i++) html += '<i class="fas fa-star text-amber-400 text-xs"></i>';
-        for (let i = 0; i < empty; i++) html += '<i class="far fa-star text-slate-300 text-xs"></i>';
-        return html;
-      }
-
-      function navigateTo(url, replace = false) {
-        if (replace) window.history.replaceState(null, '', url);
-        else window.history.pushState(null, '', url);
-        handleRoute();
-      }
-
+      function navigateTo(url, replace = false) { if (replace) window.history.replaceState(null, '', url); else window.history.pushState(null, '', url); handleRoute(); }
       function getCurrentPath() { return window.location.pathname + window.location.search; }
 
       function showView(view) {
@@ -549,7 +518,7 @@
         }
       }
 
-      // Direct Web3Forms email send (exposed key)
+      // Direct Web3Forms email
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const payload = {
@@ -588,8 +557,9 @@
 
       async function depositWalletSimulated(amount) {
         if (!state.currentUser) return false;
+        // Simulated deposit – replace with real integration
         try {
-          const { error } = await supabase.functions.invoke('deposit-wallet', { body: { amount } });
+          const { error } = await supabase.rpc('increment_wallet', { user_id: state.currentUser.id, amount });
           if (error) throw error;
           await loadWallet();
           return true;
@@ -774,11 +744,7 @@
           state.allProperties = enriched;
           state.filteredProperties = [...enriched];
           applyFiltersAndSearch();
-        } catch (err) {
-          console.error('Fetch error:', err);
-        } finally {
-          if (skeleton) skeleton.style.display = 'none';
-        }
+        } catch (err) { console.error('Fetch error:', err); } finally { if (skeleton) skeleton.style.display = 'none'; }
       }
 
       function applyFiltersAndSearch() {
@@ -803,9 +769,7 @@
       function navigateToAuth() { showView(document.getElementById('authView')); navigateTo('/auth'); setAuthMode(false); document.getElementById('authForm').reset(); }
       function goToDiscovery() { showView(document.getElementById('discoveryView')); state.currentBrokerId = null; navigateTo('/'); applyFiltersAndSearch(); }
 
-      async function loadMyProperties() { /* ... */ }
-
-      // Add property form, edit form, reviews, reports, quiz, verification, leads – all existing functions.
+      async function loadMyProperties() { /* ... existing ... */ }
 
       async function openQuizModal(propertyId) {
         document.getElementById('quizPropertyId').value = propertyId;
@@ -815,7 +779,7 @@
         document.getElementById('quizModal').classList.remove('hidden');
       }
 
-      // Quiz form submission with direct email
+      // Quiz form submission: direct insert + direct email
       const quizFormEl = document.getElementById('quizForm');
       if (quizFormEl) {
         quizFormEl.addEventListener('submit', async function(e) {
@@ -836,7 +800,7 @@
           const answers = { q1: score1, q2: score2 };
 
           try {
-            // Insert lead request directly using supabase-js (no edge function needed if RLS is disabled)
+            // Insert lead request directly
             const { data: lead, error: insertError } = await supabase.from('lead_requests').insert({
               property_id: propertyId,
               visitor_name: name,
@@ -853,7 +817,7 @@
             document.getElementById('waitingModal').classList.remove('hidden');
             document.getElementById('waitingStatus').textContent = 'Request sent. Waiting for broker...';
 
-            // Fetch broker email
+            // Fetch broker email and send notification
             const { data: propertyData } = await supabase.from('properties').select('owner_id, title, address').eq('id', propertyId).single();
             if (propertyData) {
               const { data: brokerProfile } = await supabase.from('profiles').select('email, business_name').eq('id', propertyData.owner_id).single();
@@ -864,7 +828,6 @@
             }
 
             subscribeToLeadRequest(lead.id);
-
           } catch (err) {
             console.error('Quiz submission error:', err);
             alert('Error: ' + err.message);
@@ -875,19 +838,12 @@
       function subscribeToLeadRequest(requestId) {
         const interval = setInterval(async () => {
           const { data } = await supabase.from('lead_requests').select('status').eq('id', requestId).single();
-          if (data?.status === 'approved') {
-            clearInterval(interval);
-            document.getElementById('waitingModal').classList.add('hidden');
-            alert('✅ Lead approved!');
-          } else if (data?.status === 'rejected') {
-            clearInterval(interval);
-            document.getElementById('waitingModal').classList.add('hidden');
-            alert('❌ Lead rejected.');
-          }
+          if (data?.status === 'approved') { clearInterval(interval); document.getElementById('waitingModal').classList.add('hidden'); alert('✅ Lead approved!'); }
+          else if (data?.status === 'rejected') { clearInterval(interval); document.getElementById('waitingModal').classList.add('hidden'); alert('❌ Lead rejected.'); }
         }, 3000);
       }
 
-      // Scroll to top button
+      // Scroll to top
       const scrollTopBtn = document.getElementById('scrollTopBtn');
       window.addEventListener('scroll', () => {
         if (window.scrollY > 300) scrollTopBtn.classList.add('show');
@@ -897,40 +853,26 @@
 
       async function init() {
         console.log('🚀 Initializing...');
-        if (window.supabase) {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else return;
-
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) { state.currentUser = user; document.getElementById('portalBtnLabel').textContent = 'Dashboard'; await loadWallet(); }
-        } catch (err) { console.log('No session.'); }
+        if (window.supabase) { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } else return;
+        try { const { data: { user } } = await supabase.auth.getUser(); if (user) { state.currentUser = user; document.getElementById('portalBtnLabel').textContent = 'Dashboard'; await loadWallet(); } } catch (err) { console.log('No session.'); }
 
         const searchInput = document.getElementById('searchInput');
         searchInput?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
         document.getElementById('clearSearchBtn')?.addEventListener('click', () => { searchInput.value = ''; state.searchQuery = ''; applyFiltersAndSearch(); });
-
-        document.querySelectorAll('.filter-pill').forEach(pill => {
-          pill.addEventListener('click', () => {
-            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            state.currentFilter = pill.dataset.filter;
-            applyFiltersAndSearch();
-          });
-        });
-
-        document.getElementById('brokerPortalBtn')?.addEventListener('click', () => {
-          if (state.currentUser) { showView(document.getElementById('dashboardView')); navigateTo('/dashboard'); loadMyProperties(); loadWallet(); }
-          else navigateToAuth();
-        });
-
+        document.querySelectorAll('.filter-pill').forEach(pill => pill.addEventListener('click', () => {
+          document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          state.currentFilter = pill.dataset.filter;
+          applyFiltersAndSearch();
+        }));
+        document.getElementById('brokerPortalBtn')?.addEventListener('click', () => { if (state.currentUser) { showView(document.getElementById('dashboardView')); navigateTo('/dashboard'); loadMyProperties(); loadWallet(); } else navigateToAuth(); });
         document.getElementById('backToDiscovery')?.addEventListener('click', goToDiscovery);
         document.getElementById('backToSearchBtn')?.addEventListener('click', goToDiscovery);
         document.getElementById('toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
         document.getElementById('toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
         document.getElementById('logoutBtn')?.addEventListener('click', async () => { await supabase.auth.signOut(); state.currentUser = null; document.getElementById('portalBtnLabel').textContent = 'Broker Portal'; goToDiscovery(); });
 
-        // Other event bindings (topup, profile, add property, etc.) go here (as before)
+        // Other event bindings (topup, profile, add property, etc.) should be added here; they are not fully expanded for brevity.
 
         await handleRoute();
         await fetchAllData();
