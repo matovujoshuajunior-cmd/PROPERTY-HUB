@@ -675,16 +675,19 @@
       }
 
       // ─── Email notification helper (Web3Forms) ───────────────────────────
-     async function sendNotificationEmail(to_email, to_name, subject, message) {
+async function sendNotificationEmail(to_email, to_name, subject, message) {
   try {
     const { data, error } = await supabase.functions.invoke('send-email-web3forms', {
       body: { to_email, to_name, subject, message }
     });
-    if (error) throw error;
-    console.log('📧 Email sent:', data);
+    if (error) {
+      console.error('❌ Email send failed with error object:', error);
+      return false;
+    }
+    console.log('📧 Email sent successfully:', data);
     return true;
   } catch (err) {
-    console.error('❌ Email send failed:', err.message);
+    console.error('❌ Unexpected error in sendNotificationEmail:', err);
     return false;
   }
 }
