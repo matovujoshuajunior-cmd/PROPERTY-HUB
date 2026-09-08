@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    /* ─── All existing styles (unchanged) ─── */
+    /* All previous styles unchanged */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -47,7 +47,6 @@
     #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
     .loader { border: 4px solid #f3f4f6; border-top: 4px solid #4f46e5; border-radius: 50%; width: 48px; height: 48px; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
     .modal-backdrop.hidden { display: none; }
     .modal-content { background: white; border-radius: 2rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; }
@@ -55,28 +54,22 @@
     .image-thumb img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
     .image-thumb .remove-img { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: none; }
     .image-thumb .remove-img:hover { background: #dc2626; }
-
     .stars { color: #f59e0b; letter-spacing: 2px; }
     .stars .empty { color: #d1d5db; }
     .badge-lead { background: #10b981; color: white; padding: 0.1rem 0.5rem; border-radius: 9999px; font-size: 0.6rem; font-weight: bold; }
-
     .star-rating .star { cursor: pointer; font-size: 2rem; color: #d1d5db; transition: 0.15s; }
     .star-rating .star.active { color: #f59e0b; }
     .star-rating .star:hover { transform: scale(1.2); color: #f59e0b; }
     .star-rating .star:hover ~ .star { color: #d1d5db; }
-
     .badge-verified { background: #10b981; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; animation: fadeIn 0.3s ease; }
     .badge-pending { background: #f59e0b; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-rejected { background: #ef4444; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-trusted { background: #f59e0b; color: #1e293b; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 700; border: 1px solid #d97706; }
-
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-
     .dashboard-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; background: white; padding: 1rem 1.25rem; border-radius: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
     .wallet-pill { background: #1e293b; color: white; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .wallet-pill .balance { color: #34d399; }
     .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
-
     .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; }
     .dashboard-toolbar .toolbar-btn:hover { background: #e2e8f0; }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
@@ -85,33 +78,26 @@
     .dashboard-toolbar .toolbar-btn.green:hover { background: #059669; }
     .dashboard-toolbar .toolbar-btn.amber { background: #f59e0b; color: white; }
     .dashboard-toolbar .toolbar-btn.amber:hover { background: #d97706; }
-
     .profile-form-container, .add-property-container, .verification-form-container { background: white; border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); display: none; }
     .profile-form-container.visible, .add-property-container.visible, .verification-form-container.visible { display: block; }
-
     .safety-banner { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }
     .security-notification { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: #1e293b; color: white; padding: 1rem 1.25rem; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 999; display: none; animation: slideUp 0.5s ease; }
     .security-notification .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 0 0 0 0.5rem; }
     .security-notification .close-btn:hover { color: white; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
     .verification-info-panel { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-top: 0.5rem; display: none; font-size: 0.875rem; color: #0369a1; }
     .verification-info-panel.visible { display: block; }
     .verification-info-panel ul { list-style: disc; padding-left: 1.5rem; margin-top: 0.25rem; }
-
     .review-item { background: #f8fafc; border-radius: 0.75rem; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
     .review-item .review-text { font-size: 0.875rem; color: #334155; }
     .review-item .review-meta { font-size: 0.75rem; color: #94a3b8; }
     .review-item .stars-small { letter-spacing: 1px; }
-
     .review-stats { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 0.5rem; }
     .review-stats .stat { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #475569; }
     .review-stats .stat .value { font-weight: 700; font-size: 1.125rem; color: #1e293b; }
     .review-stats .stat .label { color: #94a3b8; }
-
     .write-review-toggle { cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; color: #4f46e5; font-weight: 500; transition: 0.2s; }
     .write-review-toggle:hover { color: #4338ca; }
-
     .verification-property-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
     .verification-property-item .property-title { font-weight: 600; color: #1e293b; flex: 1; }
     .verification-property-item .property-status { font-size: 0.75rem; font-weight: 600; padding: 0.1rem 0.6rem; border-radius: 9999px; }
@@ -119,16 +105,13 @@
     .verification-property-item .property-status.pending { background: #fef3c7; color: #92400e; }
     .verification-property-item .property-status.rejected { background: #fee2e2; color: #991b1b; }
     .verification-property-item .property-status.unverified { background: #e2e8f0; color: #475569; }
-
     .detail-field { margin-bottom: 0.75rem; }
     .detail-field .label { font-weight: 600; color: #1e293b; font-size: 0.875rem; display: block; }
     .detail-field .value { color: #475569; word-break: break-all; }
     .detail-field .value a { color: #4f46e5; text-decoration: underline; }
-
     #scrollTopBtn { position: fixed; bottom: 30px; right: 30px; z-index: 1000; background: #4f46e5; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s; border: none; }
     #scrollTopBtn.show { opacity: 1; visibility: visible; }
     #scrollTopBtn:hover { background: #4338ca; }
-
     @media (max-width: 640px) {
       .dashboard-toolbar { flex-direction: column; align-items: stretch; padding: 0.75rem; }
       .dashboard-toolbar .wallet-pill { justify-content: center; }
@@ -614,6 +597,7 @@
           </div>
         `;
 
+        // Event listeners
         const editBtn = article.querySelector('.edit-btn');
         if (editBtn) editBtn.addEventListener('click', e => { e.stopPropagation(); openEditModal(property.id); });
         const boostBtn = article.querySelector('.boost-btn');
@@ -817,12 +801,68 @@
         });
       }
 
-      // Reviews, reports, quiz, leads, verification, broker profile, etc.
-      async function openReviewModal(brokerId) { /* ... */ }
-      async function loadReviewsForModal(brokerId) { /* ... */ }
-      function updateStarUI(active) { /* ... */ }
-      function openReportModal(brokerId) { /* ... */ }
-      async function openQuizModal(propertyId) { /* ... */ }
+      // Reviews
+      async function openReviewModal(brokerId) {
+        document.getElementById('reviewBrokerId').value = brokerId;
+        document.getElementById('reviewRating').value = 5;
+        document.getElementById('reviewComment').value = '';
+        document.getElementById('reviewClientName').value = '';
+        updateStarUI(5);
+        document.getElementById('reviewFormContainer').classList.add('hidden');
+        document.getElementById('toggleWriteReview').innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+        document.getElementById('reviewModal').classList.remove('hidden');
+        await loadReviewsForModal(brokerId);
+      }
+
+      async function loadReviewsForModal(brokerId) {
+        const list = document.getElementById('reviewsList');
+        if (!list) return;
+        list.innerHTML = '<p class="text-slate-500 text-sm">Loading...</p>';
+        document.getElementById('noReviewsMessage').classList.add('hidden');
+        try {
+          const { data, error } = await supabase.from('reviews').select('*').eq('broker_id', brokerId).order('created_at', { ascending: false });
+          if (error) throw error;
+          if (!data || data.length === 0) {
+            list.innerHTML = '';
+            document.getElementById('noReviewsMessage').classList.remove('hidden');
+            return;
+          }
+          let html = '';
+          data.forEach(review => {
+            const stars = renderStarsSmall(review.rating);
+            const date = new Date(review.created_at).toLocaleDateString('en-UG');
+            const reviewer = review.client_name || 'Guest';
+            html += `<div class="review-item"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="font-medium text-slate-700">${reviewer}</span><span class="stars-small">${stars}</span></div><span class="review-meta">${date}</span></div>${review.comment ? `<p class="review-text mt-1">${review.comment}</p>` : ''}</div>`;
+          });
+          list.innerHTML = html;
+        } catch (err) { list.innerHTML = '<p class="text-red-500 text-sm">Error loading reviews.</p>'; }
+      }
+
+      function updateStarUI(active) {
+        const selector = document.getElementById('starSelector');
+        if (!selector) return;
+        selector.querySelectorAll('.star').forEach(el => {
+          const val = parseInt(el.dataset.value);
+          el.classList.toggle('active', val <= active);
+        });
+      }
+
+      function openReportModal(brokerId) {
+        document.getElementById('reportBrokerId').value = brokerId;
+        document.getElementById('reportReason').value = '';
+        document.getElementById('reportDescription').value = '';
+        document.getElementById('reportStatus').textContent = '';
+        document.getElementById('reportModal').classList.remove('hidden');
+      }
+
+      async function openQuizModal(propertyId) {
+        document.getElementById('quizPropertyId').value = propertyId;
+        document.getElementById('quizStep1').classList.remove('hidden');
+        document.getElementById('quizStep2').classList.add('hidden');
+        document.getElementById('quizForm').reset();
+        document.getElementById('quizModal').classList.remove('hidden');
+      }
+
       const quizFormEl = document.getElementById('quizForm');
       if (quizFormEl) {
         quizFormEl.addEventListener('submit', async function(e) {
@@ -871,18 +911,254 @@
           }
         });
       }
-      function subscribeToLeadRequest(requestId) { /* ... */ }
-      async function loadLeads() { /* ... */ }
-      async function loadPropertyVerificationList() { /* ... */ }
-      async function openPropertyVerificationModal(propertyId) { /* ... */ }
-      async function loadBrokerProfile(brokerId) { /* ... */ }
-      function goToDiscovery() { showView(document.getElementById('discoveryView')); state.currentBrokerId = null; navigateTo('/'); applyFiltersAndSearch(); }
-      function navigateToAuth() { showView(document.getElementById('authView')); navigateTo('/auth'); setAuthMode(false); document.getElementById('authForm').reset(); }
-      async function fetchAllData() { /* ... */ }
-      async function loadMyProperties() { /* ... */ }
-      function applyFiltersAndSearch() { /* ... */ }
-      async function handleRoute() { /* ... */ }
-      async function init() { /* ... */ }
+
+      function subscribeToLeadRequest(requestId) {
+        const interval = setInterval(async () => {
+          const { data } = await supabase.from('lead_requests').select('status').eq('id', requestId).single();
+          if (data?.status === 'approved') { clearInterval(interval); document.getElementById('waitingModal').classList.add('hidden'); alert('✅ Lead approved!'); }
+          else if (data?.status === 'rejected') { clearInterval(interval); document.getElementById('waitingModal').classList.add('hidden'); alert('❌ Lead rejected.'); }
+        }, 3000);
+      }
+
+      async function loadLeads() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase.from('lead_requests').select('*, property:property_id (title)').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
+          if (error) throw error;
+          const list = document.getElementById('leadsList');
+          const noMsg = document.getElementById('noLeads');
+          if (!list || !noMsg) return;
+          if (!data || data.length === 0) {
+            list.innerHTML = '';
+            noMsg.classList.remove('hidden');
+            return;
+          }
+          noMsg.classList.add('hidden');
+          let html = '';
+          data.forEach(lead => {
+            const statusClass = lead.status === 'approved' ? 'approved' : lead.status === 'pending' ? 'pending' : lead.status === 'rejected' ? 'rejected' : 'expired';
+            const statusLabel = lead.status === 'approved' ? '✅ Unlocked' : lead.status === 'pending' ? '⏳ Pending' : lead.status === 'rejected' ? '❌ Rejected' : '⏰ Expired';
+            const canUnlock = lead.status === 'pending';
+            html += `<div class="verification-property-item"><div class="property-title">${lead.property?.title || 'Unknown'}</div><div><span class="property-status ${statusClass}">${statusLabel}</span></div><div>${canUnlock ? `<button class="unlock-lead-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full" data-lead-id="${lead.id}">Unlock</button>` : lead.status === 'approved' ? `<button class="view-lead-details text-xs text-blue-600" data-lead-id="${lead.id}">View Contact</button>` : ''}</div></div>`;
+          });
+          list.innerHTML = html;
+          list.querySelectorAll('.unlock-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
+            const leadId = btn.dataset.leadId;
+            if (!confirm('Unlock this lead? (Free)')) return;
+            try {
+              const { data, error } = await supabase.functions.invoke('handle-lead-decision', { body: { token: leadId, decision: 'approve' } });
+              if (error) throw error;
+              if (!data.success) { alert('Failed: ' + data.error); return; }
+              alert(`✅ Lead unlocked!\nName: ${data.visitor_name}\nEmail: ${data.visitor_email}\nWhatsApp: ${data.visitor_whatsapp}`);
+              loadLeads(); loadWallet();
+            } catch (err) { alert('Error: ' + err.message); }
+          }));
+          list.querySelectorAll('.view-lead-details').forEach(btn => btn.addEventListener('click', async () => {
+            const leadId = btn.dataset.leadId;
+            const { data: lead, error } = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', leadId).single();
+            if (error) { alert('Error'); return; }
+            alert(`Contact Details:\nName: ${lead.visitor_name}\nEmail: ${lead.visitor_email}\nWhatsApp: ${lead.visitor_whatsapp}\nUnlocked: ${new Date(lead.unlocked_at).toLocaleString()}`);
+          }));
+        } catch (err) { console.error('Leads load error:', err); }
+      }
+
+      async function loadPropertyVerificationList() {
+        if (!state.currentUser) return;
+        try {
+          const { data: properties, error } = await supabase.from('properties').select('id, title, verification_status').eq('owner_id', state.currentUser.id);
+          if (error) throw error;
+          const list = document.getElementById('propertyVerificationList');
+          if (!list) return;
+          list.innerHTML = '';
+          if (!properties || properties.length === 0) {
+            list.innerHTML = '<p class="text-slate-500">You have no properties.</p>';
+            return;
+          }
+          properties.forEach(prop => {
+            const status = prop.verification_status || 'unverified';
+            const statusLabel = status === 'approved' ? '✅ Approved' : status === 'pending' ? '⏳ Pending' : status === 'rejected' ? '❌ Rejected' : 'Not requested';
+            const canRequest = status !== 'pending';
+            list.innerHTML += `<div class="verification-property-item"><span>${prop.title}</span><span>${statusLabel}</span><button class="request-verification-btn" data-property-id="${prop.id}">Request</button></div>`;
+          });
+          list.querySelectorAll('.request-verification-btn').forEach(btn => btn.addEventListener('click', () => openPropertyVerificationModal(btn.dataset.propertyId)));
+        } catch (err) { console.error(err); }
+      }
+
+      async function openPropertyVerificationModal(propertyId) {
+        document.getElementById('verifPropertyId').value = propertyId;
+        document.getElementById('verifStatus').textContent = '';
+        document.getElementById('propertyVerificationModal').classList.remove('hidden');
+      }
+
+      async function loadBrokerProfile(brokerId) {
+        const grid = document.getElementById('brokerListingsGrid');
+        if (!grid) return;
+        grid.innerHTML = '<div class="text-center py-12">Loading...</div>';
+        try {
+          const { data: broker, error } = await supabase.from('profiles').select('*').eq('id', brokerId).single();
+          if (error) throw error;
+          document.getElementById('brokerBusinessName').textContent = broker.business_name || 'Broker';
+          const isTrusted = isTrustedBroker(broker);
+          document.getElementById('brokerTrustedBadge').classList.toggle('hidden', !isTrusted);
+          const rating = broker.average_rating || 0;
+          const reviewCount = broker.review_count || 0;
+          document.getElementById('brokerStars').innerHTML = renderStars(rating);
+          document.getElementById('brokerReviewCount').textContent = `(${reviewCount} reviews)`;
+          document.getElementById('brokerLeadScore').textContent = `⚡ ${broker.lead_score || 0}`;
+          document.getElementById('statTotalReviews').textContent = reviewCount;
+          document.getElementById('statAvgRating').textContent = rating.toFixed(1);
+          const { data: props, error: propErr } = await supabase.from('properties').select('*').eq('owner_id', brokerId).eq('is_paused', false).order('created_at', { ascending: false });
+          if (propErr) throw propErr;
+          grid.innerHTML = '';
+          if (!props || props.length === 0) {
+            document.getElementById('brokerEmptyState').classList.remove('hidden');
+            return;
+          }
+          document.getElementById('brokerEmptyState').classList.add('hidden');
+          props.forEach(prop => grid.appendChild(createPropertyCard(prop, broker, false, false)));
+        } catch (err) {
+          console.error('Broker profile error:', err);
+          grid.innerHTML = '<div class="text-center py-12 text-red-500">Error loading profile.</div>';
+        }
+      }
+
+      function goToDiscovery() {
+        showView(document.getElementById('discoveryView'));
+        state.currentBrokerId = null;
+        navigateTo('/');
+        applyFiltersAndSearch();
+      }
+
+      function navigateToAuth() {
+        showView(document.getElementById('authView'));
+        navigateTo('/auth');
+        setAuthMode(false);
+        document.getElementById('authForm').reset();
+      }
+
+      async function fetchAllData() {
+        const grid = document.getElementById('listingsGrid');
+        const skeleton = document.getElementById('loadingSkeleton');
+        const empty = document.getElementById('emptyState');
+        if (skeleton) skeleton.style.display = 'grid';
+        if (grid) grid.innerHTML = '';
+        if (empty) empty.classList.add('hidden');
+        try {
+          const { data: properties, error } = await supabase.from('properties').select('*').eq('is_paused', false).order('created_at', { ascending: false });
+          if (error) throw error;
+          state.allProperties = properties || [];
+          state.filteredProperties = [...state.allProperties];
+          applyFiltersAndSearch();
+        } catch (err) { console.error('Fetch error:', err); } finally { if (skeleton) skeleton.style.display = 'none'; }
+      }
+
+      async function loadMyProperties() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase.from('properties').select('*').eq('owner_id', state.currentUser.id).order('created_at', { ascending: false });
+          if (error) throw error;
+          state.myProperties = data || [];
+          renderMyProperties();
+        } catch (err) { console.error('Load my properties error:', err); }
+      }
+
+      function applyFiltersAndSearch() {
+        const filter = state.currentFilter;
+        const query = state.searchQuery.trim().toLowerCase();
+        let result = [...state.allProperties];
+        if (filter !== 'all') result = result.filter(p => (p.property_type || '').toLowerCase() === filter);
+        if (query) {
+          result = result.filter(p => {
+            const address = (p.address || '').toLowerCase();
+            const title = (p.title || '').toLowerCase();
+            const brokerName = (p.broker?.business_name || '').toLowerCase();
+            return address.includes(query) || title.includes(query) || brokerName.includes(query);
+          });
+        }
+        state.filteredProperties = result;
+        renderListings(result);
+      }
+
+      async function handleRoute() {
+        const path = getCurrentPath();
+        if (path.startsWith('/broker/')) {
+          const brokerId = path.split('/')[2];
+          if (brokerId) {
+            showView(document.getElementById('brokerView'));
+            await loadBrokerProfile(brokerId);
+          }
+        } else if (path === '/auth') {
+          showView(document.getElementById('authView'));
+          setAuthMode(false);
+        } else if (path === '/dashboard') {
+          if (state.currentUser) {
+            showView(document.getElementById('dashboardView'));
+            await loadMyProperties();
+            await loadWallet();
+            loadLeads();
+          } else {
+            navigateTo('/auth', true);
+            handleRoute();
+          }
+        } else {
+          showView(document.getElementById('discoveryView'));
+          applyFiltersAndSearch();
+        }
+      }
+
+      async function init() {
+        console.log('🚀 Initializing...');
+        if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        else return;
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) { state.currentUser = user; document.getElementById('portalBtnLabel').textContent = 'Dashboard'; await loadWallet(); }
+        } catch (err) { console.log('No session.'); }
+
+        const searchInput = document.getElementById('searchInput');
+        searchInput?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
+        document.getElementById('clearSearchBtn')?.addEventListener('click', () => { searchInput.value = ''; state.searchQuery = ''; applyFiltersAndSearch(); });
+        document.querySelectorAll('.filter-pill').forEach(pill => pill.addEventListener('click', () => {
+          document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          state.currentFilter = pill.dataset.filter;
+          applyFiltersAndSearch();
+        }));
+        document.getElementById('brokerPortalBtn')?.addEventListener('click', () => {
+          if (state.currentUser) { showView(document.getElementById('dashboardView')); navigateTo('/dashboard'); loadMyProperties(); loadWallet(); loadLeads(); }
+          else navigateToAuth();
+        });
+        document.getElementById('backToDiscovery')?.addEventListener('click', goToDiscovery);
+        document.getElementById('backToSearchBtn')?.addEventListener('click', goToDiscovery);
+        document.getElementById('toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
+        document.getElementById('toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+          await supabase.auth.signOut();
+          state.currentUser = null;
+          document.getElementById('portalBtnLabel').textContent = 'Broker Portal';
+          goToDiscovery();
+        });
+
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 300) scrollTopBtn.classList.add('show');
+          else scrollTopBtn.classList.remove('show');
+        });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Show security notification after 3 seconds
+        setTimeout(() => {
+          document.getElementById('securityNotification').style.display = 'block';
+        }, 3000);
+        document.getElementById('closeSecurityNotification')?.addEventListener('click', () => {
+          document.getElementById('securityNotification').style.display = 'none';
+        });
+
+        await handleRoute();
+        await fetchAllData();
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        console.log('✅ Property Hub ready');
+      }
 
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
       else init();
