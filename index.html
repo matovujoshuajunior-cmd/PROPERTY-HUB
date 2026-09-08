@@ -675,19 +675,19 @@
       }
 
       // ─── Email notification helper (Web3Forms) ───────────────────────────
-      async function sendNotificationEmail(to_email, to_name, subject, message) {
-        try {
-          const { data, error } = await supabase.functions.invoke('send-email', {
-            body: { to_email, to_name, subject, message }
-          });
-          if (error) throw error;
-          console.log('📧 Email sent:', data);
-          return true;
-        } catch (err) {
-          console.error('❌ Email send failed:', err.message);
-          return false;
-        }
-      }
+     async function sendNotificationEmail(to_email, to_name, subject, message) {
+  try {
+    const { data, error } = await supabase.functions.invoke('send-email-web3forms', {
+      body: { to_email, to_name, subject, message }
+    });
+    if (error) throw error;
+    console.log('📧 Email sent:', data);
+    return true;
+  } catch (err) {
+    console.error('❌ Email send failed:', err.message);
+    return false;
+  }
+}
 
       // ─── Wallet ──────────────────────────────────────────────────────────
       async function loadWallet() {
