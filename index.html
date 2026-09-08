@@ -659,6 +659,21 @@
         }
       }
 
+      // ─── Email notification helper (Web3Forms) ───────────────────────────
+      async function sendNotificationEmail(to_email, to_name, subject, message) {
+        try {
+          const { data, error } = await supabase.functions.invoke('send-email', {
+            body: { to_email, to_name, subject, message }
+          });
+          if (error) throw error;
+          console.log('📧 Email sent:', data);
+          return true;
+        } catch (err) {
+          console.error('❌ Email send failed:', err.message);
+          return false;
+        }
+      }
+
       // ─── Wallet ──────────────────────────────────────────────────────────
       async function loadWallet() {
         if (!state.currentUser) return;
@@ -1546,18 +1561,25 @@
         });
       }
 
+      // UPDATED QUIZ FORM SUBMIT HANDLER WITH EMAIL NOTIFICATION
       const quizFormEl = document.getElementById('quizForm');
       if (quizFormEl) {
         quizFormEl.addEventListener('submit', async function(e) {
           e.preventDefault();
+
+          // Collect visitor details
           const propertyId = document.getElementById('quizPropertyId').value;
           const name = document.getElementById('quizName').value.trim();
           const email = document.getElementById('quizEmail').value.trim();
           const whatsapp = document.getElementById('quizWhatsapp').value.trim();
 
+          // Collect quiz answers
           const q1 = document.querySelector('input[name="q1"]:checked');
           const q2 = document.querySelector('input[name="q2"]:checked');
-          if (!q1 || !q2) { alert('Answer both quiz questions.'); return; }
+          if (!q1 || !q2) {
+            alert('Answer both quiz questions.');
+            return;
+          }
 
           const score1 = parseInt(q1.value);
           const score2 = parseInt(q2.value);
@@ -1569,6 +1591,7 @@
           const answers = { q1: score1, q2: score2 };
 
           try {
+            // 1️⃣ Submit the lead request via Edge Function
             const { data, error } = await supabase.functions.invoke('request-lead', {
               body: {
                 property_id: propertyId,
@@ -1582,12 +1605,58 @@
             });
             if (error) throw error;
 
+            const requestId = data.lead_id;
+
+            // 2️⃣ Hide quiz modal, show waiting room
             document.getElementById('quizModal').classList.add('hidden');
             document.getElementById('waitingModal').classList.remove('hidden');
             document.getElementById('waitingStatus').textContent = 'Request sent. Waiting for broker...';
 
-            const requestId = data.lead_id;
+            // 3️⃣ Send email notification to broker
+            try {
+              // Fetch property owner_id, title, address
+              const { data: propertyData, error: propErr } = await supabase
+                .from('properties')
+                .select('owner_id, title, address')
+                .eq('id', propertyId)
+                .single();
+              if (propErr) throw propErr;
+
+              if (propertyData?.owner_id) {
+                // Fetch broker email and business name
+                const { data: brokerProfile, error: profileErr } = await supabase
+                  .from('profiles')
+                  .select('email, business_name')
+                  .eq('id', propertyData.owner_id)
+                  .single();
+                if (profileErr) throw profileErr;
+
+                if (brokerProfile?.email) {
+                  const message = `You have a new lead request!\n\n` +
+                    `🏠 Property: ${propertyData.title || 'Untitled'}\n` +
+                    `📍 Address: ${propertyData.address || 'Not specified'}\n\n` +
+                    `👤 Visitor: ${name}\n` +
+                    `✉️ Email: ${email}\n` +
+                    `📱 WhatsApp: ${whatsapp}\n\n` +
+                    `🔥 Lead type: ${leadType.toUpperCase()}\n` +
+                    `Score: ${totalScore}/8`;
+
+                  await sendNotificationEmail(
+                    brokerProfile.email,
+                    brokerProfile.business_name || 'Broker',
+                    '🔔 New Lead Request from Property Hub',
+                    message
+                  );
+                }
+              }
+            } catch (emailErr) {
+              // Email error shouldn't break the main flow
+              console.error('⚠️ Could not send broker email:', emailErr.message);
+            }
+
+            // 4️⃣ Subscribe to lead status updates
             subscribeToLeadRequest(requestId);
+
           } catch (err) {
             alert('Error: ' + err.message);
           }
@@ -1720,7 +1789,10 @@
       }
 
       async function openPropertyVerificationModal(propertyId) {
-        alert('Property verification request will open here. In production, this would show a form with document upload fields.');
+        // Basic placeholder – you can enhance later
+        document.getElementById('verifPropertyId').value = propertyId;
+        document.getElementById('verifStatus').textContent = '';
+        document.getElementById('propertyVerificationModal').classList.remove('hidden');
       }
 
       // ─── Leads ──────────────────────────────────────────────────────────
