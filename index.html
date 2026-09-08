@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    /* ─── All existing styles (unchanged) ─── */
+    /* (Paste all previous CSS here – omitted for brevity but must be included) */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -462,14 +462,13 @@
       const WEB3FORMS_ACCESS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
 
       const state = {
-        allProperties: [],
-        publicProperties: [],
+        allProperties: [],        // public properties (is_paused = false)
+        myProperties: [],         // broker's own properties (all, including paused)
         filteredProperties: [],
         currentFilter: 'all',
         searchQuery: '',
         currentBrokerId: null,
         currentUser: null,
-        myProperties: [],
         profilesMap: {},
         walletBalance: 0,
         isSignUpMode: false,
@@ -519,7 +518,7 @@
         }
       }
 
-      // Direct Web3Forms email
+      // ─── Email helper ─────────────────────────────────────────────────
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const payload = {
@@ -546,6 +545,7 @@
         }
       }
 
+      // ─── Wallet ──────────────────────────────────────────────────────
       async function loadWallet() {
         if (!state.currentUser) return;
         try {
@@ -566,6 +566,7 @@
         } catch (err) { console.error('Deposit error:', err); alert('Error: ' + err.message); return false; }
       }
 
+      // ─── Ranking helpers ─────────────────────────────────────────────
       function isTrustedBroker(broker) {
         if (!broker) return false;
         const rating = broker.average_rating || 0;
@@ -591,6 +592,7 @@
         return Math.round(score);
       }
 
+      // ─── Property Card ────────────────────────────────────────────────
       function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
         const article = document.createElement('article');
         article.className = 'property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/70 flex flex-col';
@@ -620,7 +622,6 @@
         let rateHtml = '';
         if (!showEdit && state.currentUser && broker && !isOwner) rateHtml = `<button class="rate-btn text-xs text-yellow-600 hover:text-yellow-800 font-medium" data-broker-id="${broker.id}"><i class="fas fa-star mr-1"></i>Rate</button>`;
 
-        // Pause/Resume button for broker's own property cards
         let pauseHtml = '';
         if (showEdit) {
           const pauseText = property.is_paused ? 'Resume' : 'Pause';
@@ -675,7 +676,7 @@
         return article;
       }
 
-      // Toggle property pause state
+      // Toggle pause state
       async function togglePropertyPause(propertyId, currentPaused) {
         try {
           const newPaused = !currentPaused;
@@ -689,6 +690,7 @@
         }
       }
 
+      // ─── Rendering functions ──────────────────────────────────────────
       function renderListings(properties) {
         const grid = document.getElementById('listingsGrid');
         if (!grid) return;
@@ -726,6 +728,7 @@
         });
       }
 
+      // ─── Edit modal functions ─────────────────────────────────────────
       async function openEditModal(propertyId) {
         const prop = state.myProperties.find(p => p.id === propertyId);
         if (!prop) return;
@@ -778,7 +781,7 @@
         });
       }
 
-      // Edit property form submit
+      // Edit form submit
       const editPropertyForm = document.getElementById('editPropertyForm');
       if (editPropertyForm) {
         editPropertyForm.addEventListener('submit', async (e) => {
@@ -825,7 +828,7 @@
         });
       }
 
-      // Add Property Form (simplified, same logic as before)
+      // ─── Add property form ────────────────────────────────────────────
       const addPropertyForm = document.getElementById('addPropertyForm');
       if (addPropertyForm) {
         addPropertyForm.addEventListener('submit', async (e) => {
@@ -880,56 +883,357 @@
         });
       }
 
-      // Reviews, Reports, Quiz, Leads, Verification functions are already defined above in the previous code snippets; they are not repeated here for brevity.
+      // ─── Reviews ───────────────────────────────────────────────────────
+      async function openReviewModal(brokerId) {
+        document.getElementById('reviewBrokerId').value = brokerId;
+        document.getElementById('reviewRating').value = 5;
+        document.getElementById('reviewComment').value = '';
+        document.getElementById('reviewClientName').value = '';
+        updateStarUI(5);
+        document.getElementById('reviewFormContainer').classList.add('hidden');
+        document.getElementById('toggleWriteReview').innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+        document.getElementById('reviewModal').classList.remove('hidden');
+        await loadReviewsForModal(brokerId);
+      }
 
-      // Route handler
+      async function openViewReviewsModal(brokerId) {
+        document.getElementById('reviewBrokerId').value = brokerId;
+        document.getElementById('reviewFormContainer').classList.add('hidden');
+        document.getElementById('toggleWriteReview').innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+        document.getElementById('reviewModal').classList.remove('hidden');
+        await loadReviewsForModal(brokerId);
+      }
+
+      async function loadReviewsForModal(brokerId) {
+        const list = document.getElementById('reviewsList');
+        if (!list) return;
+        list.innerHTML = '<p class="text-slate-500 text-sm">Loading...</p>';
+        document.getElementById('noReviewsMessage').classList.add('hidden');
+        try {
+          const { data, error } = await supabase.from('reviews').select('*').eq('broker_id', brokerId).order('created_at', { ascending: false });
+          if (error) throw error;
+          if (!data || data.length === 0) {
+            list.innerHTML = '';
+            document.getElementById('noReviewsMessage').classList.remove('hidden');
+            return;
+          }
+          let html = '';
+          data.forEach(review => {
+            const stars = renderStarsSmall(review.rating);
+            const date = new Date(review.created_at).toLocaleDateString('en-UG');
+            const reviewer = review.client_name || 'Guest';
+            html += `<div class="review-item"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="font-medium text-slate-700">${reviewer}</span><span class="stars-small">${stars}</span></div><span class="review-meta">${date}</span></div>${review.comment ? `<p class="review-text mt-1">${review.comment}</p>` : ''}</div>`;
+          });
+          list.innerHTML = html;
+        } catch (err) {
+          list.innerHTML = '<p class="text-red-500 text-sm">Error loading reviews.</p>';
+        }
+      }
+
+      function updateStarUI(active) {
+        const selector = document.getElementById('starSelector');
+        if (!selector) return;
+        selector.querySelectorAll('.star').forEach(el => {
+          const val = parseInt(el.dataset.value);
+          el.classList.toggle('active', val <= active);
+        });
+      }
+
+      // ─── Reports ───────────────────────────────────────────────────────
+      function openReportModal(brokerId) {
+        document.getElementById('reportBrokerId').value = brokerId;
+        document.getElementById('reportReason').value = '';
+        document.getElementById('reportDescription').value = '';
+        document.getElementById('reportStatus').textContent = '';
+        document.getElementById('reportModal').classList.remove('hidden');
+      }
+
+      // ─── Quiz / Connect ───────────────────────────────────────────────
+      async function openQuizModal(propertyId) {
+        document.getElementById('quizPropertyId').value = propertyId;
+        document.getElementById('quizStep1').classList.remove('hidden');
+        document.getElementById('quizStep2').classList.add('hidden');
+        document.getElementById('quizForm').reset();
+        document.getElementById('quizModal').classList.remove('hidden');
+      }
+
+      // ─── Lead submission ───────────────────────────────────────────────
+      const quizFormEl = document.getElementById('quizForm');
+      if (quizFormEl) {
+        quizFormEl.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const propertyId = document.getElementById('quizPropertyId').value;
+          const name = document.getElementById('quizName').value.trim();
+          const email = document.getElementById('quizEmail').value.trim();
+          const whatsapp = document.getElementById('quizWhatsapp').value.trim();
+          const q1 = document.querySelector('input[name="q1"]:checked');
+          const q2 = document.querySelector('input[name="q2"]:checked');
+          if (!q1 || !q2) { alert('Answer both quiz questions.'); return; }
+          const score1 = parseInt(q1.value);
+          const score2 = parseInt(q2.value);
+          const totalScore = score1 + score2;
+          let leadType = 'cold';
+          if (totalScore >= 7) leadType = 'hot';
+          else if (totalScore >= 4) leadType = 'warm';
+          const answers = { q1: score1, q2: score2 };
+
+          try {
+            const { data: lead, error: insertError } = await supabase.from('lead_requests').insert({
+              property_id: propertyId,
+              visitor_name: name,
+              visitor_email: email,
+              visitor_whatsapp: whatsapp,
+              quiz_answers: answers,
+              total_score: totalScore,
+              lead_type: leadType,
+              status: 'pending'
+            }).select().single();
+            if (insertError) throw insertError;
+
+            document.getElementById('quizModal').classList.add('hidden');
+            document.getElementById('waitingModal').classList.remove('hidden');
+            document.getElementById('waitingStatus').textContent = 'Request sent. Waiting for broker...';
+
+            const { data: propertyData } = await supabase.from('properties').select('owner_id, title, address').eq('id', propertyId).single();
+            if (propertyData) {
+              const { data: brokerProfile } = await supabase.from('profiles').select('email, business_name').eq('id', propertyData.owner_id).single();
+              if (brokerProfile?.email) {
+                const message = `New lead request!\nProperty: ${propertyData.title}\nAddress: ${propertyData.address}\nVisitor: ${name}\nEmail: ${email}\nWhatsApp: ${whatsapp}\nLead type: ${leadType}\nScore: ${totalScore}/8`;
+                await sendNotificationEmail(brokerProfile.email, brokerProfile.business_name || 'Broker', '🔔 New Lead Request', message);
+              }
+            }
+
+            subscribeToLeadRequest(lead.id);
+          } catch (err) {
+            console.error('Quiz submission error:', err);
+            alert('Error: ' + err.message);
+          }
+        });
+      }
+
+      function subscribeToLeadRequest(requestId) {
+        const interval = setInterval(async () => {
+          const { data } = await supabase.from('lead_requests').select('status').eq('id', requestId).single();
+          if (data?.status === 'approved') { clearInterval(interval); document.getElementById('waitingModal').classList.add('hidden'); alert('✅ Lead approved!'); }
+          else if (data?.status === 'rejected') { clearInterval(interval); document.getElementById('waitingModal').classList.add('hidden'); alert('❌ Lead rejected.'); }
+        }, 3000);
+      }
+
+      // ─── Leads panel ───────────────────────────────────────────────────
+      async function loadLeads() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase.from('lead_requests').select('*, property:property_id (title, price_amount, property_type, address)').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
+          if (error) throw error;
+          const list = document.getElementById('leadsList');
+          const noMsg = document.getElementById('noLeads');
+          if (!list || !noMsg) return;
+          if (!data || data.length === 0) {
+            list.innerHTML = '';
+            noMsg.classList.remove('hidden');
+            return;
+          }
+          noMsg.classList.add('hidden');
+          let html = '';
+          data.forEach(lead => {
+            const statusClass = lead.status === 'approved' ? 'approved' : lead.status === 'pending' ? 'pending' : lead.status === 'rejected' ? 'rejected' : 'expired';
+            const statusLabel = lead.status === 'approved' ? '✅ Unlocked' : lead.status === 'pending' ? '⏳ Pending' : lead.status === 'rejected' ? '❌ Rejected' : '⏰ Expired';
+            const canUnlock = lead.status === 'pending';
+            html += `<div class="verification-property-item"><div class="property-title">${lead.property?.title || 'Unknown'}</div><div><span class="property-status ${statusClass}">${statusLabel}</span></div><div>${canUnlock ? `<button class="unlock-lead-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full" data-lead-id="${lead.id}">Unlock</button>` : lead.status === 'approved' ? `<button class="view-lead-details text-xs text-blue-600" data-lead-id="${lead.id}">View Contact</button>` : ''}</div></div>`;
+          });
+          list.innerHTML = html;
+          list.querySelectorAll('.unlock-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
+            const leadId = btn.dataset.leadId;
+            if (!confirm('Unlock this lead? (Free)')) return;
+            try {
+              const { data, error } = await supabase.functions.invoke('handle-lead-decision', { body: { token: leadId, decision: 'approve' } });
+              if (error) throw error;
+              if (!data.success) { alert('Failed: ' + data.error); return; }
+              alert(`✅ Lead unlocked!\nName: ${data.visitor_name}\nEmail: ${data.visitor_email}\nWhatsApp: ${data.visitor_whatsapp}`);
+              loadLeads(); loadWallet();
+            } catch (err) { alert('Error: ' + err.message); }
+          }));
+          list.querySelectorAll('.view-lead-details').forEach(btn => btn.addEventListener('click', async () => {
+            const leadId = btn.dataset.leadId;
+            const { data: lead, error } = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', leadId).single();
+            if (error) { alert('Error'); return; }
+            alert(`Contact Details:\nName: ${lead.visitor_name}\nEmail: ${lead.visitor_email}\nWhatsApp: ${lead.visitor_whatsapp}\nUnlocked: ${new Date(lead.unlocked_at).toLocaleString()}`);
+          }));
+        } catch (err) {
+          console.error('Leads load error:', err);
+        }
+      }
+
+      // ─── Property Verification list ────────────────────────────────────
+      async function loadPropertyVerificationList() {
+        if (!state.currentUser) return;
+        try {
+          const { data: properties, error } = await supabase.from('properties').select('id, title, verification_status').eq('owner_id', state.currentUser.id);
+          if (error) throw error;
+          const list = document.getElementById('propertyVerificationList');
+          if (!list) return;
+          list.innerHTML = '';
+          if (!properties || properties.length === 0) {
+            list.innerHTML = '<p class="text-slate-500">You have no properties.</p>';
+            return;
+          }
+          properties.forEach(prop => {
+            const status = prop.verification_status || 'unverified';
+            const statusLabel = status === 'approved' ? '✅ Approved' : status === 'pending' ? '⏳ Pending' : status === 'rejected' ? '❌ Rejected' : 'Not requested';
+            const canRequest = status !== 'pending';
+            list.innerHTML += `<div class="verification-property-item"><span>${prop.title}</span><span>${statusLabel}</span><button class="request-verification-btn" data-property-id="${prop.id}">Request</button></div>`;
+          });
+          list.querySelectorAll('.request-verification-btn').forEach(btn => btn.addEventListener('click', () => openPropertyVerificationModal(btn.dataset.propertyId)));
+        } catch (err) { console.error(err); }
+      }
+
+      async function openPropertyVerificationModal(propertyId) {
+        document.getElementById('verifPropertyId').value = propertyId;
+        document.getElementById('verifStatus').textContent = '';
+        document.getElementById('propertyVerificationModal').classList.remove('hidden');
+      }
+
+      // ─── Navigation functions ─────────────────────────────────────────
+      async function loadBrokerProfile(brokerId) {
+        const grid = document.getElementById('brokerListingsGrid');
+        if (!grid) return;
+        grid.innerHTML = '<div class="text-center py-12">Loading...</div>';
+        try {
+          const { data: broker, error } = await supabase.from('profiles').select('*').eq('id', brokerId).single();
+          if (error) throw error;
+          document.getElementById('brokerBusinessName').textContent = broker.business_name || 'Broker';
+          const isTrusted = isTrustedBroker(broker);
+          document.getElementById('brokerTrustedBadge').classList.toggle('hidden', !isTrusted);
+          const rating = broker.average_rating || 0;
+          const reviewCount = broker.review_count || 0;
+          document.getElementById('brokerStars').innerHTML = renderStars(rating);
+          document.getElementById('brokerReviewCount').textContent = `(${reviewCount} reviews)`;
+          document.getElementById('brokerLeadScore').textContent = `⚡ ${broker.lead_score || 0}`;
+          document.getElementById('statTotalReviews').textContent = reviewCount;
+          document.getElementById('statAvgRating').textContent = rating.toFixed(1);
+
+          const { data: props, error: propErr } = await supabase.from('properties').select('*').eq('owner_id', brokerId).eq('is_paused', false).order('created_at', { ascending: false });
+          if (propErr) throw propErr;
+          grid.innerHTML = '';
+          if (!props || props.length === 0) {
+            document.getElementById('brokerEmptyState').classList.remove('hidden');
+            return;
+          }
+          document.getElementById('brokerEmptyState').classList.add('hidden');
+          props.forEach(prop => grid.appendChild(createPropertyCard(prop, broker, false, false)));
+        } catch (err) {
+          console.error('Broker profile error:', err);
+          grid.innerHTML = '<div class="text-center py-12 text-red-500">Error loading profile.</div>';
+        }
+      }
+
+      function goToDiscovery() {
+        showView(document.getElementById('discoveryView'));
+        state.currentBrokerId = null;
+        navigateTo('/');
+        applyFiltersAndSearch();
+      }
+
+      function navigateToAuth() {
+        showView(document.getElementById('authView'));
+        navigateTo('/auth');
+        setAuthMode(false);
+        document.getElementById('authForm').reset();
+      }
+
+      // ─── Fetch all data ────────────────────────────────────────────────
+      async function fetchAllData() {
+        const grid = document.getElementById('listingsGrid');
+        const skeleton = document.getElementById('loadingSkeleton');
+        const empty = document.getElementById('emptyState');
+        if (skeleton) skeleton.style.display = 'grid';
+        if (grid) grid.innerHTML = '';
+        if (empty) empty.classList.add('hidden');
+
+        try {
+          const { data: properties, error } = await supabase.from('properties').select('*').eq('is_paused', false).order('created_at', { ascending: false });
+          if (error) throw error;
+          state.allProperties = properties || [];
+          state.filteredProperties = [...state.allProperties];
+          applyFiltersAndSearch();
+        } catch (err) {
+          console.error('Fetch error:', err);
+        } finally {
+          if (skeleton) skeleton.style.display = 'none';
+        }
+      }
+
+      async function loadMyProperties() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase.from('properties').select('*').eq('owner_id', state.currentUser.id).order('created_at', { ascending: false });
+          if (error) throw error;
+          state.myProperties = data || [];
+          renderMyProperties();
+        } catch (err) { console.error('Load my properties error:', err); }
+      }
+
+      function applyFiltersAndSearch() {
+        const filter = state.currentFilter;
+        const query = state.searchQuery.trim().toLowerCase();
+        let result = [...state.allProperties];
+        if (filter !== 'all') result = result.filter(p => (p.property_type || '').toLowerCase() === filter);
+        if (query) {
+          result = result.filter(p => {
+            const address = (p.address || '').toLowerCase();
+            const title = (p.title || '').toLowerCase();
+            const brokerName = (p.broker?.business_name || '').toLowerCase();
+            return address.includes(query) || title.includes(query) || brokerName.includes(query);
+          });
+        }
+        state.filteredProperties = result;
+        renderListings(result);
+      }
+
+      // ─── Route handler ──────────────────────────────────────────────────
       async function handleRoute() {
         const path = getCurrentPath();
         if (path.startsWith('/broker/')) {
           const brokerId = path.split('/')[2];
-          if (brokerId && brokerId !== state.currentBrokerId) {
-            if (document.getElementById('brokerView').classList.contains('view-hidden')) {
-              showView(document.getElementById('brokerView'));
-              await loadBrokerProfile(brokerId);
-            }
+          if (brokerId) {
+            showView(document.getElementById('brokerView'));
+            await loadBrokerProfile(brokerId);
           }
         } else if (path === '/auth') {
-          if (document.getElementById('authView').classList.contains('view-hidden')) {
-            showView(document.getElementById('authView'));
-            setAuthMode(false);
-            document.getElementById('authForm').reset();
-          }
+          showView(document.getElementById('authView'));
+          setAuthMode(false);
         } else if (path === '/dashboard') {
           if (state.currentUser) {
-            if (document.getElementById('dashboardView').classList.contains('view-hidden')) {
-              showView(document.getElementById('dashboardView'));
-              await loadMyProperties();
-              await loadWallet();
-              loadLeads();
-            }
+            showView(document.getElementById('dashboardView'));
+            await loadMyProperties();
+            await loadWallet();
+            loadLeads();
           } else {
             navigateTo('/auth', true);
             handleRoute();
           }
-        } else if (path === '/') {
-          if (!document.getElementById('discoveryView').classList.contains('view-visible')) {
-            showView(document.getElementById('discoveryView'));
-            applyFiltersAndSearch();
-          }
         } else {
-          navigateTo('/', true);
-          handleRoute();
+          showView(document.getElementById('discoveryView'));
+          applyFiltersAndSearch();
         }
       }
 
-      // Initialization
+      // ─── Initialization ───────────────────────────────────────────────
       async function init() {
         console.log('🚀 Initializing...');
         if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         else return;
-        try { const { data: { user } } = await supabase.auth.getUser(); if (user) { state.currentUser = user; document.getElementById('portalBtnLabel').textContent = 'Dashboard'; await loadWallet(); } } catch (err) { console.log('No session.'); }
 
-        // Event listeners for search, filters, etc.
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            state.currentUser = user;
+            document.getElementById('portalBtnLabel').textContent = 'Dashboard';
+            await loadWallet();
+          }
+        } catch (err) { console.log('No session.'); }
+
+        // Event listeners
         const searchInput = document.getElementById('searchInput');
         searchInput?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
         document.getElementById('clearSearchBtn')?.addEventListener('click', () => { searchInput.value = ''; state.searchQuery = ''; applyFiltersAndSearch(); });
@@ -939,12 +1243,28 @@
           state.currentFilter = pill.dataset.filter;
           applyFiltersAndSearch();
         }));
-        document.getElementById('brokerPortalBtn')?.addEventListener('click', () => { if (state.currentUser) { showView(document.getElementById('dashboardView')); navigateTo('/dashboard'); loadMyProperties(); loadWallet(); loadLeads(); } else navigateToAuth(); });
+        document.getElementById('brokerPortalBtn')?.addEventListener('click', () => {
+          if (state.currentUser) { showView(document.getElementById('dashboardView')); navigateTo('/dashboard'); loadMyProperties(); loadWallet(); loadLeads(); }
+          else navigateToAuth();
+        });
         document.getElementById('backToDiscovery')?.addEventListener('click', goToDiscovery);
         document.getElementById('backToSearchBtn')?.addEventListener('click', goToDiscovery);
         document.getElementById('toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
         document.getElementById('toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
-        document.getElementById('logoutBtn')?.addEventListener('click', async () => { await supabase.auth.signOut(); state.currentUser = null; document.getElementById('portalBtnLabel').textContent = 'Broker Portal'; goToDiscovery(); });
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+          await supabase.auth.signOut();
+          state.currentUser = null;
+          document.getElementById('portalBtnLabel').textContent = 'Broker Portal';
+          goToDiscovery();
+        });
+
+        // Scroll to top
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 300) scrollTopBtn.classList.add('show');
+          else scrollTopBtn.classList.remove('show');
+        });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
         await handleRoute();
         await fetchAllData();
