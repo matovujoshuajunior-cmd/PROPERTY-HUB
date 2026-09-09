@@ -19,7 +19,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
-    /* All previous styles kept intact */
+    /* All styles unchanged */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -150,7 +150,6 @@
       </div>
       <div class="flex justify-between items-center mb-3">
         <span class="text-sm text-slate-500">What others say</span>
-        <!-- Write Review button visible only to logged-in users -->
         <button id="toggleWriteReview" class="write-review-toggle" style="display: none;"><i class="fas fa-pen"></i> Write a Review</button>
         <span id="signInToReview" class="text-xs text-indigo-500 cursor-pointer" style="display: none;" onclick="navigateToAuth()">Sign in to write a review</span>
       </div>
@@ -182,7 +181,6 @@
         <div><label>Property Type *</label><select id="editType" class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
         <div><label>Address *</label><input type="text" id="editAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
         <div><label>Images</label><div id="editImagePreviews" class="flex flex-wrap gap-2 mb-2"></div><input type="file" id="editImageInput" accept="image/*" multiple class="w-full text-sm" /></div>
-        <!-- Verification checkbox will be hidden if property is already verified -->
         <div id="editVerificationContainer" class="flex items-center gap-3 mt-2">
           <input type="checkbox" id="editRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
           <label for="editRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label>
@@ -289,7 +287,6 @@
     <main>
       <!-- Discovery View -->
       <section id="discoveryView" class="view view-visible">
-        <!-- Hero and content -->
         <div class="relative bg-slate-900 text-white overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80')] bg-cover bg-center opacity-30"></div>
           <div class="absolute inset-0 hero-gradient"></div>
@@ -336,7 +333,7 @@
               </div>
               <div class="flex items-center gap-3 flex-wrap">
                 <button id="rateBrokerBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-star"></i> Rate</button>
-                <button id="viewReviewsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-comment"></i> Reviews</button>
+                <button id="viewReviewsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2"><i class="fas fa-comment"></i> Reviews</button>
                 <button id="reportBrokerBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 hidden"><i class="fas fa-flag"></i> Report</button>
                 <a id="brokerWhatsAppLink" href="#" target="_blank" class="btn-whatsapp px-6 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-md hover:shadow-lg transition hidden"><i class="fab fa-whatsapp text-lg"></i> Chat on WhatsApp</a>
               </div>
@@ -914,6 +911,26 @@
           $('#brokerLeadScore').textContent = `⚡ ${broker.lead_score || 0}`;
           $('#statTotalReviews').textContent = reviewCount;
           $('#statAvgRating').textContent = rating.toFixed(1);
+
+          // Show rate button only for logged-in users who are not the broker
+          if (state.currentUser && state.currentUser.id !== brokerId) {
+            $('#rateBrokerBtn').classList.remove('hidden');
+            $('#rateBrokerBtn').onclick = () => openReviewModal(brokerId);
+          } else {
+            $('#rateBrokerBtn').classList.add('hidden');
+          }
+
+          // Reviews button always visible
+          $('#viewReviewsBtn').onclick = () => openViewReviewsModal(brokerId);
+
+          // Report button only for logged-in users
+          if (state.currentUser && state.currentUser.id !== brokerId) {
+            $('#reportBrokerBtn').classList.remove('hidden');
+            $('#reportBrokerBtn').onclick = () => openReportModal(brokerId);
+          } else {
+            $('#reportBrokerBtn').classList.add('hidden');
+          }
+
           const { data: props, error: propErr } = await supabase.from('properties').select('*').eq('owner_id', brokerId).eq('is_paused', false).order('created_at', { ascending: false });
           if (propErr) throw propErr;
           grid.innerHTML = '';
@@ -929,20 +946,401 @@
         }
       }
 
-      function goToDiscovery() {
-        showView($('#discoveryView'));
-        state.currentBrokerId = null;
-        navigateTo('/');
-        applyFiltersAndSearch();
+      // Review modal functions
+      function openReviewModal(brokerId) {
+        if (!state.currentUser) {
+          alert('Please sign in to write a review.');
+          navigateToAuth();
+          return;
+        }
+        $('#reviewBrokerId').value = brokerId;
+        $('#reviewRating').value = 5;
+        $('#reviewComment').value = '';
+        $('#reviewClientName').value = '';
+        updateStarUI(5);
+        $('#reviewFormContainer').classList.remove('hidden');
+        $('#toggleWriteReview').style.display = 'none'; // hide toggle if already open
+        $('#signInToReview').style.display = 'none';
+        $('#reviewModal').classList.remove('hidden');
+        loadReviewsForModal(brokerId);
       }
 
-      function navigateToAuth() {
-        showView($('#authView'));
-        navigateTo('/auth');
-        setAuthMode(false);
-        $('#authForm').reset();
+      function openViewReviewsModal(brokerId) {
+        $('#reviewBrokerId').value = brokerId;
+        $('#reviewFormContainer').classList.add('hidden');
+        $('#toggleWriteReview').style.display = 'inline-flex';
+        $('#signInToReview').style.display = state.currentUser ? 'none' : 'inline';
+        $('#reviewModal').classList.remove('hidden');
+        loadReviewsForModal(brokerId);
       }
 
+      async function loadReviewsForModal(brokerId) {
+        const list = $('#reviewsList');
+        if (!list) return;
+        list.innerHTML = '<p class="text-slate-500 text-sm">Loading...</p>';
+        $('#noReviewsMessage').classList.add('hidden');
+        try {
+          const { data, error } = await supabase
+            .from('reviews')
+            .select('*')
+            .eq('broker_id', brokerId)
+            .order('created_at', { ascending: false });
+          if (error) throw error;
+          if (!data || data.length === 0) {
+            list.innerHTML = '';
+            $('#noReviewsMessage').classList.remove('hidden');
+            return;
+          }
+          let html = '';
+          data.forEach(review => {
+            const stars = renderStarsSmall(review.rating);
+            const date = new Date(review.created_at).toLocaleDateString('en-UG');
+            const reviewer = review.client_name || 'Guest';
+            html += `<div class="review-item"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="font-medium text-slate-700">${reviewer}</span><span class="stars-small">${stars}</span></div><span class="review-meta">${date}</span></div>${review.comment ? `<p class="review-text mt-1">${review.comment}</p>` : ''}</div>`;
+          });
+          list.innerHTML = html;
+        } catch (err) {
+          list.innerHTML = '<p class="text-red-500 text-sm">Error loading reviews.</p>';
+        }
+      }
+
+      function updateStarUI(active) {
+        const selector = $('#starSelector');
+        if (!selector) return;
+        selector.querySelectorAll('.star').forEach(el => {
+          const val = parseInt(el.dataset.value);
+          el.classList.toggle('active', val <= active);
+        });
+      }
+
+      // Event listeners for stars
+      const starSelector = $('#starSelector');
+      if (starSelector) {
+        starSelector.querySelectorAll('.star').forEach(star => {
+          star.addEventListener('click', () => {
+            const val = parseInt(star.dataset.value);
+            $('#reviewRating').value = val;
+            updateStarUI(val);
+          });
+        });
+      }
+
+      // Submit review
+      const reviewForm = $('#reviewForm');
+      if (reviewForm) {
+        reviewForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) { alert('Please sign in to leave a review.'); return; }
+          const brokerId = $('#reviewBrokerId').value;
+          const rating = parseInt($('#reviewRating').value);
+          const comment = $('#reviewComment').value.trim();
+          const clientName = $('#reviewClientName').value.trim() || null;
+          if (!rating || rating < 1 || rating > 5) { alert('Select a rating (1-5).'); return; }
+          try {
+            const { error } = await supabase.from('reviews').insert({
+              broker_id: brokerId, rating, comment, client_name: clientName,
+            });
+            if (error) throw error;
+            alert('✅ Review submitted!');
+            await loadReviewsForModal(brokerId);
+            reviewForm.reset();
+            $('#reviewRating').value = 5;
+            updateStarUI(5);
+            $('#reviewFormContainer').classList.add('hidden');
+            // Reload broker profile to update rating
+            if (state.currentBrokerId) await loadBrokerProfile(state.currentBrokerId);
+          } catch (err) { alert('Error: ' + err.message); }
+        });
+      }
+
+      // Toggle write review button in modal
+      const toggleWriteReview = $('#toggleWriteReview');
+      if (toggleWriteReview) {
+        toggleWriteReview.addEventListener('click', function() {
+          if (!state.currentUser) {
+            alert('Please sign in to write a review.');
+            navigateToAuth();
+            return;
+          }
+          const container = $('#reviewFormContainer');
+          if (container.classList.contains('hidden')) {
+            container.classList.remove('hidden');
+            this.innerHTML = '<i class="fas fa-times"></i> Cancel';
+          } else {
+            container.classList.add('hidden');
+            this.innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+          }
+        });
+      }
+
+      // Close review modal
+      const closeReviewModal = $('#closeReviewModal');
+      if (closeReviewModal) closeReviewModal.addEventListener('click', () => $('#reviewModal').classList.add('hidden'));
+      const reviewModalEl = $('#reviewModal');
+      if (reviewModalEl) reviewModalEl.addEventListener('click', (e) => { if (e.target === reviewModalEl) reviewModalEl.classList.add('hidden'); });
+
+      // Dashboard buttons
+      function toggleProfileForm() {
+        const c = $('#profileFormContainer');
+        c.classList.toggle('visible');
+        $('#addPropertyContainer').classList.remove('visible');
+        $('#propertyVerificationContainer').classList.remove('visible');
+        $('#leadsContainer').classList.remove('visible');
+      }
+      function toggleAddPropertyForm() {
+        const c = $('#addPropertyContainer');
+        c.classList.toggle('visible');
+        $('#profileFormContainer').classList.remove('visible');
+        $('#propertyVerificationContainer').classList.remove('visible');
+        $('#leadsContainer').classList.remove('visible');
+      }
+      function togglePropertyVerificationForm() {
+        const c = $('#propertyVerificationContainer');
+        c.classList.toggle('visible');
+        $('#profileFormContainer').classList.remove('visible');
+        $('#addPropertyContainer').classList.remove('visible');
+        $('#leadsContainer').classList.remove('visible');
+        loadPropertyVerificationList();
+      }
+      function toggleLeadsPanel() {
+        const c = $('#leadsContainer');
+        c.classList.toggle('visible');
+        $('#profileFormContainer').classList.remove('visible');
+        $('#addPropertyContainer').classList.remove('visible');
+        $('#propertyVerificationContainer').classList.remove('visible');
+        loadLeads();
+      }
+
+      $('#dashboardEditProfileBtn')?.addEventListener('click', toggleProfileForm);
+      $('#dashboardAddPropertyBtn')?.addEventListener('click', toggleAddPropertyForm);
+      $('#dashboardPropertyVerificationBtn')?.addEventListener('click', togglePropertyVerificationForm);
+      $('#dashboardLeadsBtn')?.addEventListener('click', toggleLeadsPanel);
+
+      // Cancel profile edit
+      $('#cancelProfileEditBtn')?.addEventListener('click', () => $('#profileFormContainer').classList.remove('visible'));
+
+      // Profile settings submit
+      const profileSettingsForm = $('#profileSettingsForm');
+      if (profileSettingsForm) {
+        profileSettingsForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) return;
+          const businessName = $('#settingsBusinessName').value.trim();
+          const phone = $('#settingsPhone').value.trim();
+          try {
+            const { error } = await supabase
+              .from('profiles')
+              .update({ business_name: businessName, phone: phone })
+              .eq('id', state.currentUser.id);
+            if (error) throw error;
+            $('#profileStatus').textContent = '✅ Profile updated!';
+            $('#profileStatus').className = 'mt-3 text-sm text-emerald-600';
+            if (state.currentUser) {
+              state.currentUser.business_name = businessName;
+              state.currentUser.phone = phone;
+            }
+          } catch (err) {
+            $('#profileStatus').textContent = '❌ Update failed: ' + err.message;
+            $('#profileStatus').className = 'mt-3 text-sm text-red-600';
+          }
+        });
+      }
+
+      // Add property submit
+      const addPropertyForm = $('#addPropertyForm');
+      if (addPropertyForm) {
+        addPropertyForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) { alert('Please sign in first.'); return; }
+          const title = $('#propTitle').value.trim();
+          const price = parseFloat($('#propPrice').value);
+          const type = $('#propType').value;
+          const address = $('#propAddress').value.trim();
+          const imageFiles = $('#propImage').files;
+          const requestVerification = $('#addRequestVerification').checked;
+          if (!title || !price || !address) { alert('Fill all required fields.'); return; }
+          const statusEl = $('#uploadStatus');
+          if (statusEl) { statusEl.textContent = 'Uploading images...'; statusEl.className = 'mt-3 text-sm text-indigo-600'; }
+          const imageUrls = [];
+          if (imageFiles && imageFiles.length > 0) {
+            for (const file of imageFiles) {
+              const fileExt = file.name.split('.').pop();
+              const fileName = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.${fileExt}`;
+              const filePath = `${state.currentUser.id}/${fileName}`;
+              const { error: uploadError } = await supabase.storage.from('property-media').upload(filePath, file);
+              if (uploadError) { if (statusEl) { statusEl.textContent = '❌ Upload failed: ' + uploadError.message; statusEl.className = 'mt-3 text-sm text-red-600'; } return; }
+              const { data: urlData } = supabase.storage.from('property-media').getPublicUrl(filePath);
+              imageUrls.push(urlData.publicUrl);
+            }
+          }
+          const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
+          let verificationStatus = 'unverified', isVerified = false;
+          if (requestVerification) { verificationStatus = 'pending'; isVerified = false; }
+          const insertData = { title, price_amount: price, property_type: dbType, address, media_urls: imageUrls, is_verified: isVerified, verification_status: verificationStatus, owner_id: state.currentUser.id, is_paused: false };
+          try {
+            const { error } = await supabase.from('properties').insert(insertData);
+            if (error) throw error;
+            if (statusEl) { statusEl.textContent = requestVerification ? '✅ Property added! Verification requested.' : '✅ Property added!'; statusEl.className = 'mt-3 text-sm text-emerald-600'; }
+            addPropertyForm.reset();
+            $('#addRequestVerification').checked = false;
+            $('#addVerificationInfo').classList.remove('visible');
+            $('#propImage').value = '';
+            $('#propImagePreviews').innerHTML = '';
+            await loadMyProperties();
+            await fetchAllData();
+            $('#addPropertyContainer').classList.remove('visible');
+          } catch (err) {
+            if (statusEl) { statusEl.textContent = '❌ Failed to add property: ' + err.message; statusEl.className = 'mt-3 text-sm text-red-600'; }
+          }
+        });
+      }
+
+      // Edit property modal
+      async function openEditModal(propertyId) {
+        const prop = state.myProperties.find(p => p.id === propertyId);
+        if (!prop) return;
+        $('#editPropertyId').value = propertyId;
+        $('#editTitle').value = prop.title || '';
+        $('#editPrice').value = prop.price_amount || '';
+        const dbType = prop.property_type || '';
+        let formType = 'Rentals';
+        if (dbType === 'property') formType = 'Properties';
+        else if (dbType === 'lodge') formType = 'Lodges';
+        else if (dbType === 'rental') formType = 'Rentals';
+        $('#editType').value = formType;
+        $('#editAddress').value = prop.address || '';
+        const images = getImageArray(prop);
+        renderEditImagePreviews(images);
+        const modal = $('#editModal');
+        if (modal) {
+          modal._currentImages = images;
+          modal._currentProperty = prop;
+        }
+        // Hide verification checkbox if already verified or pending
+        const verifContainer = $('#editVerificationContainer');
+        if (prop.verification_status === 'approved' || prop.verification_status === 'pending') {
+          verifContainer.style.display = 'none';
+          $('#editVerificationInfo').classList.add('visible');
+          if (prop.verification_status === 'approved') {
+            $('#editVerificationInfo').innerHTML = '<p class="font-medium">✅ This property is already verified.</p>';
+          } else {
+            $('#editVerificationInfo').innerHTML = '<p class="font-medium">⏳ Verification request pending.</p>';
+          }
+        } else {
+          verifContainer.style.display = 'flex';
+          $('#editVerificationInfo').classList.remove('visible');
+          $('#editRequestVerification').checked = false;
+        }
+        $('#editModal').classList.remove('hidden');
+      }
+
+      function renderEditImagePreviews(images) {
+        const container = $('#editImagePreviews');
+        if (!container) return;
+        container.innerHTML = '';
+        images.forEach((url, index) => {
+          const div = document.createElement('div');
+          div.className = 'image-thumb';
+          div.innerHTML = `<img src="${url}" alt="Property image" /><button class="remove-img" data-index="${index}">&times;</button>`;
+          div.querySelector('.remove-img').addEventListener('click', () => {
+            const modal = $('#editModal');
+            const current = modal ? modal._currentImages || [] : [];
+            current.splice(index, 1);
+            renderEditImagePreviews(current);
+            if (modal) modal._currentImages = current;
+          });
+          container.appendChild(div);
+        });
+      }
+
+      const editPropertyForm = $('#editPropertyForm');
+      if (editPropertyForm) {
+        editPropertyForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = $('#editPropertyId').value;
+          if (!id) return;
+          const title = $('#editTitle').value.trim();
+          const price = parseFloat($('#editPrice').value);
+          const type = $('#editType').value;
+          const address = $('#editAddress').value.trim();
+          if (!title || !price || !address) { alert('Please fill all fields.'); return; }
+          let currentImages = $('#editModal')._currentImages || [];
+          const files = $('#editImageInput').files;
+          if (files && files.length > 0) {
+            for (const file of files) {
+              const fileExt = file.name.split('.').pop();
+              const fileName = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.${fileExt}`;
+              const filePath = `${state.currentUser.id}/${fileName}`;
+              const { error: uploadError } = await supabase.storage.from('property-media').upload(filePath, file);
+              if (uploadError) { alert('Image upload failed: ' + uploadError.message); return; }
+              const { data: urlData } = supabase.storage.from('property-media').getPublicUrl(filePath);
+              currentImages.push(urlData.publicUrl);
+            }
+            $('#editImageInput').value = '';
+          }
+          const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
+          const requestVerification = $('#editRequestVerification').checked;
+          let verificationStatus = 'unverified', isVerified = false;
+          if (requestVerification) { verificationStatus = 'pending'; isVerified = false; }
+          const updateData = { title, price_amount: price, property_type: dbType, address, media_urls: currentImages, is_verified: isVerified, verification_status: verificationStatus };
+          try {
+            const { error } = await supabase.from('properties').update(updateData).eq('id', id);
+            if (error) throw error;
+            alert(requestVerification ? '✅ Property updated! Verification requested.' : '✅ Property updated!');
+            $('#editModal').classList.add('hidden');
+            await loadMyProperties();
+            await fetchAllData();
+          } catch (err) { alert('Update failed: ' + err.message); }
+        });
+      }
+
+      // Report modal
+      function openReportModal(brokerId) {
+        $('#reportBrokerId').value = brokerId;
+        $('#reportReason').value = '';
+        $('#reportDescription').value = '';
+        $('#reportStatus').textContent = '';
+        $('#reportModal').classList.remove('hidden');
+      }
+
+      const reportForm = $('#reportForm');
+      if (reportForm) {
+        reportForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!state.currentUser) { alert('Please sign in to report.'); return; }
+          const brokerId = $('#reportBrokerId').value;
+          const reason = $('#reportReason').value;
+          const description = $('#reportDescription').value.trim();
+          if (!reason || !description) {
+            $('#reportStatus').textContent = 'Please fill all fields.';
+            $('#reportStatus').className = 'mt-3 text-sm text-red-600';
+            return;
+          }
+          $('#reportStatus').textContent = 'Submitting...';
+          $('#reportStatus').className = 'mt-3 text-sm text-indigo-600';
+          try {
+            const { error } = await supabase.from('reports').insert({
+              reporter_id: state.currentUser.id,
+              broker_id: brokerId,
+              reason, description, status: 'pending',
+            });
+            if (error) throw error;
+            $('#reportStatus').textContent = '✅ Report submitted!';
+            $('#reportStatus').className = 'mt-3 text-sm text-emerald-600';
+            setTimeout(() => $('#reportModal').classList.add('hidden'), 2000);
+          } catch (err) {
+            $('#reportStatus').textContent = '❌ Failed: ' + err.message;
+            $('#reportStatus').className = 'mt-3 text-sm text-red-600';
+          }
+        });
+      }
+
+      // Close modals
+      $('#closeReportModal')?.addEventListener('click', () => $('#reportModal').classList.add('hidden'));
+      $('#closeEditModal')?.addEventListener('click', () => $('#editModal').classList.add('hidden'));
+      $('#closeVerificationModal')?.addEventListener('click', () => $('#propertyVerificationModal').classList.add('hidden'));
+
+      // Auth submit handler
       async function handleAuthSubmit(e) {
         e.preventDefault();
         const email = $('#emailInput').value.trim();
@@ -977,6 +1375,7 @@
             await loadWallet();
             await fetchAllData();
             loadLeads();
+            updateReviewButtonVisibility();
           } catch (err) { alert('❌ Sign in failed: ' + err.message); }
         }
       }
@@ -994,6 +1393,18 @@
           $('#settingsPhone').value = data.phone || '';
           state.isAdmin = data.is_admin || false;
         } catch (err) { console.error('Profile load error:', err); }
+      }
+
+      function updateReviewButtonVisibility() {
+        const writeBtn = $('#toggleWriteReview');
+        const signInLink = $('#signInToReview');
+        if (state.currentUser) {
+          writeBtn.style.display = 'inline-flex';
+          signInLink.style.display = 'none';
+        } else {
+          writeBtn.style.display = 'none';
+          signInLink.style.display = 'inline';
+        }
       }
 
       async function handleRoute() {
@@ -1016,12 +1427,19 @@
         if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         else return;
 
-        // Event listeners for auth form
+        // Auth form
         const authForm = $('#authForm');
         if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
         $('#toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
         $('#toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
         $('#backToSearchBtn')?.addEventListener('click', goToDiscovery);
+        $('#logoutBtn')?.addEventListener('click', async () => {
+          await supabase.auth.signOut();
+          state.currentUser = null;
+          $('#portalBtnLabel').textContent = 'Broker Portal';
+          updateReviewButtonVisibility();
+          goToDiscovery();
+        });
 
         // Review modal controls
         $('#toggleWriteReview')?.addEventListener('click', function() {
@@ -1041,22 +1459,9 @@
         });
         $('#closeReviewModal')?.addEventListener('click', () => $('#reviewModal').classList.add('hidden'));
 
-        // Show/hide review write button based on auth state
-        function updateReviewButtonVisibility() {
-          const writeBtn = $('#toggleWriteReview');
-          const signInLink = $('#signInToReview');
-          if (state.currentUser) {
-            writeBtn.style.display = 'inline-flex';
-            signInLink.style.display = 'none';
-          } else {
-            writeBtn.style.display = 'none';
-            signInLink.style.display = 'inline';
-          }
-        }
-        // Call after auth state changes
         updateReviewButtonVisibility();
 
-        // Other event listeners (search, filters, etc.)
+        // Search and filters
         $('#searchInput')?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
         $('#clearSearchBtn')?.addEventListener('click', () => { $('#searchInput').value = ''; state.searchQuery = ''; applyFiltersAndSearch(); });
         $$('.filter-pill').forEach(pill => pill.addEventListener('click', () => {
@@ -1070,7 +1475,6 @@
           else navigateToAuth();
         });
         $('#backToDiscovery')?.addEventListener('click', goToDiscovery);
-        $('#logoutBtn')?.addEventListener('click', async () => { await supabase.auth.signOut(); state.currentUser = null; $('#portalBtnLabel').textContent = 'Broker Portal'; updateReviewButtonVisibility(); goToDiscovery(); });
 
         // Security notification
         setTimeout(() => { $('#securityNotification').style.display = 'block'; }, 3000);
