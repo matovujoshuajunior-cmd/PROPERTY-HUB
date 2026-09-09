@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
-    /* ─── All previous styles (same) ─── */
+    /* ─── All original styles (unchanged) ─── */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -162,6 +162,7 @@
     </div>
   </div>
 
+  <!-- Modals (full HTML for all modals is included below for brevity) -->
   <!-- Review Modal -->
   <div id="reviewModal" class="modal-backdrop hidden">
     <div class="modal-content">
@@ -531,7 +532,6 @@
         }
       }
 
-      // Email notification via direct Web3Forms
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const payload = {
