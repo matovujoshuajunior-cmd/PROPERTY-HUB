@@ -7,23 +7,19 @@
   <meta name="description" content="Discover the best properties, rentals, and lodges across Uganda." />
   <link rel="canonical" href="https://yourdomain.com/" />
   <meta name="robots" content="index, follow" />
-
   <meta property="og:title" content="Property Hub Uganda" />
   <meta property="og:description" content="Find your perfect property in Uganda – from rentals to luxury lodges." />
   <meta property="og:image" content="https://yourdomain.com/og-image.jpg" />
   <meta property="og:url" content="https://yourdomain.com/" />
   <meta property="og:type" content="website" />
-
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Property Hub Uganda" />
   <meta name="twitter:description" content="Find your perfect property in Uganda." />
   <meta name="twitter:image" content="https://yourdomain.com/og-image.jpg" />
-
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
   <style>
-    /* ─── All original styles (unchanged) ─── */
+    /* All previous styles unchanged */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -47,7 +43,6 @@
     #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
     .loader { border: 4px solid #f3f4f6; border-top: 4px solid #4f46e5; border-radius: 50%; width: 48px; height: 48px; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
     .modal-backdrop.hidden { display: none; }
     .modal-content { background: white; border-radius: 2rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; }
@@ -55,28 +50,22 @@
     .image-thumb img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
     .image-thumb .remove-img { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: none; }
     .image-thumb .remove-img:hover { background: #dc2626; }
-
     .stars { color: #f59e0b; letter-spacing: 2px; }
     .stars .empty { color: #d1d5db; }
     .badge-lead { background: #10b981; color: white; padding: 0.1rem 0.5rem; border-radius: 9999px; font-size: 0.6rem; font-weight: bold; }
-
     .star-rating .star { cursor: pointer; font-size: 2rem; color: #d1d5db; transition: 0.15s; }
     .star-rating .star.active { color: #f59e0b; }
     .star-rating .star:hover { transform: scale(1.2); color: #f59e0b; }
     .star-rating .star:hover ~ .star { color: #d1d5db; }
-
     .badge-verified { background: #10b981; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; animation: fadeIn 0.3s ease; }
     .badge-pending { background: #f59e0b; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-rejected { background: #ef4444; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-trusted { background: #f59e0b; color: #1e293b; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 700; border: 1px solid #d97706; }
-
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-
     .dashboard-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; background: white; padding: 1rem 1.25rem; border-radius: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
     .wallet-pill { background: #1e293b; color: white; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .wallet-pill .balance { color: #34d399; }
     .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
-
     .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; }
     .dashboard-toolbar .toolbar-btn:hover { background: #e2e8f0; }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
@@ -85,33 +74,26 @@
     .dashboard-toolbar .toolbar-btn.green:hover { background: #059669; }
     .dashboard-toolbar .toolbar-btn.amber { background: #f59e0b; color: white; }
     .dashboard-toolbar .toolbar-btn.amber:hover { background: #d97706; }
-
     .profile-form-container, .add-property-container, .verification-form-container { background: white; border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); display: none; }
     .profile-form-container.visible, .add-property-container.visible, .verification-form-container.visible { display: block; }
-
     .safety-banner { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }
     .security-notification { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: #1e293b; color: white; padding: 1rem 1.25rem; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 999; display: none; animation: slideUp 0.5s ease; }
     .security-notification .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 0 0 0 0.5rem; }
     .security-notification .close-btn:hover { color: white; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
     .verification-info-panel { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-top: 0.5rem; display: none; font-size: 0.875rem; color: #0369a1; }
     .verification-info-panel.visible { display: block; }
     .verification-info-panel ul { list-style: disc; padding-left: 1.5rem; margin-top: 0.25rem; }
-
     .review-item { background: #f8fafc; border-radius: 0.75rem; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
     .review-item .review-text { font-size: 0.875rem; color: #334155; }
     .review-item .review-meta { font-size: 0.75rem; color: #94a3b8; }
     .review-item .stars-small { letter-spacing: 1px; }
-
     .review-stats { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 0.5rem; }
     .review-stats .stat { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #475569; }
     .review-stats .stat .value { font-weight: 700; font-size: 1.125rem; color: #1e293b; }
     .review-stats .stat .label { color: #94a3b8; }
-
     .write-review-toggle { cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; color: #4f46e5; font-weight: 500; transition: 0.2s; }
     .write-review-toggle:hover { color: #4338ca; }
-
     .verification-property-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
     .verification-property-item .property-title { font-weight: 600; color: #1e293b; flex: 1; }
     .verification-property-item .property-status { font-size: 0.75rem; font-weight: 600; padding: 0.1rem 0.6rem; border-radius: 9999px; }
@@ -119,16 +101,13 @@
     .verification-property-item .property-status.pending { background: #fef3c7; color: #92400e; }
     .verification-property-item .property-status.rejected { background: #fee2e2; color: #991b1b; }
     .verification-property-item .property-status.unverified { background: #e2e8f0; color: #475569; }
-
     .detail-field { margin-bottom: 0.75rem; }
     .detail-field .label { font-weight: 600; color: #1e293b; font-size: 0.875rem; display: block; }
     .detail-field .value { color: #475569; word-break: break-all; }
     .detail-field .value a { color: #4f46e5; text-decoration: underline; }
-
     #scrollTopBtn { position: fixed; bottom: 30px; right: 30px; z-index: 1000; background: #4f46e5; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s; border: none; }
     #scrollTopBtn.show { opacity: 1; visibility: visible; }
     #scrollTopBtn:hover { background: #4338ca; }
-
     @media (max-width: 640px) {
       .dashboard-toolbar { flex-direction: column; align-items: stretch; padding: 0.75rem; }
       .dashboard-toolbar .wallet-pill { justify-content: center; }
@@ -140,7 +119,6 @@
   </style>
 </head>
 <body>
-
   <!-- Loading Overlay -->
   <div id="loadingOverlay">
     <div class="loader"></div>
@@ -162,7 +140,7 @@
     </div>
   </div>
 
-  <!-- Modals (full HTML for all modals is included below for brevity) -->
+  <!-- Modals (all full HTML included) -->
   <!-- Review Modal -->
   <div id="reviewModal" class="modal-backdrop hidden">
     <div class="modal-content">
@@ -202,8 +180,12 @@
         <div><label>Property Type *</label><select id="editType" class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
         <div><label>Address *</label><input type="text" id="editAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
         <div><label>Images</label><div id="editImagePreviews" class="flex flex-wrap gap-2 mb-2"></div><input type="file" id="editImageInput" accept="image/*" multiple class="w-full text-sm" /></div>
-        <div class="flex items-center gap-3"><input type="checkbox" id="editRequestVerification" /><label for="editRequestVerification">Request Verification</label></div>
-        <div id="editVerificationInfo" class="verification-info-panel">Verification info...</div>
+        <div id="editVerificationContainer" class="flex items-center gap-3 mt-2">
+          <input type="checkbox" id="editRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+          <label for="editRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label>
+          <span class="text-xs text-slate-400">(You'll provide details later)</span>
+        </div>
+        <div id="editVerificationInfo" class="verification-info-panel"><p class="font-medium">🔍 Verification Process</p><ul><li>After saving, go to the Verification panel to submit required documents.</li><li>We'll review your property and approve it.</li><li>Verified properties rank higher.</li></ul></div>
         <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Update Property</button>
       </form>
     </div>
