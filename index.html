@@ -19,7 +19,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
-    /* All previous styles unchanged */
+    /* All previous styles kept intact */
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
     .property-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.18); }
@@ -119,6 +119,7 @@
   </style>
 </head>
 <body>
+
   <!-- Loading Overlay -->
   <div id="loadingOverlay">
     <div class="loader"></div>
@@ -140,7 +141,6 @@
     </div>
   </div>
 
-  <!-- Modals (all full HTML included) -->
   <!-- Review Modal -->
   <div id="reviewModal" class="modal-backdrop hidden">
     <div class="modal-content">
@@ -150,7 +150,9 @@
       </div>
       <div class="flex justify-between items-center mb-3">
         <span class="text-sm text-slate-500">What others say</span>
-        <button id="toggleWriteReview" class="write-review-toggle"><i class="fas fa-pen"></i> Write a Review</button>
+        <!-- Write Review button visible only to logged-in users -->
+        <button id="toggleWriteReview" class="write-review-toggle" style="display: none;"><i class="fas fa-pen"></i> Write a Review</button>
+        <span id="signInToReview" class="text-xs text-indigo-500 cursor-pointer" style="display: none;" onclick="navigateToAuth()">Sign in to write a review</span>
       </div>
       <div id="reviewFormContainer" class="hidden mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
         <form id="reviewForm">
@@ -180,6 +182,7 @@
         <div><label>Property Type *</label><select id="editType" class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
         <div><label>Address *</label><input type="text" id="editAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
         <div><label>Images</label><div id="editImagePreviews" class="flex flex-wrap gap-2 mb-2"></div><input type="file" id="editImageInput" accept="image/*" multiple class="w-full text-sm" /></div>
+        <!-- Verification checkbox will be hidden if property is already verified -->
         <div id="editVerificationContainer" class="flex items-center gap-3 mt-2">
           <input type="checkbox" id="editRequestVerification" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
           <label for="editRequestVerification" class="text-sm text-slate-700 font-medium">Request Property Verification</label>
@@ -286,6 +289,7 @@
     <main>
       <!-- Discovery View -->
       <section id="discoveryView" class="view view-visible">
+        <!-- Hero and content -->
         <div class="relative bg-slate-900 text-white overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80')] bg-cover bg-center opacity-30"></div>
           <div class="absolute inset-0 hero-gradient"></div>
@@ -514,6 +518,7 @@
         }
       }
 
+      // Email notification via direct Web3Forms
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const payload = {
@@ -938,6 +943,59 @@
         $('#authForm').reset();
       }
 
+      async function handleAuthSubmit(e) {
+        e.preventDefault();
+        const email = $('#emailInput').value.trim();
+        const password = $('#passwordInput').value;
+
+        if (state.isSignUpMode) {
+          const businessName = $('#bizNameInput').value.trim();
+          const accountType = $('#accTypeSelect').value;
+          const phone = $('#phoneInput').value.trim();
+          if (!businessName) { alert('Please enter Business Name.'); return; }
+          try {
+            const { data, error } = await supabase.auth.signUp({
+              email, password,
+              options: { data: { business_name: businessName, account_type: accountType, phone } }
+            });
+            if (error) throw error;
+            alert('✅ Account created! Please check your email to verify.');
+            setAuthMode(false);
+            $('#authForm').reset();
+          } catch (err) { alert('❌ Registration failed: ' + err.message); }
+        } else {
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            state.currentUser = data.user;
+            alert('✅ Signed in successfully!');
+            showView($('#dashboardView'));
+            navigateTo('/dashboard');
+            $('#portalBtnLabel').textContent = 'Dashboard';
+            await loadProfileSettings();
+            await loadMyProperties();
+            await loadWallet();
+            await fetchAllData();
+            loadLeads();
+          } catch (err) { alert('❌ Sign in failed: ' + err.message); }
+        }
+      }
+
+      async function loadProfileSettings() {
+        if (!state.currentUser) return;
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('business_name, phone, is_admin')
+            .eq('id', state.currentUser.id)
+            .single();
+          if (error) throw error;
+          $('#settingsBusinessName').value = data.business_name || '';
+          $('#settingsPhone').value = data.phone || '';
+          state.isAdmin = data.is_admin || false;
+        } catch (err) { console.error('Profile load error:', err); }
+      }
+
       async function handleRoute() {
         const path = getCurrentPath();
         if (path.startsWith('/broker/')) {
@@ -958,8 +1016,47 @@
         if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         else return;
 
-        try { const { data: { user } } = await supabase.auth.getUser(); if (user) { state.currentUser = user; $('#portalBtnLabel').textContent = 'Dashboard'; await loadWallet(); } } catch (e) {}
+        // Event listeners for auth form
+        const authForm = $('#authForm');
+        if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
+        $('#toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
+        $('#toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
+        $('#backToSearchBtn')?.addEventListener('click', goToDiscovery);
 
+        // Review modal controls
+        $('#toggleWriteReview')?.addEventListener('click', function() {
+          if (!state.currentUser) {
+            alert('Please sign in to write a review.');
+            navigateToAuth();
+            return;
+          }
+          const container = $('#reviewFormContainer');
+          if (container.classList.contains('hidden')) {
+            container.classList.remove('hidden');
+            this.innerHTML = '<i class="fas fa-times"></i> Cancel';
+          } else {
+            container.classList.add('hidden');
+            this.innerHTML = '<i class="fas fa-pen"></i> Write a Review';
+          }
+        });
+        $('#closeReviewModal')?.addEventListener('click', () => $('#reviewModal').classList.add('hidden'));
+
+        // Show/hide review write button based on auth state
+        function updateReviewButtonVisibility() {
+          const writeBtn = $('#toggleWriteReview');
+          const signInLink = $('#signInToReview');
+          if (state.currentUser) {
+            writeBtn.style.display = 'inline-flex';
+            signInLink.style.display = 'none';
+          } else {
+            writeBtn.style.display = 'none';
+            signInLink.style.display = 'inline';
+          }
+        }
+        // Call after auth state changes
+        updateReviewButtonVisibility();
+
+        // Other event listeners (search, filters, etc.)
         $('#searchInput')?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
         $('#clearSearchBtn')?.addEventListener('click', () => { $('#searchInput').value = ''; state.searchQuery = ''; applyFiltersAndSearch(); });
         $$('.filter-pill').forEach(pill => pill.addEventListener('click', () => {
@@ -973,13 +1070,19 @@
           else navigateToAuth();
         });
         $('#backToDiscovery')?.addEventListener('click', goToDiscovery);
-        $('#backToSearchBtn')?.addEventListener('click', goToDiscovery);
-        $('#toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
-        $('#toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
-        $('#logoutBtn')?.addEventListener('click', async () => { await supabase.auth.signOut(); state.currentUser = null; $('#portalBtnLabel').textContent = 'Broker Portal'; goToDiscovery(); });
+        $('#logoutBtn')?.addEventListener('click', async () => { await supabase.auth.signOut(); state.currentUser = null; $('#portalBtnLabel').textContent = 'Broker Portal'; updateReviewButtonVisibility(); goToDiscovery(); });
 
+        // Security notification
         setTimeout(() => { $('#securityNotification').style.display = 'block'; }, 3000);
         $('#closeSecurityNotification')?.addEventListener('click', () => { $('#securityNotification').style.display = 'none'; });
+
+        // Scroll to top
+        const scrollTopBtn = $('#scrollTopBtn');
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 300) scrollTopBtn.classList.add('show');
+          else scrollTopBtn.classList.remove('show');
+        });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
         await handleRoute();
         await fetchAllData();
