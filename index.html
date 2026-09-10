@@ -56,7 +56,7 @@
     .wallet-pill { background: #1e293b; color: white; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .wallet-pill .balance { color: #34d399; }
     .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; }
+    .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; white-space: nowrap; }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
     .dashboard-toolbar .toolbar-btn.green { background: #10b981; color: white; }
     .dashboard-toolbar .toolbar-btn.amber { background: #f59e0b; color: white; }
@@ -80,10 +80,15 @@
     .property-status.expired { background: #e2e8f0; color: #475569; }
     #scrollTopBtn { position: fixed; bottom: 30px; right: 30px; z-index: 1000; background: #4f46e5; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s; border: none; }
     #scrollTopBtn.show { opacity: 1; visibility: visible; }
+
+    /* ─── Responsive dashboard toolbar ─── */
     @media (max-width: 640px) {
-      .dashboard-toolbar { flex-direction: column; align-items: stretch; padding: 0.75rem; }
+      .dashboard-toolbar { flex-direction: column; align-items: stretch; padding: 0.75rem; gap: 0.5rem; }
+      .dashboard-toolbar .wallet-pill { justify-content: center; width: 100%; }
+      .dashboard-toolbar .toolbar-btn { justify-content: center; width: 100%; padding: 0.6rem 1rem; }
       .verification-property-item { flex-direction: column; align-items: stretch; gap: 0.5rem; }
     }
+
     .quiz-question { background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;margin-bottom:0.75rem; }
     .quiz-question p.q-title { font-weight:600;color:#1e293b;font-size:0.875rem;margin-bottom:0.5rem; }
     .quiz-option { display:inline-flex;align-items:center;gap:0.4rem;font-size:0.8rem;background:#fff;padding:0.3rem 0.75rem;border-radius:9999px;border:1px solid #e2e8f0;margin:0.2rem;cursor:pointer; }
@@ -170,7 +175,7 @@
     </div>
   </div>
 
-  <!-- Quiz / Connect Modal (4 questions) -->
+  <!-- Quiz / Connect Modal -->
   <div id="quizModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-lg">
       <div class="flex justify-between items-center mb-4"><h2>📞 Connect with Broker</h2><button id="closeQuizModal">&times;</button></div>
@@ -184,27 +189,23 @@
         </div>
         <div id="quizStep2" class="hidden">
           <div id="quizQuestionsContainer" class="space-y-2">
-            <!-- Q1: Timeline -->
             <div class="quiz-question">
               <p class="q-title">1. When do you plan to move in or buy?</p>
               <label class="quiz-option"><input type="radio" name="q1" value="1" required /> More than 6 months</label>
               <label class="quiz-option"><input type="radio" name="q1" value="2" /> 1 – 6 months</label>
               <label class="quiz-option"><input type="radio" name="q1" value="3" /> Less than 1 month / ASAP</label>
             </div>
-            <!-- Q2: Budget (only 2 options) -->
             <div class="quiz-question">
               <p class="q-title">2. How does your budget compare to this property?</p>
               <label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below the property price</label>
               <label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches the property price</label>
             </div>
-            <!-- Q3: Viewing readiness -->
             <div class="quiz-question">
               <p class="q-title">3. Are you ready to view this property within the next 7 days?</p>
               <label class="quiz-option"><input type="radio" name="q3" value="1" required /> No, not yet</label>
               <label class="quiz-option"><input type="radio" name="q3" value="2" /> Maybe – would like more info</label>
               <label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes, I am ready</label>
             </div>
-            <!-- Q4: Seriousness -->
             <div class="quiz-question">
               <p class="q-title">4. How serious are you about this property specifically?</p>
               <label class="quiz-option"><input type="radio" name="q4" value="1" required /> Just browsing</label>
@@ -252,7 +253,11 @@
               <p class="mt-3 text-slate-300 text-lg">Explore homes, rentals, and lodges from trusted brokers across Uganda.</p>
               <div class="mt-6 flex flex-col sm:flex-row gap-3">
                 <input id="searchInput" type="text" placeholder="Search by address, city, area, or broker name…" class="w-full flex-1 pl-4 pr-4 py-3 rounded-xl text-slate-800" />
-                <button id="clearSearchBtn" class="bg-white/20 text-white px-5 py-3 rounded-xl">Clear</button>
+                <!-- Compact clear button -->
+                <button id="clearSearchBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl flex items-center justify-center gap-2 border border-white/10 flex-shrink-0">
+                  <i class="fas fa-times"></i>
+                  <span class="hidden sm:inline">Clear</span>
+                </button>
               </div>
             </div>
           </div>
@@ -426,11 +431,12 @@
         }
       }
 
+      // ─── Generic email sender via Web3Forms ───
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const payload = {
             access_key: WEB3FORMS_ACCESS_KEY, from_name: 'Property Hub Uganda',
-            subject, email: to_email, name: to_name || 'Broker',
+            subject, email: to_email, name: to_name || 'User',
             message, replyto: 'no-reply@propertyhub.ug'
           };
           const response = await fetch('https://api.web3forms.com/submit', {
@@ -440,29 +446,76 @@
           });
           const result = await response.json();
           if (!response.ok || !result.success) throw new Error(result.message || 'Web3Forms error');
-          console.log('📧 Email sent:', result);
+          console.log('📧 Email sent to', to_email);
           return true;
         } catch (err) { console.error('❌ Email failed:', err.message); return false; }
       }
 
-      function buildLeadEmailHtml(title, address, name, email, whatsapp, leadType, score, answersSummary) {
-        return `
-          <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;border:1px solid #ddd;border-radius:8px;">
-            <h2 style="color:#4f46e5;">🔔 New Lead Request</h2>
-            <p><strong>Property:</strong> ${title || 'Untitled'}</p>
-            <p><strong>Address:</strong> ${address || 'Not specified'}</p>
-            <table style="width:100%;border-collapse:collapse;">
-              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Visitor</strong></td><td style="padding:8px;border:1px solid #eee;">${name}</td></tr>
-              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Email</strong></td><td style="padding:8px;border:1px solid #eee;">${email}</td></tr>
-              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>WhatsApp</strong></td><td style="padding:8px;border:1px solid #eee;">${whatsapp}</td></tr>
-              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Lead Type</strong></td><td style="padding:8px;border:1px solid #eee;">${(leadType||'cold').toUpperCase()}</td></tr>
-              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Score</strong></td><td style="padding:8px;border:1px solid #eee;">${score}/${MAX_QUIZ_SCORE}</td></tr>
-            </table>
-            <p style="margin-top:12px;"><strong>Quiz answers:</strong></p>
-            <ul style="padding-left:18px;margin:0;">${answersSummary}</ul>
-            <p style="margin-top:16px;">Log in to your dashboard to unlock this lead.</p>
-          </div>
-        `;
+      // ─── Clean plain-text email to broker ───
+      function buildBrokerLeadEmail(title, address, visitorName, visitorEmail, visitorWhatsapp, leadType, score, answersText) {
+        return `Hello ${''}
+
+🔔 NEW LEAD REQUEST
+━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 PROPERTY
+${title || 'Untitled'}
+📍 ${address || 'Location not specified'}
+
+👤 VISITOR DETAILS
+Name: ${visitorName}
+Email: ${visitorEmail}
+WhatsApp: ${visitorWhatsapp}
+
+🔥 LEAD QUALITY: ${(leadType || 'cold').toUpperCase()}
+Score: ${score}/${MAX_QUIZ_SCORE}
+
+📝 QUIZ ANSWERS
+${answersText}
+
+━━━━━━━━━━━━━━━━━━━━━━━
+Log in to your dashboard to unlock this lead.
+Notifications fade after 24 hours, so act fast.
+
+Property Hub Uganda
+https://yourdomain.com`;
+      }
+
+      // ─── Visitor emails (approved / rejected) ───
+      function buildVisitorApprovedEmail(visitorName, propertyTitle, brokerName, brokerPhone) {
+        return `Hello ${visitorName},
+
+🎉 GREAT NEWS!
+
+Your request for "${propertyTitle}" has been approved by ${brokerName}.
+
+You can now reach out to the broker directly:
+
+📱 WhatsApp: ${brokerPhone || 'Check your dashboard'}
+
+Please be cautious:
+• Visit the property in person before sending any money.
+• Never transfer funds without seeing the property.
+• Report suspicious activity immediately.
+
+Thank you for using Property Hub Uganda.
+
+Property Hub Uganda
+https://yourdomain.com`;
+      }
+
+      function buildVisitorRejectedEmail(visitorName, propertyTitle) {
+        return `Hello ${visitorName},
+
+We're sorry to inform you that the broker was unavailable to respond to your request for "${propertyTitle}" within our 24-hour window.
+
+Don't worry! You can still try connecting with them again. Simply return to Property Hub Uganda and submit a new request — this signals strong interest and pushes your request to the top of their queue.
+
+🔗 Visit us again: https://yourdomain.com
+
+Thank you for your patience.
+
+Property Hub Uganda`;
       }
 
       async function loadWallet() {
@@ -539,7 +592,6 @@
         let connectHtml = '';
         if (!showEdit) connectHtml = `<button class="connect-btn bg-indigo-600 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5" data-property-id="${property.id}"><i class="fas fa-handshake"></i> Connect</button>`;
 
-        // NOTE: rank badge removed here as requested
         article.innerHTML = `
           <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
             <img src="${imageUrl}" alt="${property.title || 'Property'}" class="w-full h-full object-cover" loading="lazy"/>
@@ -693,7 +745,6 @@
         } catch (err) { console.error('Load my properties error:', err); }
       }
 
-      // ─── SEARCH now includes broker business name ───
       function applyFiltersAndSearch() {
         const filter = state.currentFilter;
         const query = state.searchQuery.trim().toLowerCase();
@@ -719,7 +770,6 @@
         $('#quizModal').classList.remove('hidden');
       }
 
-      // ─── QUIZ SUBMISSION (4 questions, includes broker_id) ───
       const quizFormEl = $('#quizForm');
       if (quizFormEl) {
         quizFormEl.addEventListener('submit', async function(e) {
@@ -743,7 +793,6 @@
           else if (totalScore >= 6) leadType = 'warm';
 
           try {
-            // ✅ Fetch the property first so we can populate broker_id
             const { data: propData, error: propErr } = await supabase
               .from('properties')
               .select('owner_id, title, address')
@@ -754,7 +803,7 @@
 
             const { data: lead, error } = await supabase.from('lead_requests').insert({
               property_id: propertyId,
-              broker_id: propData.owner_id,   // ✅ FIX: now set
+              broker_id: propData.owner_id,
               visitor_name: name,
               visitor_email: email,
               visitor_whatsapp: whatsapp,
@@ -766,7 +815,7 @@
             }).select().single();
             if (error) throw error;
 
-            // Send broker notification email
+            // ─── Email broker (clean plain-text) ───
             const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
             if (brokerData?.email) {
               const answerLabels = {
@@ -775,36 +824,41 @@
                 q3: ['Not yet', 'Maybe', 'Yes, ready'],
                 q4: ['Browsing', 'Comparing', 'Top choice']
               };
-              let summary = '';
+              let answersText = '';
               for (let i = 1; i <= 4; i++) {
-                const val = answers[`q${i}`];
-                summary += `<li>Q${i}: ${answerLabels[`q${i}`][val-1]}</li>`;
+                answersText += `• Q${i}: ${answerLabels[`q${i}`][answers[`q${i}`]-1]}\n`;
               }
-              const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, leadType, totalScore, summary);
-              await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', `🔔 New ${leadType.toUpperCase()} Lead Request`, html);
+              const text = buildBrokerLeadEmail(
+                propData.title, propData.address,
+                name, email, whatsapp,
+                leadType, totalScore, answersText
+              );
+              await sendNotificationEmail(
+                brokerData.email,
+                brokerData.business_name || 'Broker',
+                `🔔 New ${leadType.toUpperCase()} Lead – ${propData.title}`,
+                text
+              );
             }
 
-            // Close the quiz and show visitor alert
             $('#quizModal').classList.add('hidden');
 
             alert(
               `✅ Notification Sent!\n\n` +
               `We've notified the broker about your interest in "${propData.title}".\n\n` +
-              `📧 Please check your email regularly. Once the broker opens your request, we will notify you with their contact details.\n\n` +
+              `📧 Please check your email regularly. Once the broker opens your request, we'll send their contact details directly to your inbox.\n\n` +
               `⏰ If you don't hear back within 24 hours, please return to Property Hub and try connecting again — our notifications fade after 24 hours.\n\n` +
               `Thank you for using Property Hub Uganda!`
             );
 
-            // Optional: still poll briefly for immediate responses (60 seconds)
             subscribeToLeadRequest(lead.id);
           } catch (err) { console.error(err); alert('Error: ' + err.message); }
         });
       }
 
-      // Short polling window (60s) — if broker responds immediately we alert the visitor
       function subscribeToLeadRequest(requestId) {
         let attempts = 0;
-        const maxAttempts = 20; // 20 × 3s = 60s
+        const maxAttempts = 20;
         const interval = setInterval(async () => {
           attempts++;
           if (attempts > maxAttempts) { clearInterval(interval); return; }
@@ -815,12 +869,12 @@
             alert('🎉 Great news! The broker has approved your request. Check your email for their contact details.');
           } else if (lead.status === 'rejected') {
             clearInterval(interval);
-            alert('The broker was unable to respond in time. Please return to Property Hub and try connecting with them again.');
+            alert('The broker was unavailable. Please return to Property Hub and try again.');
           }
         }, 3000);
       }
 
-      // ─── LOAD LEADS ───
+      // ─── LOAD LEADS + visitor emails on approve/reject ───
       async function loadLeads() {
         if (!state.currentUser) return;
         try {
@@ -872,6 +926,7 @@
           });
           list.innerHTML = html;
 
+          // ─── UNLOCK: also email the visitor ───
           list.querySelectorAll('.unlock-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
             const leadId = btn.dataset.leadId;
             if (!confirm('Unlock this lead? (Free)')) return;
@@ -880,20 +935,65 @@
                 .from('lead_requests')
                 .update({ status: 'approved', unlocked_at: new Date().toISOString() })
                 .eq('id', leadId)
-                .select('visitor_name, visitor_email, visitor_whatsapp')
+                .select('visitor_name, visitor_email, visitor_whatsapp, property:property_id (title)')
                 .single();
               if (error) throw error;
-              alert(`✅ Lead unlocked!\nName: ${updatedLead.visitor_name}\nEmail: ${updatedLead.visitor_email}\nWhatsApp: ${updatedLead.visitor_whatsapp}`);
+
+              // Get broker info for the visitor email
+              const { data: brokerProfile } = await supabase
+                .from('profiles')
+                .select('business_name, phone')
+                .eq('id', state.currentUser.id)
+                .single();
+
+              // Send visitor email
+              if (updatedLead.visitor_email) {
+                const text = buildVisitorApprovedEmail(
+                  updatedLead.visitor_name,
+                  updatedLead.property?.title || 'the property',
+                  brokerProfile?.business_name || 'the broker',
+                  brokerProfile?.phone || updatedLead.visitor_whatsapp
+                );
+                await sendNotificationEmail(
+                  updatedLead.visitor_email,
+                  updatedLead.visitor_name,
+                  '🎉 Your Request Was Approved',
+                  text
+                );
+              }
+
+              alert(`✅ Lead unlocked!\n\nVisitor: ${updatedLead.visitor_name}\nEmail: ${updatedLead.visitor_email}\nWhatsApp: ${updatedLead.visitor_whatsapp}\n\nA confirmation email has been sent to the visitor.`);
               loadLeads();
             } catch (err) { alert('Error: ' + err.message); }
           }));
 
+          // ─── REJECT: also email the visitor ───
           list.querySelectorAll('.reject-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
             const leadId = btn.dataset.leadId;
-            if (!confirm('Reject this lead? It will disappear from your list.')) return;
+            if (!confirm('Reject this lead? The visitor will be emailed that you were unavailable.')) return;
             try {
-              const { error } = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', leadId);
+              const { data: updatedLead, error } = await supabase
+                .from('lead_requests')
+                .update({ status: 'rejected' })
+                .eq('id', leadId)
+                .select('visitor_name, visitor_email, property:property_id (title)')
+                .single();
               if (error) throw error;
+
+              // Send visitor email
+              if (updatedLead.visitor_email) {
+                const text = buildVisitorRejectedEmail(
+                  updatedLead.visitor_name,
+                  updatedLead.property?.title || 'the property'
+                );
+                await sendNotificationEmail(
+                  updatedLead.visitor_email,
+                  updatedLead.visitor_name,
+                  'Your Request Was Not Approved',
+                  text
+                );
+              }
+
               loadLeads();
             } catch (err) { alert('Error: ' + err.message); }
           }));
