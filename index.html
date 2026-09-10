@@ -26,8 +26,7 @@
     .filter-pill.active { background: #1e293b; color: #fff; border-color: #1e293b; }
     .filter-pill { transition: all 0.15s ease; cursor: pointer; user-select: none; }
     .filter-pill:hover { background: #e2e8f0; }
-    .btn-whatsapp { background: #25d366; color: #fff; transition: background 0.2s; }
-    .btn-whatsapp:hover { background: #1da851; }
+    .btn-whatsapp { background: #25d366; color: #fff; }
     .broker-header { background: linear-gradient(145deg, #ffffff, #f1f5f9); border-bottom: 1px solid #e2e8f0; }
     .view { transition: opacity 0.25s ease; }
     .view-hidden { display: none; opacity: 0; }
@@ -35,7 +34,6 @@
     .auth-card { background: white; border-radius: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
     .auth-toggle-btn { transition: all 0.2s; cursor: pointer; }
     .auth-toggle-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
-    .auth-toggle-btn:hover:not(.active) { background: #f1f5f9; }
     #loadingOverlay { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; transition: opacity 0.5s; }
     #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
     .loader { border: 4px solid #f3f4f6; border-top: 4px solid #4f46e5; border-radius: 50%; width: 48px; height: 48px; animation: spin 1s linear infinite; }
@@ -48,7 +46,7 @@
     .image-thumb .remove-img { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: none; }
     .stars { color: #f59e0b; letter-spacing: 2px; }
     .badge-lead { background: #10b981; color: white; padding: 0.1rem 0.5rem; border-radius: 9999px; font-size: 0.6rem; font-weight: bold; }
-    .star-rating .star { cursor: pointer; font-size: 2rem; color: #d1d5db; transition: 0.15s; }
+    .star-rating .star { cursor: pointer; font-size: 2rem; color: #d1d5db; }
     .star-rating .star.active { color: #f59e0b; }
     .badge-verified { background: #10b981; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-pending { background: #f59e0b; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
@@ -58,8 +56,7 @@
     .wallet-pill { background: #1e293b; color: white; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .wallet-pill .balance { color: #34d399; }
     .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; }
-    .dashboard-toolbar .toolbar-btn:hover { background: #e2e8f0; }
+    .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
     .dashboard-toolbar .toolbar-btn.green { background: #10b981; color: white; }
     .dashboard-toolbar .toolbar-btn.amber { background: #f59e0b; color: white; }
@@ -173,7 +170,7 @@
     </div>
   </div>
 
-  <!-- Quiz / Connect Modal (UPDATED with 5 questions) -->
+  <!-- Quiz / Connect Modal (4 questions) -->
   <div id="quizModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-lg">
       <div class="flex justify-between items-center mb-4"><h2>📞 Connect with Broker</h2><button id="closeQuizModal">&times;</button></div>
@@ -194,53 +191,30 @@
               <label class="quiz-option"><input type="radio" name="q1" value="2" /> 1 – 6 months</label>
               <label class="quiz-option"><input type="radio" name="q1" value="3" /> Less than 1 month / ASAP</label>
             </div>
-            <!-- Q2: Budget -->
+            <!-- Q2: Budget (only 2 options) -->
             <div class="quiz-question">
-              <p class="q-title">2. What is your budget range?</p>
-              <label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below property price</label>
-              <label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches property price</label>
-              <label class="quiz-option"><input type="radio" name="q2" value="3" /> Above property price</label>
+              <p class="q-title">2. How does your budget compare to this property?</p>
+              <label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below the property price</label>
+              <label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches the property price</label>
             </div>
-            <!-- Q3: Financing -->
+            <!-- Q3: Viewing readiness -->
             <div class="quiz-question">
-              <p class="q-title">3. Have you secured the finances / deposit for this property?</p>
-              <label class="quiz-option"><input type="radio" name="q3" value="1" required /> Not yet – still planning</label>
-              <label class="quiz-option"><input type="radio" name="q3" value="2" /> Partially – saving up</label>
-              <label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes – fully ready</label>
+              <p class="q-title">3. Are you ready to view this property within the next 7 days?</p>
+              <label class="quiz-option"><input type="radio" name="q3" value="1" required /> No, not yet</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="2" /> Maybe – would like more info</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes, I am ready</label>
             </div>
-            <!-- Q4: Viewing readiness -->
+            <!-- Q4: Seriousness -->
             <div class="quiz-question">
-              <p class="q-title">4. Are you ready to view this property within the next 7 days?</p>
-              <label class="quiz-option"><input type="radio" name="q4" value="1" required /> No, not yet</label>
-              <label class="quiz-option"><input type="radio" name="q4" value="2" /> Maybe – would like more info first</label>
-              <label class="quiz-option"><input type="radio" name="q4" value="3" /> Yes, I am ready</label>
-            </div>
-            <!-- Q5: Seriousness / contact -->
-            <div class="quiz-question">
-              <p class="q-title">5. How serious are you about this property specifically?</p>
-              <label class="quiz-option"><input type="radio" name="q5" value="1" required /> Just browsing</label>
-              <label class="quiz-option"><input type="radio" name="q5" value="2" /> Interested but comparing options</label>
-              <label class="quiz-option"><input type="radio" name="q5" value="3" /> Very serious – this is my top choice</label>
+              <p class="q-title">4. How serious are you about this property specifically?</p>
+              <label class="quiz-option"><input type="radio" name="q4" value="1" required /> Just browsing</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="2" /> Interested but comparing options</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="3" /> Very serious – top choice</label>
             </div>
           </div>
           <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl mt-4">Submit Request</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <!-- Waiting Room Modal -->
-  <div id="waitingModal" class="modal-backdrop hidden">
-    <div class="modal-content text-center max-w-md">
-      <div class="py-8">
-        <i id="waitingIcon" class="fas fa-hourglass-half text-5xl text-indigo-400 mb-4"></i>
-        <h3 id="waitingTitle" class="text-xl font-bold">⏳ Waiting for Broker</h3>
-        <p id="waitingMessage" class="text-slate-500 text-sm mt-2">Your request has been sent.</p>
-        <div id="waitingStatus" class="mt-4 text-sm text-slate-600"></div>
-        <button id="cancelWaitBtn" class="mt-6 text-sm text-red-500">Cancel Request</button>
-        <button id="resubmitLeadBtn" class="hidden mt-4 bg-indigo-600 text-white px-4 py-2 rounded-xl" style="display:none;">Re-submit Interest</button>
-        <button id="searchAgainBtn" class="hidden mt-4 bg-slate-200 text-slate-700 px-4 py-2 rounded-xl" style="display:none;" onclick="goToDiscovery()">Search Other Properties</button>
-      </div>
     </div>
   </div>
 
@@ -277,7 +251,7 @@
               <h1 class="text-4xl md:text-5xl font-extrabold">Find your <span class="text-indigo-300">perfect</span> space</h1>
               <p class="mt-3 text-slate-300 text-lg">Explore homes, rentals, and lodges from trusted brokers across Uganda.</p>
               <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                <input id="searchInput" type="text" placeholder="Search by address, city, or area…" class="w-full flex-1 pl-4 pr-4 py-3 rounded-xl text-slate-800" />
+                <input id="searchInput" type="text" placeholder="Search by address, city, area, or broker name…" class="w-full flex-1 pl-4 pr-4 py-3 rounded-xl text-slate-800" />
                 <button id="clearSearchBtn" class="bg-white/20 text-white px-5 py-3 rounded-xl">Clear</button>
               </div>
             </div>
@@ -408,14 +382,14 @@
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const WEB3FORMS_ACCESS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
-      const MAX_QUIZ_SCORE = 15;
+      const MAX_QUIZ_SCORE = 11;
 
       let supabase;
       const state = {
         allProperties: [], filteredProperties: [], myProperties: [],
         currentFilter: 'all', searchQuery: '', currentBrokerId: null,
         currentUser: null, isSignUpMode: false, profilesMap: {},
-        walletBalance: 0, isAdmin: false, lastLeadData: null
+        walletBalance: 0, isAdmin: false
       };
 
       function $(sel) { return document.querySelector(sel); }
@@ -501,7 +475,6 @@
         } catch (err) { console.error('Wallet load error:', err); }
       }
 
-      // ─── RANKING ALGORITHM (Restored + enhanced) ───────────────
       function isTrustedBroker(broker) {
         if (!broker) return false;
         return (broker.average_rating >= 4 && broker.review_count >= 10 && broker.lead_score >= 20 && (broker.report_count || 0) < 3);
@@ -509,34 +482,24 @@
 
       function calculateRankScore(property, broker, reportCount = 0) {
         let score = 0;
-        // Verification boost
         if (property.verification_status === 'approved') score += 100;
         else if (property.verification_status === 'pending') score += 30;
         else if (property.verification_status === 'rejected') score -= 50;
-
         if (broker) {
           const rating = broker.average_rating || 0;
           const reviewCount = broker.review_count || 0;
           const leadScore = broker.lead_score || 0;
-          // Rating boost
           score += rating * 10;
-          // Reviews boost (capped)
           score += Math.min(reviewCount, 50) * 0.5;
-          // Trusted bonus
           if (isTrustedBroker(broker)) score += 25;
-          // Lead score bonus
           score += leadScore / 2;
-          // Reports penalty
           score -= (reportCount || 0) * 8;
         }
-
-        // Fresh listings get a small boost (last 7 days)
         if (property.created_at) {
           const daysOld = (Date.now() - new Date(property.created_at).getTime()) / (1000 * 60 * 60 * 24);
           if (daysOld < 7) score += 10;
           else if (daysOld < 30) score += 5;
         }
-
         return Math.round(score);
       }
 
@@ -551,8 +514,6 @@
         const verificationStatus = property.verification_status || 'pending';
         const isVerified = verificationStatus === 'approved';
         const isTrusted = broker ? isTrustedBroker(broker) : false;
-        const reportCount = broker?.report_count || 0;
-        const rankScore = property.rankScore || calculateRankScore(property, broker, reportCount);
 
         let badgeHtml = '';
         if (isVerified) badgeHtml = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>`;
@@ -578,12 +539,12 @@
         let connectHtml = '';
         if (!showEdit) connectHtml = `<button class="connect-btn bg-indigo-600 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5" data-property-id="${property.id}"><i class="fas fa-handshake"></i> Connect</button>`;
 
+        // NOTE: rank badge removed here as requested
         article.innerHTML = `
           <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
             <img src="${imageUrl}" alt="${property.title || 'Property'}" class="w-full h-full object-cover" loading="lazy"/>
             <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full">${property.property_type || 'Property'}</span>
             ${!showEdit && isVerified ? `<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>` : ''}
-            ${!showEdit ? `<span class="absolute top-3 left-3 bg-indigo-700 text-white text-[8px] font-bold px-2 py-1 rounded-full">Rank ${rankScore}</span>` : ''}
           </div>
           <div class="p-4 flex flex-col flex-1">
             <div class="flex items-center justify-between flex-wrap gap-1">
@@ -688,8 +649,7 @@
         try {
           let { data: properties, error } = await supabase.from('properties').select('*').eq('is_paused', false).order('created_at', { ascending: false });
           if (error) {
-            const { data: allProps, error: allErr } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
-            if (allErr) throw allErr;
+            const { data: allProps } = await supabase.from('properties').select('*').order('created_at', { ascending: false });
             properties = allProps;
           }
           const raw = properties || [];
@@ -700,7 +660,6 @@
             state.profilesMap = profiles ? profiles.reduce((acc, p) => (acc[p.id] = p, acc), {}) : {};
           }
 
-          // Fetch report counts
           const { data: reports } = await supabase.from('reports').select('broker_id, status').eq('status', 'pending');
           if (reports) {
             const reportCounts = {};
@@ -710,7 +669,6 @@
             });
           }
 
-          // Compute rank score and sort
           const enriched = raw.map(prop => {
             const broker = state.profilesMap[prop.owner_id] || null;
             const reportCount = broker?.report_count || 0;
@@ -735,6 +693,7 @@
         } catch (err) { console.error('Load my properties error:', err); }
       }
 
+      // ─── SEARCH now includes broker business name ───
       function applyFiltersAndSearch() {
         const filter = state.currentFilter;
         const query = state.searchQuery.trim().toLowerCase();
@@ -744,7 +703,8 @@
           result = result.filter(p => {
             const address = (p.address || '').toLowerCase();
             const title = (p.title || '').toLowerCase();
-            return address.includes(query) || title.includes(query);
+            const brokerName = (p.broker?.business_name || '').toLowerCase();
+            return address.includes(query) || title.includes(query) || brokerName.includes(query);
           });
         }
         state.filteredProperties = result;
@@ -759,7 +719,7 @@
         $('#quizModal').classList.remove('hidden');
       }
 
-      // ─── QUIZ SUBMISSION with 5 questions ──────────────
+      // ─── QUIZ SUBMISSION (4 questions, includes broker_id) ───
       const quizFormEl = $('#quizForm');
       if (quizFormEl) {
         quizFormEl.addEventListener('submit', async function(e) {
@@ -771,7 +731,7 @@
 
           const answers = {};
           let totalScore = 0;
-          for (let i = 1; i <= 5; i++) {
+          for (let i = 1; i <= 4; i++) {
             const sel = document.querySelector(`input[name="q${i}"]:checked`);
             if (!sel) { alert(`Please answer question ${i}.`); return; }
             answers[`q${i}`] = parseInt(sel.value);
@@ -779,12 +739,22 @@
           }
 
           let leadType = 'cold';
-          if (totalScore >= 12) leadType = 'hot';
-          else if (totalScore >= 8) leadType = 'warm';
+          if (totalScore >= 9) leadType = 'hot';
+          else if (totalScore >= 6) leadType = 'warm';
 
           try {
+            // ✅ Fetch the property first so we can populate broker_id
+            const { data: propData, error: propErr } = await supabase
+              .from('properties')
+              .select('owner_id, title, address')
+              .eq('id', propertyId)
+              .single();
+            if (propErr) throw propErr;
+            if (!propData?.owner_id) throw new Error('Property has no owner.');
+
             const { data: lead, error } = await supabase.from('lead_requests').insert({
               property_id: propertyId,
+              broker_id: propData.owner_id,   // ✅ FIX: now set
               visitor_name: name,
               visitor_email: email,
               visitor_whatsapp: whatsapp,
@@ -796,118 +766,61 @@
             }).select().single();
             if (error) throw error;
 
-            state.lastLeadData = { propertyId, name, email, whatsapp, answers, totalScore };
-
-            // Email broker
-            const { data: propData } = await supabase.from('properties').select('owner_id, title, address').eq('id', propertyId).single();
-            if (propData) {
-              const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
-              if (brokerData?.email) {
-                const answerLabels = {
-                  q1: ['>6 months', '1-6 months', 'ASAP'],
-                  q2: ['Below price', 'Matches price', 'Above price'],
-                  q3: ['Not ready', 'Saving up', 'Fully ready'],
-                  q4: ['Not yet', 'Maybe', 'Yes, ready'],
-                  q5: ['Browsing', 'Comparing', 'Top choice']
-                };
-                let summary = '';
-                for (let i = 1; i <= 5; i++) {
-                  const val = answers[`q${i}`];
-                  summary += `<li>Q${i}: ${answerLabels[`q${i}`][val-1]}</li>`;
-                }
-                const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, leadType, totalScore, summary);
-                await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', `🔔 New ${leadType.toUpperCase()} Lead Request`, html);
+            // Send broker notification email
+            const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
+            if (brokerData?.email) {
+              const answerLabels = {
+                q1: ['>6 months', '1-6 months', 'ASAP'],
+                q2: ['Below price', 'Matches price'],
+                q3: ['Not yet', 'Maybe', 'Yes, ready'],
+                q4: ['Browsing', 'Comparing', 'Top choice']
+              };
+              let summary = '';
+              for (let i = 1; i <= 4; i++) {
+                const val = answers[`q${i}`];
+                summary += `<li>Q${i}: ${answerLabels[`q${i}`][val-1]}</li>`;
               }
+              const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, leadType, totalScore, summary);
+              await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', `🔔 New ${leadType.toUpperCase()} Lead Request`, html);
             }
 
+            // Close the quiz and show visitor alert
             $('#quizModal').classList.add('hidden');
-            $('#waitingModal').classList.remove('hidden');
-            $('#waitingIcon').className = 'fas fa-hourglass-half text-5xl text-indigo-400 mb-4';
-            $('#waitingTitle').textContent = '⏳ Waiting for Broker';
-            $('#waitingMessage').textContent = `Your ${leadType} lead has been sent. The broker will review it shortly.`;
-            $('#cancelWaitBtn').classList.remove('hidden');
-            $('#resubmitLeadBtn').style.display = 'none';
-            $('#searchAgainBtn').style.display = 'none';
-            $('#waitingStatus').textContent = '';
+
+            alert(
+              `✅ Notification Sent!\n\n` +
+              `We've notified the broker about your interest in "${propData.title}".\n\n` +
+              `📧 Please check your email regularly. Once the broker opens your request, we will notify you with their contact details.\n\n` +
+              `⏰ If you don't hear back within 24 hours, please return to Property Hub and try connecting again — our notifications fade after 24 hours.\n\n` +
+              `Thank you for using Property Hub Uganda!`
+            );
+
+            // Optional: still poll briefly for immediate responses (60 seconds)
             subscribeToLeadRequest(lead.id);
           } catch (err) { console.error(err); alert('Error: ' + err.message); }
         });
       }
 
+      // Short polling window (60s) — if broker responds immediately we alert the visitor
       function subscribeToLeadRequest(requestId) {
+        let attempts = 0;
+        const maxAttempts = 20; // 20 × 3s = 60s
         const interval = setInterval(async () => {
-          const { data: lead } = await supabase.from('lead_requests').select('status, expires_at').eq('id', requestId).single();
+          attempts++;
+          if (attempts > maxAttempts) { clearInterval(interval); return; }
+          const { data: lead } = await supabase.from('lead_requests').select('status').eq('id', requestId).single();
           if (!lead) return;
-          const now = new Date();
-          const expiresAt = lead.expires_at ? new Date(lead.expires_at) : null;
-
           if (lead.status === 'approved') {
             clearInterval(interval);
-            $('#waitingIcon').className = 'fas fa-check-circle text-5xl text-emerald-400 mb-4';
-            $('#waitingTitle').textContent = '✅ Request Approved';
-            $('#waitingMessage').textContent = 'The broker accepted your request and will contact you.';
-            $('#cancelWaitBtn').classList.add('hidden');
-            $('#searchAgainBtn').style.display = 'inline-block';
-            $('#resubmitLeadBtn').style.display = 'none';
+            alert('🎉 Great news! The broker has approved your request. Check your email for their contact details.');
           } else if (lead.status === 'rejected') {
             clearInterval(interval);
-            $('#waitingIcon').className = 'fas fa-times-circle text-5xl text-red-400 mb-4';
-            $('#waitingTitle').textContent = '❌ Request Declined';
-            $('#waitingMessage').textContent = 'The broker declined your request. You can re-submit to show continued interest.';
-            $('#cancelWaitBtn').classList.add('hidden');
-            $('#resubmitLeadBtn').style.display = 'inline-block';
-            $('#searchAgainBtn').style.display = 'inline-block';
-          } else if (lead.status === 'expired' || (lead.status === 'pending' && expiresAt && expiresAt < now)) {
-            if (lead.status === 'pending') {
-              await supabase.from('lead_requests').update({ status: 'expired' }).eq('id', requestId);
-            }
-            clearInterval(interval);
-            $('#waitingIcon').className = 'fas fa-clock text-5xl text-amber-400 mb-4';
-            $('#waitingTitle').textContent = '⏰ Request Expired';
-            $('#waitingMessage').textContent = 'The broker did not respond in time. Re-submit to show high interest.';
-            $('#cancelWaitBtn').classList.add('hidden');
-            $('#resubmitLeadBtn').style.display = 'inline-block';
-            $('#searchAgainBtn').style.display = 'inline-block';
+            alert('The broker was unable to respond in time. Please return to Property Hub and try connecting with them again.');
           }
         }, 3000);
       }
 
-      $('#resubmitLeadBtn')?.addEventListener('click', async () => {
-        if (!state.lastLeadData) { alert('No previous data.'); return; }
-        const { propertyId, name, email, whatsapp, answers, totalScore } = state.lastLeadData;
-        try {
-          const { data: newLead, error } = await supabase.from('lead_requests').insert({
-            property_id: propertyId, visitor_name: name, visitor_email: email,
-            visitor_whatsapp: whatsapp, quiz_answers: answers, total_score: totalScore,
-            lead_type: 'hot', status: 'pending', is_resubmission: true,
-            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-          }).select().single();
-          if (error) throw error;
-
-          const { data: propData } = await supabase.from('properties').select('owner_id, title, address').eq('id', propertyId).single();
-          if (propData) {
-            const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
-            if (brokerData?.email) {
-              const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, 'hot', totalScore, '<li>Re-submitted (hot interest)</li>');
-              await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', '🔥 Hot Lead Re-submitted', html);
-            }
-          }
-
-          $('#waitingIcon').className = 'fas fa-hourglass-half text-5xl text-indigo-400 mb-4';
-          $('#waitingTitle').textContent = '⏳ Waiting (Re-submitted)';
-          $('#waitingMessage').textContent = 'Your renewed interest has been sent.';
-          $('#cancelWaitBtn').classList.remove('hidden');
-          $('#resubmitLeadBtn').style.display = 'none';
-          $('#searchAgainBtn').style.display = 'none';
-          subscribeToLeadRequest(newLead.id);
-        } catch (err) { alert('Error: ' + err.message); }
-      });
-
-      $('#cancelWaitBtn')?.addEventListener('click', () => {
-        if (confirm('Cancel this request?')) $('#waitingModal').classList.add('hidden');
-      });
-
-      // ─── LOAD LEADS (Rejected auto-hidden, unlocked can be removed) ───
+      // ─── LOAD LEADS ───
       async function loadLeads() {
         if (!state.currentUser) return;
         try {
@@ -922,7 +835,6 @@
           const noMsg = $('#noLeads');
           if (!list || !noMsg) return;
 
-          // Filter out rejected leads automatically
           const visible = (data || []).filter(l => l.status !== 'rejected');
 
           if (visible.length === 0) {
@@ -997,7 +909,6 @@
             const leadId = btn.dataset.leadId;
             if (!confirm('Remove this unlocked lead from your list?')) return;
             try {
-              // We do NOT delete the lead permanently, but mark it hidden. If your DB doesn't have is_hidden, we simply delete it.
               const { error } = await supabase.from('lead_requests').delete().eq('id', leadId);
               if (error) throw error;
               loadLeads();
@@ -1065,7 +976,6 @@
             return;
           }
           $('#brokerEmptyState').classList.add('hidden');
-          // Sort by rank
           const sorted = props.map(p => ({ ...p, rankScore: calculateRankScore(p, broker) }))
                               .sort((a,b) => b.rankScore - a.rankScore);
           sorted.forEach(prop => grid.appendChild(createPropertyCard(prop, broker, false, false)));
@@ -1086,7 +996,6 @@
         $('#authForm').reset();
       }
 
-      // Reviews
       function openReviewModal(brokerId) {
         if (!state.currentUser) { alert('Please sign in to write a review.'); navigateToAuth(); return; }
         $('#reviewBrokerId').value = brokerId;
@@ -1181,7 +1090,6 @@
 
       $('#closeReviewModal')?.addEventListener('click', () => $('#reviewModal').classList.add('hidden'));
 
-      // Dashboard toggles
       function toggleProfileForm() {
         const c = $('#profileFormContainer'); c.classList.toggle('visible');
         $('#addPropertyContainer').classList.remove('visible');
