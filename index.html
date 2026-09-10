@@ -484,7 +484,7 @@
         }
       }
 
-      // Email via Supabase Edge Function proxy → Web3Forms
+      // Email via Supabase Edge Function proxy
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const { data, error } = await supabase.functions.invoke('send-email-web3forms', {
@@ -536,7 +536,7 @@ https://yourdomain.com`;
 Property: ${propertyTitle}
 Broker: ${brokerName || 'the broker'}
 
-Here are the broker's contact details:
+Contact details:
 
 📱 WhatsApp: ${brokerPhone || 'Check your dashboard'}
 📧 Email: ${brokerEmail || 'Check your dashboard'}
