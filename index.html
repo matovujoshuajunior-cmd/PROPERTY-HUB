@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://yourdomain.com/" />
   <meta name="robots" content="index, follow" />
   <meta property="og:title" content="Property Hub Uganda" />
-  <meta property="og:description" content="Find your perfect property in Uganda – from rentals to luxury lodges." />
+  <meta property="og:description" content="Find your perfect property in Uganda." />
   <meta property="og:image" content="https://yourdomain.com/og-image.jpg" />
   <meta property="og:url" content="https://yourdomain.com/" />
   <meta property="og:type" content="website" />
@@ -36,8 +36,6 @@
     .auth-toggle-btn { transition: all 0.2s; cursor: pointer; }
     .auth-toggle-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
     .auth-toggle-btn:hover:not(.active) { background: #f1f5f9; }
-    .dashboard-card { background: white; border-radius: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); }
-    .dashboard-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
     #loadingOverlay { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; transition: opacity 0.5s; }
     #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
     .loader { border: 4px solid #f3f4f6; border-top: 4px solid #4f46e5; border-radius: 50%; width: 48px; height: 48px; animation: spin 1s linear infinite; }
@@ -48,13 +46,10 @@
     .image-thumb { position: relative; display: inline-block; margin: 0.25rem; }
     .image-thumb img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; }
     .image-thumb .remove-img { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: none; }
-    .image-thumb .remove-img:hover { background: #dc2626; }
     .stars { color: #f59e0b; letter-spacing: 2px; }
-    .stars .empty { color: #d1d5db; }
     .badge-lead { background: #10b981; color: white; padding: 0.1rem 0.5rem; border-radius: 9999px; font-size: 0.6rem; font-weight: bold; }
     .star-rating .star { cursor: pointer; font-size: 2rem; color: #d1d5db; transition: 0.15s; }
     .star-rating .star.active { color: #f59e0b; }
-    .star-rating .star:hover { transform: scale(1.2); color: #f59e0b; }
     .badge-verified { background: #10b981; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-pending { background: #f59e0b; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
     .badge-rejected { background: #ef4444; color: white; font-size: 0.6rem; padding: 0.1rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 600; }
@@ -66,45 +61,36 @@
     .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; }
     .dashboard-toolbar .toolbar-btn:hover { background: #e2e8f0; }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
-    .dashboard-toolbar .toolbar-btn.primary:hover { background: #4338ca; }
     .dashboard-toolbar .toolbar-btn.green { background: #10b981; color: white; }
-    .dashboard-toolbar .toolbar-btn.green:hover { background: #059669; }
     .dashboard-toolbar .toolbar-btn.amber { background: #f59e0b; color: white; }
-    .dashboard-toolbar .toolbar-btn.amber:hover { background: #d97706; }
     .profile-form-container, .add-property-container, .verification-form-container { background: white; border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); display: none; }
     .profile-form-container.visible, .add-property-container.visible, .verification-form-container.visible { display: block; }
     .safety-banner { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.75rem; }
     .security-notification { position: fixed; bottom: 20px; right: 20px; max-width: 380px; background: #1e293b; color: white; padding: 1rem 1.25rem; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 999; display: none; }
-    .security-notification .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; padding: 0 0 0 0.5rem; }
-    .security-notification .close-btn:hover { color: white; }
     .verification-info-panel { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-top: 0.5rem; display: none; font-size: 0.875rem; color: #0369a1; }
     .verification-info-panel.visible { display: block; }
-    .verification-info-panel ul { list-style: disc; padding-left: 1.5rem; margin-top: 0.25rem; }
     .review-item { background: #f8fafc; border-radius: 0.75rem; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
-    .review-item .review-text { font-size: 0.875rem; color: #334155; }
-    .review-item .review-meta { font-size: 0.75rem; color: #94a3b8; }
     .review-stats { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 0.5rem; }
     .review-stats .stat { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #475569; }
     .review-stats .stat .value { font-weight: 700; font-size: 1.125rem; color: #1e293b; }
-    .review-stats .stat .label { color: #94a3b8; }
     .write-review-toggle { cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; color: #4f46e5; font-weight: 500; }
     .verification-property-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
     .verification-property-item .property-title { font-weight: 600; color: #1e293b; flex: 1; }
     .verification-property-item .property-status { font-size: 0.75rem; font-weight: 600; padding: 0.1rem 0.6rem; border-radius: 9999px; }
-    .verification-property-item .property-status.approved { background: #d1fae5; color: #065f46; }
-    .verification-property-item .property-status.pending { background: #fef3c7; color: #92400e; }
-    .verification-property-item .property-status.rejected { background: #fee2e2; color: #991b1b; }
-    .verification-property-item .property-status.expired { background: #e2e8f0; color: #475569; }
+    .property-status.approved { background: #d1fae5; color: #065f46; }
+    .property-status.pending { background: #fef3c7; color: #92400e; }
+    .property-status.rejected { background: #fee2e2; color: #991b1b; }
+    .property-status.expired { background: #e2e8f0; color: #475569; }
     #scrollTopBtn { position: fixed; bottom: 30px; right: 30px; z-index: 1000; background: #4f46e5; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s; border: none; }
     #scrollTopBtn.show { opacity: 1; visibility: visible; }
-    #scrollTopBtn:hover { background: #4338ca; }
     @media (max-width: 640px) {
       .dashboard-toolbar { flex-direction: column; align-items: stretch; padding: 0.75rem; }
-      .dashboard-toolbar .wallet-pill { justify-content: center; }
-      .dashboard-toolbar .toolbar-btn { justify-content: center; }
-      .security-notification { bottom: 10px; right: 10px; left: 10px; max-width: unset; }
       .verification-property-item { flex-direction: column; align-items: stretch; gap: 0.5rem; }
     }
+    .quiz-question { background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;margin-bottom:0.75rem; }
+    .quiz-question p.q-title { font-weight:600;color:#1e293b;font-size:0.875rem;margin-bottom:0.5rem; }
+    .quiz-option { display:inline-flex;align-items:center;gap:0.4rem;font-size:0.8rem;background:#fff;padding:0.3rem 0.75rem;border-radius:9999px;border:1px solid #e2e8f0;margin:0.2rem;cursor:pointer; }
+    .quiz-option:hover { border-color:#6366f1; }
   </style>
 </head>
 <body>
@@ -128,12 +114,12 @@
     <div class="modal-content">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold text-slate-800">⭐ Reviews</h2>
-        <button id="closeReviewModal" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+        <button id="closeReviewModal" class="text-slate-400 text-2xl">&times;</button>
       </div>
       <div class="flex justify-between items-center mb-3">
         <span class="text-sm text-slate-500">What others say</span>
-        <button id="toggleWriteReview" class="write-review-toggle" style="display: none;"><i class="fas fa-pen"></i> Write a Review</button>
-        <span id="signInToReview" class="text-xs text-indigo-500 cursor-pointer" style="display: none;" onclick="navigateToAuth()">Sign in to write a review</span>
+        <button id="toggleWriteReview" class="write-review-toggle" style="display:none;"><i class="fas fa-pen"></i> Write a Review</button>
+        <span id="signInToReview" class="text-xs text-indigo-500 cursor-pointer" style="display:none;" onclick="navigateToAuth()">Sign in to write a review</span>
       </div>
       <div id="reviewFormContainer" class="hidden mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
         <form id="reviewForm">
@@ -181,28 +167,61 @@
         <input type="hidden" id="verifPropertyId" />
         <input type="hidden" id="verifPropertyType" />
         <div id="verifDynamicFields"></div>
-        <button type="submit" class="w-full bg-indigo-600 text-white py-2.5">Submit Verification Request</button>
+        <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Submit Verification Request</button>
       </form>
       <div id="verifStatus" class="mt-3 text-sm"></div>
     </div>
   </div>
 
-  <!-- Quiz / Connect Modal -->
+  <!-- Quiz / Connect Modal (UPDATED with 5 questions) -->
   <div id="quizModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-lg">
       <div class="flex justify-between items-center mb-4"><h2>📞 Connect with Broker</h2><button id="closeQuizModal">&times;</button></div>
       <form id="quizForm">
         <input type="hidden" id="quizPropertyId" />
         <div id="quizStep1">
-          <div class="mb-3"><label>Your Full Name *</label><input type="text" id="quizName" required class="w-full px-4 py-2 border rounded-xl" /></div>
-          <div class="mb-3"><label>Email Address *</label><input type="email" id="quizEmail" required class="w-full px-4 py-2 border rounded-xl" /></div>
-          <div class="mb-3"><label>WhatsApp Number *</label><input type="text" id="quizWhatsapp" required class="w-full px-4 py-2 border rounded-xl" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold mb-1">Your Full Name *</label><input type="text" id="quizName" required class="w-full px-4 py-2 border rounded-xl" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold mb-1">Email Address *</label><input type="email" id="quizEmail" required class="w-full px-4 py-2 border rounded-xl" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold mb-1">WhatsApp Number *</label><input type="text" id="quizWhatsapp" required class="w-full px-4 py-2 border rounded-xl" /></div>
           <button type="button" id="quizNextBtn" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Next: Quiz Questions →</button>
         </div>
         <div id="quizStep2" class="hidden">
-          <div class="space-y-4">
-            <div><p>1. When do you plan to move in or buy?</p><label><input type="radio" name="q1" value="1" required /> More than 6 months</label><label><input type="radio" name="q1" value="2" /> 1 – 6 months</label><label><input type="radio" name="q1" value="3" /> Less than 1 month / ASAP</label></div>
-            <div><p>2. What is your budget range?</p><label><input type="radio" name="q2" value="1" required /> Below property price</label><label><input type="radio" name="q2" value="2" /> Matches property price</label><label><input type="radio" name="q2" value="3" /> Above property price</label></div>
+          <div id="quizQuestionsContainer" class="space-y-2">
+            <!-- Q1: Timeline -->
+            <div class="quiz-question">
+              <p class="q-title">1. When do you plan to move in or buy?</p>
+              <label class="quiz-option"><input type="radio" name="q1" value="1" required /> More than 6 months</label>
+              <label class="quiz-option"><input type="radio" name="q1" value="2" /> 1 – 6 months</label>
+              <label class="quiz-option"><input type="radio" name="q1" value="3" /> Less than 1 month / ASAP</label>
+            </div>
+            <!-- Q2: Budget -->
+            <div class="quiz-question">
+              <p class="q-title">2. What is your budget range?</p>
+              <label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below property price</label>
+              <label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches property price</label>
+              <label class="quiz-option"><input type="radio" name="q2" value="3" /> Above property price</label>
+            </div>
+            <!-- Q3: Financing -->
+            <div class="quiz-question">
+              <p class="q-title">3. Have you secured the finances / deposit for this property?</p>
+              <label class="quiz-option"><input type="radio" name="q3" value="1" required /> Not yet – still planning</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="2" /> Partially – saving up</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes – fully ready</label>
+            </div>
+            <!-- Q4: Viewing readiness -->
+            <div class="quiz-question">
+              <p class="q-title">4. Are you ready to view this property within the next 7 days?</p>
+              <label class="quiz-option"><input type="radio" name="q4" value="1" required /> No, not yet</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="2" /> Maybe – would like more info first</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="3" /> Yes, I am ready</label>
+            </div>
+            <!-- Q5: Seriousness / contact -->
+            <div class="quiz-question">
+              <p class="q-title">5. How serious are you about this property specifically?</p>
+              <label class="quiz-option"><input type="radio" name="q5" value="1" required /> Just browsing</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="2" /> Interested but comparing options</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="3" /> Very serious – this is my top choice</label>
+            </div>
           </div>
           <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl mt-4">Submit Request</button>
         </div>
@@ -216,10 +235,10 @@
       <div class="py-8">
         <i id="waitingIcon" class="fas fa-hourglass-half text-5xl text-indigo-400 mb-4"></i>
         <h3 id="waitingTitle" class="text-xl font-bold">⏳ Waiting for Broker</h3>
-        <p id="waitingMessage" class="text-slate-500 text-sm mt-2">Your request has been sent. The broker will review it shortly.</p>
+        <p id="waitingMessage" class="text-slate-500 text-sm mt-2">Your request has been sent.</p>
         <div id="waitingStatus" class="mt-4 text-sm text-slate-600"></div>
         <button id="cancelWaitBtn" class="mt-6 text-sm text-red-500">Cancel Request</button>
-        <button id="resubmitLeadBtn" class="hidden mt-4 bg-indigo-600 text-white px-4 py-2 rounded-xl" style="display:none;">Re‑submit Interest</button>
+        <button id="resubmitLeadBtn" class="hidden mt-4 bg-indigo-600 text-white px-4 py-2 rounded-xl" style="display:none;">Re-submit Interest</button>
         <button id="searchAgainBtn" class="hidden mt-4 bg-slate-200 text-slate-700 px-4 py-2 rounded-xl" style="display:none;" onclick="goToDiscovery()">Search Other Properties</button>
       </div>
     </div>
@@ -232,7 +251,7 @@
 
   <!-- Report Modal -->
   <div id="reportModal" class="modal-backdrop hidden">
-    <div class="modal-content max-w-sm"><h2>🚨 Report Broker</h2><form id="reportForm"><input type="hidden" id="reportBrokerId" /><select id="reportReason" class="w-full px-4 py-2 border rounded-xl"><option value="">Select reason</option><option value="fraud">Fraud / Scam</option><option value="fake_listing">Fake Listing</option></select><textarea id="reportDescription" required class="w-full px-4 py-2 border rounded-xl mt-3"></textarea><button type="submit" class="w-full bg-red-600 text-white py-2.5 rounded-xl mt-3">Submit Report</button></form><div id="reportStatus"></div></div>
+    <div class="modal-content max-w-sm"><h2>🚨 Report Broker</h2><form id="reportForm"><input type="hidden" id="reportBrokerId" /><select id="reportReason" class="w-full px-4 py-2 border rounded-xl"><option value="">Select reason</option><option value="fraud">Fraud / Scam</option><option value="fake_listing">Fake Listing</option><option value="harassment">Harassment</option><option value="spam">Spam</option><option value="other">Other</option></select><textarea id="reportDescription" required class="w-full px-4 py-2 border rounded-xl mt-3" placeholder="Describe the issue..."></textarea><button type="submit" class="w-full bg-red-600 text-white py-2.5 rounded-xl mt-3">Submit Report</button></form><div id="reportStatus"></div></div>
   </div>
 
   <div id="app" class="min-h-screen">
@@ -264,9 +283,7 @@
             </div>
           </div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 -mt-4">
-          <div class="safety-banner">🔒 Verified &amp; Trusted Properties</div>
-        </div>
+        <div class="max-w-7xl mx-auto px-4 -mt-4"><div class="safety-banner">🔒 Verified &amp; Trusted Properties</div></div>
         <section class="max-w-7xl mx-auto px-4 py-4">
           <div class="flex gap-2 overflow-x-auto pb-3 mb-6">
             <button class="filter-pill active px-5 py-2 rounded-full bg-slate-900 text-white text-sm" data-filter="all">All</button>
@@ -276,7 +293,6 @@
           </div>
           <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
           <div id="emptyState" class="hidden text-center py-20">No properties found.</div>
-          <div id="loadingSkeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
         </section>
       </section>
 
@@ -312,14 +328,14 @@
           <h2 id="formTitle" class="text-2xl font-bold mb-6">Welcome Back</h2>
           <form id="authForm" class="space-y-4">
             <div id="signUpFields" class="hidden space-y-4">
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Business Name</label><input type="text" id="bizNameInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="lodge_owner">Lodge Operator / Manager</option></select></div>
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">WhatsApp Phone</label><input type="text" id="phoneInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
+              <div><label class="block text-xs font-bold mb-1">Business Name</label><input type="text" id="bizNameInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
+              <div><label class="block text-xs font-bold mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="lodge_owner">Lodge Operator / Manager</option></select></div>
+              <div><label class="block text-xs font-bold mb-1">WhatsApp Phone</label><input type="text" id="phoneInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
             </div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Email</label><input type="email" id="emailInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
-            <div><label class="block text-xs font-bold text-slate-500 mb-1">Password</label><input type="password" id="passwordInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
+            <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="emailInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
+            <div><label class="block text-xs font-bold mb-1">Password</label><input type="password" id="passwordInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
             <button type="submit" id="submitAuthBtn" class="w-full bg-indigo-600 text-white py-3 rounded-xl">Access Dashboard</button>
-            <button type="button" id="backToSearchBtn" class="w-full text-center text-xs">← Back to public search listings</button>
+            <button type="button" id="backToSearchBtn" class="w-full text-center text-xs">← Back to search</button>
           </form>
         </div>
       </section>
@@ -335,7 +351,7 @@
             <button id="refreshWalletBtn" class="toolbar-btn" style="background:#334155;color:white;"><i class="fas fa-sync-alt"></i></button>
             <button id="dashboardEditProfileBtn" class="toolbar-btn"><i class="fas fa-user-edit"></i> Edit Profile</button>
             <button id="dashboardAddPropertyBtn" class="toolbar-btn primary"><i class="fas fa-plus-circle"></i> Add Property</button>
-            <button id="dashboardPropertyVerificationBtn" class="toolbar-btn amber"><i class="fas fa-shield-alt"></i> Property Verification</button>
+            <button id="dashboardPropertyVerificationBtn" class="toolbar-btn amber"><i class="fas fa-shield-alt"></i> Verification</button>
             <button id="dashboardLeadsBtn" class="toolbar-btn green"><i class="fas fa-users"></i> Leads</button>
           </div>
 
@@ -344,34 +360,35 @@
             <form id="profileSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div><label class="block text-xs font-bold mb-1">Business Name</label><input type="text" id="settingsBusinessName" class="w-full px-4 py-2 rounded-xl border" /></div>
               <div><label class="block text-xs font-bold mb-1">WhatsApp Phone</label><input type="text" id="settingsPhone" class="w-full px-4 py-2 rounded-xl border" /></div>
-              <div class="md:col-span-2"><button type="submit" class="bg-indigo-600 text-white py-2.5 px-6 rounded-xl">Save Profile</button><button type="button" id="cancelProfileEditBtn" class="ml-2 text-sm">Cancel</button></div>
+              <div class="md:col-span-2"><button type="submit" class="bg-indigo-600 text-white py-2.5 px-6 rounded-xl">Save</button><button type="button" id="cancelProfileEditBtn" class="ml-2 text-sm">Cancel</button></div>
             </form>
             <div id="profileStatus" class="mt-3 text-sm"></div>
           </div>
 
           <div id="addPropertyContainer" class="add-property-container">
-            <h4 class="font-semibold mb-3">➕ Add New Property</h4>
+            <h4 class="font-semibold mb-3">➕ Add Property</h4>
             <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div><label class="block text-xs font-bold mb-1">Title *</label><input type="text" id="propTitle" required class="w-full px-4 py-2 rounded-xl border" /></div>
               <div><label class="block text-xs font-bold mb-1">Price (UGX) *</label><input type="number" id="propPrice" required class="w-full px-4 py-2 rounded-xl border" /></div>
               <div><label class="block text-xs font-bold mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
               <div><label class="block text-xs font-bold mb-1">Address *</label><input type="text" id="propAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
-              <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Images</label><input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm" /><div id="propImagePreviews" class="flex flex-wrap gap-2 mt-2"></div></div>
-              <div class="md:col-span-2"><input type="checkbox" id="addRequestVerification" /><label for="addRequestVerification" class="ml-2 text-sm">Request Property Verification</label></div>
-              <div id="addVerificationInfo" class="verification-info-panel">Verification info...</div>
-              <div class="md:col-span-2"><button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Add Property</button></div>
+              <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Images</label><input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm" /></div>
+              <div class="md:col-span-2"><input type="checkbox" id="addRequestVerification" /><label for="addRequestVerification" class="ml-2 text-sm">Request Verification</label></div>
+              <div class="md:col-span-2"><button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Add</button></div>
             </form>
             <div id="uploadStatus" class="mt-3 text-sm"></div>
           </div>
 
           <div id="propertyVerificationContainer" class="verification-form-container">
-            <div class="flex items-center justify-between mb-4"><h4 class="font-semibold">🛡️ Property Verification</h4></div>
+            <div class="flex items-center justify-between mb-4"><h4 class="font-semibold">🛡️ Verification</h4></div>
             <div id="propertyVerificationList"><p class="text-slate-500 text-sm">Loading...</p></div>
-            <div id="propertyVerificationEmpty" class="hidden text-center py-4 text-sm">No properties yet.</div>
           </div>
 
           <div id="leadsContainer" class="verification-form-container">
-            <div class="flex items-center justify-between mb-4"><h4 class="font-semibold">📨 My Leads</h4></div>
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-semibold">📨 My Leads</h4>
+              <button id="refreshLeadsBtn" class="text-xs bg-slate-200 px-3 py-1 rounded-full"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
             <div id="leadsList"><p class="text-slate-500 text-sm">Loading...</p></div>
             <div id="noLeads" class="hidden text-center py-8 text-sm">No leads yet.</div>
           </div>
@@ -391,13 +408,14 @@
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const WEB3FORMS_ACCESS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
+      const MAX_QUIZ_SCORE = 15;
 
       let supabase;
       const state = {
         allProperties: [], filteredProperties: [], myProperties: [],
         currentFilter: 'all', searchQuery: '', currentBrokerId: null,
-        currentUser: null, isSignUpMode: false, profilesMap: {}, walletBalance: 0,
-        isAdmin: false, lastLeadData: null
+        currentUser: null, isSignUpMode: false, profilesMap: {},
+        walletBalance: 0, isAdmin: false, lastLeadData: null
       };
 
       function $(sel) { return document.querySelector(sel); }
@@ -405,14 +423,10 @@
       function formatPrice(amount) { return Number(amount).toLocaleString('en-UG') + ' UGX'; }
       function getImageArray(p) { if (!p.media_urls) return []; return Array.isArray(p.media_urls) ? p.media_urls : [p.media_urls]; }
       function getImageUrl(p) { const arr = getImageArray(p); return arr[0] || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center'; }
-      function renderStars(rating) { let html=''; for(let i=0;i<5;i++) html += i<rating ? '★' : '☆'; return html; }
-      function renderStarsSmall(rating) { let html=''; for(let i=0;i<5;i++) html += i<rating ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : '<i class="far fa-star text-slate-300 text-xs"></i>'; return html; }
+      function renderStars(rating) { let h=''; for(let i=0;i<5;i++) h += i<rating ? '★' : '☆'; return h; }
+      function renderStarsSmall(rating) { let h=''; for(let i=0;i<5;i++) h += i<rating ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : '<i class="far fa-star text-slate-300 text-xs"></i>'; return h; }
 
-      function navigateTo(url, replace = false) {
-        if (replace) window.history.replaceState(null, '', url);
-        else window.history.pushState(null, '', url);
-        handleRoute();
-      }
+      function navigateTo(url, replace = false) { if (replace) window.history.replaceState(null, '', url); else window.history.pushState(null, '', url); handleRoute(); }
       function getCurrentPath() { return window.location.pathname + window.location.search; }
 
       function showView(view) {
@@ -425,32 +439,25 @@
 
       function setAuthMode(signUpMode) {
         state.isSignUpMode = signUpMode;
-        const signIn = $('#toggleSignIn'), signUp = $('#toggleSignUp'), fields = $('#signUpFields'), title = $('#formTitle'), btn = $('#submitAuthBtn');
-        if (!signIn || !signUp || !fields || !title || !btn) return;
+        const signIn=$('#toggleSignIn'), signUp=$('#toggleSignUp'), fields=$('#signUpFields'), title=$('#formTitle'), btn=$('#submitAuthBtn');
+        if (!signIn||!signUp||!fields||!title||!btn) return;
         if (signUpMode) {
           signUp.classList.add('active'); signIn.classList.remove('active');
           fields.classList.remove('hidden');
-          title.innerText = 'Create Hub Space';
-          btn.innerText = 'Register Business Hub';
+          title.innerText='Create Hub Space'; btn.innerText='Register Business Hub';
         } else {
           signIn.classList.add('active'); signUp.classList.remove('active');
           fields.classList.add('hidden');
-          title.innerText = 'Welcome Back';
-          btn.innerText = 'Access Dashboard';
+          title.innerText='Welcome Back'; btn.innerText='Access Dashboard';
         }
       }
 
-      // Email notification via Web3Forms (HTML formatted like lead card)
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const payload = {
-            access_key: WEB3FORMS_ACCESS_KEY,
-            from_name: 'Property Hub Uganda',
-            subject,
-            email: to_email,
-            name: to_name || 'Broker',
-            message,
-            replyto: 'no-reply@propertyhub.ug'
+            access_key: WEB3FORMS_ACCESS_KEY, from_name: 'Property Hub Uganda',
+            subject, email: to_email, name: to_name || 'Broker',
+            message, replyto: 'no-reply@propertyhub.ug'
           };
           const response = await fetch('https://api.web3forms.com/submit', {
             method: 'POST',
@@ -459,28 +466,26 @@
           });
           const result = await response.json();
           if (!response.ok || !result.success) throw new Error(result.message || 'Web3Forms error');
-          console.log('📧 Email sent to', to_email, result);
+          console.log('📧 Email sent:', result);
           return true;
-        } catch (err) {
-          console.error('❌ Email failed:', err.message);
-          return false;
-        }
+        } catch (err) { console.error('❌ Email failed:', err.message); return false; }
       }
 
-      // Build HTML email message similar to the lead card
-      function buildLeadEmailHtml(propertyTitle, address, visitorName, visitorEmail, visitorWhatsapp, leadType, totalScore) {
+      function buildLeadEmailHtml(title, address, name, email, whatsapp, leadType, score, answersSummary) {
         return `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;border:1px solid #ddd;border-radius:8px;">
-            <h2 style="color:#4f46e5;margin:0 0 12px 0;">🔔 New Lead Request</h2>
-            <p style="margin:0 0 4px 0;"><strong>Property:</strong> ${propertyTitle || 'Untitled'}</p>
-            <p style="margin:0 0 12px 0;"><strong>Address:</strong> ${address || 'Not specified'}</p>
+            <h2 style="color:#4f46e5;">🔔 New Lead Request</h2>
+            <p><strong>Property:</strong> ${title || 'Untitled'}</p>
+            <p><strong>Address:</strong> ${address || 'Not specified'}</p>
             <table style="width:100%;border-collapse:collapse;">
-              <tr><td style="padding:8px;border:1px solid #eee;background:#f9fafb;"><strong>Visitor</strong></td><td style="padding:8px;border:1px solid #eee;">${visitorName}</td></tr>
-              <tr><td style="padding:8px;border:1px solid #eee;background:#f9fafb;"><strong>Email</strong></td><td style="padding:8px;border:1px solid #eee;">${visitorEmail}</td></tr>
-              <tr><td style="padding:8px;border:1px solid #eee;background:#f9fafb;"><strong>WhatsApp</strong></td><td style="padding:8px;border:1px solid #eee;">${visitorWhatsapp}</td></tr>
-              <tr><td style="padding:8px;border:1px solid #eee;background:#f9fafb;"><strong>Lead Type</strong></td><td style="padding:8px;border:1px solid #eee;">${(leadType||'cold').toUpperCase()}</td></tr>
-              <tr><td style="padding:8px;border:1px solid #eee;background:#f9fafb;"><strong>Score</strong></td><td style="padding:8px;border:1px solid #eee;">${totalScore}/8</td></tr>
+              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Visitor</strong></td><td style="padding:8px;border:1px solid #eee;">${name}</td></tr>
+              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Email</strong></td><td style="padding:8px;border:1px solid #eee;">${email}</td></tr>
+              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>WhatsApp</strong></td><td style="padding:8px;border:1px solid #eee;">${whatsapp}</td></tr>
+              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Lead Type</strong></td><td style="padding:8px;border:1px solid #eee;">${(leadType||'cold').toUpperCase()}</td></tr>
+              <tr><td style="padding:8px;background:#f9fafb;border:1px solid #eee;"><strong>Score</strong></td><td style="padding:8px;border:1px solid #eee;">${score}/${MAX_QUIZ_SCORE}</td></tr>
             </table>
+            <p style="margin-top:12px;"><strong>Quiz answers:</strong></p>
+            <ul style="padding-left:18px;margin:0;">${answersSummary}</ul>
             <p style="margin-top:16px;">Log in to your dashboard to unlock this lead.</p>
           </div>
         `;
@@ -491,25 +496,47 @@
         try {
           const { data: profile } = await supabase.from('profiles').select('wallet_balance').eq('id', state.currentUser.id).single();
           state.walletBalance = profile?.wallet_balance || 0;
-          $('#walletBalanceDisplay').textContent = state.walletBalance.toLocaleString();
+          const el = $('#walletBalanceDisplay');
+          if (el) el.textContent = state.walletBalance.toLocaleString();
         } catch (err) { console.error('Wallet load error:', err); }
       }
 
+      // ─── RANKING ALGORITHM (Restored + enhanced) ───────────────
       function isTrustedBroker(broker) {
         if (!broker) return false;
         return (broker.average_rating >= 4 && broker.review_count >= 10 && broker.lead_score >= 20 && (broker.report_count || 0) < 3);
       }
+
       function calculateRankScore(property, broker, reportCount = 0) {
         let score = 0;
+        // Verification boost
         if (property.verification_status === 'approved') score += 100;
         else if (property.verification_status === 'pending') score += 30;
+        else if (property.verification_status === 'rejected') score -= 50;
+
         if (broker) {
-          score += (broker.average_rating || 0) * 10;
-          score += Math.min(broker.review_count || 0, 50) * 0.5;
-          if (isTrustedBroker(broker)) score += 20;
-          score += (broker.lead_score || 0) / 2;
-          score -= (reportCount || 0) * 5;
+          const rating = broker.average_rating || 0;
+          const reviewCount = broker.review_count || 0;
+          const leadScore = broker.lead_score || 0;
+          // Rating boost
+          score += rating * 10;
+          // Reviews boost (capped)
+          score += Math.min(reviewCount, 50) * 0.5;
+          // Trusted bonus
+          if (isTrustedBroker(broker)) score += 25;
+          // Lead score bonus
+          score += leadScore / 2;
+          // Reports penalty
+          score -= (reportCount || 0) * 8;
         }
+
+        // Fresh listings get a small boost (last 7 days)
+        if (property.created_at) {
+          const daysOld = (Date.now() - new Date(property.created_at).getTime()) / (1000 * 60 * 60 * 24);
+          if (daysOld < 7) score += 10;
+          else if (daysOld < 30) score += 5;
+        }
+
         return Math.round(score);
       }
 
@@ -532,8 +559,7 @@
         else if (verificationStatus === 'pending') badgeHtml = `<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>`;
         else if (verificationStatus === 'rejected') badgeHtml = `<span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>`;
 
-        let trustedHtml = '';
-        if (isTrusted) trustedHtml = `<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>`;
+        let trustedHtml = isTrusted ? `<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>` : '';
 
         let actionsHtml = '';
         if (showEdit) actionsHtml += `<button class="edit-btn text-xs text-indigo-600 font-medium" data-id="${property.id}"><i class="fas fa-edit mr-1"></i>Edit</button>`;
@@ -546,19 +572,18 @@
         if (showEdit) {
           const pauseText = property.is_paused ? 'Resume' : 'Pause';
           const pauseIcon = property.is_paused ? 'fa-play' : 'fa-pause';
-          pauseHtml = `<button class="pause-btn text-xs text-blue-600 font-medium ml-2" data-property-id="${property.id}" data-paused="${property.is_paused}"><i class="fas ${pauseIcon} mr-1"></i>${pauseText}</button>`;
+          pauseHtml = `<button class="pause-btn text-xs text-blue-600 font-medium ml-2" data-property-id="${property.id}"><i class="fas ${pauseIcon} mr-1"></i>${pauseText}</button>`;
         }
 
         let connectHtml = '';
-        if (!showEdit) {
-          connectHtml = `<button class="connect-btn bg-indigo-600 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5" data-property-id="${property.id}"><i class="fas fa-handshake"></i> Connect</button>`;
-        }
+        if (!showEdit) connectHtml = `<button class="connect-btn bg-indigo-600 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5" data-property-id="${property.id}"><i class="fas fa-handshake"></i> Connect</button>`;
 
         article.innerHTML = `
           <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
             <img src="${imageUrl}" alt="${property.title || 'Property'}" class="w-full h-full object-cover" loading="lazy"/>
             <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full">${property.property_type || 'Property'}</span>
             ${!showEdit && isVerified ? `<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>` : ''}
+            ${!showEdit ? `<span class="absolute top-3 left-3 bg-indigo-700 text-white text-[8px] font-bold px-2 py-1 rounded-full">Rank ${rankScore}</span>` : ''}
           </div>
           <div class="p-4 flex flex-col flex-1">
             <div class="flex items-center justify-between flex-wrap gap-1">
@@ -572,8 +597,7 @@
               <span class="text-slate-500">(${reviewCount})</span>
               <span class="badge-lead">⚡ ${leadScore}</span>
             </div>
-            ${!showEdit ? `<div class="mt-1 text-xs text-slate-400">Rank Score: ${rankScore}${reportCount > 0 ? ` <span class="text-red-500">⚠️ ${reportCount}</span>` : ''}</div>` : ''}
-            <div class="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 flex-wrap">
+            <div class="mt-3 flex items-center justify-between gap-2 border-t pt-3 flex-wrap">
               ${showBrokerLink ? `<button class="broker-name-link text-xs font-medium text-indigo-600 flex items-center gap-1" data-broker-id="${broker?.id || ''}"><i class="fas fa-user-circle text-slate-400"></i> ${broker?.business_name || 'Unknown Broker'}</button>` : `<span class="text-xs text-slate-500 flex items-center gap-1"><i class="fas fa-user-circle text-slate-400"></i> ${broker?.business_name || 'Broker'}</span>`}
               <div class="flex gap-2">${actionsHtml}${boostHtml}${pauseHtml}${rateHtml}${connectHtml}</div>
             </div>
@@ -583,7 +607,7 @@
         article.querySelector('.edit-btn')?.addEventListener('click', e => { e.stopPropagation(); openEditModal(property.id); });
         article.querySelector('.boost-btn')?.addEventListener('click', async e => {
           e.stopPropagation();
-          try { await supabase.rpc('increment_lead_score', { broker_id: e.currentTarget.dataset.brokerId, amount: 5 }); alert('Boosted!'); }
+          try { await supabase.rpc('increment_lead_score', { broker_id: e.currentTarget.dataset.brokerId, amount: 5 }); alert('Boosted!'); await fetchAllData(); }
           catch (err) { alert('Error: ' + err.message); }
         });
         article.querySelector('.rate-btn')?.addEventListener('click', e => { e.stopPropagation(); openReviewModal(broker.id); });
@@ -657,9 +681,7 @@
 
       async function fetchAllData() {
         const grid = $('#listingsGrid');
-        const skeleton = $('#loadingSkeleton');
         const empty = $('#emptyState');
-        if (skeleton) skeleton.style.display = 'grid';
         if (grid) grid.innerHTML = '';
         if (empty) empty.classList.add('hidden');
 
@@ -670,17 +692,37 @@
             if (allErr) throw allErr;
             properties = allProps;
           }
-          state.allProperties = properties || [];
-          state.filteredProperties = [...state.allProperties];
+          const raw = properties || [];
 
-          const ownerIds = [...new Set(state.allProperties.map(p => p.owner_id).filter(id => id))];
+          const ownerIds = [...new Set(raw.map(p => p.owner_id).filter(id => id))];
           if (ownerIds.length) {
             const { data: profiles } = await supabase.from('profiles').select('*').in('id', ownerIds);
             state.profilesMap = profiles ? profiles.reduce((acc, p) => (acc[p.id] = p, acc), {}) : {};
           }
+
+          // Fetch report counts
+          const { data: reports } = await supabase.from('reports').select('broker_id, status').eq('status', 'pending');
+          if (reports) {
+            const reportCounts = {};
+            reports.forEach(r => { reportCounts[r.broker_id] = (reportCounts[r.broker_id] || 0) + 1; });
+            Object.keys(state.profilesMap).forEach(id => {
+              state.profilesMap[id].report_count = reportCounts[id] || 0;
+            });
+          }
+
+          // Compute rank score and sort
+          const enriched = raw.map(prop => {
+            const broker = state.profilesMap[prop.owner_id] || null;
+            const reportCount = broker?.report_count || 0;
+            const rankScore = calculateRankScore(prop, broker, reportCount);
+            return { ...prop, broker, rankScore };
+          });
+          enriched.sort((a, b) => b.rankScore - a.rankScore);
+
+          state.allProperties = enriched;
+          state.filteredProperties = [...enriched];
           applyFiltersAndSearch();
         } catch (err) { console.error('Fetch error:', err); }
-        finally { if (skeleton) skeleton.style.display = 'none'; }
       }
 
       async function loadMyProperties() {
@@ -717,6 +759,7 @@
         $('#quizModal').classList.remove('hidden');
       }
 
+      // ─── QUIZ SUBMISSION with 5 questions ──────────────
       const quizFormEl = $('#quizForm');
       if (quizFormEl) {
         quizFormEl.addEventListener('submit', async function(e) {
@@ -725,12 +768,19 @@
           const name = $('#quizName').value.trim();
           const email = $('#quizEmail').value.trim();
           const whatsapp = $('#quizWhatsapp').value.trim();
-          const q1 = document.querySelector('input[name="q1"]:checked');
-          const q2 = document.querySelector('input[name="q2"]:checked');
-          if (!q1 || !q2) { alert('Answer both quiz questions.'); return; }
-          const totalScore = parseInt(q1.value) + parseInt(q2.value);
-          const leadType = totalScore >= 7 ? 'hot' : totalScore >= 4 ? 'warm' : 'cold';
-          const answers = { q1: parseInt(q1.value), q2: parseInt(q2.value) };
+
+          const answers = {};
+          let totalScore = 0;
+          for (let i = 1; i <= 5; i++) {
+            const sel = document.querySelector(`input[name="q${i}"]:checked`);
+            if (!sel) { alert(`Please answer question ${i}.`); return; }
+            answers[`q${i}`] = parseInt(sel.value);
+            totalScore += parseInt(sel.value);
+          }
+
+          let leadType = 'cold';
+          if (totalScore >= 12) leadType = 'hot';
+          else if (totalScore >= 8) leadType = 'warm';
 
           try {
             const { data: lead, error } = await supabase.from('lead_requests').insert({
@@ -741,19 +791,32 @@
               quiz_answers: answers,
               total_score: totalScore,
               lead_type: leadType,
-              status: 'pending'
+              status: 'pending',
+              expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
             }).select().single();
             if (error) throw error;
 
-            state.lastLeadData = { propertyId, name, email, whatsapp, answers, totalScore, leadType };
+            state.lastLeadData = { propertyId, name, email, whatsapp, answers, totalScore };
 
-            // Send email to broker
+            // Email broker
             const { data: propData } = await supabase.from('properties').select('owner_id, title, address').eq('id', propertyId).single();
             if (propData) {
               const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
               if (brokerData?.email) {
-                const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, leadType, totalScore);
-                await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', '🔔 New Lead Request', html);
+                const answerLabels = {
+                  q1: ['>6 months', '1-6 months', 'ASAP'],
+                  q2: ['Below price', 'Matches price', 'Above price'],
+                  q3: ['Not ready', 'Saving up', 'Fully ready'],
+                  q4: ['Not yet', 'Maybe', 'Yes, ready'],
+                  q5: ['Browsing', 'Comparing', 'Top choice']
+                };
+                let summary = '';
+                for (let i = 1; i <= 5; i++) {
+                  const val = answers[`q${i}`];
+                  summary += `<li>Q${i}: ${answerLabels[`q${i}`][val-1]}</li>`;
+                }
+                const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, leadType, totalScore, summary);
+                await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', `🔔 New ${leadType.toUpperCase()} Lead Request`, html);
               }
             }
 
@@ -761,16 +824,13 @@
             $('#waitingModal').classList.remove('hidden');
             $('#waitingIcon').className = 'fas fa-hourglass-half text-5xl text-indigo-400 mb-4';
             $('#waitingTitle').textContent = '⏳ Waiting for Broker';
-            $('#waitingMessage').textContent = 'Your request has been sent. The broker will review it shortly.';
+            $('#waitingMessage').textContent = `Your ${leadType} lead has been sent. The broker will review it shortly.`;
             $('#cancelWaitBtn').classList.remove('hidden');
             $('#resubmitLeadBtn').style.display = 'none';
             $('#searchAgainBtn').style.display = 'none';
             $('#waitingStatus').textContent = '';
             subscribeToLeadRequest(lead.id);
-          } catch (err) {
-            console.error(err);
-            alert('Error: ' + err.message);
-          }
+          } catch (err) { console.error(err); alert('Error: ' + err.message); }
         });
       }
 
@@ -789,16 +849,14 @@
             $('#cancelWaitBtn').classList.add('hidden');
             $('#searchAgainBtn').style.display = 'inline-block';
             $('#resubmitLeadBtn').style.display = 'none';
-            $('#waitingStatus').textContent = '';
           } else if (lead.status === 'rejected') {
             clearInterval(interval);
             $('#waitingIcon').className = 'fas fa-times-circle text-5xl text-red-400 mb-4';
             $('#waitingTitle').textContent = '❌ Request Declined';
-            $('#waitingMessage').textContent = 'The broker declined your request. You can re‑submit to show continued interest.';
+            $('#waitingMessage').textContent = 'The broker declined your request. You can re-submit to show continued interest.';
             $('#cancelWaitBtn').classList.add('hidden');
             $('#resubmitLeadBtn').style.display = 'inline-block';
             $('#searchAgainBtn').style.display = 'inline-block';
-            $('#waitingStatus').textContent = '';
           } else if (lead.status === 'expired' || (lead.status === 'pending' && expiresAt && expiresAt < now)) {
             if (lead.status === 'pending') {
               await supabase.from('lead_requests').update({ status: 'expired' }).eq('id', requestId);
@@ -806,79 +864,82 @@
             clearInterval(interval);
             $('#waitingIcon').className = 'fas fa-clock text-5xl text-amber-400 mb-4';
             $('#waitingTitle').textContent = '⏰ Request Expired';
-            $('#waitingMessage').textContent = 'The broker did not respond in time. Re‑submit to show high interest.';
+            $('#waitingMessage').textContent = 'The broker did not respond in time. Re-submit to show high interest.';
             $('#cancelWaitBtn').classList.add('hidden');
             $('#resubmitLeadBtn').style.display = 'inline-block';
             $('#searchAgainBtn').style.display = 'inline-block';
-            $('#waitingStatus').textContent = '';
           }
         }, 3000);
       }
 
-      // Re-submit handler
       $('#resubmitLeadBtn')?.addEventListener('click', async () => {
-        if (!state.lastLeadData) { alert('No previous lead data.'); return; }
+        if (!state.lastLeadData) { alert('No previous data.'); return; }
         const { propertyId, name, email, whatsapp, answers, totalScore } = state.lastLeadData;
         try {
           const { data: newLead, error } = await supabase.from('lead_requests').insert({
-            property_id: propertyId,
-            visitor_name: name,
-            visitor_email: email,
-            visitor_whatsapp: whatsapp,
-            quiz_answers: answers,
-            total_score: totalScore,
-            lead_type: 'hot',
-            status: 'pending',
+            property_id: propertyId, visitor_name: name, visitor_email: email,
+            visitor_whatsapp: whatsapp, quiz_answers: answers, total_score: totalScore,
+            lead_type: 'hot', status: 'pending', is_resubmission: true,
             expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
           }).select().single();
           if (error) throw error;
 
-          // Send hot lead email
           const { data: propData } = await supabase.from('properties').select('owner_id, title, address').eq('id', propertyId).single();
           if (propData) {
             const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
             if (brokerData?.email) {
-              const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, 'hot', totalScore);
-              await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', '🔥 Hot Lead Re‑submitted', html);
+              const html = buildLeadEmailHtml(propData.title, propData.address, name, email, whatsapp, 'hot', totalScore, '<li>Re-submitted (hot interest)</li>');
+              await sendNotificationEmail(brokerData.email, brokerData.business_name || 'Broker', '🔥 Hot Lead Re-submitted', html);
             }
           }
 
           $('#waitingIcon').className = 'fas fa-hourglass-half text-5xl text-indigo-400 mb-4';
-          $('#waitingTitle').textContent = '⏳ Waiting (Re‑submitted)';
-          $('#waitingMessage').textContent = 'Your renewed interest has been sent. The broker will review again.';
+          $('#waitingTitle').textContent = '⏳ Waiting (Re-submitted)';
+          $('#waitingMessage').textContent = 'Your renewed interest has been sent.';
           $('#cancelWaitBtn').classList.remove('hidden');
           $('#resubmitLeadBtn').style.display = 'none';
           $('#searchAgainBtn').style.display = 'none';
           subscribeToLeadRequest(newLead.id);
-        } catch (err) { alert('Error re‑submitting: ' + err.message); }
+        } catch (err) { alert('Error: ' + err.message); }
       });
 
-      // Cancel wait
       $('#cancelWaitBtn')?.addEventListener('click', () => {
         if (confirm('Cancel this request?')) $('#waitingModal').classList.add('hidden');
       });
 
+      // ─── LOAD LEADS (Rejected auto-hidden, unlocked can be removed) ───
       async function loadLeads() {
         if (!state.currentUser) return;
         try {
-          const { data, error } = await supabase.from('lead_requests').select('*, property:property_id (title)').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
+          const { data, error } = await supabase
+            .from('lead_requests')
+            .select('*, property:property_id (title)')
+            .eq('broker_id', state.currentUser.id)
+            .order('created_at', { ascending: false });
           if (error) throw error;
+
           const list = $('#leadsList');
           const noMsg = $('#noLeads');
           if (!list || !noMsg) return;
-          if (!data || data.length === 0) {
+
+          // Filter out rejected leads automatically
+          const visible = (data || []).filter(l => l.status !== 'rejected');
+
+          if (visible.length === 0) {
             list.innerHTML = '';
             noMsg.classList.remove('hidden');
             return;
           }
           noMsg.classList.add('hidden');
+
           let html = '';
-          data.forEach(lead => {
+          visible.forEach(lead => {
             const isPending = lead.status === 'pending';
-            const statusClass = lead.status === 'approved' ? 'approved' : lead.status === 'pending' ? 'pending' : lead.status === 'rejected' ? 'rejected' : 'expired';
-            const statusLabel = lead.status === 'approved' ? '✅ Unlocked' : lead.status === 'pending' ? '⏳ Pending' : lead.status === 'rejected' ? '❌ Rejected' : '⏰ Expired';
+            const isApproved = lead.status === 'approved';
+            const statusClass = lead.status === 'approved' ? 'approved' : lead.status === 'pending' ? 'pending' : 'expired';
+            const statusLabel = isApproved ? '✅ Unlocked' : isPending ? '⏳ Pending' : '⏰ Expired';
             const isHot = lead.lead_type === 'hot';
-            html += `<div class="verification-property-item">
+            html += `<div class="verification-property-item" data-lead-id="${lead.id}">
               <div class="property-title">
                 ${lead.property?.title || 'Unknown'}
                 ${isHot ? '<span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : ''}
@@ -890,7 +951,10 @@
                   <button class="unlock-lead-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full" data-lead-id="${lead.id}">Unlock</button>
                   <button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full ml-2" data-lead-id="${lead.id}">Reject</button>
                 ` : ''}
-                ${lead.status === 'approved' ? `<button class="view-lead-details text-xs text-blue-600" data-lead-id="${lead.id}">View Contact</button>` : ''}
+                ${isApproved ? `
+                  <button class="view-lead-details text-xs text-blue-600 mr-2" data-lead-id="${lead.id}">View Contact</button>
+                  <button class="remove-lead-btn text-xs text-red-500 font-medium" data-lead-id="${lead.id}"><i class="fas fa-trash"></i></button>
+                ` : ''}
               </div>
             </div>`;
           });
@@ -914,11 +978,10 @@
 
           list.querySelectorAll('.reject-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
             const leadId = btn.dataset.leadId;
-            if (!confirm('Reject this lead? The visitor will be notified.')) return;
+            if (!confirm('Reject this lead? It will disappear from your list.')) return;
             try {
               const { error } = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', leadId);
               if (error) throw error;
-              alert('Lead rejected.');
               loadLeads();
             } catch (err) { alert('Error: ' + err.message); }
           }));
@@ -929,8 +992,21 @@
             if (error) { alert('Error'); return; }
             alert(`Contact Details:\nName: ${lead.visitor_name}\nEmail: ${lead.visitor_email}\nWhatsApp: ${lead.visitor_whatsapp}\nUnlocked: ${new Date(lead.unlocked_at).toLocaleString()}`);
           }));
+
+          list.querySelectorAll('.remove-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
+            const leadId = btn.dataset.leadId;
+            if (!confirm('Remove this unlocked lead from your list?')) return;
+            try {
+              // We do NOT delete the lead permanently, but mark it hidden. If your DB doesn't have is_hidden, we simply delete it.
+              const { error } = await supabase.from('lead_requests').delete().eq('id', leadId);
+              if (error) throw error;
+              loadLeads();
+            } catch (err) { alert('Error: ' + err.message); }
+          }));
         } catch (err) { console.error('Leads load error:', err); }
       }
+
+      $('#refreshLeadsBtn')?.addEventListener('click', loadLeads);
 
       async function loadPropertyVerificationList() {
         if (!state.currentUser) return;
@@ -989,11 +1065,11 @@
             return;
           }
           $('#brokerEmptyState').classList.add('hidden');
-          props.forEach(prop => grid.appendChild(createPropertyCard(prop, broker, false, false)));
-        } catch (err) {
-          console.error('Broker profile error:', err);
-          grid.innerHTML = '<div class="text-center py-12 text-red-500">Error loading profile.</div>';
-        }
+          // Sort by rank
+          const sorted = props.map(p => ({ ...p, rankScore: calculateRankScore(p, broker) }))
+                              .sort((a,b) => b.rankScore - a.rankScore);
+          sorted.forEach(prop => grid.appendChild(createPropertyCard(prop, broker, false, false)));
+        } catch (err) { console.error(err); grid.innerHTML = '<div class="text-center py-12 text-red-500">Error loading profile.</div>'; }
       }
 
       function goToDiscovery() {
@@ -1042,17 +1118,13 @@
         try {
           const { data, error } = await supabase.from('reviews').select('*').eq('broker_id', brokerId).order('created_at', { ascending: false });
           if (error) throw error;
-          if (!data || data.length === 0) {
-            list.innerHTML = '';
-            $('#noReviewsMessage').classList.remove('hidden');
-            return;
-          }
+          if (!data || data.length === 0) { list.innerHTML = ''; $('#noReviewsMessage').classList.remove('hidden'); return; }
           let html = '';
           data.forEach(review => {
             const stars = renderStarsSmall(review.rating);
             const date = new Date(review.created_at).toLocaleDateString('en-UG');
             const reviewer = review.client_name || 'Guest';
-            html += `<div class="review-item"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="font-medium text-slate-700">${reviewer}</span><span class="stars-small">${stars}</span></div><span class="review-meta">${date}</span></div>${review.comment ? `<p class="review-text mt-1">${review.comment}</p>` : ''}</div>`;
+            html += `<div class="review-item"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="font-medium">${reviewer}</span><span>${stars}</span></div><span class="text-xs text-slate-400">${date}</span></div>${review.comment ? `<p class="text-sm mt-1">${review.comment}</p>` : ''}</div>`;
           });
           list.innerHTML = html;
         } catch (err) { list.innerHTML = '<p class="text-red-500 text-sm">Error loading reviews.</p>'; }
@@ -1062,8 +1134,7 @@
         const selector = $('#starSelector');
         if (!selector) return;
         selector.querySelectorAll('.star').forEach(el => {
-          const val = parseInt(el.dataset.value);
-          el.classList.toggle('active', val <= active);
+          el.classList.toggle('active', parseInt(el.dataset.value) <= active);
         });
       }
 
@@ -1077,7 +1148,7 @@
 
       $('#reviewForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!state.currentUser) { alert('Please sign in to leave a review.'); return; }
+        if (!state.currentUser) { alert('Please sign in.'); return; }
         const brokerId = $('#reviewBrokerId').value;
         const rating = parseInt($('#reviewRating').value);
         const comment = $('#reviewComment').value.trim();
@@ -1097,7 +1168,7 @@
       });
 
       $('#toggleWriteReview')?.addEventListener('click', function() {
-        if (!state.currentUser) { alert('Please sign in to write a review.'); navigateToAuth(); return; }
+        if (!state.currentUser) { alert('Sign in to write a review.'); navigateToAuth(); return; }
         const container = $('#reviewFormContainer');
         if (container.classList.contains('hidden')) {
           container.classList.remove('hidden');
@@ -1144,7 +1215,6 @@
       $('#dashboardLeadsBtn')?.addEventListener('click', toggleLeadsPanel);
       $('#cancelProfileEditBtn')?.addEventListener('click', () => $('#profileFormContainer').classList.remove('visible'));
 
-      // Profile settings
       $('#profileSettingsForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!state.currentUser) return;
@@ -1154,17 +1224,12 @@
           const { error } = await supabase.from('profiles').update({ business_name: businessName, phone }).eq('id', state.currentUser.id);
           if (error) throw error;
           $('#profileStatus').textContent = '✅ Profile updated!';
-          $('#profileStatus').className = 'mt-3 text-sm text-emerald-600';
-        } catch (err) {
-          $('#profileStatus').textContent = '❌ Update failed: ' + err.message;
-          $('#profileStatus').className = 'mt-3 text-sm text-red-600';
-        }
+        } catch (err) { $('#profileStatus').textContent = '❌ ' + err.message; }
       });
 
-      // Add property
       $('#addPropertyForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!state.currentUser) { alert('Please sign in first.'); return; }
+        if (!state.currentUser) { alert('Sign in first.'); return; }
         const title = $('#propTitle').value.trim();
         const price = parseFloat($('#propPrice').value);
         const type = $('#propType').value;
@@ -1172,8 +1237,6 @@
         const imageFiles = $('#propImage').files;
         const requestVerification = $('#addRequestVerification').checked;
         if (!title || !price || !address) { alert('Fill all required fields.'); return; }
-        const statusEl = $('#uploadStatus');
-        if (statusEl) { statusEl.textContent = 'Uploading images...'; }
         const imageUrls = [];
         if (imageFiles && imageFiles.length > 0) {
           for (const file of imageFiles) {
@@ -1187,16 +1250,13 @@
           }
         }
         const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
-        const insertData = {
-          title, price_amount: price, property_type: dbType, address,
-          media_urls: imageUrls,
-          is_verified: false,
-          verification_status: requestVerification ? 'pending' : 'unverified',
-          owner_id: state.currentUser.id,
-          is_paused: false
-        };
         try {
-          const { error } = await supabase.from('properties').insert(insertData);
+          const { error } = await supabase.from('properties').insert({
+            title, price_amount: price, property_type: dbType, address,
+            media_urls: imageUrls, is_verified: false,
+            verification_status: requestVerification ? 'pending' : 'unverified',
+            owner_id: state.currentUser.id, is_paused: false
+          });
           if (error) throw error;
           alert('✅ Property added!');
           $('#addPropertyForm').reset();
@@ -1206,7 +1266,6 @@
         } catch (err) { alert('Failed: ' + err.message); }
       });
 
-      // Edit modal
       async function openEditModal(propertyId) {
         const prop = state.myProperties.find(p => p.id === propertyId);
         if (!prop) return;
@@ -1256,10 +1315,8 @@
         if (!title || !price || !address) { alert('Fill all fields.'); return; }
         const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
         const requestVerification = $('#editRequestVerification').checked;
-        let verificationStatus = undefined;
-        if (requestVerification) verificationStatus = 'pending';
         const updateData = { title, price_amount: price, property_type: dbType, address };
-        if (verificationStatus) updateData.verification_status = verificationStatus;
+        if (requestVerification) updateData.verification_status = 'pending';
         try {
           const { error } = await supabase.from('properties').update(updateData).eq('id', id);
           if (error) throw error;
@@ -1272,7 +1329,6 @@
 
       $('#closeEditModal')?.addEventListener('click', () => $('#editModal').classList.add('hidden'));
 
-      // Report
       function openReportModal(brokerId) {
         $('#reportBrokerId').value = brokerId;
         $('#reportReason').value = '';
@@ -1289,9 +1345,7 @@
         const description = $('#reportDescription').value.trim();
         if (!reason || !description) { alert('Fill all fields.'); return; }
         try {
-          const { error } = await supabase.from('reports').insert({
-            reporter_id: state.currentUser.id, broker_id: brokerId, reason, description, status: 'pending'
-          });
+          const { error } = await supabase.from('reports').insert({ reporter_id: state.currentUser.id, broker_id: brokerId, reason, description, status: 'pending' });
           if (error) throw error;
           $('#reportStatus').textContent = '✅ Report submitted!';
           setTimeout(() => $('#reportModal').classList.add('hidden'), 2000);
@@ -1300,7 +1354,6 @@
 
       $('#closeReportModal')?.addEventListener('click', () => $('#reportModal').classList.add('hidden'));
 
-      // Auth
       async function handleAuthSubmit(e) {
         e.preventDefault();
         const email = $('#emailInput').value.trim();
@@ -1311,12 +1364,9 @@
           const phone = $('#phoneInput').value.trim();
           if (!businessName) { alert('Enter Business Name.'); return; }
           try {
-            const { error } = await supabase.auth.signUp({
-              email, password,
-              options: { data: { business_name: businessName, account_type: accountType, phone } }
-            });
+            const { error } = await supabase.auth.signUp({ email, password, options: { data: { business_name: businessName, account_type: accountType, phone } } });
             if (error) throw error;
-            alert('✅ Account created! Check email to verify.');
+            alert('✅ Account created!');
             setAuthMode(false);
             $('#authForm').reset();
           } catch (err) { alert('Registration failed: ' + err.message); }
@@ -1334,7 +1384,6 @@
             await loadWallet();
             await fetchAllData();
             loadLeads();
-            updateReviewButtonVisibility();
           } catch (err) { alert('Sign in failed: ' + err.message); }
         }
       }
@@ -1346,15 +1395,7 @@
           if (error) throw error;
           $('#settingsBusinessName').value = data.business_name || '';
           $('#settingsPhone').value = data.phone || '';
-          state.isAdmin = data.is_admin || false;
         } catch (err) { console.error(err); }
-      }
-
-      function updateReviewButtonVisibility() {
-        const writeBtn = $('#toggleWriteReview');
-        const signInLink = $('#signInToReview');
-        if (writeBtn) writeBtn.style.display = state.currentUser ? 'inline-flex' : 'none';
-        if (signInLink) signInLink.style.display = state.currentUser ? 'none' : 'inline';
       }
 
       async function handleRoute() {
@@ -1385,8 +1426,16 @@
           await supabase.auth.signOut();
           state.currentUser = null;
           $('#portalBtnLabel').textContent = 'Broker Portal';
-          updateReviewButtonVisibility();
           goToDiscovery();
+        });
+
+        $('#quizNextBtn')?.addEventListener('click', () => {
+          const name = $('#quizName').value.trim();
+          const email = $('#quizEmail').value.trim();
+          const whatsapp = $('#quizWhatsapp').value.trim();
+          if (!name || !email || !whatsapp) { alert('Fill all contact fields.'); return; }
+          $('#quizStep1').classList.add('hidden');
+          $('#quizStep2').classList.remove('hidden');
         });
 
         $('#searchInput')?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
