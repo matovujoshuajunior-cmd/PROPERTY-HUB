@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Property Hub Uganda – Find Homes, Rentals &amp; Lodges</title>
-  <meta name="description" content="Discover the best properties, rentals, and lodges across Uganda." />
+  <title>Property Hub Uganda – Find Homes, Rentals &amp; Guesthouses</title>
+  <meta name="description" content="Discover the best properties, rentals, and guesthouses across Uganda." />
   <link rel="canonical" href="https://yourdomain.com/" />
   <meta name="robots" content="index, follow" />
   <meta property="og:title" content="Property Hub Uganda" />
@@ -156,7 +156,7 @@
         <input type="hidden" id="editPropertyId" />
         <div><label>Title *</label><input type="text" id="editTitle" required class="w-full px-4 py-2 rounded-xl border" /></div>
         <div><label>Price (UGX) *</label><input type="number" id="editPrice" required class="w-full px-4 py-2 rounded-xl border" /></div>
-        <div><label>Property Type *</label><select id="editType" class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
+        <div><label>Property Type *</label><select id="editType" class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
         <div><label>Address *</label><input type="text" id="editAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
         <div><label>Images</label><div id="editImagePreviews" class="flex flex-wrap gap-2 mb-2"></div><input type="file" id="editImageInput" accept="image/*" multiple class="w-full text-sm" /></div>
         <div id="editVerificationContainer" class="flex items-center gap-3 mt-2">
@@ -285,7 +285,7 @@
           <div class="relative max-w-7xl mx-auto px-4 py-20">
             <div class="max-w-2xl">
               <h1 class="text-4xl md:text-5xl font-extrabold">Find your <span class="text-indigo-300">perfect</span> space</h1>
-              <p class="mt-3 text-slate-300 text-lg">Explore homes, rentals, and lodges from trusted brokers across Uganda.</p>
+              <p class="mt-3 text-slate-300 text-lg">Explore homes, rentals, and guesthouses from trusted brokers across Uganda.</p>
               <div class="mt-6 flex flex-col sm:flex-row gap-3">
                 <input id="searchInput" type="text" placeholder="Search by address, city, area, or broker name…" class="w-full flex-1 pl-4 pr-4 py-3 rounded-xl text-slate-800" />
                 <button id="clearSearchBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl flex items-center justify-center gap-2 border border-white/10 flex-shrink-0">
@@ -321,7 +321,7 @@
             <button class="filter-pill active px-5 py-2 rounded-full bg-slate-900 text-white text-sm" data-filter="all">All</button>
             <button class="filter-pill px-5 py-2 rounded-full bg-white text-sm" data-filter="rental">Rentals</button>
             <button class="filter-pill px-5 py-2 rounded-full bg-white text-sm" data-filter="property">Properties</button>
-            <button class="filter-pill px-5 py-2 rounded-full bg-white text-sm" data-filter="lodge">Lodges</button>
+            <button class="filter-pill px-5 py-2 rounded-full bg-white text-sm" data-filter="guesthouse">Guesthouses</button>
           </div>
           <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
           <div id="emptyState" class="hidden text-center py-20">No properties found.</div>
@@ -364,7 +364,7 @@
           <form id="authForm" class="space-y-4">
             <div id="signUpFields" class="hidden space-y-4">
               <div><label class="block text-xs font-bold mb-1">Business Name</label><input type="text" id="bizNameInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
-              <div><label class="block text-xs font-bold mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="lodge_owner">Lodge Operator / Manager</option></select></div>
+              <div><label class="block text-xs font-bold mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="guesthouse_owner">Guesthouse Operator / Manager</option></select></div>
               <div><label class="block text-xs font-bold mb-1">WhatsApp Phone</label><input type="text" id="phoneInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
             </div>
             <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="emailInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
@@ -405,7 +405,7 @@
             <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div><label class="block text-xs font-bold mb-1">Title *</label><input type="text" id="propTitle" required class="w-full px-4 py-2 rounded-xl border" /></div>
               <div><label class="block text-xs font-bold mb-1">Price (UGX) *</label><input type="number" id="propPrice" required class="w-full px-4 py-2 rounded-xl border" /></div>
-              <div><label class="block text-xs font-bold mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Lodges">Lodges</option></select></div>
+              <div><label class="block text-xs font-bold mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
               <div><label class="block text-xs font-bold mb-1">Address *</label><input type="text" id="propAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
               <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Images</label><input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm" /></div>
               <div class="md:col-span-2"><input type="checkbox" id="addRequestVerification" /><label for="addRequestVerification" class="ml-2 text-sm">Request Verification</label></div>
@@ -446,22 +446,25 @@
       const SITE_URL = 'https://matovujoshuajunior-cmd.github.io/PROPERTY-HUB/';
 
       // ─── LEAD COST CONFIG ───
-      // Base cost for a "hot" lead on a property priced 0 – 150,000 UGX = 2,000
-      // Multipliers: cold = 0.5, warm = 1.0, hot = 1.5
-      const LEAD_BASE_COST = 2000;
-      const LEAD_MULTIPLIERS = { cold: 0.5, warm: 1.0, hot: 1.5 };
+      // Rates per 150,000 UGX of property value:
+      //   Cold = 700, Warm = 1,300, Hot = 2,000
+      // Example: 300,000 UGX property, hot lead → ceil(300000/150000)=2 × 2000 = 4,000 UGX
+      // Guesthouses → flat 4% of property price (regardless of lead type)
+      const LEAD_RATE_PER_150K = { cold: 700, warm: 1300, hot: 2000 };
+      const GUESTHOUSE_LEAD_PERCENT = 0.04; // 4%
 
-      function calculateLeadCost(propertyPrice, leadType) {
-        // Base cost starts at 2000 for properties priced up to 150,000 UGX.
-        // For higher-priced properties, add 1,000 per additional 1,000,000 UGX
-        // (a placeholder scale — feel free to tune once you define higher tiers).
-        let base = LEAD_BASE_COST;
-        if (propertyPrice > 150000) {
-          const extraTiers = Math.floor((propertyPrice - 150000) / 1000000);
-          base = LEAD_BASE_COST + extraTiers * 1000;
+      function calculateLeadCost(propertyPrice, leadType, propertyType) {
+        const price = Number(propertyPrice) || 0;
+
+        // Guesthouses: 4% flat
+        if (propertyType === 'guesthouse') {
+          return Math.round(price * GUESTHOUSE_LEAD_PERCENT);
         }
-        const multiplier = LEAD_MULTIPLIERS[leadType] || 1.0;
-        return Math.round(base * multiplier);
+
+        // Rentals & Properties: tiered rate per 150,000 UGX
+        const units = Math.max(1, Math.ceil(price / 150000));
+        const rate = LEAD_RATE_PER_150K[leadType] || LEAD_RATE_PER_150K.warm;
+        return units * rate;
       }
 
       let supabase;
@@ -520,8 +523,7 @@
         }
       }
 
-      // ─── SIMPLIFIED BROKER NOTIFICATION ───
-      // No visitor info leaked. Just the lead type, the property, and a link to unlock.
+      // ─── Simplified broker notification: no visitor data, just lead type + property + cost + link ───
       function buildBrokerLeadEmail(propertyTitle, propertyAddress, leadType, cost) {
         return `Hello Broker,
 
@@ -865,14 +867,14 @@ Property Hub Uganda`;
           try {
             const { data: propData, error: propErr } = await supabase
               .from('properties')
-              .select('owner_id, title, address, price_amount')
+              .select('owner_id, title, address, price_amount, property_type')
               .eq('id', propertyId)
               .single();
             if (propErr) throw propErr;
             if (!propData?.owner_id) throw new Error('Property has no owner.');
 
-            // ✅ Compute lead cost
-            const leadCost = calculateLeadCost(propData.price_amount || 0, leadType);
+            // ✅ Compute lead cost based on price, lead type, property type
+            const leadCost = calculateLeadCost(propData.price_amount || 0, leadType, propData.property_type);
 
             const { data: lead, error } = await supabase.from('lead_requests').insert({
               property_id: propertyId,
@@ -944,7 +946,7 @@ Property Hub Uganda`;
         try {
           const { data, error } = await supabase
             .from('lead_requests')
-            .select('*, property:property_id (title, price_amount)')
+            .select('*, property:property_id (title, price_amount, property_type)')
             .eq('broker_id', state.currentUser.id)
             .order('created_at', { ascending: false });
           if (error) throw error;
@@ -969,7 +971,11 @@ Property Hub Uganda`;
             const statusClass = lead.status === 'approved' ? 'approved' : lead.status === 'pending' ? 'pending' : 'expired';
             const statusLabel = isApproved ? '✅ Unlocked' : isPending ? '⏳ Pending' : '⏰ Expired';
             const isHot = lead.lead_type === 'hot';
-            const leadCost = lead.cost || calculateLeadCost(lead.property?.price_amount || 0, lead.lead_type);
+            const leadCost = lead.cost || calculateLeadCost(
+              lead.property?.price_amount || 0,
+              lead.lead_type,
+              lead.property?.property_type
+            );
             const costLabel = leadCost.toLocaleString();
 
             html += `<div class="verification-property-item" data-lead-id="${lead.id}">
@@ -1319,7 +1325,7 @@ Property Hub Uganda`;
             imageUrls.push(urlData.publicUrl);
           }
         }
-        const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
+        const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Guesthouses': 'guesthouse' }[type] || type;
         try {
           const { error } = await supabase.from('properties').insert({
             title, price_amount: price, property_type: dbType, address,
@@ -1345,7 +1351,7 @@ Property Hub Uganda`;
         const dbType = prop.property_type || '';
         let formType = 'Rentals';
         if (dbType === 'property') formType = 'Properties';
-        else if (dbType === 'lodge') formType = 'Lodges';
+        else if (dbType === 'guesthouse') formType = 'Guesthouses';
         $('#editType').value = formType;
         $('#editAddress').value = prop.address || '';
         renderEditImagePreviews(getImageArray(prop));
@@ -1383,7 +1389,7 @@ Property Hub Uganda`;
         const type = $('#editType').value;
         const address = $('#editAddress').value.trim();
         if (!title || !price || !address) { alert('Fill all fields.'); return; }
-        const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Lodges': 'lodge' }[type] || type;
+        const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Guesthouses': 'guesthouse' }[type] || type;
         const requestVerification = $('#editRequestVerification').checked;
         const updateData = { title, price_amount: price, property_type: dbType, address };
         if (requestVerification) updateData.verification_status = 'pending';
