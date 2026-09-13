@@ -99,6 +99,8 @@
     .quiz-question p.q-title { font-weight:600;color:#1e293b;font-size:0.875rem;margin-bottom:0.5rem; }
     .quiz-option { display:inline-flex;align-items:center;gap:0.4rem;font-size:0.8rem;background:#fff;padding:0.3rem 0.75rem;border-radius:9999px;border:1px solid #e2e8f0;margin:0.2rem;cursor:pointer; }
     .quiz-option:hover { border-color:#6366f1; }
+    .unlock-btn { background: #10b981; color: white; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.15s; }
+    .unlock-btn:hover { background: #059669; }
   </style>
 </head>
 <body>
@@ -441,6 +443,26 @@
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const MAX_QUIZ_SCORE = 11;
+      const SITE_URL = 'https://matovujoshuajunior-cmd.github.io/PROPERTY-HUB/';
+
+      // ─── LEAD COST CONFIG ───
+      // Base cost for a "hot" lead on a property priced 0 – 150,000 UGX = 2,000
+      // Multipliers: cold = 0.5, warm = 1.0, hot = 1.5
+      const LEAD_BASE_COST = 2000;
+      const LEAD_MULTIPLIERS = { cold: 0.5, warm: 1.0, hot: 1.5 };
+
+      function calculateLeadCost(propertyPrice, leadType) {
+        // Base cost starts at 2000 for properties priced up to 150,000 UGX.
+        // For higher-priced properties, add 1,000 per additional 1,000,000 UGX
+        // (a placeholder scale — feel free to tune once you define higher tiers).
+        let base = LEAD_BASE_COST;
+        if (propertyPrice > 150000) {
+          const extraTiers = Math.floor((propertyPrice - 150000) / 1000000);
+          base = LEAD_BASE_COST + extraTiers * 1000;
+        }
+        const multiplier = LEAD_MULTIPLIERS[leadType] || 1.0;
+        return Math.round(base * multiplier);
+      }
 
       let supabase;
       const state = {
@@ -484,14 +506,13 @@
         }
       }
 
-      // Email via Supabase Edge Function proxy
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const { data, error } = await supabase.functions.invoke('send-email-web3forms', {
             body: { to_email, to_name, subject, message }
           });
           if (error) throw error;
-          console.log('📧 Email sent to', to_email, '→', data);
+          console.log('📧 Email sent to', to_email);
           return true;
         } catch (err) {
           console.error('❌ Email failed for', to_email, '→', err.message);
@@ -499,33 +520,31 @@
         }
       }
 
-      function buildBrokerLeadEmail(title, address, visitorName, visitorEmail, visitorWhatsapp, leadType, score, answersText) {
+      // ─── SIMPLIFIED BROKER NOTIFICATION ───
+      // No visitor info leaked. Just the lead type, the property, and a link to unlock.
+      function buildBrokerLeadEmail(propertyTitle, propertyAddress, leadType, cost) {
         return `Hello Broker,
 
-🔔 NEW LEAD REQUEST
+🔔 NEW ${leadType.toUpperCase()} LEAD
 ━━━━━━━━━━━━━━━━━━━━━━━
 
-📌 PROPERTY
-${title || 'Untitled'}
-📍 ${address || 'Location not specified'}
+A visitor is interested in your property:
 
-👤 VISITOR DETAILS
-Name: ${visitorName}
-Email: ${visitorEmail}
-WhatsApp: ${visitorWhatsapp}
+🏠 ${propertyTitle || 'Untitled'}
+📍 ${propertyAddress || 'Location not specified'}
 
-🔥 LEAD QUALITY: ${(leadType || 'cold').toUpperCase()}
-Score: ${score}/${MAX_QUIZ_SCORE}
-
-📝 QUIZ ANSWERS
-${answersText}
+🔥 Lead Type: ${leadType.toUpperCase()}
+💰 Cost to unlock: ${cost.toLocaleString()} UGX
 
 ━━━━━━━━━━━━━━━━━━━━━━━
-Log in to your dashboard to unlock this lead.
-Notifications fade after 24 hours, so act fast.
+Log in to your dashboard to unlock this lead and reveal the visitor's contact details.
 
-Property Hub Uganda
-https://yourdomain.com`;
+👉 Open your dashboard: ${SITE_URL}?dashboard=1
+
+⏰ This lead notification fades after 24 hours. Act fast.
+
+— Property Hub Uganda
+${SITE_URL}`;
       }
 
       function buildVisitorApprovedEmail(visitorName, propertyTitle, brokerName, brokerPhone, brokerEmail) {
@@ -552,7 +571,7 @@ Contact details:
 Thank you for using Property Hub Uganda.
 
 Property Hub Uganda
-https://yourdomain.com`;
+${SITE_URL}`;
       }
 
       function buildVisitorRejectedEmail(visitorName, propertyTitle) {
@@ -562,7 +581,7 @@ We're sorry to inform you that the broker was unavailable to respond to your req
 
 Don't worry! You can still try connecting with them again. Simply return to Property Hub Uganda and submit a new request — this signals strong interest and pushes your request to the top of their queue.
 
-🔗 Visit us again: https://yourdomain.com
+🔗 Visit us again: ${SITE_URL}
 
 Thank you for your patience.
 
@@ -846,11 +865,14 @@ Property Hub Uganda`;
           try {
             const { data: propData, error: propErr } = await supabase
               .from('properties')
-              .select('owner_id, title, address')
+              .select('owner_id, title, address, price_amount')
               .eq('id', propertyId)
               .single();
             if (propErr) throw propErr;
             if (!propData?.owner_id) throw new Error('Property has no owner.');
+
+            // ✅ Compute lead cost
+            const leadCost = calculateLeadCost(propData.price_amount || 0, leadType);
 
             const { data: lead, error } = await supabase.from('lead_requests').insert({
               property_id: propertyId,
@@ -862,26 +884,19 @@ Property Hub Uganda`;
               total_score: totalScore,
               lead_type: leadType,
               status: 'pending',
+              cost: leadCost,
               expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
             }).select().single();
             if (error) throw error;
 
+            // ─── Simplified notification to broker ───
             const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
             if (brokerData?.email) {
-              const answerLabels = {
-                q1: ['>6 months', '1-6 months', 'ASAP'],
-                q2: ['Below price', 'Matches price'],
-                q3: ['Not yet', 'Maybe', 'Yes, ready'],
-                q4: ['Browsing', 'Comparing', 'Top choice']
-              };
-              let answersText = '';
-              for (let i = 1; i <= 4; i++) {
-                answersText += `• Q${i}: ${answerLabels[`q${i}`][answers[`q${i}`]-1]}\n`;
-              }
               const text = buildBrokerLeadEmail(
-                propData.title, propData.address,
-                name, email, whatsapp,
-                leadType, totalScore, answersText
+                propData.title,
+                propData.address,
+                leadType,
+                leadCost
               );
               await sendNotificationEmail(
                 brokerData.email,
@@ -929,7 +944,7 @@ Property Hub Uganda`;
         try {
           const { data, error } = await supabase
             .from('lead_requests')
-            .select('*, property:property_id (title)')
+            .select('*, property:property_id (title, price_amount)')
             .eq('broker_id', state.currentUser.id)
             .order('created_at', { ascending: false });
           if (error) throw error;
@@ -954,6 +969,9 @@ Property Hub Uganda`;
             const statusClass = lead.status === 'approved' ? 'approved' : lead.status === 'pending' ? 'pending' : 'expired';
             const statusLabel = isApproved ? '✅ Unlocked' : isPending ? '⏳ Pending' : '⏰ Expired';
             const isHot = lead.lead_type === 'hot';
+            const leadCost = lead.cost || calculateLeadCost(lead.property?.price_amount || 0, lead.lead_type);
+            const costLabel = leadCost.toLocaleString();
+
             html += `<div class="verification-property-item" data-lead-id="${lead.id}">
               <div class="property-title">
                 ${lead.property?.title || 'Unknown'}
@@ -961,13 +979,15 @@ Property Hub Uganda`;
                 <span class="text-xs text-slate-400">(${lead.lead_type})</span>
               </div>
               <div><span class="property-status ${statusClass}">${statusLabel}</span></div>
-              <div>
+              <div class="flex items-center gap-2 flex-wrap">
                 ${isPending ? `
-                  <button class="unlock-lead-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full" data-lead-id="${lead.id}">Unlock</button>
-                  <button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full ml-2" data-lead-id="${lead.id}">Reject</button>
+                  <button class="unlock-lead-btn unlock-btn" data-lead-id="${lead.id}">
+                    <i class="fas fa-unlock"></i> Unlock · ${costLabel} UGX
+                  </button>
+                  <button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full" data-lead-id="${lead.id}">Reject</button>
                 ` : ''}
                 ${isApproved ? `
-                  <button class="view-lead-details text-xs text-blue-600 mr-2" data-lead-id="${lead.id}">View Contact</button>
+                  <button class="view-lead-details text-xs text-blue-600" data-lead-id="${lead.id}">View Contact</button>
                   <button class="remove-lead-btn text-xs text-red-500 font-medium" data-lead-id="${lead.id}"><i class="fas fa-trash"></i></button>
                 ` : ''}
               </div>
@@ -977,7 +997,7 @@ Property Hub Uganda`;
 
           list.querySelectorAll('.unlock-lead-btn').forEach(btn => btn.addEventListener('click', async () => {
             const leadId = btn.dataset.leadId;
-            if (!confirm('Unlock this lead? (Free)')) return;
+            if (!confirm('Unlock this lead? (Free during beta)')) return;
             try {
               const { data: updatedLead, error } = await supabase
                 .from('lead_requests')
@@ -1552,6 +1572,17 @@ Property Hub Uganda`;
 
         await handleRoute();
         await fetchAllData();
+
+        // Check for ?dashboard=1 from email link
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('dashboard') === '1' && state.currentUser) {
+          showView($('#dashboardView'));
+          navigateTo('/dashboard');
+          await loadMyProperties();
+          await loadWallet();
+          loadLeads();
+        }
+
         $('#loadingOverlay').classList.add('hidden');
         console.log('✅ Ready');
       }
