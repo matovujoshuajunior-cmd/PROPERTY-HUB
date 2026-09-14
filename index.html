@@ -145,7 +145,7 @@
     </div>
   </div>
 
-  <!-- Edit Property Modal -->
+  <!-- Edit Property Modal (no verification option here) -->
   <div id="editModal" class="modal-backdrop hidden">
     <div class="modal-content">
       <div class="flex justify-between items-center mb-4">
@@ -159,11 +159,6 @@
         <div><label>Property Type *</label><select id="editType" class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
         <div><label>Address *</label><input type="text" id="editAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
         <div><label>Images</label><div id="editImagePreviews" class="flex flex-wrap gap-2 mb-2"></div><input type="file" id="editImageInput" accept="image/*" multiple class="w-full text-sm" /></div>
-        <div id="editVerificationContainer" class="flex items-center gap-3 mt-2">
-          <input type="checkbox" id="editRequestVerification" />
-          <label for="editRequestVerification" class="text-sm">Request Property Verification</label>
-        </div>
-        <div id="editVerificationInfo" class="verification-info-panel">Verification info...</div>
         <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Update Property</button>
       </form>
     </div>
@@ -172,7 +167,14 @@
   <!-- Property Verification Modal -->
   <div id="propertyVerificationModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-2xl">
-      <div class="flex justify-between items-center mb-4"><h2>📋 Property Verification</h2><button id="closeVerificationModal">&times;</button></div>
+      <div class="flex justify-between items-center mb-4">
+        <h2>📋 Property Verification</h2>
+        <button id="closeVerificationModal">&times;</button>
+      </div>
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm text-amber-800">
+        <i class="fas fa-info-circle mr-1"></i>
+        Verification fee: <strong id="verifFeeDisplay">5,000 UGX</strong> — deducted from your wallet when you submit.
+      </div>
       <form id="propertyVerificationForm" class="space-y-4">
         <input type="hidden" id="verifPropertyId" />
         <input type="hidden" id="verifPropertyType" />
@@ -408,7 +410,10 @@
               <div><label class="block text-xs font-bold mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
               <div><label class="block text-xs font-bold mb-1">Address *</label><input type="text" id="propAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
               <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Images</label><input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm" /></div>
-              <div class="md:col-span-2"><input type="checkbox" id="addRequestVerification" /><label for="addRequestVerification" class="ml-2 text-sm">Request Verification</label></div>
+              <div class="md:col-span-2 flex items-center">
+                <input type="checkbox" id="addRequestVerification" />
+                <label for="addRequestVerification" class="ml-2 text-sm">Request Verification <span class="text-amber-700 font-semibold">(5,000 UGX)</span></label>
+              </div>
               <div class="md:col-span-2"><button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Add</button></div>
             </form>
             <div id="uploadStatus" class="mt-3 text-sm"></div>
@@ -445,23 +450,18 @@
       const MAX_QUIZ_SCORE = 11;
       const SITE_URL = 'https://matovujoshuajunior-cmd.github.io/PROPERTY-HUB/';
 
-      // ─── LEAD COST CONFIG ───
-      // Rates per 150,000 UGX of property value:
-      //   Cold = 700, Warm = 1,300, Hot = 2,000
-      // Example: 300,000 UGX property, hot lead → ceil(300000/150000)=2 × 2000 = 4,000 UGX
-      // Guesthouses → flat 4% of property price (regardless of lead type)
+      // ─── VERIFICATION FEE (fixed 5,000 UGX) ───
+      const VERIFICATION_FEE = 5000;
+
+      // ─── LEAD COST CONFIG (unchanged) ───
       const LEAD_RATE_PER_150K = { cold: 700, warm: 1300, hot: 2000 };
-      const GUESTHOUSE_LEAD_PERCENT = 0.04; // 4%
+      const GUESTHOUSE_LEAD_PERCENT = 0.04;
 
       function calculateLeadCost(propertyPrice, leadType, propertyType) {
         const price = Number(propertyPrice) || 0;
-
-        // Guesthouses: 4% flat
         if (propertyType === 'guesthouse') {
           return Math.round(price * GUESTHOUSE_LEAD_PERCENT);
         }
-
-        // Rentals & Properties: tiered rate per 150,000 UGX
         const units = Math.max(1, Math.ceil(price / 150000));
         const rate = LEAD_RATE_PER_150K[leadType] || LEAD_RATE_PER_150K.warm;
         return units * rate;
@@ -523,7 +523,6 @@
         }
       }
 
-      // ─── Simplified broker notification: no visitor data, just lead type + property + cost + link ───
       function buildBrokerLeadEmail(propertyTitle, propertyAddress, leadType, cost) {
         return `Hello Broker,
 
@@ -873,7 +872,6 @@ Property Hub Uganda`;
             if (propErr) throw propErr;
             if (!propData?.owner_id) throw new Error('Property has no owner.');
 
-            // ✅ Compute lead cost based on price, lead type, property type
             const leadCost = calculateLeadCost(propData.price_amount || 0, leadType, propData.property_type);
 
             const { data: lead, error } = await supabase.from('lead_requests').insert({
@@ -891,15 +889,9 @@ Property Hub Uganda`;
             }).select().single();
             if (error) throw error;
 
-            // ─── Simplified notification to broker ───
             const { data: brokerData } = await supabase.from('profiles').select('email, business_name').eq('id', propData.owner_id).single();
             if (brokerData?.email) {
-              const text = buildBrokerLeadEmail(
-                propData.title,
-                propData.address,
-                leadType,
-                leadCost
-              );
+              const text = buildBrokerLeadEmail(propData.title, propData.address, leadType, leadCost);
               await sendNotificationEmail(
                 brokerData.email,
                 brokerData.business_name || 'Broker',
@@ -1089,22 +1081,180 @@ Property Hub Uganda`;
 
       $('#refreshLeadsBtn')?.addEventListener('click', loadLeads);
 
+      // ══════════════════════════════════════════════════════════════
+      //  PROPERTY VERIFICATION  (5,000 UGX — Verification button only)
+      // ══════════════════════════════════════════════════════════════
+
+      const VERIF_FIELDS = {
+        property: [
+          { id: 'landTitle', label: 'Land Title / Certificate of Occupancy Number', required: true },
+          { id: 'ownerName', label: 'Registered Owner Name', required: true },
+          { id: 'lc1Name', label: 'LC1 Chairperson Name & Contact', required: true },
+          { id: 'surveyNumber', label: 'Survey / Plot Number', required: false },
+          { id: 'titleDocUrl', label: 'Link to Title Document (Google Drive / Dropbox)', required: true },
+          { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
+        ],
+        rental: [
+          { id: 'landlordName', label: 'Landlord / Owner Name', required: true },
+          { id: 'landlordPhone', label: 'Landlord Phone', required: true },
+          { id: 'units', label: 'Number of Units', required: false },
+          { id: 'proofUrl', label: 'Proof of Ownership Link (agreement / title)', required: true },
+          { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
+        ],
+        guesthouse: [
+          { id: 'managerName', label: 'Manager / Operator Name', required: true },
+          { id: 'managerPhone', label: 'Manager Phone', required: true },
+          { id: 'licenseNumber', label: 'Tourism / Trading License Number', required: false },
+          { id: 'rooms', label: 'Number of Rooms', required: false },
+          { id: 'proofUrl', label: 'Proof Link (license / photos)', required: true },
+          { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
+        ]
+      };
+
+      function buildVerifFields(propertyType) {
+        const container = $('#verifDynamicFields');
+        if (!container) return;
+        const fields = VERIF_FIELDS[propertyType] || VERIF_FIELDS.rental;
+        container.innerHTML = fields.map(f => `
+          <div class="mb-3">
+            <label class="block text-xs font-bold mb-1">${f.label}${f.required ? ' *' : ''}</label>
+            ${f.textarea
+              ? `<textarea data-verif-field="${f.id}" rows="3" ${f.required ? 'required' : ''} class="w-full px-4 py-2 border rounded-xl text-sm"></textarea>`
+              : `<input type="text" data-verif-field="${f.id}" ${f.required ? 'required' : ''} class="w-full px-4 py-2 border rounded-xl text-sm" />`}
+          </div>
+        `).join('');
+      }
+
+      function openVerificationModal(propertyId, propertyType) {
+        if (state.walletBalance < VERIFICATION_FEE) {
+          alert(
+            `⚠️ Insufficient wallet balance.\n\n` +
+            `Verification costs ${formatPrice(VERIFICATION_FEE)}.\n` +
+            `Your balance: ${formatPrice(state.walletBalance)}.\n\n` +
+            `Please top up your wallet first.`
+          );
+          return;
+        }
+        // Confirmation alert before opening
+        if (!confirm(
+          `⚠️ Property Verification\n\n` +
+          `Verifying this property costs ${formatPrice(VERIFICATION_FEE)}.\n\n` +
+          `Do you approve this charge to submit the verification request?`
+        )) return;
+
+        $('#verifPropertyId').value = propertyId;
+        $('#verifPropertyType').value = propertyType || 'rental';
+        $('#verifStatus').textContent = '';
+        const feeEl = $('#verifFeeDisplay'); if (feeEl) feeEl.textContent = formatPrice(VERIFICATION_FEE);
+        buildVerifFields(propertyType || 'rental');
+        $('#propertyVerificationModal').classList.remove('hidden');
+      }
+
+      $('#closeVerificationModal')?.addEventListener('click', () => $('#propertyVerificationModal').classList.add('hidden'));
+
+      $('#propertyVerificationForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const propertyId = $('#verifPropertyId').value;
+        if (!propertyId) return;
+
+        if (state.walletBalance < VERIFICATION_FEE) {
+          $('#verifStatus').className = 'mt-3 text-sm text-red-600';
+          $('#verifStatus').textContent = `❌ Insufficient balance. You need ${formatPrice(VERIFICATION_FEE)}.`;
+          return;
+        }
+
+        const submittedData = {};
+        document.querySelectorAll('[data-verif-field]').forEach(el => {
+          submittedData[el.dataset.verifField] = el.value.trim();
+        });
+
+        $('#verifStatus').className = 'mt-3 text-sm text-indigo-600';
+        $('#verifStatus').textContent = 'Processing payment…';
+
+        try {
+          const { error: walletErr } = await supabase.rpc('deduct_wallet', {
+            p_user_id: state.currentUser.id,
+            p_amount: VERIFICATION_FEE,
+            p_type: 'verification_fee',
+            p_reference: propertyId,
+            p_description: 'Property verification fee'
+          });
+          if (walletErr) throw new Error(walletErr.message);
+
+          const { error: reqErr } = await supabase.from('property_verification_requests').insert({
+            property_id: propertyId,
+            broker_id: state.currentUser.id,
+            submitted_data: submittedData,
+            fee_amount: VERIFICATION_FEE,
+            fee_paid: true,
+            status: 'pending'
+          });
+          if (reqErr) throw reqErr;
+
+          await supabase.from('properties').update({ verification_status: 'pending' }).eq('id', propertyId);
+
+          await loadWallet();
+          await loadPropertyVerificationList();
+          await loadMyProperties();
+
+          $('#verifStatus').className = 'mt-3 text-sm text-emerald-600';
+          $('#verifStatus').textContent = `✅ Request submitted! ${formatPrice(VERIFICATION_FEE)} deducted. Our team will review it shortly.`;
+          setTimeout(() => $('#propertyVerificationModal').classList.add('hidden'), 2500);
+        } catch (err) {
+          $('#verifStatus').className = 'mt-3 text-sm text-red-600';
+          $('#verifStatus').textContent = '❌ ' + err.message;
+        }
+      });
+
       async function loadPropertyVerificationList() {
         if (!state.currentUser) return;
         try {
-          const { data: properties, error } = await supabase.from('properties').select('id, title, verification_status').eq('owner_id', state.currentUser.id);
+          const { data: properties, error } = await supabase
+            .from('properties')
+            .select('id, title, property_type, verification_status')
+            .eq('owner_id', state.currentUser.id);
           if (error) throw error;
+
           const list = $('#propertyVerificationList');
           if (!list) return;
           list.innerHTML = '';
+
           if (!properties || properties.length === 0) {
-            list.innerHTML = '<p class="text-slate-500">You have no properties.</p>';
+            list.innerHTML = '<p class="text-slate-500 text-sm">You have no properties.</p>';
             return;
           }
+
           properties.forEach(prop => {
             const status = prop.verification_status || 'unverified';
-            const statusLabel = status === 'approved' ? '✅ Approved' : status === 'pending' ? '⏳ Pending' : status === 'rejected' ? '❌ Rejected' : 'Not requested';
-            list.innerHTML += `<div class="verification-property-item"><span>${prop.title}</span><span>${statusLabel}</span></div>`;
+            const statusLabel =
+              status === 'approved' ? '✅ Approved' :
+              status === 'pending'  ? '⏳ Pending'  :
+              status === 'rejected' ? '❌ Rejected' : '⚪ Not requested';
+            const statusClass =
+              status === 'approved' ? 'approved' :
+              status === 'pending'  ? 'pending'  :
+              status === 'rejected' ? 'rejected' : 'expired';
+
+            const canRequest = status === 'unverified' || status === 'rejected';
+
+            const row = document.createElement('div');
+            row.className = 'verification-property-item';
+            row.innerHTML = `
+              <div class="property-title">${prop.title || 'Untitled'}</div>
+              <div><span class="property-status ${statusClass}">${statusLabel}</span></div>
+              <div class="flex items-center gap-2 flex-wrap">
+                ${canRequest
+                  ? `<button class="request-verif-btn unlock-btn" data-id="${prop.id}" data-type="${prop.property_type || 'rental'}">
+                       <i class="fas fa-shield-alt"></i> Request Verification · ${formatPrice(VERIFICATION_FEE)}
+                     </button>`
+                  : ''}
+              </div>
+            `;
+            list.appendChild(row);
+          });
+
+          list.querySelectorAll('.request-verif-btn').forEach(btn => {
+            btn.addEventListener('click', () => openVerificationModal(btn.dataset.id, btn.dataset.type));
           });
         } catch (err) { console.error(err); }
       }
@@ -1290,6 +1440,7 @@ Property Hub Uganda`;
       $('#dashboardPropertyVerificationBtn')?.addEventListener('click', togglePropertyVerificationForm);
       $('#dashboardLeadsBtn')?.addEventListener('click', toggleLeadsPanel);
       $('#cancelProfileEditBtn')?.addEventListener('click', () => $('#profileFormContainer').classList.remove('visible'));
+      $('#refreshWalletBtn')?.addEventListener('click', loadWallet);
 
       $('#profileSettingsForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1303,6 +1454,7 @@ Property Hub Uganda`;
         } catch (err) { $('#profileStatus').textContent = '❌ ' + err.message; }
       });
 
+      // ─── ADD PROPERTY (with 5,000 UGX confirm alert) ───
       $('#addPropertyForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!state.currentUser) { alert('Sign in first.'); return; }
@@ -1313,6 +1465,17 @@ Property Hub Uganda`;
         const imageFiles = $('#propImage').files;
         const requestVerification = $('#addRequestVerification').checked;
         if (!title || !price || !address) { alert('Fill all required fields.'); return; }
+
+        // ─── 5,000 UGX verification confirmation ───
+        if (requestVerification) {
+          const ok = confirm(
+            `⚠️ Property Verification\n\n` +
+            `Verifying this property costs ${formatPrice(VERIFICATION_FEE)}.\n\n` +
+            `Do you approve this charge to submit the verification request?`
+          );
+          if (!ok) return;
+        }
+
         const imageUrls = [];
         if (imageFiles && imageFiles.length > 0) {
           for (const file of imageFiles) {
@@ -1334,7 +1497,7 @@ Property Hub Uganda`;
             owner_id: state.currentUser.id, is_paused: false
           });
           if (error) throw error;
-          alert('✅ Property added!');
+          alert('✅ Property added!' + (requestVerification ? `\n\nVerification fee of ${formatPrice(VERIFICATION_FEE)} will be processed.` : ''));
           $('#addPropertyForm').reset();
           await loadMyProperties();
           await fetchAllData();
@@ -1355,12 +1518,6 @@ Property Hub Uganda`;
         $('#editType').value = formType;
         $('#editAddress').value = prop.address || '';
         renderEditImagePreviews(getImageArray(prop));
-        const verifContainer = $('#editVerificationContainer');
-        if (prop.verification_status === 'approved' || prop.verification_status === 'pending') {
-          verifContainer.style.display = 'none';
-        } else {
-          verifContainer.style.display = 'flex';
-        }
         $('#editModal').classList.remove('hidden');
       }
 
@@ -1380,6 +1537,7 @@ Property Hub Uganda`;
         });
       }
 
+      // ─── EDIT PROPERTY (no verification option) ───
       $('#editPropertyForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = $('#editPropertyId').value;
@@ -1390,9 +1548,7 @@ Property Hub Uganda`;
         const address = $('#editAddress').value.trim();
         if (!title || !price || !address) { alert('Fill all fields.'); return; }
         const dbType = { 'Rentals': 'rental', 'Properties': 'property', 'Guesthouses': 'guesthouse' }[type] || type;
-        const requestVerification = $('#editRequestVerification').checked;
         const updateData = { title, price_amount: price, property_type: dbType, address };
-        if (requestVerification) updateData.verification_status = 'pending';
         try {
           const { error } = await supabase.from('properties').update(updateData).eq('id', id);
           if (error) throw error;
@@ -1449,6 +1605,40 @@ Property Hub Uganda`;
       });
 
       $('#closeReportModal')?.addEventListener('click', () => $('#reportModal').classList.add('hidden'));
+
+      // ─── TOP-UP (unchanged) ───
+      $('#topupBtn')?.addEventListener('click', () => {
+        $('#topupStatus').textContent = '';
+        $('#topupModal').classList.remove('hidden');
+      });
+      $('#closeTopupModal')?.addEventListener('click', () => $('#topupModal').classList.add('hidden'));
+      $('#topupForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!state.currentUser) return;
+        const amount = parseFloat($('#topupAmount').value);
+        if (!amount || amount < 1000) {
+          $('#topupStatus').className = 'mt-3 text-sm text-red-600';
+          $('#topupStatus').textContent = 'Minimum top-up is 1,000 UGX.';
+          return;
+        }
+        try {
+          const { error } = await supabase.from('wallet_transactions').insert({
+            profile_id: state.currentUser.id,
+            amount: amount,
+            type: 'topup',
+            status: 'pending',
+            description: 'Top-up request awaiting admin approval'
+          });
+          if (error) throw error;
+          $('#topupStatus').className = 'mt-3 text-sm text-emerald-600';
+          $('#topupStatus').textContent = '✅ Request sent! An admin will confirm and credit your wallet shortly.';
+          $('#topupForm').reset();
+          setTimeout(() => $('#topupModal').classList.add('hidden'), 2500);
+        } catch (err) {
+          $('#topupStatus').className = 'mt-3 text-sm text-red-600';
+          $('#topupStatus').textContent = '❌ ' + err.message;
+        }
+      });
 
       async function handleAuthSubmit(e) {
         e.preventDefault();
@@ -1514,6 +1704,13 @@ Property Hub Uganda`;
         if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         else return;
 
+        // 🧹 30-day cleanup for approved/rejected leads
+        try {
+          const { data: purged, error: purgeErr } = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
+          if (purgeErr) console.warn('Lead cleanup skipped:', purgeErr.message);
+          else console.log(`🧹 Lead cleanup: ${purged ?? 0} old lead(s) removed.`);
+        } catch (e) { console.warn('Lead cleanup unavailable:', e.message); }
+
         $('#authForm')?.addEventListener('submit', handleAuthSubmit);
         $('#toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
         $('#toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
@@ -1533,6 +1730,8 @@ Property Hub Uganda`;
           $('#quizStep1').classList.add('hidden');
           $('#quizStep2').classList.remove('hidden');
         });
+
+        $('#closeQuizModal')?.addEventListener('click', () => $('#quizModal').classList.add('hidden'));
 
         const trustBanner = $('#trustBanner');
         const trustMini = $('#trustBannerMini');
@@ -1579,7 +1778,6 @@ Property Hub Uganda`;
         await handleRoute();
         await fetchAllData();
 
-        // Check for ?dashboard=1 from email link
         const params = new URLSearchParams(window.location.search);
         if (params.get('dashboard') === '1' && state.currentUser) {
           showView($('#dashboardView'));
