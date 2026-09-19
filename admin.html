@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Property Hub – Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    body { background: #f1f5f9; font-family: 'Inter', system-ui, sans-serif; }
+    .stat-card { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+    .stat-card .icon { font-size: 2rem; color: #4f46e5; opacity: 0.3; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    .stat-card .label { font-size: 0.875rem; color: #64748b; }
+    .admin-tab { cursor: pointer; padding: 0.5rem 1.25rem; border-radius: 9999px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+    .admin-tab.active { background: #4f46e5; color: white; }
+    .admin-tab:not(.active):hover { background: #e2e8f0; }
+    .b-pending { background:#f59e0b;color:#fff; } .b-approved { background:#10b981;color:#fff; }
+    .b-rejected { background:#ef4444;color:#fff; } .b-unverified { background:#94a3b8;color:#fff; }
+    .b-verified { background:#10b981;color:#fff; } .b-blocked { background:#ef4444;color:#fff; }
+    .b-active { background:#10b981;color:#fff; } .b-hot { background:#ef4444;color:#fff; }
+    .b-warm { background:#f59e0b;color:#fff; } .b-cold { background:#3b82f6;color:#fff; }
+    .section-card { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
+    .section-card h3 { font-weight: 600; font-size: 1.125rem; margin-bottom: 1rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; font-size: 0.875rem; }
+    table th { text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; }
+    table td { padding: 0.75rem 0.5rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .btn-sm { padding: 0.2rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; border: none; cursor: pointer; margin: 0.1rem; }
+    .btn-sm.green { background:#10b981;color:#fff; } .btn-sm.red { background:#ef4444;color:#fff; }
+    .btn-sm.blue { background:#3b82f6;color:#fff; } .btn-sm.amber { background:#f59e0b;color:#fff; }
+    .auth-card { max-width: 400px; margin: 4rem auto; background: white; border-radius: 2rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    .auth-card h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .auth-card input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 1rem; margin-bottom: 1rem; outline: none; font-size: 0.875rem; }
+    .auth-card button { width: 100%; padding: 0.75rem; border-radius: 1rem; background: #4f46e5; color: white; font-weight: 600; border: none; cursor: pointer; }
+    .auth-card .error { color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem; }
+    .hidden { display: none !important; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+    .max-w-7xl { max-width: 80rem; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+    .profile-header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+    .profile-avatar { width: 60px; height: 60px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #475569; }
+    .back-btn { cursor: pointer; color: #4f46e5; font-weight: 500; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 0.5rem; background: none; border: none; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .detail-card { background: #f8fafc; border-radius: 1rem; padding: 1rem; }
+    .detail-card .label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+    .detail-card .value { font-size: 1.25rem; font-weight: 600; color: #0f172a; }
+    @media (max-width: 768px) { .grid-4 { grid-template-columns: repeat(2,1fr); } .grid-3 { grid-template-columns: 1fr; } .detail-grid { grid-template-columns: 1fr; } }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+    .modal-backdrop.hidden { display: none; }
+    .modal-content { background: white; border-radius: 2rem; max-width: 720px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; }
+    .detail-field { margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 1px solid #f1f5f9; }
+    .detail-field:last-child { border-bottom: none; }
+    .detail-field .label { font-weight: 600; color: #1e293b; font-size: 0.8rem; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
+    .detail-field .value { color: #475569; word-break: break-word; font-size: 0.9rem; }
+    .settings-input { width: 100%; padding: 0.6rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; font-size: 0.875rem; }
+    #detailContent img { transition: transform 0.2s; }
+    #detailContent img:hover { transform: scale(1.02); }
+    .spinner { border: 3px solid #e2e8f0; border-top: 3px solid #4f46e5; border-radius: 50%; width: 32px; height: 32px; animation: spin 0.8s linear infinite; margin: 2rem auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center flex-col gap-4">
+    <div class="spinner" style="width:48px;height:48px;border-width:4px;"></div>
+    <p class="text-slate-600 text-sm">Loading Admin Dashboard…</p>
+  </div>
+
+  <div id="authView" class="min-h-screen flex items-center justify-center p-4">
+    <div class="auth-card">
+      <h1>🔐 Admin Login</h1>
+      <p class="text-slate-500 text-sm mb-4">Sign in with your admin account.</p>
+      <form id="loginForm">
+        <input type="email" id="adminEmail" placeholder="Email address" required />
+        <input type="password" id="adminPassword" placeholder="Password" required />
+        <button type="submit">Sign In</button>
+        <div id="loginError" class="error hidden"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboardView" class="hidden">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-bold text-slate-800">🏠 Property<span class="text-indigo-600">Hub</span></span>
+          <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Admin</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-slate-600" id="adminUserDisplay">Admin</span>
+          <button id="logoutBtn" class="text-sm text-red-500 font-medium">Sign Out</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="grid-4 mb-6">
+        <div class="stat-card"><div class="icon"><i class="fas fa-users"></i></div><div class="value" id="statBrokers">0</div><div class="label">Total Brokers</div></div>
+        <div class="stat-card"><div class="icon"><i class="fas fa-home text-indigo-500"></i></div><div class="value" id="statProperties">0</div><div class="label">Total Properties</div></div>
+        <div class="stat-card"><div class="icon"><i class="fas fa-clock text-amber-500"></i></div><div class="value" id="statPendingVerifications">0</div><div class="label">Pending Verifications</div></div>
+        <div class="stat-card"><div class="icon"><i class="fas fa-handshake text-emerald-500"></i></div><div class="value" id="statLeads">0</div><div class="label">Active Leads</div></div>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button class="admin-tab active" data-tab="brokers">Brokers</button>
+        <button class="admin-tab" data-tab="verifications">Verifications</button>
+        <button class="admin-tab" data-tab="leads">Leads</button>
+        <button class="admin-tab" data-tab="reports">Reports</button>
+        <button class="admin-tab" data-tab="transactions">Transactions</button>
+        <button class="admin-tab" data-tab="settings">⚙️ Settings</button>
+      </div>
+
+      <div id="tab-brokers" class="tab-content">
+        <div class="section-card">
+          <h3>👥 All Brokers</h3>
+          <div id="brokerList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+          <div id="noBrokers" class="hidden text-slate-500 text-sm py-4">No brokers found.</div>
+        </div>
+      </div>
+
+      <div id="brokerDetailView" class="hidden">
+        <div class="section-card">
+          <button class="back-btn" id="backToBrokerList"><i class="fas fa-arrow-left"></i> Back to Brokers</button>
+          <div class="profile-header">
+            <div class="profile-avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <h2 id="detailBusinessName" class="text-xl font-bold">Loading...</h2>
+              <div class="text-sm text-slate-500" id="detailEmail">Email: —</div>
+              <div class="text-sm text-slate-500" id="detailPhone">Phone: —</div>
+            </div>
+            <div class="ml-auto flex gap-2 flex-wrap" id="detailActions"></div>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-card"><div class="label">Status</div><div class="value" id="detailStatus">—</div></div>
+            <div class="detail-card"><div class="label">Verification</div><div class="value" id="detailVerification">—</div></div>
+            <div class="detail-card"><div class="label">Properties</div><div class="value" id="detailPropertyCount">0</div></div>
+            <div class="detail-card"><div class="label">Wallet</div><div class="value" id="detailWalletBalance">0 UGX</div></div>
+            <div class="detail-card"><div class="label">Lead Score</div><div class="value" id="detailLeadScore">0</div></div>
+            <div class="detail-card"><div class="label">Avg Rating</div><div class="value" id="detailAvgRating">0.0 ⭐</div></div>
+          </div>
+          <div class="mt-6"><h4 class="font-semibold mb-2">📋 Properties</h4><div id="detailProperties" class="table-wrap"></div></div>
+          <div class="mt-6"><h4 class="font-semibold mb-2">📨 Lead Requests</h4><div id="detailLeads" class="table-wrap"></div></div>
+          <div class="mt-6"><h4 class="font-semibold mb-2">⭐ Reviews</h4><div id="detailReviews" class="table-wrap"></div></div>
+          <div class="mt-6"><h4 class="font-semibold mb-2">🚨 Reports Against</h4><div id="detailReports" class="table-wrap"></div></div>
+          <div class="mt-6"><h4 class="font-semibold mb-2">💰 Transactions</h4><div id="detailTransactions" class="table-wrap"></div></div>
+        </div>
+      </div>
+
+      <div id="tab-verifications" class="tab-content hidden">
+        <div class="section-card">
+          <h3>🏠 Pending Property Verifications</h3>
+          <div id="verificationList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+          <div id="noVerifications" class="hidden text-slate-500 text-sm py-4">No pending property verifications.</div>
+        </div>
+      </div>
+
+      <div id="tab-leads" class="tab-content hidden">
+        <div class="section-card">
+          <div class="flex-between mb-4">
+            <h3>📨 All Lead Requests</h3>
+            <div class="flex gap-2 items-center flex-wrap">
+              <select id="leadStatusFilter" class="settings-input" style="width:auto;">
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <button id="runCleanupBtn" class="btn-sm red"><i class="fas fa-broom"></i> Run cleanup (30d)</button>
+            </div>
+          </div>
+          <div id="cleanupBanner" class="hidden mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800"></div>
+          <div id="leadsList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+          <div id="noLeads" class="hidden text-slate-500 text-sm py-4">No leads found.</div>
+        </div>
+      </div>
+
+      <div id="tab-reports" class="tab-content hidden">
+        <div class="section-card">
+          <h3>🚨 All Reports</h3>
+          <div id="reportList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+          <div id="noReports" class="hidden text-slate-500 text-sm py-4">No reports found.</div>
+        </div>
+      </div>
+
+      <div id="tab-transactions" class="tab-content hidden">
+        <div class="section-card">
+          <h3>💰 All Wallet Transactions</h3>
+          <div id="transactionList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+          <div id="noTransactions" class="hidden text-slate-500 text-sm py-4">No transactions found.</div>
+        </div>
+      </div>
+
+      <div id="tab-settings" class="tab-content hidden">
+        <div class="section-card">
+          <h3>⚙️ Platform Settings</h3>
+          <p class="text-sm text-slate-500 mb-4">These values control pricing and site behaviour across Property Hub.</p>
+          <div class="grid-3">
+            <div><label class="text-xs font-bold uppercase text-slate-500">Verification fee (UGX)</label><input type="number" id="setVerifFee" class="settings-input" min="0" /></div>
+            <div><label class="text-xs font-bold uppercase text-slate-500">Lead cleanup (days)</label><input type="number" id="setCleanupDays" class="settings-input" min="1" /></div>
+          </div>
+          <div class="mt-4 flex gap-2 flex-wrap">
+            <button id="saveSettingsBtn" class="btn-sm green"><i class="fas fa-save"></i> Save settings</button>
+            <button id="refreshStatsBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh stats</button>
+          </div>
+          <div id="settingsStatus" class="mt-3 text-sm"></div>
+        </div>
+        <div class="section-card">
+          <h3>🧹 Lead Cleanup</h3>
+          <p class="text-sm text-slate-500 mb-3">Approved and rejected leads are automatically removed 30 days after creation. The Supabase pg_cron job runs daily at 03:00. You can also trigger it manually.</p>
+          <button id="runCleanupBtn2" class="btn-sm red"><i class="fas fa-trash"></i> Purge old leads now</button>
+          <div id="cleanupStatus" class="mt-3 text-sm"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="verificationDetailModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-slate-800">📄 Verification Details</h2>
+        <button id="closeDetailModal" class="text-slate-400 text-2xl">&times;</button>
+      </div>
+      <div id="detailContent"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    var SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+
+    var supabase = null;
+    var currentUser = null;
+    var leadFilter = '';
+
+    // ─── DOM refs ───
+    var authView, dashboardView, loadingOverlay;
+
+    // ─── Helpers ───
+    function $(id) { return document.getElementById(id); }
+    function hideLoading() { if (loadingOverlay) loadingOverlay.classList.add('hidden'); }
+    function showError(msg) { var el = $('loginError'); if (el) { el.textContent = msg; el.classList.remove('hidden'); } }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function formatDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-UG', { day:'numeric', month:'short', year:'numeric' }); }
+    function formatDateTime(d) { if (!d) return '—'; return new Date(d).toLocaleString('en-UG', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+    function formatCurrency(a) { return Number(a || 0).toLocaleString('en-UG') + ' UGX'; }
+    function badge(status) {
+      var map = { pending:'b-pending', approved:'b-approved', rejected:'b-rejected', verified:'b-verified', unverified:'b-unverified', blocked:'b-blocked', active:'b-active', hot:'b-hot', warm:'b-warm', cold:'b-cold' };
+      return map[status] || 'b-unverified';
+    }
+    function isImageUrl(v) {
+      return typeof v === 'string' && (/res\.cloudinary\.com/.test(v) || /\.(jpg|jpeg|png|webp|gif|bmp|svg)(\?.*)?$/i.test(v));
+    }
+    function isUrl(v) { return typeof v === 'string' && /^https?:\/\//.test(v); }
+
+    function waitForSupabase() {
+      return new Promise(function(resolve) {
+        if (window.supabase) return resolve();
+        var n = 0;
+        var iv = setInterval(function() {
+          n++;
+          if (window.supabase || n > 30) { clearInterval(iv); resolve(); }
+        }, 100);
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  AUTH
+    // ══════════════════════════════════════════════════════════════════
+    async function checkAdmin() {
+      try {
+        var r = await supabase.auth.getUser();
+        var user = r.data && r.data.user;
+        if (!user) throw new Error('Not logged in');
+        var pr = await supabase.from('profiles').select('is_admin, business_name').eq('id', user.id).single();
+        if (pr.error || !pr.data || !pr.data.is_admin) throw new Error('Not admin');
+        currentUser = user;
+        $('adminUserDisplay').textContent = pr.data.business_name || user.email;
+        return true;
+      } catch (e) { return false; }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      $('loginError').classList.add('hidden');
+      var email = $('adminEmail').value.trim();
+      var password = $('adminPassword').value;
+      try {
+        var r = await supabase.auth.signInWithPassword({ email: email, password: password });
+        if (r.error) throw r.error;
+        if (!(await checkAdmin())) { await supabase.auth.signOut(); showError('You do not have admin privileges.'); return; }
+        showDashboard();
+      } catch (err) { showError(err.message); }
+    }
+
+    async function handleLogout() {
+      await supabase.auth.signOut();
+      currentUser = null;
+      showAuth();
+    }
+
+    function showAuth() {
+      authView.classList.remove('hidden');
+      dashboardView.classList.add('hidden');
+      $('loginForm').reset();
+    }
+
+    function showDashboard() {
+      authView.classList.add('hidden');
+      dashboardView.classList.remove('hidden');
+      loadStats();
+      loadBrokers();
+      loadVerifications();
+      loadReports();
+      loadTransactions();
+      loadLeads();
+      loadSettings();
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  TABS
+    // ══════════════════════════════════════════════════════════════════
+    function setupTabs() {
+      var tabs = document.querySelectorAll('.admin-tab');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t){ t.classList.remove('active'); });
+          tab.classList.add('active');
+          document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.add('hidden'); });
+          var target = $('tab-' + tab.dataset.tab);
+          if (target) target.classList.remove('hidden');
+          var t = tab.dataset.tab;
+          if (t === 'brokers') loadBrokers();
+          else if (t === 'verifications') loadVerifications();
+          else if (t === 'leads') loadLeads();
+          else if (t === 'reports') loadReports();
+          else if (t === 'transactions') loadTransactions();
+          else if (t === 'settings') loadSettings();
+        });
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  STATS
+    // ══════════════════════════════════════════════════════════════════
+    async function loadStats() {
+      try {
+        var res = await Promise.all([
+          supabase.from('profiles').select('id', { count:'exact', head:true }),
+          supabase.from('properties').select('id', { count:'exact', head:true }),
+          supabase.from('property_verification_requests').select('id', { count:'exact', head:true }).eq('status','pending'),
+          supabase.from('lead_requests').select('id', { count:'exact', head:true }).in('status', ['pending','approved'])
+        ]);
+        $('statBrokers').textContent = res[0].count || 0;
+        $('statProperties').textContent = res[1].count || 0;
+        $('statPendingVerifications').textContent = res[2].count || 0;
+        $('statLeads').textContent = res[3].count || 0;
+      } catch (e) { console.error(e); }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  BROKERS
+    // ══════════════════════════════════════════════════════════════════
+    async function loadBrokers() {
+      var box = $('brokerList'), no = $('noBrokers');
+      try {
+        var r = await supabase.from('profiles').select('*').order('created_at', { ascending:false });
+        if (r.error) throw r.error;
+        var data = r.data || [];
+        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+        no.classList.add('hidden');
+        var html = '<table><thead><tr><th>Business</th><th>Email</th><th>Phone</th><th>Verified</th><th>Blocked</th><th>Actions</th></tr></thead><tbody>';
+        data.forEach(function(b) {
+          html += '<tr>' +
+            '<td class="font-medium">' + esc(b.business_name || 'Unnamed') + '</td>' +
+            '<td>' + esc(b.email || '—') + '</td>' +
+            '<td>' + esc(b.phone || '—') + '</td>' +
+            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span></td>' +
+            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span></td>' +
+            '<td>' +
+              '<button class="btn-sm blue view-broker" data-id="' + b.id + '">View</button>' +
+              (b.is_verified ? '<button class="btn-sm amber unverify-broker" data-id="' + b.id + '">Unverify</button>' : '<button class="btn-sm green verify-broker" data-id="' + b.id + '">Verify</button>') +
+              (b.is_blocked ? '<button class="btn-sm green unblock-broker" data-id="' + b.id + '">Unblock</button>' : '<button class="btn-sm red block-broker" data-id="' + b.id + '">Block</button>') +
+            '</td></tr>';
+        });
+        html += '</tbody></table>';
+        box.innerHTML = html;
+        box.querySelectorAll('.view-broker').forEach(function(x){ x.onclick = function(){ showBrokerDetail(x.dataset.id); }; });
+        box.querySelectorAll('.verify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'verify'); }; });
+        box.querySelectorAll('.unverify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unverify'); }; });
+        box.querySelectorAll('.block-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'block'); }; });
+        box.querySelectorAll('.unblock-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unblock'); }; });
+      } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading brokers.</p>'; }
+    }
+
+    async function handleBrokerAction(id, action) {
+      if (!confirm('Are you sure you want to ' + action + ' this broker?')) return;
+      try {
+        var u = {};
+        if (action === 'verify') u.is_verified = true;
+        else if (action === 'unverify') u.is_verified = false;
+        else if (action === 'block') u.is_blocked = true;
+        else if (action === 'unblock') u.is_blocked = false;
+        var r = await supabase.from('profiles').update(u).eq('id', id);
+        if (r.error) throw r.error;
+        alert('✅ Broker ' + action + 'd.');
+        loadBrokers(); loadStats();
+      } catch (e) { alert('Error: ' + e.message); }
+    }
+
+    async function showBrokerDetail(id) {
+      $('tab-brokers').classList.add('hidden');
+      $('brokerDetailView').classList.remove('hidden');
+      try {
+        var rb = await supabase.from('profiles').select('*').eq('id', id).single();
+        if (rb.error) throw rb.error;
+        var b = rb.data;
+
+        $('detailBusinessName').textContent = b.business_name || 'Unnamed';
+        $('detailEmail').textContent = 'Email: ' + (b.email || '—');
+        $('detailPhone').textContent = 'Phone: ' + (b.phone || '—');
+        $('detailStatus').innerHTML = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span>';
+        $('detailVerification').innerHTML = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span>';
+        $('detailWalletBalance').textContent = formatCurrency(b.wallet_balance || 0);
+        $('detailLeadScore').textContent = b.lead_score || 0;
+        $('detailAvgRating').textContent = ((b.average_rating||0).toFixed(1)) + ' ⭐';
+
+        $('detailActions').innerHTML =
+          (b.is_verified ? '<button class="btn-sm amber" id="dv-unverify">Unverify</button>' : '<button class="btn-sm green" id="dv-verify">Verify</button>') +
+          (b.is_blocked ? '<button class="btn-sm green" id="dv-unblock">Unblock</button>' : '<button class="btn-sm red" id="dv-block">Block</button>');
+
+        var dv = $('dv-verify'); if (dv) dv.onclick = function(){ handleBrokerAction(b.id,'verify').then(function(){ showBrokerDetail(b.id); }); };
+        var duv = $('dv-unverify'); if (duv) duv.onclick = function(){ handleBrokerAction(b.id,'unverify').then(function(){ showBrokerDetail(b.id); }); };
+        var db = $('dv-block'); if (db) db.onclick = function(){ handleBrokerAction(b.id,'block').then(function(){ showBrokerDetail(b.id); }); };
+        var dub = $('dv-unblock'); if (dub) dub.onclick = function(){ handleBrokerAction(b.id,'unblock').then(function(){ showBrokerDetail(b.id); }); };
+
+        var rp = await supabase.from('properties').select('*').eq('owner_id', b.id);
+        var props = rp.data || [];
+        $('detailPropertyCount').textContent = props.length;
+        $('detailProperties').innerHTML = !props.length ? '<p class="text-slate-500 text-sm">No properties.</p>' :
+          '<table><thead><tr><th>Title</th><th>Price</th><th>Type</th><th>Verified</th></tr></thead><tbody>' +
+          props.map(function(p){
+            return '<tr><td>' + esc(p.title||'—') + '</td><td>' + formatCurrency(p.price_amount) + '</td><td>' + esc(p.property_type||'—') + '</td><td>' + (p.is_verified?'✅':'❌') + '</td></tr>';
+          }).join('') + '</tbody></table>';
+
+        var rl = await supabase.from('lead_requests').select('*').eq('broker_id', b.id).order('created_at', { ascending:false }).limit(20);
+        var leads = rl.data || [];
+        $('detailLeads').innerHTML = !leads.length ? '<p class="text-slate-500 text-sm">No leads.</p>' :
+          '<table><thead><tr><th>Visitor</th><th>Type</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+          leads.map(function(l){
+            return '<tr><td>' + esc(l.visitor_name||'—') + '</td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.lead_type) + '">' + esc(l.lead_type||'—') + '</span></td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.status) + '">' + esc(l.status) + '</span></td><td>' + formatDate(l.created_at) + '</td></tr>';
+          }).join('') + '</tbody></table>';
+
+        var rr = await supabase.from('reviews').select('*').eq('broker_id', b.id).order('created_at', { ascending:false });
+        var revs = rr.data || [];
+        $('detailReviews').innerHTML = !revs.length ? '<p class="text-slate-500 text-sm">No reviews.</p>' :
+          '<table><thead><tr><th>Rating</th><th>Comment</th><th>Date</th></tr></thead><tbody>' +
+          revs.map(function(x){
+            return '<tr><td>' + x.rating + '⭐</td><td>' + esc(x.comment||'—') + '</td><td>' + formatDate(x.created_at) + '</td></tr>';
+          }).join('') + '</tbody></table>';
+
+        var rrep = await supabase.from('reports').select('*').eq('broker_id', b.id);
+        var reps = rrep.data || [];
+        $('detailReports').innerHTML = !reps.length ? '<p class="text-slate-500 text-sm">No reports.</p>' :
+          '<table><thead><tr><th>Reason</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+          reps.map(function(x){
+            return '<tr><td>' + esc(x.reason) + '</td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status) + '">' + esc(x.status) + '</span></td><td>' + formatDate(x.created_at) + '</td></tr>';
+          }).join('') + '</tbody></table>';
+
+        var rt = await supabase.from('wallet_transactions').select('*').eq('profile_id', b.id).order('created_at', { ascending:false }).limit(20);
+        var txs = rt.data || [];
+        $('detailTransactions').innerHTML = !txs.length ? '<p class="text-slate-500 text-sm">No transactions.</p>' :
+          '<table><thead><tr><th>Amount</th><th>Type</th><th>Date</th></tr></thead><tbody>' +
+          txs.map(function(t){
+            var color = t.amount < 0 ? 'text-red-500' : 'text-emerald-600';
+            return '<tr><td class="' + color + ' font-medium">' + (t.amount < 0 ? '' : '+') + Number(t.amount).toLocaleString() + ' UGX</td><td>' + esc((t.type||'').toUpperCase()) + '</td><td>' + formatDate(t.created_at) + '</td></tr>';
+          }).join('') + '</tbody></table>';
+      } catch (e) { console.error(e); }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  VERIFICATIONS
+    // ══════════════════════════════════════════════════════════════════
+    async function loadVerifications() {
+      var box = $('verificationList'), no = $('noVerifications');
+      try {
+        var r = await supabase.from('property_verification_requests').select('*').eq('status','pending').order('created_at', { ascending:false });
+        if (r.error) throw r.error;
+        var reqs = r.data || [];
+        if (!reqs.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+        no.classList.add('hidden');
+
+        var propIds = [], brokerIds = [];
+        reqs.forEach(function(x){
+          if (x.property_id && propIds.indexOf(x.property_id) === -1) propIds.push(x.property_id);
+          if (x.broker_id && brokerIds.indexOf(x.broker_id) === -1) brokerIds.push(x.broker_id);
+        });
+
+        var propMap = {}, brokerMap = {};
+        if (propIds.length) {
+          var rp = await supabase.from('properties').select('id, title, address, property_type').in('id', propIds);
+          (rp.data || []).forEach(function(p){ propMap[p.id] = p; });
+        }
+        if (brokerIds.length) {
+          var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
+          (rb.data || []).forEach(function(b){ brokerMap[b.id] = b; });
+        }
+
+        var html = '<table><thead><tr><th>Property</th><th>Broker</th><th>Type</th><th>Fee</th><th>Actions</th></tr></thead><tbody>';
+        reqs.forEach(function(x){
+          var prop = propMap[x.property_id] || {};
+          var broker = brokerMap[x.broker_id] || {};
+          html += '<tr>' +
+            '<td><div class="font-medium">' + esc(prop.title || 'Unknown') + '</div><div class="text-xs text-slate-500">' + esc(prop.address || '') + '</div></td>' +
+            '<td>' + esc(broker.business_name || 'Unknown') + '</td>' +
+            '<td>' + esc(prop.property_type || '—') + '</td>' +
+            '<td>' + (x.fee_paid ? '✅ ' + formatCurrency(x.fee_amount) : '❌') + '</td>' +
+            '<td>' +
+              '<button class="btn-sm blue view-details" data-id="' + x.id + '">View</button>' +
+              '<button class="btn-sm green approve-prop" data-id="' + x.id + '" data-prop="' + x.property_id + '">Approve</button>' +
+              '<button class="btn-sm red reject-prop" data-id="' + x.id + '" data-prop="' + x.property_id + '">Reject</button>' +
+            '</td></tr>';
+        });
+        html += '</tbody></table>';
+        box.innerHTML = html;
+        box.querySelectorAll('.view-details').forEach(function(el){ el.onclick = function(){ openVerificationDetail(el.dataset.id); }; });
+        box.querySelectorAll('.approve-prop').forEach(function(el){ el.onclick = function(){ handleVerification(el.dataset.id, el.dataset.prop, 'approved'); }; });
+        box.querySelectorAll('.reject-prop').forEach(function(el){ el.onclick = function(){ handleVerification(el.dataset.id, el.dataset.prop, 'rejected'); }; });
+      } catch (e) {
+        console.error(e);
+        box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+      }
+    }
+
+    async function openVerificationDetail(reqId) {
+      var modal = $('verificationDetailModal');
+      var content = $('detailContent');
+      content.innerHTML = '<div class="spinner"></div>';
+      modal.classList.remove('hidden');
+      try {
+        var rr = await supabase.from('property_verification_requests').select('*').eq('id', reqId).single();
+        if (rr.error) { content.innerHTML = '<p class="text-red-500 text-sm">Could not load: ' + esc(rr.error.message) + '</p>'; return; }
+        var req = rr.data;
+
+        var property = null;
+        if (req.property_id) {
+          var rp = await supabase.from('properties').select('title, address, property_type, media_urls').eq('id', req.property_id).maybeSingle();
+          property = rp.data;
+        }
+        var broker = null;
+        if (req.broker_id) {
+          var rb = await supabase.from('profiles').select('business_name, email, phone').eq('id', req.broker_id).maybeSingle();
+          broker = rb.data;
+        }
+
+        var h = '';
+        h += '<div class="detail-field"><span class="label">Property</span><span class="value">' + esc(property && property.title || '—') + '</span></div>';
+        h += '<div class="detail-field"><span class="label">Address</span><span class="value">' + esc(property && property.address || '—') + '</span></div>';
+        h += '<div class="detail-field"><span class="label">Broker</span><span class="value">' + esc(broker && broker.business_name || '—') + '</span></div>';
+        h += '<div class="detail-field"><span class="label">Broker Contact</span><span class="value">' + esc(broker && broker.phone || '—') + ' · ' + esc(broker && broker.email || '—') + '</span></div>';
+        h += '<div class="detail-field"><span class="label">Status</span><span class="value">' + esc(req.status) + '</span></div>';
+        h += '<div class="detail-field"><span class="label">Fee Paid</span><span class="value">' + (req.fee_paid ? '✅ ' + formatCurrency(req.fee_amount) : '❌ Not paid') + '</span></div>';
+        h += '<div class="detail-field"><span class="label">Submitted</span><span class="value">' + formatDateTime(req.created_at) + '</span></div>';
+
+        var propImgs = property && property.media_urls ? (Array.isArray(property.media_urls) ? property.media_urls : [property.media_urls]) : [];
+        if (propImgs.length) {
+          h += '<div class="detail-field"><span class="label">Property Images (' + propImgs.length + ')</span><div class="value" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.4rem;">';
+          propImgs.forEach(function(u){
+            h += '<a href="' + esc(u) + '" target="_blank" rel="noopener"><img src="' + esc(u) + '" style="width:130px;height:100px;object-fit:cover;border-radius:0.6rem;border:1px solid #e2e8f0;"/></a>';
+          });
+          h += '</div></div>';
+        }
+
+        var data = req.submitted_data || {};
+        var keys = Object.keys(data);
+        h += '<h4 class="font-semibold mt-4 mb-2 text-slate-800">📋 Submitted Verification Data</h4>';
+        if (!keys.length) {
+          h += '<p class="text-slate-500 text-sm">No additional data provided.</p>';
+        } else {
+          keys.forEach(function(k){
+            var v = data[k];
+            var label = k.replace(/([A-Z])/g, ' $1').replace(/^./, function(s){ return s.toUpperCase(); }).trim();
+            var display = '';
+            if (isImageUrl(v)) {
+              display = '<div style="margin-top:0.5rem;"><a href="' + esc(v) + '" target="_blank" rel="noopener"><img src="' + esc(v) + '" style="max-width:100%;max-height:320px;border-radius:0.75rem;border:1px solid #e2e8f0;display:block;"/></a><a href="' + esc(v) + '" target="_blank" rel="noopener" style="font-size:0.75rem;color:#4f46e5;text-decoration:underline;margin-top:0.3rem;display:inline-block;">Open full size ↗</a></div>';
+            } else if (Array.isArray(v)) {
+              display = v.map(function(item){
+                if (isImageUrl(item)) return '<a href="' + esc(item) + '" target="_blank" rel="noopener" style="display:inline-block;margin:0.25rem;"><img src="' + esc(item) + '" style="width:130px;height:100px;object-fit:cover;border-radius:0.6rem;border:1px solid #e2e8f0;"/></a>';
+                if (isUrl(item)) return '<a href="' + esc(item) + '" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:underline;">' + esc(item) + '</a>';
+                return esc(item);
+              }).join(' ');
+            } else if (isUrl(v)) {
+              display = '<a href="' + esc(v) + '" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:underline;">' + esc(v) + '</a>';
+            } else {
+              display = esc(v || '—');
+            }
+            h += '<div class="detail-field"><span class="label">' + esc(label) + '</span><span class="value">' + display + '</span></div>';
+          });
+        }
+
+        content.innerHTML = h;
+      } catch (err) {
+        console.error(err);
+        content.innerHTML = '<p class="text-red-500 text-sm">Unexpected error: ' + esc(err.message) + '</p>';
+      }
+    }
+
+    async function handleVerification(reqId, propId, status) {
+      if (!confirm('Mark this verification as ' + status + '?')) return;
+      try {
+        var r1 = await supabase.from('property_verification_requests').update({
+          status: status,
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentUser.id
+        }).eq('id', reqId);
+        if (r1.error) throw r1.error;
+
+        if (propId) {
+          var r2 = await supabase.from('properties').update({
+            is_verified: status === 'approved',
+            verification_status: status
+          }).eq('id', propId);
+          if (r2.error) throw r2.error;
+        }
+        alert('✅ Verification ' + status + '.');
+        loadVerifications(); loadStats();
+      } catch (e) { alert('Error: ' + e.message); }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  LEADS
+    // ══════════════════════════════════════════════════════════════════
+    async function loadLeads() {
+      var box = $('leadsList'), no = $('noLeads');
+      try {
+        var q = supabase.from('lead_requests').select('*').order('created_at', { ascending:false });
+        if (leadFilter) q = q.eq('status', leadFilter);
+        var r = await q;
+        if (r.error) throw r.error;
+        var data = r.data || [];
+        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+        no.classList.add('hidden');
+
+        var propIds = [], brokerIds = [];
+        data.forEach(function(l){
+          if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
+          if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
+        });
+        var propMap = {}, brokerMap = {};
+        if (propIds.length) {
+          var rp = await supabase.from('properties').select('id, title').in('id', propIds);
+          (rp.data || []).forEach(function(p){ propMap[p.id] = p; });
+        }
+        if (brokerIds.length) {
+          var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
+          (rb.data || []).forEach(function(b){ brokerMap[b.id] = b; });
+        }
+
+        var html = '<table><thead><tr><th>Property</th><th>Broker</th><th>Visitor</th><th>Type</th><th>Cost</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
+        data.forEach(function(l){
+          var age = Math.floor((Date.now() - new Date(l.created_at).getTime()) / 86400000);
+          var ageClass = age >= 30 ? 'text-red-600 font-bold' : age >= 25 ? 'text-amber-600' : 'text-slate-500';
+          html += '<tr>' +
+            '<td>' + esc(propMap[l.property_id] && propMap[l.property_id].title || '—') + '</td>' +
+            '<td>' + esc(brokerMap[l.broker_id] && brokerMap[l.broker_id].business_name || '—') + '</td>' +
+            '<td>' + esc(l.visitor_name || '—') + '</td>' +
+            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.lead_type) + '">' + esc(l.lead_type||'—') + '</span></td>' +
+            '<td>' + formatCurrency(l.cost || 0) + '</td>' +
+            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.status) + '">' + esc(l.status) + '</span></td>' +
+            '<td class="' + ageClass + '">' + formatDate(l.created_at) + ' (' + age + 'd)</td>' +
+            '<td>' + (l.status === 'pending' ? '<button class="btn-sm red del-lead" data-id="' + l.id + '">Delete</button>' : '') + '</td>' +
+            '</tr>';
+        });
+        html += '</tbody></table>';
+        box.innerHTML = html;
+        box.querySelectorAll('.del-lead').forEach(function(el){
+          el.onclick = async function(){
+            if (!confirm('Delete this lead?')) return;
+            var r = await supabase.from('lead_requests').delete().eq('id', el.dataset.id);
+            if (r.error) return alert('Error: ' + r.error.message);
+            loadLeads(); loadStats();
+          };
+        });
+      } catch (e) { console.error(e); box.innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>'; }
+    }
+
+    async function runCleanup() {
+      if (!confirm('Permanently delete all approved & rejected leads older than 30 days?\n\nThis cannot be undone.')) return;
+      var banner = $('cleanupBanner');
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
+      banner.textContent = '🧹 Running cleanup…';
+      banner.classList.remove('hidden');
+      try {
+        var r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
+        if (r.error) throw r.error;
+        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
+        banner.textContent = '✅ Cleanup complete. ' + (r.data || 0) + ' lead(s) permanently deleted.';
+        loadLeads(); loadStats();
+      } catch (e) {
+        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+        banner.textContent = '❌ Cleanup failed: ' + e.message;
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  REPORTS
+    // ══════════════════════════════════════════════════════════════════
+    async function loadReports() {
+      var box = $('reportList'), no = $('noReports');
+      try {
+        var r = await supabase.from('reports').select('*').order('created_at', { ascending:false });
+        if (r.error) throw r.error;
+        var data = r.data || [];
+        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+        no.classList.add('hidden');
+
+        var ids = [];
+        data.forEach(function(x){
+          if (x.reporter_id && ids.indexOf(x.reporter_id) === -1) ids.push(x.reporter_id);
+          if (x.broker_id && ids.indexOf(x.broker_id) === -1) ids.push(x.broker_id);
+        });
+        var pMap = {};
+        if (ids.length) {
+          var rp = await supabase.from('profiles').select('id, business_name, email').in('id', ids);
+          (rp.data || []).forEach(function(p){ pMap[p.id] = p; });
+        }
+
+        var html = '<table><thead><tr><th>Reporter</th><th>Broker</th><th>Reason</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+        data.forEach(function(x){
+          var reporter = pMap[x.reporter_id] || {};
+          var broker = pMap[x.broker_id] || {};
+          html += '<tr>' +
+            '<td>' + esc(reporter.business_name || reporter.email || x.reporter_name || 'Anonymous') + '</td>' +
+            '<td>' + esc(broker.business_name || 'Unknown') + '</td>' +
+            '<td>' + esc(x.reason) + '</td>' +
+            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status) + '">' + esc(x.status) + '</span></td>' +
+            '<td>' + formatDate(x.created_at) + '</td>' +
+            '<td>' + (x.status === 'pending' ? '<button class="btn-sm green resolve-report" data-id="' + x.id + '">Resolve</button><button class="btn-sm red dismiss-report" data-id="' + x.id + '">Dismiss</button>' : '') + '</td>' +
+            '</tr>';
+        });
+        html += '</tbody></table>';
+        box.innerHTML = html;
+        box.querySelectorAll('.resolve-report').forEach(function(el){
+          el.onclick = function(){ handleReport(el.dataset.id, 'resolved'); };
+        });
+        box.querySelectorAll('.dismiss-report').forEach(function(el){
+          el.onclick = function(){ handleReport(el.dataset.id, 'dismissed'); };
+        });
+      } catch (e) { console.error(e); box.innerHTML = '<p class="text-red-500 text-sm">Error loading reports.</p>'; }
+    }
+
+    async function handleReport(id, status) {
+      if (!confirm('Mark as ' + status + '?')) return;
+      try {
+        var r = await supabase.from('reports').update({
+          status: status,
+          resolved_at: new Date().toISOString(),
+          resolved_by: currentUser ? currentUser.id : null
+        }).eq('id', id);
+        if (r.error) throw r.error;
+        loadReports(); loadStats();
+      } catch (e) { alert('Error: ' + e.message); }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  TRANSACTIONS
+    // ══════════════════════════════════════════════════════════════════
+    async function loadTransactions() {
+      var box = $('transactionList'), no = $('noTransactions');
+      try {
+        var r = await supabase.from('wallet_transactions').select('*').order('created_at', { ascending:false }).limit(100);
+        if (r.error && r.error.code === '42P01') { box.innerHTML = '<p class="text-slate-500 text-sm">Table not set up yet.</p>'; no.classList.add('hidden'); return; }
+        if (r.error) throw r.error;
+        var data = r.data || [];
+        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+        no.classList.add('hidden');
+
+        var ids = [];
+        data.forEach(function(x){ if (x.profile_id && ids.indexOf(x.profile_id) === -1) ids.push(x.profile_id); });
+        var pMap = {};
+        if (ids.length) {
+          var rp = await supabase.from('profiles').select('id, business_name, email').in('id', ids);
+          (rp.data || []).forEach(function(p){ pMap[p.id] = p; });
+        }
+
+        var html = '<table><thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead><tbody>';
+        data.forEach(function(x){
+          var u = pMap[x.profile_id] || {};
+          var color = x.amount < 0 ? 'text-red-500' : 'text-emerald-600';
+          html += '<tr>' +
+            '<td>' + esc(u.business_name || u.email || 'Unknown') + '</td>' +
+            '<td class="' + color + ' font-medium">' + (x.amount < 0 ? '' : '+') + Number(x.amount).toLocaleString() + ' UGX</td>' +
+            '<td>' + esc((x.type||'').replace('_',' ').toUpperCase()) + '</td>' +
+            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status || 'active') + '">' + esc(x.status || '—') + '</span></td>' +
+            '<td>' + formatDate(x.created_at) + '</td>' +
+            '</tr>';
+        });
+        html += '</tbody></table>';
+        box.innerHTML = html;
+      } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading transactions.</p>'; }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  SETTINGS
+    // ══════════════════════════════════════════════════════════════════
+    async function loadSettings() {
+      try {
+        var r = await supabase.from('platform_settings').select('key,value');
+        if (r.error) throw r.error;
+        var map = {};
+        (r.data || []).forEach(function(x){ map[x.key] = x.value; });
+        $('setVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
+        $('setCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
+      } catch (e) { console.warn('Settings load failed:', e.message); }
+    }
+
+    async function saveSettings() {
+      var st = $('settingsStatus');
+      st.textContent = 'Saving…'; st.className = 'mt-3 text-sm text-indigo-600';
+      var updates = [
+        { key: 'verification_fee',  value: Number($('setVerifFee').value) || 5000 },
+        { key: 'lead_cleanup_days', value: Number($('setCleanupDays').value) || 30 }
+      ];
+      try {
+        for (var i = 0; i < updates.length; i++) {
+          var u = updates[i];
+          var r = await supabase.from('platform_settings').upsert({ key: u.key, value: u.value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+          if (r.error) throw r.error;
+        }
+        st.textContent = '✅ Settings saved.'; st.className = 'mt-3 text-sm text-emerald-600';
+      } catch (e) { st.textContent = '❌ ' + e.message; st.className = 'mt-3 text-sm text-red-600'; }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  INIT
+    // ══════════════════════════════════════════════════════════════════
+    async function init() {
+      authView = $('authView');
+      dashboardView = $('dashboardView');
+      loadingOverlay = $('loadingOverlay');
+
+      await waitForSupabase();
+      if (!window.supabase) { alert('Supabase failed to load.'); hideLoading(); return; }
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      setupTabs();
+
+      var ok = await checkAdmin();
+      if (ok) showDashboard(); else showAuth();
+
+      $('loginForm').addEventListener('submit', handleLogin);
+      $('logoutBtn').addEventListener('click', handleLogout);
+      $('backToBrokerList').addEventListener('click', function() {
+        $('brokerDetailView').classList.add('hidden');
+        $('tab-brokers').classList.remove('hidden');
+        loadBrokers();
+      });
+      $('leadStatusFilter').addEventListener('change', function(e){ leadFilter = e.target.value; loadLeads(); });
+      $('runCleanupBtn').addEventListener('click', runCleanup);
+      $('runCleanupBtn2').addEventListener('click', async function() {
+        var st = $('cleanupStatus');
+        st.textContent = '🧹 Running…'; st.className = 'mt-3 text-sm text-indigo-600';
+        try {
+          var r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
+          if (r.error) throw r.error;
+          st.textContent = '✅ Deleted ' + (r.data || 0) + ' old lead(s).';
+          st.className = 'mt-3 text-sm text-emerald-600';
+          loadLeads(); loadStats();
+        } catch (e) { st.textContent = '❌ ' + e.message; st.className = 'mt-3 text-sm text-red-600'; }
+      });
+      $('saveSettingsBtn').addEventListener('click', saveSettings);
+      $('refreshStatsBtn').addEventListener('click', loadStats);
+      $('closeDetailModal').addEventListener('click', function(){ $('verificationDetailModal').classList.add('hidden'); });
+      $('verificationDetailModal').addEventListener('click', function(e){
+        if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
+      });
+
+      hideLoading();
+
+      setInterval(function() {
+        if (!authView.classList.contains('hidden')) return;
+        loadStats();
+        var active = document.querySelector('.admin-tab.active');
+        if (!active) return;
+        var t = active.dataset.tab;
+        if (t === 'brokers') loadBrokers();
+        else if (t === 'verifications') loadVerifications();
+        else if (t === 'leads') loadLeads();
+        else if (t === 'reports') loadReports();
+        else if (t === 'transactions') loadTransactions();
+      }, 30000);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+</body>
+</html>
