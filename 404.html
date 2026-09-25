@@ -5,17 +5,22 @@
   <title>Property Hub Uganda</title>
   <script>
     // GitHub Pages SPA 404 redirect hack
-    // Preserves the path so your router can handle it
+    // Based on https://github.com/rafgraph/spa-github-pages
     (function() {
-      var path = window.location.pathname;
-      var search = window.location.search;
-      var hash = window.location.hash;
-      var redirect = '/?redirect=' + encodeURIComponent(path + search + hash);
-      window.location.replace(redirect);
+      var segmentCount = 0; // 0 for custom domain, 1 for username.github.io/repo
+      var location = window.location;
+      var repo = '/';
+      var l = location.pathname.split('/').slice(1 + segmentCount);
+      var path = '/' + l.slice(0).join('/');
+      var search = location.search;
+      var hash = location.hash;
+      location.replace(
+        location.origin + repo + '?p=' + encodeURIComponent(path + search) + hash
+      );
     })();
   </script>
 </head>
 <body>
-  <p>Redirecting…</p>
+  <p>Redirecting to Property Hub…</p>
 </body>
 </html>
