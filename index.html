@@ -294,20 +294,24 @@
           <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80')] bg-cover bg-center opacity-30"></div>
           <div class="absolute inset-0 hero-gradient"></div>
           <div class="relative max-w-7xl mx-auto px-4 py-20">
-            <div class="max-w-3xl">
+            <div class="max-w-2xl mx-auto text-center">
               <h1 class="text-4xl md:text-5xl font-extrabold">Find your <span class="text-indigo-300">perfect</span> space</h1>
               <p class="mt-3 text-slate-300 text-lg">Explore homes, rentals, and guesthouses from trusted brokers across Uganda.</p>
 
-              <div class="mt-6 flex flex-col gap-3">
-                <input id="searchInput" type="text" placeholder="Search by address, city, area, or broker name…" class="w-full pl-4 pr-4 py-3 rounded-xl text-slate-800" />
-                <div class="flex flex-col sm:flex-row gap-3">
-                  <input id="minPriceInput" type="number" min="0" placeholder="Min price (UGX)" class="w-full sm:w-1/3 pl-4 pr-4 py-3 rounded-xl text-slate-800" />
-                  <input id="maxPriceInput" type="number" min="0" placeholder="Max price (UGX)" class="w-full sm:w-1/3 pl-4 pr-4 py-3 rounded-xl text-slate-800" />
-                  <button id="clearSearchBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl flex items-center justify-center gap-2 border border-white/10 sm:w-auto w-full">
+              <div class="mt-6 text-left">
+                <div class="relative">
+                  <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                  <input id="searchInput" type="text"
+                    placeholder="Search name, address, or price…"
+                    class="w-full pl-12 pr-12 py-4 rounded-xl text-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <button id="clearSearchBtn" title="Clear"
+                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100">
                     <i class="fas fa-times"></i>
-                    <span>Clear all</span>
                   </button>
                 </div>
+                <p class="mt-2 text-xs text-slate-300 hidden sm:block">
+                  💡 Try "300000-700000" for a price range, "under 500k", or "over 200k"
+                </p>
               </div>
             </div>
           </div>
@@ -464,14 +468,11 @@
       const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org/';
 
-      // ─── LEAD COST CONFIG — derived from hot rate ───
-      // Hot = base. Warm = 65% of hot. Cold = 35% of hot.
-      // Matches the original ratios (2000 / 1300 / 700) just scaled ×2.5.
       const HOT_RATE_PER_150K = 5000;
       const LEAD_RATE_PER_150K = {
         hot:  HOT_RATE_PER_150K,
-        warm: Math.round(HOT_RATE_PER_150K * 0.65),   // 3250
-        cold: Math.round(HOT_RATE_PER_150K * 0.35)    // 1750
+        warm: Math.round(HOT_RATE_PER_150K * 0.65),
+        cold: Math.round(HOT_RATE_PER_150K * 0.35)
       };
       const GUESTHOUSE_LEAD_PERCENT = 0.04;
 
@@ -483,13 +484,65 @@
         return units * rate;
       }
 
+      // ─── SMART SEARCH PARSER ───
+      // Parses "300000-700000", "under 500k", "over 200k", "3m", "500000", "Kampala"
+      function parseNumberToken(s) {
+        s = String(s).trim().toLowerCase().replace(/[, ]/g, '');
+        const mMatch = s.match(/^(\d+(?:\.\d+)?)m$/);
+        if (mMatch) return Math.round(parseFloat(mMatch[1]) * 1000000);
+        const kMatch = s.match(/^(\d+(?:\.\d+)?)k$/);
+        if (kMatch) return Math.round(parseFloat(kMatch[1]) * 1000);
+        const n = parseInt(s.replace(/[^0-9]/g, ''), 10);
+        return isNaN(n) ? null : n;
+      }
+
+      function parseSearchQuery(raw) {
+        const q = String(raw || '').trim();
+        if (!q) return { type: 'all' };
+
+        // "under 500k" / "below 500000" / "<500k"
+        let m = q.match(/^(?:under|below|<)\s*([\d.,]+\s*[kKmM]?)$/i);
+        if (m) {
+          const n = parseNumberToken(m[1]);
+          if (n !== null) return { type: 'max', max: n };
+        }
+
+        // "over 200k" / "above 200000" / ">200k"
+        m = q.match(/^(?:over|above|>)\s*([\d.,]+\s*[kKmM]?)$/i);
+        if (m) {
+          const n = parseNumberToken(m[1]);
+          if (n !== null) return { type: 'min', min: n };
+        }
+
+        // "300000-700000" or "300k-700k" or "300000 - 700000"
+        m = q.match(/^([\d.,]+\s*[kKmM]?)\s*[-–to]+\s*([\d.,]+\s*[kKmM]?)$/i);
+        if (m) {
+          const a = parseNumberToken(m[1]);
+          const b = parseNumberToken(m[2]);
+          if (a !== null && b !== null) {
+            return { type: 'range', min: Math.min(a, b), max: Math.max(a, b) };
+          }
+        }
+
+        // Single number alone → treat as "around this price" (±25%)
+        m = q.match(/^([\d.,]+\s*[kKmM]?)$/);
+        if (m) {
+          const n = parseNumberToken(m[1]);
+          if (n !== null && n >= 1000) {
+            return { type: 'range', min: Math.round(n * 0.75), max: Math.round(n * 1.25) };
+          }
+        }
+
+        // Otherwise, text search
+        return { type: 'text', q: q.toLowerCase() };
+      }
+
       let supabase;
       const state = {
         allProperties: [], filteredProperties: [], myProperties: [],
         currentFilter: 'all', searchQuery: '', currentBrokerId: null,
         currentUser: null, isSignUpMode: false, profilesMap: {},
-        walletBalance: 0, isAdmin: false,
-        minPrice: 0, maxPrice: Infinity
+        walletBalance: 0, isAdmin: false
       };
 
       function $(s) { return document.querySelector(s); }
@@ -519,7 +572,6 @@
         else { sIn.classList.add('active'); sUp.classList.remove('active'); f.classList.add('hidden'); t.innerText='Welcome Back'; b.innerText='Access Dashboard'; }
       }
 
-      // ─── EMAIL ───
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const { error } = await supabase.functions.invoke('send-email-brevo', {
@@ -534,7 +586,6 @@
         }
       }
 
-      // ─── EMAIL TEMPLATES ───
       function buildBrokerLeadEmail(t, a, lt, c) { return `Hello Broker,\n\n🔔 NEW ${lt.toUpperCase()} LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\nA visitor is interested in your property:\n\n🏠 ${t || 'Untitled'}\n📍 ${a || 'Location not specified'}\n\n🔥 Lead Type: ${lt.toUpperCase()}\n💰 Cost to unlock: ${c.toLocaleString()} UGX\n\n━━━━━━━━━━━━━━━━━━━━━━━\nLog in to your dashboard to unlock this lead.\n\n👉 ${SITE_URL}?dashboard=1\n\n⏰ This lead notification fades after 24 hours. Act fast.\n\n— Property Hub Uganda\n${SITE_URL}`; }
       function buildVisitorApprovedEmail(n, t, bn, bp, be) { return `Hello ${n},\n\n🎉 GREAT NEWS! Your request has been APPROVED.\n\nProperty: ${t}\nBroker: ${bn || 'the broker'}\n\n📱 WhatsApp: ${bp || '—'}\n📧 Email: ${be || '—'}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n⚠️ SAFETY REMINDERS\n\n• Always visit the property in person before sending ANY money.\n• Never transfer funds without viewing the property.\n• Verify the broker's identity before any payment.\n• If anything feels off, report them on Property Hub.\n\nThank you for using Property Hub Uganda.\n\n${SITE_URL}`; }
       function buildVisitorRejectedEmail(n, t) { return `Hello ${n},\n\nWe're sorry to inform you that the broker was unavailable to respond to your request for "${t}" within our 24-hour window.\n\nDon't worry! You can still try connecting with them again. Simply return to Property Hub Uganda and submit a new request.\n\n🔗 Visit us again: ${SITE_URL}\n\nThank you for your patience.\n\nProperty Hub Uganda`; }
@@ -752,32 +803,40 @@
         } catch (e) { console.error(e); }
       }
 
+      // ─── SEARCH + FILTER (uses the smart parser) ───
       function applyFiltersAndSearch() {
         const f = state.currentFilter;
-        const q = state.searchQuery.trim().toLowerCase();
-        const minP = Number(state.minPrice) || 0;
-        const maxP = Number(state.maxPrice) || Infinity;
+        const parsed = parseSearchQuery(state.searchQuery);
 
         let r = [...state.allProperties];
 
         if (f !== 'all') r = r.filter(p => (p.property_type || '').toLowerCase() === f);
 
-        if (q) {
+        if (parsed.type === 'text' && parsed.q) {
+          const q = parsed.q;
           r = r.filter(p => {
             const a = (p.address || '').toLowerCase();
             const t = (p.title || '').toLowerCase();
             const b = (p.broker?.business_name || '').toLowerCase();
             return a.includes(q) || t.includes(q) || b.includes(q);
           });
+        } else if (parsed.type === 'range') {
+          r = r.filter(p => {
+            const price = Number(p.price_amount || 0);
+            return price >= parsed.min && price <= parsed.max;
+          });
+        } else if (parsed.type === 'min') {
+          r = r.filter(p => Number(p.price_amount || 0) >= parsed.min);
+        } else if (parsed.type === 'max') {
+          r = r.filter(p => Number(p.price_amount || 0) <= parsed.max);
         }
-
-        r = r.filter(p => {
-          const price = Number(p.price_amount || 0);
-          return price >= minP && price <= maxP;
-        });
 
         state.filteredProperties = r;
         renderListings(r);
+
+        // Show/hide the clear button
+        const clearBtn = $('#clearSearchBtn');
+        if (clearBtn) clearBtn.classList.toggle('hidden', !state.searchQuery.trim());
       }
 
       function openQuizModal(pid) {
@@ -840,7 +899,6 @@
         }, 3000);
       }
 
-      // ─── BROKER LEADS — with follow-up status + manual send ───
       async function loadLeads() {
         if (!state.currentUser) return;
         try {
@@ -849,7 +907,6 @@
             .eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
           if (error) throw error;
 
-          // Fetch related properties separately
           const propIds = [...new Set((data || []).map(l => l.property_id).filter(Boolean))];
           let propMap = {};
           if (propIds.length) {
@@ -873,7 +930,6 @@
             const isHot = l.lead_type === 'hot';
             const lc = l.cost || calculateLeadCost(prop.price_amount || 0, l.lead_type, prop.property_type);
 
-            // Follow-up status
             let followUpBadge = '';
             let showSendBtn = false;
             if (isA && l.approved_at) {
@@ -904,7 +960,6 @@
           });
           list.innerHTML = html;
 
-          // Unlock handler — now sets approved_at + follow_up_sent:false
           list.querySelectorAll('.unlock-lead-btn').forEach(b => b.addEventListener('click', async () => {
             const id = b.dataset.leadId;
             if (!confirm('Unlock this lead? (Free during beta)')) return;
@@ -950,7 +1005,6 @@
             alert(`Contact:\nName: ${l.visitor_name}\nEmail: ${l.visitor_email}\nWhatsApp: ${l.visitor_whatsapp}\nUnlocked: ${new Date(l.unlocked_at).toLocaleString()}`);
           }));
 
-          // Manual follow-up trigger
           list.querySelectorAll('.send-followup-btn').forEach(b => b.addEventListener('click', async () => {
             const id = b.dataset.leadId;
             if (!confirm('Send the follow-up email to this visitor now?')) return;
@@ -981,7 +1035,6 @@
 
       $('#refreshLeadsBtn')?.addEventListener('click', loadLeads);
 
-      // ─── VERIFICATION ───
       const VERIF_FIELDS = {
         property: [
           { id: 'landTitle', label: 'Land Title / Certificate Number', required: true },
@@ -1468,17 +1521,16 @@
         $('#hideTrustBanner')?.addEventListener('click', () => { tb.style.display = 'none'; tm.classList.add('visible'); localStorage.setItem(hk, '1'); });
         $('#showTrustBanner')?.addEventListener('click', () => { tb.style.display = 'block'; tm.classList.remove('visible'); localStorage.setItem(hk, '0'); });
 
-        $('#searchInput')?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
-        $('#minPriceInput')?.addEventListener('input', e => { state.minPrice = Number(e.target.value) || 0; applyFiltersAndSearch(); });
-        $('#maxPriceInput')?.addEventListener('input', e => { state.maxPrice = Number(e.target.value) || Infinity; applyFiltersAndSearch(); });
+        // ─── Single smart search input ───
+        $('#searchInput')?.addEventListener('input', e => {
+          state.searchQuery = e.target.value;
+          applyFiltersAndSearch();
+        });
         $('#clearSearchBtn')?.addEventListener('click', () => {
           $('#searchInput').value = '';
-          $('#minPriceInput').value = '';
-          $('#maxPriceInput').value = '';
           state.searchQuery = '';
-          state.minPrice = 0;
-          state.maxPrice = Infinity;
           applyFiltersAndSearch();
+          $('#searchInput').focus();
         });
 
         $$('.filter-pill').forEach(p => p.addEventListener('click', () => {
