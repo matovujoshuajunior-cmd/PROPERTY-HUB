@@ -3,19 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Property Hub Uganda – Find Homes, Rentals &amp; Guesthouses</title>
-  <meta name="description" content="Discover the best properties, rentals, and guesthouses across Uganda." />
+
+  <!-- ─── PRIMARY SEO ─── -->
+  <title>Property Hub Uganda – Find Homes, Rentals & Guesthouses in Kampala & Uganda</title>
+  <meta name="description" content="Find houses, rentals, land, and guesthouses for sale and rent across Uganda. Verified listings from trusted brokers in Kampala, Wakiso, Entebbe, and beyond. Connect directly with brokers." />
+  <meta name="keywords" content="property Uganda, houses for sale Uganda, rentals Kampala, land for sale Uganda, guesthouses Uganda, apartments Kampala, real estate Uganda, brokers Uganda, cheap houses Uganda" />
   <link rel="canonical" href="https://propertyhub.dpdns.org/" />
-  <meta name="robots" content="index, follow" />
-  <meta property="og:title" content="Property Hub Uganda" />
-  <meta property="og:description" content="Find your perfect property in Uganda." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="Property Hub Uganda" />
+  <meta name="geo.region" content="UG" />
+  <meta name="geo.placename" content="Kampala" />
+  <meta name="theme-color" content="#4f46e5" />
+
+  <!-- ─── OPEN GRAPH (Facebook / WhatsApp / LinkedIn) ─── -->
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Property Hub Uganda" />
+  <meta property="og:title" content="Property Hub Uganda – Find Homes, Rentals & Guesthouses" />
+  <meta property="og:description" content="Verified properties from trusted brokers across Uganda. Houses, rentals, land, and guesthouses — all in one place." />
   <meta property="og:url" content="https://propertyhub.dpdns.org/" />
+  <meta property="og:image" content="https://propertyhub.dpdns.org/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="en_UG" />
+
+  <!-- ─── TWITTER CARD ─── -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Property Hub Uganda" />
-  <meta name="twitter:description" content="Find your perfect property in Uganda." />
+  <meta name="twitter:title" content="Property Hub Uganda – Find Homes, Rentals & Guesthouses" />
+  <meta name="twitter:description" content="Verified properties from trusted brokers across Uganda." />
+  <meta name="twitter:image" content="https://propertyhub.dpdns.org/og-image.jpg" />
+
+  <!-- ─── FAVICON ─── -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
+
+  <!-- ─── PERFORMANCE ─── -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="preconnect" href="https://ubkgovgoifgpazkapaxi.supabase.co" />
+  <link rel="dns-prefetch" href="https://images.unsplash.com" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <!-- ─── STRUCTURED DATA ─── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Property Hub Uganda",
+    "url": "https://propertyhub.dpdns.org/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://propertyhub.dpdns.org/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Property Hub Uganda",
+    "url": "https://propertyhub.dpdns.org/",
+    "logo": "https://propertyhub.dpdns.org/og-image.jpg",
+    "description": "Property Hub Uganda connects property seekers with trusted brokers across Uganda.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "UG",
+      "addressLocality": "Kampala"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Uganda"
+    },
+    "priceRange": "UGX"
+  }
+  </script>
+
   <style>
     body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .property-card { transition: transform 0.2s ease, box-shadow 0.25s ease; }
@@ -294,25 +357,23 @@
           <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80')] bg-cover bg-center opacity-30"></div>
           <div class="absolute inset-0 hero-gradient"></div>
           <div class="relative max-w-7xl mx-auto px-4 py-20">
-            <div class="max-w-2xl mx-auto text-center">
+            <div class="max-w-3xl">
               <h1 class="text-4xl md:text-5xl font-extrabold">Find your <span class="text-indigo-300">perfect</span> space</h1>
               <p class="mt-3 text-slate-300 text-lg">Explore homes, rentals, and guesthouses from trusted brokers across Uganda.</p>
 
-              <div class="mt-6 text-left">
-                <div class="relative">
-                  <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-                  <input id="searchInput" type="text"
-                    placeholder="Search name, address, or price…"
-                    class="w-full pl-12 pr-12 py-4 rounded-xl text-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                  <button id="clearSearchBtn" title="Clear"
-                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-                <p class="mt-2 text-xs text-slate-300 hidden sm:block">
-                  💡 Try "300000-700000" for a price range, "under 500k", or "over 200k"
-                </p>
+              <div class="mt-6 relative">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                <input id="searchInput" type="text"
+                  placeholder="Search name, address, or price…"
+                  class="w-full pl-12 pr-12 py-3 rounded-xl text-slate-800" />
+                <button id="clearSearchBtn" title="Clear"
+                  class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100">
+                  <i class="fas fa-times"></i>
+                </button>
               </div>
+              <p class="mt-2 text-xs text-slate-300 hidden sm:block">
+                💡 Try "300000-700000" for a price range, "under 500k", or "over 200k"
+              </p>
             </div>
           </div>
         </div>
@@ -456,6 +517,32 @@
         </div>
       </section>
     </main>
+
+    <!-- ─── SEO FOOTER ─── -->
+    <footer class="bg-slate-900 text-slate-300 mt-12">
+      <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+        <div>
+          <h4 class="text-white font-bold text-lg mb-3">🏠 Property Hub Uganda</h4>
+          <p class="text-slate-400">Connecting property seekers with trusted brokers across Uganda. Find homes, rentals, land, and guesthouses with confidence.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-bold mb-3">Popular Searches</h4>
+          <ul class="space-y-1 text-slate-400">
+            <li><a href="/?filter=rental" class="hover:text-indigo-300">Rentals in Kampala</a></li>
+            <li><a href="/?filter=property" class="hover:text-indigo-300">Houses for sale in Uganda</a></li>
+            <li><a href="/?filter=guesthouse" class="hover:text-indigo-300">Guesthouses in Uganda</a></li>
+            <li><a href="/?filter=property" class="hover:text-indigo-300">Land for sale in Wakiso</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-bold mb-3">Areas We Cover</h4>
+          <p class="text-slate-400">Kampala · Wakiso · Entebbe · Mukono · Jinja · Mbarara · Gulu · Arua · Fort Portal · Masaka</p>
+        </div>
+      </div>
+      <div class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
+        © 2026 Property Hub Uganda. All rights reserved.
+      </div>
+    </footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
@@ -484,8 +571,6 @@
         return units * rate;
       }
 
-      // ─── SMART SEARCH PARSER ───
-      // Parses "300000-700000", "under 500k", "over 200k", "3m", "500000", "Kampala"
       function parseNumberToken(s) {
         s = String(s).trim().toLowerCase().replace(/[, ]/g, '');
         const mMatch = s.match(/^(\d+(?:\.\d+)?)m$/);
@@ -500,21 +585,18 @@
         const q = String(raw || '').trim();
         if (!q) return { type: 'all' };
 
-        // "under 500k" / "below 500000" / "<500k"
         let m = q.match(/^(?:under|below|<)\s*([\d.,]+\s*[kKmM]?)$/i);
         if (m) {
           const n = parseNumberToken(m[1]);
           if (n !== null) return { type: 'max', max: n };
         }
 
-        // "over 200k" / "above 200000" / ">200k"
         m = q.match(/^(?:over|above|>)\s*([\d.,]+\s*[kKmM]?)$/i);
         if (m) {
           const n = parseNumberToken(m[1]);
           if (n !== null) return { type: 'min', min: n };
         }
 
-        // "300000-700000" or "300k-700k" or "300000 - 700000"
         m = q.match(/^([\d.,]+\s*[kKmM]?)\s*[-–to]+\s*([\d.,]+\s*[kKmM]?)$/i);
         if (m) {
           const a = parseNumberToken(m[1]);
@@ -524,7 +606,6 @@
           }
         }
 
-        // Single number alone → treat as "around this price" (±25%)
         m = q.match(/^([\d.,]+\s*[kKmM]?)$/);
         if (m) {
           const n = parseNumberToken(m[1]);
@@ -533,7 +614,6 @@
           }
         }
 
-        // Otherwise, text search
         return { type: 'text', q: q.toLowerCase() };
       }
 
@@ -552,6 +632,50 @@
       function getImageUrl(p) { const arr = getImageArray(p); return arr[0] || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop&crop=center'; }
       function renderStars(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '★' : '☆'; return h; }
       function renderStarsSmall(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : '<i class="far fa-star text-slate-300 text-xs"></i>'; return h; }
+
+      // ─── DYNAMIC SEO: Update meta tags + JSON-LD when listings load ───
+      function updateSEO(properties) {
+        // Update page title based on listings
+        const count = properties.length;
+        document.title = `${count} Properties for Sale & Rent in Uganda | Property Hub Uganda`;
+
+        // Build ItemList schema for properties
+        const items = properties.slice(0, 20).map((p, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "item": {
+            "@type": "RealEstateListing",
+            "name": p.title || "Property",
+            "url": SITE_URL + "#property-" + p.id,
+            "offers": {
+              "@type": "Offer",
+              "price": p.price_amount || 0,
+              "priceCurrency": "UGX"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": p.address || "Uganda",
+              "addressCountry": "UG"
+            }
+          }
+        }));
+
+        const schema = {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "numberOfItems": count,
+          "itemListElement": items
+        };
+
+        let scriptEl = document.getElementById('dynamic-schema');
+        if (!scriptEl) {
+          scriptEl = document.createElement('script');
+          scriptEl.id = 'dynamic-schema';
+          scriptEl.type = 'application/ld+json';
+          document.head.appendChild(scriptEl);
+        }
+        scriptEl.textContent = JSON.stringify(schema);
+      }
 
       function navigateTo(url, replace = false) { if (replace) history.replaceState(null, '', url); else history.pushState(null, '', url); handleRoute(); }
       function getCurrentPath() { return location.pathname + location.search; }
@@ -631,6 +755,8 @@
       function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
         const article = document.createElement('article');
         article.className = 'property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/70 flex flex-col';
+        article.setAttribute('itemscope', '');
+        article.setAttribute('itemtype', 'https://schema.org/RealEstateListing');
         const imageUrl = getImageUrl(property);
         const rating = broker?.average_rating || 0;
         const reviewCount = broker?.review_count || 0;
@@ -663,17 +789,17 @@
 
         article.innerHTML = `
           <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
-            <img src="${imageUrl}" alt="${property.title || 'Property'}" class="w-full h-full object-cover" loading="lazy"/>
+            <img src="${imageUrl}" alt="${property.title || 'Property'} in ${property.address || 'Uganda'} - Property Hub Uganda" class="w-full h-full object-cover" loading="lazy" itemprop="image"/>
             <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full">${property.property_type || 'Property'}</span>
             ${!showEdit && isVerified ? `<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>` : ''}
           </div>
           <div class="p-4 flex flex-col flex-1">
             <div class="flex items-center justify-between flex-wrap gap-1">
-              <h3 class="font-semibold text-slate-800 text-base line-clamp-1">${property.title || 'Untitled'}</h3>
+              <h3 class="font-semibold text-slate-800 text-base line-clamp-1" itemprop="name">${property.title || 'Untitled'}</h3>
               <div class="flex items-center gap-1">${!showEdit ? badgeHtml : ''} ${!showEdit && isTrusted ? trustedHtml : ''}</div>
             </div>
-            <p class="text-indigo-700 font-bold text-sm mt-0.5">${formatPrice(property.price_amount)}</p>
-            <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5"><i class="fas fa-map-pin text-slate-400 text-[10px]"></i>${property.address || 'Location not specified'}</p>
+            <p class="text-indigo-700 font-bold text-sm mt-0.5" itemprop="price" content="${property.price_amount}">${formatPrice(property.price_amount)}</p>
+            <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5" itemprop="address">${property.address || 'Location not specified'}</p>
             <div class="mt-2 flex items-center gap-2 text-xs">
               <span class="stars text-xs">${renderStars(rating)}</span>
               <span class="text-slate-500">(${reviewCount})</span>
@@ -789,6 +915,10 @@
           enriched.sort((a, b) => b.rankScore - a.rankScore);
           state.allProperties = enriched;
           state.filteredProperties = [...enriched];
+
+          // ─── UPDATE SEO WITH FRESH DATA ───
+          updateSEO(enriched);
+
           applyFiltersAndSearch();
         } catch (e) { console.error('Fetch error:', e); }
       }
@@ -803,7 +933,6 @@
         } catch (e) { console.error(e); }
       }
 
-      // ─── SEARCH + FILTER (uses the smart parser) ───
       function applyFiltersAndSearch() {
         const f = state.currentFilter;
         const parsed = parseSearchQuery(state.searchQuery);
@@ -834,7 +963,6 @@
         state.filteredProperties = r;
         renderListings(r);
 
-        // Show/hide the clear button
         const clearBtn = $('#clearSearchBtn');
         if (clearBtn) clearBtn.classList.toggle('hidden', !state.searchQuery.trim());
       }
@@ -1521,7 +1649,6 @@
         $('#hideTrustBanner')?.addEventListener('click', () => { tb.style.display = 'none'; tm.classList.add('visible'); localStorage.setItem(hk, '1'); });
         $('#showTrustBanner')?.addEventListener('click', () => { tb.style.display = 'block'; tm.classList.remove('visible'); localStorage.setItem(hk, '0'); });
 
-        // ─── Single smart search input ───
         $('#searchInput')?.addEventListener('input', e => {
           state.searchQuery = e.target.value;
           applyFiltersAndSearch();
