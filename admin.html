@@ -110,6 +110,7 @@
         <button class="admin-tab" data-tab="reports">Reports</button>
         <button class="admin-tab" data-tab="transactions">Transactions</button>
         <button class="admin-tab" data-tab="settings">⚙️ Settings</button>
+        <button class="admin-tab" data-tab="followups">📬 Follow-Ups</button>
       </div>
 
       <div id="tab-brokers" class="tab-content">
@@ -192,6 +193,29 @@
         </div>
       </div>
 
+			<!-- FOLLOW-UPS TAB -->
+<div id="tab-followups" class="tab-content hidden">
+  <div class="section-card">
+    <div class="flex-between mb-4">
+      <h3>📬 Visitor Follow-Ups</h3>
+      <div class="flex gap-2 items-center flex-wrap">
+        <select id="followupFilter" class="settings-input" style="width:auto;">
+          <option value="pending">Pending only</option>
+          <option value="due">Due now (3+ days)</option>
+          <option value="sent">Sent</option>
+          <option value="all">All approved</option>
+        </select>
+        <button id="refreshFollowupsBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh</button>
+        <button id="runFollowupCronBtn" class="btn-sm amber"><i class="fas fa-play"></i> Run auto-send now</button>
+      </div>
+    </div>
+    <div id="followupBanner" class="hidden mb-3 text-sm rounded-xl p-3"></div>
+    <div id="followupStats" class="grid-3 mb-4"></div>
+    <div id="followupList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+    <div id="noFollowups" class="hidden text-slate-500 text-sm py-4">No follow-ups found.</div>
+  </div>
+</div>
+			
       <div id="tab-settings" class="tab-content hidden">
         <div class="section-card">
           <h3>⚙️ Platform Settings</h3>
@@ -707,6 +731,178 @@
       }
     }
 
+// ══════════════════════════════════════════════════════════════════
+//  FOLLOW-UPS MANAGEMENT
+// ══════════════════════════════════════════════════════════════════
+async function loadFollowups() {
+  var box = document.getElementById('followupList');
+  var no = document.getElementById('noFollowups');
+  var statsBox = document.getElementById('followupStats');
+  var filter = document.getElementById('followupFilter').value;
+
+  try {
+    var q = supabase.from('lead_requests')
+      .select('*')
+      .eq('status', 'approved')
+      .order('approved_at', { ascending: false });
+
+    if (filter === 'pending') q = q.eq('follow_up_sent', false);
+    else if (filter === 'sent') q = q.eq('follow_up_sent', true);
+
+    var r = await q.limit(200);
+    if (r.error) throw r.error;
+    var data = r.data || [];
+
+    // Apply "due" filter locally
+    var now = Date.now();
+    if (filter === 'due') {
+      data = data.filter(function(l) {
+        if (!l.approved_at || l.follow_up_sent) return false;
+        var days = (now - new Date(l.approved_at).getTime()) / 86400000;
+        return days >= 3;
+      });
+    }
+
+    // ─── Stats ───
+    var totalApproved = data.length;
+    var pending = data.filter(function(l) { return !l.follow_up_sent; }).length;
+    var sent = data.filter(function(l) { return l.follow_up_sent; }).length;
+    var due = data.filter(function(l) {
+      if (!l.approved_at || l.follow_up_sent) return false;
+      return (now - new Date(l.approved_at).getTime()) / 86400000 >= 3;
+    }).length;
+
+    if (statsBox) {
+      statsBox.innerHTML =
+        '<div class="detail-card"><div class="label">Total Approved</div><div class="value">' + totalApproved + '</div></div>' +
+        '<div class="detail-card"><div class="label">Pending Follow-Up</div><div class="value text-amber-600">' + pending + '</div></div>' +
+        '<div class="detail-card"><div class="label">Sent</div><div class="value text-emerald-600">' + sent + '</div></div>';
+    }
+
+    if (!data.length) {
+      box.innerHTML = '';
+      no.classList.remove('hidden');
+      return;
+    }
+    no.classList.add('hidden');
+
+    // ─── Fetch related properties + brokers ───
+    var propIds = [], brokerIds = [];
+    data.forEach(function(l) {
+      if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
+      if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
+    });
+
+    var propMap = {}, brokerMap = {};
+    if (propIds.length) {
+      var rp = await supabase.from('properties').select('id, title, property_type').in('id', propIds);
+      (rp.data || []).forEach(function(p) { propMap[p.id] = p; });
+    }
+    if (brokerIds.length) {
+      var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
+      (rb.data || []).forEach(function(b) { brokerMap[b.id] = b; });
+    }
+
+    // ─── Render table ───
+    var html = '<table><thead><tr>' +
+      '<th>Visitor</th><th>Property</th><th>Broker</th><th>Approved</th><th>Status</th><th>Actions</th>' +
+      '</tr></thead><tbody>';
+
+    data.forEach(function(l) {
+      var prop = propMap[l.property_id] || {};
+      var broker = brokerMap[l.broker_id] || {};
+      var daysSince = l.approved_at ? Math.floor((now - new Date(l.approved_at).getTime()) / 86400000) : 0;
+      var daysLeft = Math.max(0, 3 - daysSince);
+
+      var statusBadge;
+      if (l.follow_up_sent) {
+        statusBadge = '<span class="badge-approved">✅ Sent</span>';
+      } else if (daysLeft > 0) {
+        statusBadge = '<span class="badge-pending">⏳ In ' + daysLeft + 'd</span>';
+      } else {
+        statusBadge = '<span class="badge-report">🔔 Due now</span>';
+      }
+
+      html += '<tr>' +
+        '<td><div class="font-medium">' + esc(l.visitor_name || '—') + '</div><div class="text-xs text-slate-500">' + esc(l.visitor_email || '') + '</div></td>' +
+        '<td>' + esc(prop.title || '—') + '<div class="text-xs text-slate-500">' + esc(prop.property_type || '') + '</div></td>' +
+        '<td>' + esc(broker.business_name || '—') + '</td>' +
+        '<td>' + formatDate(l.approved_at) + '<div class="text-xs text-slate-500">' + daysSince + 'd ago</div></td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td>' +
+          '<button class="btn-sm blue view-followup" data-id="' + l.id + '">View</button>' +
+          (!l.follow_up_sent ? '<button class="btn-sm green send-followup-admin" data-id="' + l.id + '"><i class="fas fa-paper-plane"></i> Send</button>' : '') +
+        '</td></tr>';
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+
+    // ─── View handler ───
+    box.querySelectorAll('.view-followup').forEach(function(el) {
+      el.onclick = function() {
+        var lead = data.find(function(x) { return x.id === el.dataset.id; });
+        if (!lead) return;
+        var prop = propMap[lead.property_id] || {};
+        var broker = brokerMap[lead.broker_id] || {};
+        alert(
+          'Follow-Up Details\n' +
+          '━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+          'Visitor: ' + (lead.visitor_name || '—') + '\n' +
+          'Email: ' + (lead.visitor_email || '—') + '\n' +
+          'WhatsApp: ' + (lead.visitor_whatsapp || '—') + '\n\n' +
+          'Property: ' + (prop.title || '—') + '\n' +
+          'Type: ' + (prop.property_type || '—') + '\n' +
+          'Broker: ' + (broker.business_name || '—') + '\n\n' +
+          'Approved: ' + formatDate(lead.approved_at) + '\n' +
+          'Follow-up sent: ' + (lead.follow_up_sent ? 'Yes (' + formatDate(lead.follow_up_sent_at) + ')' : 'No')
+        );
+      };
+    });
+
+    // ─── Send handler ───
+    box.querySelectorAll('.send-followup-admin').forEach(function(el) {
+      el.onclick = async function() {
+        if (!confirm('Send the follow-up email to this visitor now?')) return;
+        el.disabled = true;
+        el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        try {
+          var r = await supabase.functions.invoke('send-visitor-followup', {
+            body: { lead_id: el.dataset.id, force: true }
+          });
+          if (r.error) throw r.error;
+          alert('✅ Follow-up sent!');
+          loadFollowups();
+        } catch (e) {
+          alert('Error: ' + e.message);
+          el.disabled = false;
+          el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+        }
+      };
+    });
+  } catch (e) {
+    console.error(e);
+    box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+  }
+}
+
+async function runFollowupCron() {
+  var banner = document.getElementById('followupBanner');
+  banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
+  banner.textContent = '⏳ Running auto-send for all due follow-ups…';
+  banner.classList.remove('hidden');
+
+  try {
+    var r = await supabase.rpc('trigger_pending_followups');
+    if (r.error) throw r.error;
+    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
+    banner.textContent = '✅ Auto-send triggered. Refresh to see updated status.';
+    setTimeout(function() { loadFollowups(); }, 2000);
+  } catch (e) {
+    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+    banner.textContent = '❌ ' + e.message;
+  }
+}
+		
     // ══════════════════════════════════════════════════════════════════
     //  REPORTS
     // ══════════════════════════════════════════════════════════════════
