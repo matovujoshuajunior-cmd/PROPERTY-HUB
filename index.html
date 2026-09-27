@@ -832,6 +832,7 @@
         article.querySelector('.broker-name-link')?.addEventListener('click', e => { e.stopPropagation(); navigateToBroker(broker.id); });
         article.querySelector('.connect-btn')?.addEventListener('click', e => { e.stopPropagation(); openQuizModal(property.id); });
         article.querySelector('.pause-btn')?.addEventListener('click', e => { e.stopPropagation(); togglePropertyPause(property.id, property.is_paused); });
+        injectPropertySchema(property, broker);
         return article;
       }
 
@@ -1609,7 +1610,34 @@
           $('#settingsPhone').value = data.phone || '';
         } catch (e) { console.error(e); }
       }
-
+// Function to inject structured data for a single property
+function injectPropertySchema(property, broker) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    "name": property.title,
+    "description": `Property for ${property.property_type} in ${property.address}`,
+    "url": `${SITE_URL}#property-${property.id}`,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": property.address,
+      "addressCountry": "UG"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": property.price_amount,
+      "priceCurrency": "UGX"
+    }
+  };
+  let script = document.getElementById(`schema-${property.id}`);
+  if (script) script.remove();
+  script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = `schema-${property.id}`;
+  script.textContent = JSON.stringify(schema);
+  document.head.appendChild(script);
+}
+      
       async function handleRoute() {
         const path = getCurrentPath();
         if (path.startsWith('/broker/')) {
