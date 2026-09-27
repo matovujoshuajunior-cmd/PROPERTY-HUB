@@ -706,19 +706,19 @@
         else { sIn.classList.add('active'); sUp.classList.remove('active'); f.classList.add('hidden'); t.innerText='Welcome Back'; b.innerText='Access Dashboard'; }
       }
 
-      async function sendNotificationEmail(to_email, to_name, subject, message) {
-        try {
-          const { error } = await supabase.functions.invoke('send-email-brevo', {
-            body: { to_email, to_name, subject, message }
-          });
-          if (error) throw error;
-          console.log('📧 Email sent to', to_email);
-          return true;
-        } catch (err) {
-          console.error('❌ Email failed for', to_email, '→', err.message);
-          return false;
-        }
-      }
+     async function sendNotificationEmail(to_email, to_name, subject, message) {
+  try {
+    const { error } = await supabase.functions.invoke('send-email-web3forms', {
+      body: { to_email, to_name, subject, message }
+    });
+    if (error) throw error;
+    console.log('📧 Email sent to', to_email);
+    return true;
+  } catch (err) {
+    console.error('❌ Email failed for', to_email, '→', err.message);
+    return false;
+  }
+}
 
       function buildBrokerLeadEmail(t, a, lt, c) { return `Hello Broker,\n\n🔔 NEW ${lt.toUpperCase()} LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\nA visitor is interested in your property:\n\n🏠 ${t || 'Untitled'}\n📍 ${a || 'Location not specified'}\n\n🔥 Lead Type: ${lt.toUpperCase()}\n💰 Cost to unlock: ${c.toLocaleString()} UGX\n\n━━━━━━━━━━━━━━━━━━━━━━━\nLog in to your dashboard to unlock this lead.\n\n👉 ${SITE_URL}?dashboard=1\n\n⏰ This lead notification fades after 24 hours. Act fast.\n\n— Property Hub Uganda\n${SITE_URL}`; }
       function buildVisitorApprovedEmail(n, t, bn, bp, be) { return `Hello ${n},\n\n🎉 GREAT NEWS! Your request has been APPROVED.\n\nProperty: ${t}\nBroker: ${bn || 'the broker'}\n\n📱 WhatsApp: ${bp || '—'}\n📧 Email: ${be || '—'}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n⚠️ SAFETY REMINDERS\n\n• Always visit the property in person before sending ANY money.\n• Never transfer funds without viewing the property.\n• Verify the broker's identity before any payment.\n• If anything feels off, report them on Property Hub.\n\nThank you for using Property Hub Uganda.\n\n${SITE_URL}`; }
