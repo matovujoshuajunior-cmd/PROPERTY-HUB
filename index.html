@@ -3,58 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Property Hub Uganda – Find Homes, Rentals & Guesthouses in Kampala & Uganda</title>
   <meta name="description" content="Find houses, rentals, land, and guesthouses for sale and rent across Uganda. Verified listings from trusted brokers in Kampala, Wakiso, Entebbe, and beyond." />
-  <meta name="keywords" content="property Uganda, houses for sale Uganda, rentals Kampala, land for sale Uganda, guesthouses Uganda, apartments Kampala, real estate Uganda, brokers Uganda" />
   <link rel="canonical" href="https://propertyhub.dpdns.org/" />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="geo.region" content="UG" />
   <meta name="geo.placename" content="Kampala" />
-  <meta name="theme-color" content="#4f46e5" />
-
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Property Hub Uganda" />
-  <meta property="og:title" content="Property Hub Uganda – Find Homes, Rentals & Guesthouses" />
+  <meta property="og:title" content="Property Hub Uganda" />
   <meta property="og:description" content="Verified properties from trusted brokers across Uganda." />
   <meta property="og:url" content="https://propertyhub.dpdns.org/" />
-  <meta property="og:locale" content="en_UG" />
-
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Property Hub Uganda" />
-  <meta name="twitter:description" content="Verified properties from trusted brokers across Uganda." />
-
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
-
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
   <link rel="preconnect" href="https://ubkgovgoifgpazkapaxi.supabase.co" />
-  <link rel="dns-prefetch" href="https://images.unsplash.com" />
 
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Property Hub Uganda",
-    "url": "https://propertyhub.dpdns.org/",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://propertyhub.dpdns.org/?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
+  {"@context":"https://schema.org","@type":"WebSite","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/"}
   </script>
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "RealEstateAgent",
-    "name": "Property Hub Uganda",
-    "url": "https://propertyhub.dpdns.org/",
-    "description": "Property Hub Uganda connects property seekers with trusted brokers across Uganda.",
-    "address": { "@type": "PostalAddress", "addressCountry": "UG", "addressLocality": "Kampala" },
-    "areaServed": { "@type": "Country", "name": "Uganda" },
-    "priceRange": "UGX"
-  }
+  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":{"@type":"Country","name":"Uganda"}}
   </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -62,7 +30,6 @@
   <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 
   <script>
-    // SPA 404 redirect parser — runs BEFORE app loads
     (function() {
       var p = new URLSearchParams(window.location.search).get('p');
       if (p) { window.history.replaceState(null, '', p); }
@@ -106,7 +73,7 @@
     .dashboard-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; background: white; padding: 1rem 1.25rem; border-radius: 1.5rem; box-shadow: 0 8px 30px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
     .wallet-pill { background: #1e293b; color: white; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .wallet-pill .balance { color: #34d399; }
-    .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; }
     .dashboard-toolbar .toolbar-btn { padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; white-space: nowrap; }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
     .dashboard-toolbar .toolbar-btn.green { background: #10b981; color: white; }
@@ -149,10 +116,8 @@
     .quiz-question p.q-title { font-weight:600;color:#1e293b;font-size:0.875rem;margin-bottom:0.5rem; }
     .quiz-option { display:inline-flex;align-items:center;gap:0.4rem;font-size:0.8rem;background:#fff;padding:0.3rem 0.75rem;border-radius:9999px;border:1px solid #e2e8f0;margin:0.2rem;cursor:pointer; }
     .quiz-option:hover { border-color:#6366f1; }
-    .unlock-btn { background: #10b981; color: white; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.15s; }
+    .unlock-btn { background: #10b981; color: white; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; }
     .unlock-btn:hover { background: #059669; }
-    .followup-btn { background: #8b5cf6; color: white; font-size: 0.7rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; border: none; }
-    .followup-btn:hover { background: #7c3aed; }
   </style>
 </head>
 <body>
@@ -174,21 +139,15 @@
   <!-- Review Modal -->
   <div id="reviewModal" class="modal-backdrop hidden">
     <div class="modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-slate-800">⭐ Reviews</h2>
-        <button id="closeReviewModal" class="text-slate-400 text-2xl">&times;</button>
-      </div>
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-sm text-slate-500">What others say</span>
-        <button id="toggleWriteReview" class="write-review-toggle"><i class="fas fa-pen"></i> Write a Review</button>
-      </div>
+      <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-800">⭐ Reviews</h2><button id="closeReviewModal" class="text-slate-400 text-2xl">&times;</button></div>
+      <div class="flex justify-between items-center mb-3"><span class="text-sm text-slate-500">What others say</span><button id="toggleWriteReview" class="write-review-toggle"><i class="fas fa-pen"></i> Write a Review</button></div>
       <div id="reviewFormContainer" class="hidden mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
         <form id="reviewForm">
           <input type="hidden" id="reviewBrokerId" />
-          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Name *</label><input type="text" id="reviewClientName" required placeholder="e.g. Sarah K." class="w-full px-4 py-2 rounded-xl border text-sm" /></div>
-          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Email (optional, kept private)</label><input type="email" id="reviewClientEmail" placeholder="you@example.com" class="w-full px-4 py-2 rounded-xl border text-sm" /></div>
-          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Rating</label><div id="starSelector" class="star-rating flex gap-1"><span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span></div><input type="hidden" id="reviewRating" value="5" /></div>
-          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Review</label><textarea id="reviewComment" rows="3" class="w-full px-4 py-2 rounded-xl border text-sm" placeholder="Share your experience..."></textarea></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Name *</label><input type="text" id="reviewClientName" required class="w-full px-4 py-2 rounded-xl border text-sm" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Email (optional)</label><input type="email" id="reviewClientEmail" class="w-full px-4 py-2 rounded-xl border text-sm" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Rating</label><div id="starSelector" class="star-rating flex gap-1"><span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span></div><input type="hidden" id="reviewRating" value="5" /></div>
+          <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Review</label><textarea id="reviewComment" rows="3" class="w-full px-4 py-2 rounded-xl border text-sm"></textarea></div>
           <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Submit Review</button>
         </form>
       </div>
@@ -197,13 +156,10 @@
     </div>
   </div>
 
-  <!-- Edit Property Modal -->
+  <!-- Edit Modal -->
   <div id="editModal" class="modal-backdrop hidden">
     <div class="modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">✏️ Edit Property</h2>
-        <button id="closeEditModal" class="text-slate-400 text-2xl">&times;</button>
-      </div>
+      <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">✏️ Edit Property</h2><button id="closeEditModal" class="text-slate-400 text-2xl">&times;</button></div>
       <form id="editPropertyForm" class="space-y-4">
         <input type="hidden" id="editPropertyId" />
         <div><label>Title *</label><input type="text" id="editTitle" required class="w-full px-4 py-2 rounded-xl border" /></div>
@@ -216,17 +172,11 @@
     </div>
   </div>
 
-  <!-- Property Verification Modal -->
+  <!-- Verification Modal -->
   <div id="propertyVerificationModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h2>📋 Property Verification</h2>
-        <button id="closeVerificationModal">&times;</button>
-      </div>
-      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm text-amber-800">
-        <i class="fas fa-info-circle mr-1"></i>
-        Verification fee: <strong id="verifFeeDisplay">5,000 UGX</strong> — deducted from your wallet when you submit.
-      </div>
+      <div class="flex justify-between items-center mb-4"><h2>📋 Property Verification</h2><button id="closeVerificationModal">&times;</button></div>
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm text-amber-800"><i class="fas fa-info-circle mr-1"></i>Verification fee: <strong id="verifFeeDisplay">5,000 UGX</strong> — deducted from your wallet.</div>
       <form id="propertyVerificationForm" class="space-y-4">
         <input type="hidden" id="verifPropertyId" />
         <input type="hidden" id="verifPropertyType" />
@@ -237,7 +187,7 @@
     </div>
   </div>
 
-  <!-- Quiz / Connect Modal -->
+  <!-- Quiz Modal -->
   <div id="quizModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-lg">
       <div class="flex justify-between items-center mb-4"><h2>📞 Connect with Broker</h2><button id="closeQuizModal">&times;</button></div>
@@ -250,28 +200,24 @@
           <button type="button" id="quizNextBtn" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Next: Quiz Questions →</button>
         </div>
         <div id="quizStep2" class="hidden">
-          <div id="quizQuestionsContainer" class="space-y-2">
-            <div class="quiz-question">
-              <p class="q-title">1. When do you plan to move in or buy?</p>
+          <div class="space-y-2">
+            <div class="quiz-question"><p class="q-title">1. When do you plan to move in or buy?</p>
               <label class="quiz-option"><input type="radio" name="q1" value="1" required /> More than 6 months</label>
               <label class="quiz-option"><input type="radio" name="q1" value="2" /> 1 – 6 months</label>
               <label class="quiz-option"><input type="radio" name="q1" value="3" /> Less than 1 month / ASAP</label>
             </div>
-            <div class="quiz-question">
-              <p class="q-title">2. How does your budget compare to this property?</p>
+            <div class="quiz-question"><p class="q-title">2. How does your budget compare to this property?</p>
               <label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below the property price</label>
               <label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches the property price</label>
             </div>
-            <div class="quiz-question">
-              <p class="q-title">3. Are you ready to view this property within the next 7 days?</p>
+            <div class="quiz-question"><p class="q-title">3. Are you ready to view within the next 7 days?</p>
               <label class="quiz-option"><input type="radio" name="q3" value="1" required /> No, not yet</label>
               <label class="quiz-option"><input type="radio" name="q3" value="2" /> Maybe – would like more info</label>
               <label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes, I am ready</label>
             </div>
-            <div class="quiz-question">
-              <p class="q-title">4. How serious are you about this property specifically?</p>
+            <div class="quiz-question"><p class="q-title">4. How serious are you about this property?</p>
               <label class="quiz-option"><input type="radio" name="q4" value="1" required /> Just browsing</label>
-              <label class="quiz-option"><input type="radio" name="q4" value="2" /> Interested but comparing options</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="2" /> Interested but comparing</label>
               <label class="quiz-option"><input type="radio" name="q4" value="3" /> Very serious – top choice</label>
             </div>
           </div>
@@ -284,14 +230,8 @@
   <!-- Top-up Modal -->
   <div id="topupModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-sm">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">💰 Top Up Wallet</h2>
-        <button id="closeTopupModal" class="text-slate-400 text-2xl">&times;</button>
-      </div>
-      <form id="topupForm">
-        <input type="number" id="topupAmount" required min="1000" placeholder="Amount (e.g. 20000)" class="w-full px-4 py-2 border rounded-xl" />
-        <button type="submit" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl mt-3">Deposit</button>
-      </form>
+      <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">💰 Top Up Wallet</h2><button id="closeTopupModal" class="text-slate-400 text-2xl">&times;</button></div>
+      <form id="topupForm"><input type="number" id="topupAmount" required min="1000" placeholder="Amount (e.g. 20000)" class="w-full px-4 py-2 border rounded-xl" /><button type="submit" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl mt-3">Deposit</button></form>
       <div id="topupStatus"></div>
     </div>
   </div>
@@ -299,29 +239,18 @@
   <!-- Report Modal -->
   <div id="reportModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">🚨 Report Broker</h2>
-        <button id="closeReportModal" class="text-slate-400 text-2xl">&times;</button>
-      </div>
-      <p class="text-slate-500 text-sm mb-3">Help us keep Property Hub safe. Your report is anonymous to the broker. Our team will investigate.</p>
+      <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">🚨 Report Broker</h2><button id="closeReportModal" class="text-slate-400 text-2xl">&times;</button></div>
+      <p class="text-slate-500 text-sm mb-3">Your report is anonymous to the broker. Our team will investigate.</p>
       <form id="reportForm">
         <input type="hidden" id="reportBrokerId" />
-        <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Name (optional)</label><input type="text" id="reportName" placeholder="e.g. Anonymous" class="w-full px-4 py-2 border rounded-xl text-sm" /></div>
-        <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Email (optional, kept private)</label><input type="email" id="reportEmail" placeholder="you@example.com" class="w-full px-4 py-2 border rounded-xl text-sm" /></div>
+        <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Name (optional)</label><input type="text" id="reportName" class="w-full px-4 py-2 border rounded-xl text-sm" /></div>
+        <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Email (optional)</label><input type="email" id="reportEmail" class="w-full px-4 py-2 border rounded-xl text-sm" /></div>
         <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Reason *</label>
           <select id="reportReason" class="w-full px-4 py-2 border rounded-xl" required>
-            <option value="">Select a reason</option>
-            <option value="fraud">Fraud / Scam</option>
-            <option value="fake_listing">Fake Listing</option>
-            <option value="harassment">Harassment</option>
-            <option value="spam">Spam</option>
-            <option value="misleading">Misleading Information</option>
-            <option value="other">Other</option>
+            <option value="">Select a reason</option><option value="fraud">Fraud / Scam</option><option value="fake_listing">Fake Listing</option><option value="harassment">Harassment</option><option value="spam">Spam</option><option value="misleading">Misleading Information</option><option value="other">Other</option>
           </select>
         </div>
-        <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Description *</label>
-          <textarea id="reportDescription" required class="w-full px-4 py-2 border rounded-xl text-sm" rows="4" placeholder="Describe the issue in detail..."></textarea>
-        </div>
+        <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Description *</label><textarea id="reportDescription" required class="w-full px-4 py-2 border rounded-xl text-sm" rows="4"></textarea></div>
         <button type="submit" class="w-full bg-red-600 text-white py-2.5 rounded-xl"><i class="fas fa-flag mr-2"></i> Submit Report</button>
       </form>
       <div id="reportStatus" class="mt-3 text-sm"></div>
@@ -331,9 +260,7 @@
   <div id="app" class="min-h-screen">
     <header class="bg-white/90 border-b sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-2xl font-bold">🏠 Property<span class="text-indigo-600">Hub</span></span>
-        </div>
+        <div class="flex items-center gap-2"><span class="text-2xl font-bold">🏠 Property<span class="text-indigo-600">Hub</span></span></div>
         <div class="flex items-center gap-3">
           <span id="propertyCount" class="bg-slate-100 px-3 py-1 rounded-full text-xs">0 listings</span>
           <button id="brokerPortalBtn" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm"><i class="fas fa-user-tie"></i> <span id="portalBtnLabel">Broker Portal</span></button>
@@ -350,41 +277,29 @@
             <div class="max-w-3xl">
               <h1 class="text-4xl md:text-5xl font-extrabold">Find your <span class="text-indigo-300">perfect</span> space</h1>
               <p class="mt-3 text-slate-300 text-lg">Explore homes, rentals, and guesthouses from trusted brokers across Uganda.</p>
-
               <div class="mt-6 relative">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-                <input id="searchInput" type="text"
-                  placeholder="Search name, address, or price…"
-                  class="w-full pl-12 pr-12 py-3 rounded-xl text-slate-800" />
-                <button id="clearSearchBtn" title="Clear"
-                  class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100">
-                  <i class="fas fa-times"></i>
-                </button>
+                <input id="searchInput" type="text" placeholder="Search name, address, or price…" class="w-full pl-12 pr-12 py-3 rounded-xl text-slate-800" />
+                <button id="clearSearchBtn" title="Clear" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100"><i class="fas fa-times"></i></button>
               </div>
-              <p class="mt-2 text-xs text-slate-300 hidden sm:block">
-                💡 Try "300000-700000" for a price range, "under 500k", or "over 200k"
-              </p>
+              <p class="mt-2 text-xs text-slate-300 hidden sm:block">💡 Try "300000-700000" for a price range, "under 500k", or "over 200k"</p>
             </div>
           </div>
         </div>
 
         <div class="max-w-7xl mx-auto px-4">
           <div id="trustBanner" class="trust-banner">
-            <button id="hideTrustBanner" class="close-banner-btn" title="Hide this banner"><i class="fas fa-times"></i></button>
+            <button id="hideTrustBanner" class="close-banner-btn" title="Hide"><i class="fas fa-times"></i></button>
             <h3><i class="fas fa-shield-alt"></i> How to find a trustworthy broker</h3>
             <ul>
-              <li><i class="fas fa-check-circle"></i><span><strong class="text-emerald-700">Verified</strong> — property reviewed and confirmed by our team.</span></li>
-              <li><i class="fas fa-star"></i><span><strong class="text-amber-600">Trusted</strong> — broker with an excellent reputation (4★+, 10+ reviews).</span></li>
-              <li><i class="fas fa-comment-dots"></i><span><strong>Read reviews</strong> on the broker's profile before contacting them.</span></li>
-              <li><i class="fas fa-flag text-red-500"></i><span><strong>Report suspicious brokers</strong> via the red Report button on their profile.</span></li>
-              <li><i class="fas fa-hand-holding-usd"></i><span><strong>Never pay before viewing</strong> the property in person.</span></li>
+              <li><i class="fas fa-check-circle"></i><span><strong class="text-emerald-700">Verified</strong> — reviewed by our team.</span></li>
+              <li><i class="fas fa-star"></i><span><strong class="text-amber-600">Trusted</strong> — 4★+, 10+ reviews.</span></li>
+              <li><i class="fas fa-comment-dots"></i><span><strong>Read reviews</strong> before contacting.</span></li>
+              <li><i class="fas fa-flag text-red-500"></i><span><strong>Report suspicious brokers</strong> on their profile.</span></li>
+              <li><i class="fas fa-hand-holding-usd"></i><span><strong>Never pay before viewing</strong> in person.</span></li>
             </ul>
           </div>
-          <div id="trustBannerMini" class="trust-mini">
-            <i class="fas fa-shield-alt"></i>
-            <span>Look for <strong>Verified</strong> and <strong>Trusted</strong> badges. Always read reviews before contacting any broker.</span>
-            <button id="showTrustBanner">Learn more</button>
-          </div>
+          <div id="trustBannerMini" class="trust-mini"><i class="fas fa-shield-alt"></i><span>Look for <strong>Verified</strong> and <strong>Trusted</strong> badges.</span><button id="showTrustBanner">Learn more</button></div>
         </div>
 
         <section class="max-w-7xl mx-auto px-4 pb-4">
@@ -408,9 +323,6 @@
                 <div class="flex items-center gap-3"><h2 id="brokerBusinessName" class="text-2xl font-bold">Broker Name</h2><span id="brokerTrustedBadge" class="badge-trusted hidden"><i class="fas fa-star"></i> Trusted</span></div>
                 <div class="mt-2 flex items-center gap-2 text-sm"><span id="brokerStars"></span><span id="brokerReviewCount">(0 reviews)</span><span class="badge-lead" id="brokerLeadScore">⚡ 0</span></div>
                 <div class="review-stats mt-1"><span class="stat"><span class="value" id="statTotalReviews">0</span> reviews</span><span class="stat"><span class="value" id="statAvgRating">0.0</span> avg</span></div>
-                <p class="mt-2 text-xs text-amber-700 bg-amber-50 inline-block px-2 py-1 rounded">
-                  <i class="fas fa-lightbulb"></i> Always read the reviews below before contacting this broker.
-                </p>
               </div>
               <div class="flex gap-3 flex-wrap">
                 <button id="rateBrokerBtn" class="bg-yellow-500 text-white px-4 py-2.5 rounded-xl text-sm"><i class="fas fa-star mr-1"></i> Rate</button>
@@ -434,7 +346,7 @@
           <form id="authForm" class="space-y-4">
             <div id="signUpFields" class="hidden space-y-4">
               <div><label class="block text-xs font-bold mb-1">Business Name</label><input type="text" id="bizNameInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
-              <div><label class="block text-xs font-bold mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="guesthouse_owner">Guesthouse Operator / Manager</option></select></div>
+              <div><label class="block text-xs font-bold mb-1">Account Category</label><select id="accTypeSelect" class="w-full px-4 py-2.5 rounded-xl border"><option value="broker">Independent Broker</option><option value="property_owner">Property Owner / Investor</option><option value="guesthouse_owner">Guesthouse Operator</option></select></div>
               <div><label class="block text-xs font-bold mb-1">WhatsApp Phone</label><input type="text" id="phoneInput" class="w-full px-4 py-2.5 rounded-xl border" /></div>
             </div>
             <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="emailInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
@@ -447,10 +359,7 @@
 
       <section id="dashboardView" class="view view-hidden">
         <div class="max-w-5xl mx-auto px-4 py-8">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold">📋 My Properties</h2>
-            <button id="logoutBtn" class="text-sm text-red-500">Sign Out</button>
-          </div>
+          <div class="flex items-center justify-between mb-6"><h2 class="text-xl font-bold">📋 My Properties</h2><button id="logoutBtn" class="text-sm text-red-500">Sign Out</button></div>
           <div class="dashboard-toolbar">
             <div class="wallet-pill"><span class="wallet-label">Wallet</span><i class="fas fa-wallet"></i><span class="balance" id="walletBalanceDisplay">0</span> UGX<button id="topupBtn" class="ml-1 text-xs bg-emerald-600 text-white px-3 py-0.5 rounded-full">+ Top Up</button></div>
             <button id="refreshWalletBtn" class="toolbar-btn" style="background:#334155;color:white;"><i class="fas fa-sync-alt"></i></button>
@@ -509,27 +418,11 @@
 
     <footer class="bg-slate-900 text-slate-300 mt-12">
       <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
-        <div>
-          <h4 class="text-white font-bold text-lg mb-3">🏠 Property Hub Uganda</h4>
-          <p class="text-slate-400">Connecting property seekers with trusted brokers across Uganda. Find homes, rentals, land, and guesthouses with confidence.</p>
-        </div>
-        <div>
-          <h4 class="text-white font-bold mb-3">Popular Searches</h4>
-          <ul class="space-y-1 text-slate-400">
-            <li><a href="/?filter=rental" class="hover:text-indigo-300">Rentals in Kampala</a></li>
-            <li><a href="/?filter=property" class="hover:text-indigo-300">Houses for sale in Uganda</a></li>
-            <li><a href="/?filter=guesthouse" class="hover:text-indigo-300">Guesthouses in Uganda</a></li>
-            <li><a href="/?filter=property" class="hover:text-indigo-300">Land for sale in Wakiso</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-white font-bold mb-3">Areas We Cover</h4>
-          <p class="text-slate-400">Kampala · Wakiso · Entebbe · Mukono · Jinja · Mbarara · Gulu · Arua · Fort Portal · Masaka</p>
-        </div>
+        <div><h4 class="text-white font-bold text-lg mb-3">🏠 Property Hub Uganda</h4><p class="text-slate-400">Connecting property seekers with trusted brokers across Uganda.</p></div>
+        <div><h4 class="text-white font-bold mb-3">Popular Searches</h4><ul class="space-y-1 text-slate-400"><li><a href="/?filter=rental" class="hover:text-indigo-300">Rentals in Kampala</a></li><li><a href="/?filter=property" class="hover:text-indigo-300">Houses for sale in Uganda</a></li><li><a href="/?filter=guesthouse" class="hover:text-indigo-300">Guesthouses in Uganda</a></li></ul></div>
+        <div><h4 class="text-white font-bold mb-3">Areas We Cover</h4><p class="text-slate-400">Kampala · Wakiso · Entebbe · Mukono · Jinja · Mbarara · Gulu</p></div>
       </div>
-      <div class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
-        © 2026 Property Hub Uganda. All rights reserved.
-      </div>
+      <div class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">© 2026 Property Hub Uganda.</div>
     </footer>
   </div>
 
@@ -540,6 +433,13 @@
 
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+
+      // ═══════════════════════════════════════════════════════
+      //  🔑 REPLACE THIS WITH YOUR ACTUAL WEB3FORMS KEY
+      //  Get it from https://web3forms.com dashboard
+      // ═══════════════════════════════════════════════════════
+      const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
+
       const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org/';
 
@@ -572,32 +472,20 @@
       function parseSearchQuery(raw) {
         const q = String(raw || '').trim();
         if (!q) return { type: 'all' };
-
         let m = q.match(/^(?:under|below|<)\s*([\d.,]+\s*[kKmM]?)$/i);
-        if (m) {
-          const n = parseNumberToken(m[1]);
-          if (n !== null) return { type: 'max', max: n };
-        }
-
+        if (m) { const n = parseNumberToken(m[1]); if (n !== null) return { type: 'max', max: n }; }
         m = q.match(/^(?:over|above|>)\s*([\d.,]+\s*[kKmM]?)$/i);
-        if (m) {
-          const n = parseNumberToken(m[1]);
-          if (n !== null) return { type: 'min', min: n };
-        }
-
+        if (m) { const n = parseNumberToken(m[1]); if (n !== null) return { type: 'min', min: n }; }
         m = q.match(/^([\d.,]+\s*[kKmM]?)\s*[-–to]+\s*([\d.,]+\s*[kKmM]?)$/i);
         if (m) {
-          const a = parseNumberToken(m[1]);
-          const b = parseNumberToken(m[2]);
+          const a = parseNumberToken(m[1]); const b = parseNumberToken(m[2]);
           if (a !== null && b !== null) return { type: 'range', min: Math.min(a, b), max: Math.max(a, b) };
         }
-
         m = q.match(/^([\d.,]+\s*[kKmM]?)$/);
         if (m) {
           const n = parseNumberToken(m[1]);
           if (n !== null && n >= 1000) return { type: 'range', min: Math.round(n * 0.75), max: Math.round(n * 1.25) };
         }
-
         return { type: 'text', q: q.toLowerCase() };
       }
 
@@ -620,35 +508,21 @@
       function updateSEO(properties) {
         const count = properties.length;
         document.title = `${count} Properties for Sale & Rent in Uganda | Property Hub Uganda`;
-
         const items = properties.slice(0, 20).map((p, i) => ({
-          "@type": "ListItem",
-          "position": i + 1,
-          "item": {
-            "@type": "RealEstateListing",
-            "name": p.title || "Property",
-            "url": SITE_URL + "#property-" + p.id,
+          "@type": "ListItem", "position": i + 1,
+          "item": { "@type": "RealEstateListing", "name": p.title || "Property", "url": SITE_URL + "#property-" + p.id,
             "offers": { "@type": "Offer", "price": p.price_amount || 0, "priceCurrency": "UGX" },
-            "address": { "@type": "PostalAddress", "addressLocality": p.address || "Uganda", "addressCountry": "UG" }
-          }
+            "address": { "@type": "PostalAddress", "addressLocality": p.address || "Uganda", "addressCountry": "UG" } }
         }));
-
         const schema = { "@context": "https://schema.org", "@type": "ItemList", "numberOfItems": count, "itemListElement": items };
-
         let scriptEl = document.getElementById('dynamic-schema');
-        if (!scriptEl) {
-          scriptEl = document.createElement('script');
-          scriptEl.id = 'dynamic-schema';
-          scriptEl.type = 'application/ld+json';
-          document.head.appendChild(scriptEl);
-        }
+        if (!scriptEl) { scriptEl = document.createElement('script'); scriptEl.id = 'dynamic-schema'; scriptEl.type = 'application/ld+json'; document.head.appendChild(scriptEl); }
         scriptEl.textContent = JSON.stringify(schema);
       }
 
       function injectPropertySchema(property) {
         const schema = {
-          "@context": "https://schema.org",
-          "@type": "RealEstateListing",
+          "@context": "https://schema.org", "@type": "RealEstateListing",
           "name": property.title || "Property",
           "description": `Property for ${property.property_type || 'sale/rent'} in ${property.address || 'Uganda'}`,
           "url": `${SITE_URL}#property-${property.id}`,
@@ -683,24 +557,44 @@
         else { sIn.classList.add('active'); sUp.classList.remove('active'); f.classList.add('hidden'); t.innerText='Welcome Back'; b.innerText='Access Dashboard'; }
       }
 
-      // ─── EMAIL via Web3Forms ───
-async function sendNotificationEmail(to_email, to_name, subject, message) {
-  try {
-    const { error } = await supabase.functions.invoke('send-email-web3forms', {
-      body: { to_email, to_name, subject, message }
-    });
-    if (error) throw error;
-    console.log('📧 Email sent to', to_email);
-    return true;
-  } catch (err) {
-    console.error('❌ Email failed for', to_email, '→', err.message);
-    return false;
-  }
-}
+      // ═══════════════════════════════════════════════════════
+      //  EMAIL via Web3Forms — called DIRECTLY from browser
+      // ═══════════════════════════════════════════════════════
+      async function sendNotificationEmail(to_email, to_name, subject, message) {
+        try {
+          const payload = {
+            access_key: WEB3FORMS_KEY,
+            email: to_email,
+            subject: subject,
+            from_name: 'Property Hub Uganda',
+            message: message,
+            replyto: to_email,
+            botcheck: ''
+          };
 
-      function buildBrokerLeadEmail(t, a, lt, c) { return `Hello Broker,\n\n🔔 NEW ${lt.toUpperCase()} LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\nA visitor is interested in your property:\n\n🏠 ${t || 'Untitled'}\n📍 ${a || 'Location not specified'}\n\n🔥 Lead Type: ${lt.toUpperCase()}\n💰 Cost to unlock: ${c.toLocaleString()} UGX\n\n━━━━━━━━━━━━━━━━━━━━━━━\nLog in to your dashboard to unlock this lead.\n\n👉 ${SITE_URL}?dashboard=1\n\n⏰ This lead notification fades after 24 hours. Act fast.\n\n— Property Hub Uganda\n${SITE_URL}`; }
-      function buildVisitorApprovedEmail(n, t, bn, bp, be) { return `Hello ${n},\n\n🎉 GREAT NEWS! Your request has been APPROVED.\n\nProperty: ${t}\nBroker: ${bn || 'the broker'}\n\n📱 WhatsApp: ${bp || '—'}\n📧 Email: ${be || '—'}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n⚠️ SAFETY REMINDERS\n\n• Always visit the property in person before sending ANY money.\n• Never transfer funds without viewing the property.\n• Verify the broker's identity before any payment.\n• If anything feels off, report them on Property Hub.\n\nThank you for using Property Hub Uganda.\n\n${SITE_URL}`; }
-      function buildVisitorRejectedEmail(n, t) { return `Hello ${n},\n\nWe're sorry to inform you that the broker was unavailable to respond to your request for "${t}" within our 24-hour window.\n\nDon't worry! You can still try connecting with them again. Simply return to Property Hub Uganda and submit a new request.\n\n🔗 Visit us again: ${SITE_URL}\n\nThank you for your patience.\n\nProperty Hub Uganda`; }
+          const res = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            throw new Error(data.message || 'Email failed');
+          }
+
+          console.log('📧 Email sent to', to_email);
+          return true;
+        } catch (err) {
+          console.error('❌ Email failed for', to_email, '→', err.message);
+          return false;
+        }
+      }
+
+      function buildBrokerLeadEmail(t, a, lt, c) { return `Hello Broker,\n\n🔔 NEW ${lt.toUpperCase()} LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\nA visitor is interested in your property:\n\n🏠 ${t || 'Untitled'}\n📍 ${a || 'Location not specified'}\n\n🔥 Lead Type: ${lt.toUpperCase()}\n💰 Cost to unlock: ${c.toLocaleString()} UGX\n\n━━━━━━━━━━━━━━━━━━━━━━━\nLog in to your dashboard to unlock this lead.\n\n👉 ${SITE_URL}?dashboard=1\n\n— Property Hub Uganda`; }
+      function buildVisitorApprovedEmail(n, t, bn, bp, be) { return `Hello ${n},\n\n🎉 Your request has been APPROVED.\n\nProperty: ${t}\nBroker: ${bn || 'the broker'}\n\n📱 WhatsApp: ${bp || '—'}\n📧 Email: ${be || '—'}\n\n⚠️ Safety: Never pay before viewing the property in person.\n\n${SITE_URL}`; }
+      function buildVisitorRejectedEmail(n, t) { return `Hello ${n},\n\nUnfortunately the broker was unavailable for "${t}".\n\nTry again later: ${SITE_URL}`; }
 
       async function loadWallet() {
         if (!state.currentUser) return;
@@ -744,9 +638,6 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
         const article = document.createElement('article');
         article.className = 'property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/70 flex flex-col';
         article.id = `property-${property.id}`;
-        article.setAttribute('itemscope', '');
-        article.setAttribute('itemtype', 'https://schema.org/RealEstateListing');
-
         const imageUrl = getImageUrl(property);
         const rating = broker?.average_rating || 0;
         const reviewCount = broker?.review_count || 0;
@@ -779,17 +670,17 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
 
         article.innerHTML = `
           <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
-            <img src="${imageUrl}" alt="${property.title || 'Property'} in ${property.address || 'Uganda'} - Property Hub Uganda" class="w-full h-full object-cover" loading="lazy" itemprop="image"/>
+            <img src="${imageUrl}" alt="${property.title || 'Property'} in ${property.address || 'Uganda'}" class="w-full h-full object-cover" loading="lazy"/>
             <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full">${property.property_type || 'Property'}</span>
             ${!showEdit && isVerified ? `<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>` : ''}
           </div>
           <div class="p-4 flex flex-col flex-1">
             <div class="flex items-center justify-between flex-wrap gap-1">
-              <h3 class="font-semibold text-slate-800 text-base line-clamp-1" itemprop="name">${property.title || 'Untitled'}</h3>
+              <h3 class="font-semibold text-slate-800 text-base line-clamp-1">${property.title || 'Untitled'}</h3>
               <div class="flex items-center gap-1">${!showEdit ? badgeHtml : ''} ${!showEdit && isTrusted ? trustedHtml : ''}</div>
             </div>
-            <p class="text-indigo-700 font-bold text-sm mt-0.5" itemprop="price" content="${property.price_amount}">${formatPrice(property.price_amount)}</p>
-            <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5" itemprop="address">${property.address || 'Location not specified'}</p>
+            <p class="text-indigo-700 font-bold text-sm mt-0.5">${formatPrice(property.price_amount)}</p>
+            <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5"><i class="fas fa-map-pin text-slate-400 text-[10px]"></i>${property.address || 'Location not specified'}</p>
             <div class="mt-2 flex items-center gap-2 text-xs">
               <span class="stars text-xs">${renderStars(rating)}</span>
               <span class="text-slate-500">(${reviewCount})</span>
@@ -839,11 +730,7 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
         const grid = $('#listingsGrid');
         if (!grid) return;
         grid.innerHTML = '';
-        if (!list || list.length === 0) {
-          $('#emptyState')?.classList.remove('hidden');
-          $('#propertyCount').textContent = '0 listings';
-          return;
-        }
+        if (!list || list.length === 0) { $('#emptyState')?.classList.remove('hidden'); $('#propertyCount').textContent = '0 listings'; return; }
         $('#emptyState')?.classList.add('hidden');
         $('#propertyCount').textContent = `${list.length} listing${list.length > 1 ? 's' : ''}`;
         list.forEach(p => {
@@ -925,10 +812,8 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
       function applyFiltersAndSearch() {
         const f = state.currentFilter;
         const parsed = parseSearchQuery(state.searchQuery);
-
         let r = [...state.allProperties];
         if (f !== 'all') r = r.filter(p => (p.property_type || '').toLowerCase() === f);
-
         if (parsed.type === 'text' && parsed.q) {
           const q = parsed.q;
           r = r.filter(p => {
@@ -944,10 +829,8 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
         } else if (parsed.type === 'max') {
           r = r.filter(p => Number(p.price_amount || 0) <= parsed.max);
         }
-
         state.filteredProperties = r;
         renderListings(r);
-
         const clearBtn = $('#clearSearchBtn');
         if (clearBtn) clearBtn.classList.toggle('hidden', !state.searchQuery.trim());
       }
@@ -995,7 +878,7 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
             await sendNotificationEmail(bd.email, bd.business_name || 'Broker', `🔔 New ${lt.toUpperCase()} Lead – ${pd.title}`, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
           }
           $('#quizModal').classList.add('hidden');
-          alert(`✅ Notification Sent!\n\nWe've notified the broker about your interest in "${pd.title}".\n\n📧 Check your email — once they unlock your request, their contact details land in your inbox.\n\n⏰ If you don't hear back within 24 hours, please try connecting again.`);
+          alert(`✅ Notification Sent!\n\nWe've notified the broker about your interest in "${pd.title}".\n\n📧 Check your email — once they unlock your request, their contact details land in your inbox.`);
           subscribeToLeadRequest(lead.id);
         } catch (e) { console.error(e); alert('Error: ' + e.message); }
       });
@@ -1015,9 +898,7 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
       async function loadLeads() {
         if (!state.currentUser) return;
         try {
-          const { data, error } = await supabase.from('lead_requests')
-            .select('*')
-            .eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
+          const { data, error } = await supabase.from('lead_requests').select('*').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
           if (error) throw error;
 
           const propIds = [...new Set((data || []).map(l => l.property_id).filter(Boolean))];
@@ -1046,21 +927,16 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
             let followUpBadge = '';
             if (isA && l.approved_at) {
               if (l.follow_up_sent) {
-                followUpBadge = `<span class="badge-followup" title="Sent ${new Date(l.follow_up_sent_at).toLocaleString()}"><i class="fas fa-check"></i> Follow-up sent</span>`;
+                followUpBadge = `<span class="badge-followup"><i class="fas fa-check"></i> Follow-up sent</span>`;
               } else {
                 const daysSince = (now - new Date(l.approved_at).getTime()) / 86400000;
                 const daysLeft = Math.max(0, 3 - Math.floor(daysSince));
-                followUpBadge = `<span class="badge-followup" title="Auto-sent by Property Hub 3 days after approval"><i class="fas fa-clock"></i> Follow-up in ${daysLeft}d</span>`;
+                followUpBadge = `<span class="badge-followup"><i class="fas fa-clock"></i> Follow-up in ${daysLeft}d</span>`;
               }
             }
 
             html += `<div class="verification-property-item" data-lead-id="${l.id}">
-              <div class="property-title">
-                ${prop.title || 'Unknown'}
-                ${isHot ? '<span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : ''}
-                <span class="text-xs text-slate-400">(${l.lead_type})</span>
-                ${followUpBadge}
-              </div>
+              <div class="property-title">${prop.title || 'Unknown'} ${isHot ? '<span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : ''} <span class="text-xs text-slate-400">(${l.lead_type})</span> ${followUpBadge}</div>
               <div><span class="property-status ${sc}">${sl}</span></div>
               <div class="flex items-center gap-2 flex-wrap">
                 ${isP ? `<button class="unlock-lead-btn unlock-btn" data-lead-id="${l.id}"><i class="fas fa-unlock"></i> Unlock · ${lc.toLocaleString()} UGX</button><button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full" data-lead-id="${l.id}">Reject</button>` : ''}
@@ -1072,26 +948,23 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
 
           list.querySelectorAll('.unlock-lead-btn').forEach(b => b.addEventListener('click', async () => {
             const id = b.dataset.leadId;
-            if (!confirm('Unlock this lead? (Free during beta)')) return;
+            if (!confirm('Unlock this lead?')) return;
             try {
               const { data: u, error } = await supabase.from('lead_requests').update({
                 status: 'approved',
                 unlocked_at: new Date().toISOString(),
                 approved_at: new Date().toISOString(),
                 follow_up_sent: false
-              }).eq('id', id)
-                .select('visitor_name, visitor_email, visitor_whatsapp, property_id').single();
+              }).eq('id', id).select('visitor_name, visitor_email, visitor_whatsapp, property_id').single();
               if (error) throw error;
 
               const { data: pd } = await supabase.from('properties').select('title').eq('id', u.property_id).single();
               const { data: bp } = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
 
               if (u?.visitor_email) {
-                await sendNotificationEmail(u.visitor_email, u.visitor_name,
-                  `🎉 Your Request Was Approved`,
-                  buildVisitorApprovedEmail(u.visitor_name, pd?.title || 'the property', bp?.business_name, bp?.phone || u.visitor_whatsapp, bp?.email || state.currentUser.email));
+                await sendNotificationEmail(u.visitor_email, u.visitor_name, `🎉 Your Request Was Approved`, buildVisitorApprovedEmail(u.visitor_name, pd?.title || 'the property', bp?.business_name, bp?.phone || u.visitor_whatsapp, bp?.email || state.currentUser.email));
               }
-              alert(`✅ Lead unlocked!\n\nVisitor: ${u.visitor_name}\nEmail: ${u.visitor_email}\nWhatsApp: ${u.visitor_whatsapp}\n\nA confirmation email was sent. Our team will send a follow-up in 3 days.`);
+              alert(`✅ Lead unlocked!\n\nVisitor: ${u.visitor_name}\nEmail: ${u.visitor_email}\nWhatsApp: ${u.visitor_whatsapp}`);
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }));
@@ -1100,8 +973,7 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
             const id = b.dataset.leadId;
             if (!confirm('Reject this lead?')) return;
             try {
-              const { data: u, error } = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', id)
-                .select('visitor_name, visitor_email, property_id').single();
+              const { data: u, error } = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', id).select('visitor_name, visitor_email, property_id').single();
               if (error) throw error;
               const { data: pd } = await supabase.from('properties').select('title').eq('id', u.property_id).single();
               if (u?.visitor_email) await sendNotificationEmail(u.visitor_email, u.visitor_name, 'Your Request Was Not Approved', buildVisitorRejectedEmail(u.visitor_name, pd?.title || 'the property'));
@@ -1164,11 +1036,8 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
       }
 
       function openVerificationModal(pid, ptype) {
-        if (state.walletBalance < VERIFICATION_FEE) {
-          alert(`⚠️ Insufficient wallet balance.\n\nVerification costs ${formatPrice(VERIFICATION_FEE)}.\nYour balance: ${formatPrice(state.walletBalance)}.\n\nPlease top up first.`);
-          return;
-        }
-        if (!confirm(`⚠️ Property Verification\n\nVerifying this property costs ${formatPrice(VERIFICATION_FEE)}.\n\nDo you approve this charge?`)) return;
+        if (state.walletBalance < VERIFICATION_FEE) { alert(`⚠️ Insufficient wallet balance.\n\nVerification costs ${formatPrice(VERIFICATION_FEE)}.\nYour balance: ${formatPrice(state.walletBalance)}.`); return; }
+        if (!confirm(`⚠️ Property Verification\n\nCosts ${formatPrice(VERIFICATION_FEE)}. Do you approve?`)) return;
         $('#verifPropertyId').value = pid;
         $('#verifPropertyType').value = ptype || 'rental';
         $('#verifStatus').textContent = '';
@@ -1183,38 +1052,24 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
         e.preventDefault();
         const pid = $('#verifPropertyId').value;
         if (!pid) return;
-        if (state.walletBalance < VERIFICATION_FEE) {
-          $('#verifStatus').className = 'mt-3 text-sm text-red-600';
-          $('#verifStatus').textContent = `❌ Insufficient balance. Need ${formatPrice(VERIFICATION_FEE)}.`;
-          return;
-        }
+        if (state.walletBalance < VERIFICATION_FEE) { $('#verifStatus').className = 'mt-3 text-sm text-red-600'; $('#verifStatus').textContent = `❌ Insufficient balance.`; return; }
         const data = {};
         document.querySelectorAll('[data-verif-field]').forEach(el => { data[el.dataset.verifField] = el.value.trim(); });
         $('#verifStatus').className = 'mt-3 text-sm text-indigo-600';
         $('#verifStatus').textContent = 'Processing payment…';
         try {
-          const { error: we } = await supabase.rpc('deduct_wallet', {
-            p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE,
-            p_type: 'verification_fee', p_reference: pid,
-            p_description: 'Property verification fee'
-          });
+          const { error: we } = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE, p_type: 'verification_fee', p_reference: pid, p_description: 'Property verification fee' });
           if (we) throw new Error(we.message);
-          const { error: re } = await supabase.from('property_verification_requests').insert({
-            property_id: pid, broker_id: state.currentUser.id,
-            submitted_data: data, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending'
-          });
+          const { error: re } = await supabase.from('property_verification_requests').insert({ property_id: pid, broker_id: state.currentUser.id, submitted_data: data, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
           if (re) throw re;
           await supabase.from('properties').update({ verification_status: 'pending' }).eq('id', pid);
           await loadWallet();
           await loadPropertyVerificationList();
           await loadMyProperties();
           $('#verifStatus').className = 'mt-3 text-sm text-emerald-600';
-          $('#verifStatus').textContent = `✅ Submitted! ${formatPrice(VERIFICATION_FEE)} deducted. Our team will review shortly.`;
+          $('#verifStatus').textContent = `✅ Submitted! ${formatPrice(VERIFICATION_FEE)} deducted.`;
           setTimeout(() => $('#propertyVerificationModal').classList.add('hidden'), 2500);
-        } catch (e) {
-          $('#verifStatus').className = 'mt-3 text-sm text-red-600';
-          $('#verifStatus').textContent = '❌ ' + e.message;
-        }
+        } catch (e) { $('#verifStatus').className = 'mt-3 text-sm text-red-600'; $('#verifStatus').textContent = '❌ ' + e.message; }
       });
 
       async function loadPropertyVerificationList() {
@@ -1233,10 +1088,7 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
             const can = s === 'unverified' || s === 'rejected';
             const row = document.createElement('div');
             row.className = 'verification-property-item';
-            row.innerHTML = `
-              <div class="property-title">${p.title || 'Untitled'}</div>
-              <div><span class="property-status ${sc}">${sl}</span></div>
-              <div>${can ? `<button class="request-verif-btn unlock-btn" data-id="${p.id}" data-type="${p.property_type || 'rental'}"><i class="fas fa-shield-alt"></i> Request · ${formatPrice(VERIFICATION_FEE)}</button>` : ''}</div>`;
+            row.innerHTML = `<div class="property-title">${p.title || 'Untitled'}</div><div><span class="property-status ${sc}">${sl}</span></div><div>${can ? `<button class="request-verif-btn unlock-btn" data-id="${p.id}" data-type="${p.property_type || 'rental'}"><i class="fas fa-shield-alt"></i> Request · ${formatPrice(VERIFICATION_FEE)}</button>` : ''}</div>`;
             list.appendChild(row);
           });
           list.querySelectorAll('.request-verif-btn').forEach(b => b.addEventListener('click', () => openVerificationModal(b.dataset.id, b.dataset.type)));
@@ -1260,10 +1112,7 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
           $('#statAvgRating').textContent = r.toFixed(1);
           $('#rateBrokerBtn').onclick = () => openReviewModal(id);
           $('#viewReviewsBtn').onclick = () => openViewReviewsModal(id);
-          $('#reportBrokerBtn').onclick = () => {
-            if (state.currentUser && state.currentUser.id === id) { alert('You cannot report yourself.'); return; }
-            openReportModal(id);
-          };
+          $('#reportBrokerBtn').onclick = () => { if (state.currentUser && state.currentUser.id === id) { alert('You cannot report yourself.'); return; } openReportModal(id); };
           const { data: props } = await supabase.from('properties').select('*').eq('owner_id', id).eq('is_paused', false).order('created_at', { ascending: false });
           grid.innerHTML = '';
           if (!props || props.length === 0) { $('#brokerEmptyState').classList.remove('hidden'); return; }
@@ -1381,61 +1230,31 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
         const files = $('#propImage').files;
         const reqV = $('#addRequestVerification').checked;
         if (!title || !price || !addr) { alert('Fill required fields.'); return; }
-        if (reqV) {
-          if (!confirm(`⚠️ Property Verification\n\nVerifying this property costs ${formatPrice(VERIFICATION_FEE)}.\n\nDo you approve this charge?`)) return;
-        }
+        if (reqV) { if (!confirm(`⚠️ Property Verification\n\nCosts ${formatPrice(VERIFICATION_FEE)}. Do you approve?`)) return; }
 
         const urls = [];
-
-        // ─── COMPRESSED IMAGE UPLOAD ───
         if (files && files.length > 0) {
           $('#uploadStatus').className = 'mt-3 text-sm text-indigo-600';
           $('#uploadStatus').textContent = `Compressing ${files.length} image(s)…`;
-
           for (let i = 0; i < files.length; i++) {
             const file = files[i];
             if (!file.type.startsWith('image/')) continue;
-
             try {
-              const options = {
-                maxSizeMB: 0.25,
-                maxWidthOrHeight: 1600,
-                useWebWorker: true,
-                fileType: 'image/jpeg',
-                initialQuality: 0.8,
-              };
-
+              const options = { maxSizeMB: 0.25, maxWidthOrHeight: 1600, useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.8 };
               const compressedFile = await imageCompression(file, options);
               const savedPct = Math.round((1 - compressedFile.size / file.size) * 100);
               console.log(`📸 ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${(compressedFile.size/1024).toFixed(0)}KB (${savedPct}% saved)`);
-
               $('#uploadStatus').textContent = `Uploading ${i+1} of ${files.length}…`;
-
               const name = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.jpg`;
               const path = `${state.currentUser.id}/${name}`;
-
-              const { error: ue } = await supabase.storage
-                .from('property-media')
-                .upload(path, compressedFile, {
-                  contentType: 'image/jpeg',
-                  cacheControl: '31536000',
-                  upsert: false
-                });
-
+              const { error: ue } = await supabase.storage.from('property-media').upload(path, compressedFile, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false });
               if (ue) { alert('Upload failed: ' + ue.message); return; }
-
               const { data: ud } = supabase.storage.from('property-media').getPublicUrl(path);
               urls.push(ud.publicUrl);
-            } catch (err) {
-              console.error('Compression/upload error:', err);
-              alert('Image processing failed: ' + err.message);
-              return;
-            }
+            } catch (err) { console.error(err); alert('Image failed: ' + err.message); return; }
           }
-
           $('#uploadStatus').textContent = `✅ ${urls.length} image(s) ready`;
         }
-
         const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
         try {
           const { data: inserted, error } = await supabase.from('properties').insert({
@@ -1446,17 +1265,10 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
           }).select().single();
           if (error) throw error;
           if (reqV && inserted?.id) {
-            const { error: we } = await supabase.rpc('deduct_wallet', {
-              p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE,
-              p_type: 'verification_fee', p_reference: inserted.id,
-              p_description: 'Property verification fee'
-            });
+            const { error: we } = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE, p_type: 'verification_fee', p_reference: inserted.id, p_description: 'Property verification fee' });
             if (we) alert('Property saved, but fee charge failed: ' + we.message);
             else {
-              await supabase.from('property_verification_requests').insert({
-                property_id: inserted.id, broker_id: state.currentUser.id,
-                submitted_data: {}, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending'
-              });
+              await supabase.from('property_verification_requests').insert({ property_id: inserted.id, broker_id: state.currentUser.id, submitted_data: {}, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
               await loadWallet();
             }
           }
@@ -1654,16 +1466,8 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
         $('#hideTrustBanner')?.addEventListener('click', () => { tb.style.display = 'none'; tm.classList.add('visible'); localStorage.setItem(hk, '1'); });
         $('#showTrustBanner')?.addEventListener('click', () => { tb.style.display = 'block'; tm.classList.remove('visible'); localStorage.setItem(hk, '0'); });
 
-        $('#searchInput')?.addEventListener('input', e => {
-          state.searchQuery = e.target.value;
-          applyFiltersAndSearch();
-        });
-        $('#clearSearchBtn')?.addEventListener('click', () => {
-          $('#searchInput').value = '';
-          state.searchQuery = '';
-          applyFiltersAndSearch();
-          $('#searchInput').focus();
-        });
+        $('#searchInput')?.addEventListener('input', e => { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
+        $('#clearSearchBtn')?.addEventListener('click', () => { $('#searchInput').value = ''; state.searchQuery = ''; applyFiltersAndSearch(); $('#searchInput').focus(); });
 
         $$('.filter-pill').forEach(p => p.addEventListener('click', () => {
           $$('.filter-pill').forEach(x => x.classList.remove('active'));
@@ -1690,21 +1494,11 @@ async function sendNotificationEmail(to_email, to_name, subject, message) {
         await handleRoute();
         await fetchAllData();
 
-        supabase
-          .channel('properties-live')
-          .on('postgres_changes',
-              { event: '*', schema: 'public', table: 'properties' },
-              () => {
-                console.log('🔄 Properties changed — refreshing…');
-                fetchAllData();
-                if (state.currentUser) {
-                  loadMyProperties();
-                  loadPropertyVerificationList();
-                }
-              })
-          .subscribe(status => {
-            if (status === 'SUBSCRIBED') console.log('📡 Live property updates: ON');
-          });
+        supabase.channel('properties-live').on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
+          console.log('🔄 Properties changed — refreshing…');
+          fetchAllData();
+          if (state.currentUser) { loadMyProperties(); loadPropertyVerificationList(); }
+        }).subscribe(status => { if (status === 'SUBSCRIBED') console.log('📡 Live property updates: ON'); });
 
         const params = new URLSearchParams(window.location.search);
         if (params.get('dashboard') === '1' && state.currentUser) {
