@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /dashboard
+Disallow: /auth
+
+Sitemap: https://propertyhub.dpdns.org/sitemap.xml
