@@ -4,57 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- ─── PRIMARY SEO ─── -->
   <title>Property Hub Uganda – Find Homes, Rentals & Guesthouses in Kampala & Uganda</title>
-  <meta name="description" content="Find houses, rentals, land, and guesthouses for sale and rent across Uganda. Verified listings from trusted brokers in Kampala, Wakiso, Entebbe, and beyond. Connect directly with brokers." />
-  <meta name="keywords" content="property Uganda, houses for sale Uganda, rentals Kampala, land for sale Uganda, guesthouses Uganda, apartments Kampala, real estate Uganda, brokers Uganda, cheap houses Uganda" />
+  <meta name="description" content="Find houses, rentals, land, and guesthouses for sale and rent across Uganda. Verified listings from trusted brokers in Kampala, Wakiso, Entebbe, and beyond." />
+  <meta name="keywords" content="property Uganda, houses for sale Uganda, rentals Kampala, land for sale Uganda, guesthouses Uganda, apartments Kampala, real estate Uganda, brokers Uganda" />
   <link rel="canonical" href="https://propertyhub.dpdns.org/" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <meta name="author" content="Property Hub Uganda" />
   <meta name="geo.region" content="UG" />
   <meta name="geo.placename" content="Kampala" />
   <meta name="theme-color" content="#4f46e5" />
 
-  <!-- ─── OPEN GRAPH (Facebook / WhatsApp / LinkedIn) ─── -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Property Hub Uganda" />
   <meta property="og:title" content="Property Hub Uganda – Find Homes, Rentals & Guesthouses" />
-  <meta property="og:description" content="Verified properties from trusted brokers across Uganda. Houses, rentals, land, and guesthouses — all in one place." />
+  <meta property="og:description" content="Verified properties from trusted brokers across Uganda." />
   <meta property="og:url" content="https://propertyhub.dpdns.org/" />
-  <meta property="og:image" content="https://propertyhub.dpdns.org/og-image.jpg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="en_UG" />
 
-  <!-- ─── TWITTER CARD ─── -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Property Hub Uganda – Find Homes, Rentals & Guesthouses" />
+  <meta name="twitter:title" content="Property Hub Uganda" />
   <meta name="twitter:description" content="Verified properties from trusted brokers across Uganda." />
-  <meta name="twitter:image" content="https://propertyhub.dpdns.org/og-image.jpg" />
 
-  <!-- ─── FAVICON ─── -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
 
-  <!-- ─── PERFORMANCE ─── -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
   <link rel="preconnect" href="https://ubkgovgoifgpazkapaxi.supabase.co" />
   <link rel="dns-prefetch" href="https://images.unsplash.com" />
 
-  <script>
-  // GitHub Pages SPA redirect parser — must run BEFORE the app loads
-  (function() {
-    var p = new URLSearchParams(window.location.search).get('p');
-    if (p) {
-      // Clean the URL and restore the original path
-      window.history.replaceState(null, '', p);
-    }
-  })();
-</script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
-  <!-- ─── STRUCTURED DATA ─── -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -74,19 +50,23 @@
     "@type": "RealEstateAgent",
     "name": "Property Hub Uganda",
     "url": "https://propertyhub.dpdns.org/",
-    "logo": "https://propertyhub.dpdns.org/og-image.jpg",
     "description": "Property Hub Uganda connects property seekers with trusted brokers across Uganda.",
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "UG",
-      "addressLocality": "Kampala"
-    },
-    "areaServed": {
-      "@type": "Country",
-      "name": "Uganda"
-    },
+    "address": { "@type": "PostalAddress", "addressCountry": "UG", "addressLocality": "Kampala" },
+    "areaServed": { "@type": "Country", "name": "Uganda" },
     "priceRange": "UGX"
   }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+
+  <script>
+    // SPA 404 redirect parser — runs BEFORE app loads
+    (function() {
+      var p = new URLSearchParams(window.location.search).get('p');
+      if (p) { window.history.replaceState(null, '', p); }
+    })();
   </script>
 
   <style>
@@ -438,7 +418,6 @@
                 <button id="reportBrokerBtn" class="bg-red-500 text-white px-4 py-2.5 rounded-xl text-sm"><i class="fas fa-flag"></i> Report</button>
               </div>
             </div>
-            <div id="brokerReportNotice" class="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 hidden"></div>
           </div>
           <div id="brokerListingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
           <div id="brokerEmptyState" class="hidden text-center py-20">No listings yet.</div>
@@ -494,11 +473,11 @@
           <div id="addPropertyContainer" class="add-property-container">
             <h4 class="font-semibold mb-3">➕ Add Property</h4>
             <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label class="block text-xs font-bold mb-1">Title *</label><input type="text" id="propTitle" required class="w-full px-4 py-2 rounded-xl border" /></div>
+              <div><label class="block text-xs font-bold mb-1">Title *</label><input type="text" id="propTitle" required class="w-full px-4 py-2 rounded-xl border" placeholder="e.g. 3 Bedroom Apartment for Rent in Bukoto" /></div>
               <div><label class="block text-xs font-bold mb-1">Price (UGX) *</label><input type="number" id="propPrice" required class="w-full px-4 py-2 rounded-xl border" /></div>
               <div><label class="block text-xs font-bold mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
-              <div><label class="block text-xs font-bold mb-1">Address *</label><input type="text" id="propAddress" required class="w-full px-4 py-2 rounded-xl border" /></div>
-              <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Images</label><input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm" /></div>
+              <div><label class="block text-xs font-bold mb-1">Address *</label><input type="text" id="propAddress" required class="w-full px-4 py-2 rounded-xl border" placeholder="e.g. Bukoto, Kampala" /></div>
+              <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Images (auto-compressed)</label><input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm" /></div>
               <div class="md:col-span-2 flex items-center">
                 <input type="checkbox" id="addRequestVerification" />
                 <label for="addRequestVerification" class="ml-2 text-sm">Request Verification <span class="text-amber-700 font-semibold">(5,000 UGX)</span></label>
@@ -528,7 +507,6 @@
       </section>
     </main>
 
-    <!-- ─── SEO FOOTER ─── -->
     <footer class="bg-slate-900 text-slate-300 mt-12">
       <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
         <div>
@@ -611,17 +589,13 @@
         if (m) {
           const a = parseNumberToken(m[1]);
           const b = parseNumberToken(m[2]);
-          if (a !== null && b !== null) {
-            return { type: 'range', min: Math.min(a, b), max: Math.max(a, b) };
-          }
+          if (a !== null && b !== null) return { type: 'range', min: Math.min(a, b), max: Math.max(a, b) };
         }
 
         m = q.match(/^([\d.,]+\s*[kKmM]?)$/);
         if (m) {
           const n = parseNumberToken(m[1]);
-          if (n !== null && n >= 1000) {
-            return { type: 'range', min: Math.round(n * 0.75), max: Math.round(n * 1.25) };
-          }
+          if (n !== null && n >= 1000) return { type: 'range', min: Math.round(n * 0.75), max: Math.round(n * 1.25) };
         }
 
         return { type: 'text', q: q.toLowerCase() };
@@ -643,13 +617,10 @@
       function renderStars(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '★' : '☆'; return h; }
       function renderStarsSmall(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : '<i class="far fa-star text-slate-300 text-xs"></i>'; return h; }
 
-      // ─── DYNAMIC SEO: Update meta tags + JSON-LD when listings load ───
       function updateSEO(properties) {
-        // Update page title based on listings
         const count = properties.length;
         document.title = `${count} Properties for Sale & Rent in Uganda | Property Hub Uganda`;
 
-        // Build ItemList schema for properties
         const items = properties.slice(0, 20).map((p, i) => ({
           "@type": "ListItem",
           "position": i + 1,
@@ -657,25 +628,12 @@
             "@type": "RealEstateListing",
             "name": p.title || "Property",
             "url": SITE_URL + "#property-" + p.id,
-            "offers": {
-              "@type": "Offer",
-              "price": p.price_amount || 0,
-              "priceCurrency": "UGX"
-            },
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": p.address || "Uganda",
-              "addressCountry": "UG"
-            }
+            "offers": { "@type": "Offer", "price": p.price_amount || 0, "priceCurrency": "UGX" },
+            "address": { "@type": "PostalAddress", "addressLocality": p.address || "Uganda", "addressCountry": "UG" }
           }
         }));
 
-        const schema = {
-          "@context": "https://schema.org",
-          "@type": "ItemList",
-          "numberOfItems": count,
-          "itemListElement": items
-        };
+        const schema = { "@context": "https://schema.org", "@type": "ItemList", "numberOfItems": count, "itemListElement": items };
 
         let scriptEl = document.getElementById('dynamic-schema');
         if (!scriptEl) {
@@ -685,6 +643,25 @@
           document.head.appendChild(scriptEl);
         }
         scriptEl.textContent = JSON.stringify(schema);
+      }
+
+      function injectPropertySchema(property) {
+        const schema = {
+          "@context": "https://schema.org",
+          "@type": "RealEstateListing",
+          "name": property.title || "Property",
+          "description": `Property for ${property.property_type || 'sale/rent'} in ${property.address || 'Uganda'}`,
+          "url": `${SITE_URL}#property-${property.id}`,
+          "address": { "@type": "PostalAddress", "streetAddress": property.address || "Uganda", "addressCountry": "UG" },
+          "offers": { "@type": "Offer", "price": property.price_amount || 0, "priceCurrency": "UGX" }
+        };
+        let el = document.getElementById(`schema-${property.id}`);
+        if (el) el.remove();
+        el = document.createElement('script');
+        el.type = 'application/ld+json';
+        el.id = `schema-${property.id}`;
+        el.textContent = JSON.stringify(schema);
+        document.head.appendChild(el);
       }
 
       function navigateTo(url, replace = false) { if (replace) history.replaceState(null, '', url); else history.pushState(null, '', url); handleRoute(); }
@@ -706,19 +683,20 @@
         else { sIn.classList.add('active'); sUp.classList.remove('active'); f.classList.add('hidden'); t.innerText='Welcome Back'; b.innerText='Access Dashboard'; }
       }
 
-     async function sendNotificationEmail(to_email, to_name, subject, message) {
-  try {
-    const { error } = await supabase.functions.invoke('send-email-web3forms', {
-      body: { to_email, to_name, subject, message }
-    });
-    if (error) throw error;
-    console.log('📧 Email sent to', to_email);
-    return true;
-  } catch (err) {
-    console.error('❌ Email failed for', to_email, '→', err.message);
-    return false;
-  }
-}
+      // ─── EMAIL via Web3Forms ───
+      async function sendNotificationEmail(to_email, to_name, subject, message) {
+        try {
+          const { error } = await supabase.functions.invoke('send-email-web3forms', {
+            body: { to_email, to_name, subject, message }
+          });
+          if (error) throw error;
+          console.log('📧 Email sent to', to_email);
+          return true;
+        } catch (err) {
+          console.error('❌ Email failed for', to_email, '→', err.message);
+          return false;
+        }
+      }
 
       function buildBrokerLeadEmail(t, a, lt, c) { return `Hello Broker,\n\n🔔 NEW ${lt.toUpperCase()} LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\nA visitor is interested in your property:\n\n🏠 ${t || 'Untitled'}\n📍 ${a || 'Location not specified'}\n\n🔥 Lead Type: ${lt.toUpperCase()}\n💰 Cost to unlock: ${c.toLocaleString()} UGX\n\n━━━━━━━━━━━━━━━━━━━━━━━\nLog in to your dashboard to unlock this lead.\n\n👉 ${SITE_URL}?dashboard=1\n\n⏰ This lead notification fades after 24 hours. Act fast.\n\n— Property Hub Uganda\n${SITE_URL}`; }
       function buildVisitorApprovedEmail(n, t, bn, bp, be) { return `Hello ${n},\n\n🎉 GREAT NEWS! Your request has been APPROVED.\n\nProperty: ${t}\nBroker: ${bn || 'the broker'}\n\n📱 WhatsApp: ${bp || '—'}\n📧 Email: ${be || '—'}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n⚠️ SAFETY REMINDERS\n\n• Always visit the property in person before sending ANY money.\n• Never transfer funds without viewing the property.\n• Verify the broker's identity before any payment.\n• If anything feels off, report them on Property Hub.\n\nThank you for using Property Hub Uganda.\n\n${SITE_URL}`; }
@@ -765,8 +743,10 @@
       function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
         const article = document.createElement('article');
         article.className = 'property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/70 flex flex-col';
+        article.id = `property-${property.id}`;
         article.setAttribute('itemscope', '');
         article.setAttribute('itemtype', 'https://schema.org/RealEstateListing');
+
         const imageUrl = getImageUrl(property);
         const rating = broker?.average_rating || 0;
         const reviewCount = broker?.review_count || 0;
@@ -822,6 +802,8 @@
           </div>
         `;
 
+        injectPropertySchema(property);
+
         article.querySelector('.edit-btn')?.addEventListener('click', e => { e.stopPropagation(); openEditModal(property.id); });
         article.querySelector('.boost-btn')?.addEventListener('click', async e => {
           e.stopPropagation();
@@ -832,7 +814,6 @@
         article.querySelector('.broker-name-link')?.addEventListener('click', e => { e.stopPropagation(); navigateToBroker(broker.id); });
         article.querySelector('.connect-btn')?.addEventListener('click', e => { e.stopPropagation(); openQuizModal(property.id); });
         article.querySelector('.pause-btn')?.addEventListener('click', e => { e.stopPropagation(); togglePropertyPause(property.id, property.is_paused); });
-        injectPropertySchema(property, broker);
         return article;
       }
 
@@ -926,10 +907,7 @@
           enriched.sort((a, b) => b.rankScore - a.rankScore);
           state.allProperties = enriched;
           state.filteredProperties = [...enriched];
-
-          // ─── UPDATE SEO WITH FRESH DATA ───
           updateSEO(enriched);
-
           applyFiltersAndSearch();
         } catch (e) { console.error('Fetch error:', e); }
       }
@@ -949,7 +927,6 @@
         const parsed = parseSearchQuery(state.searchQuery);
 
         let r = [...state.allProperties];
-
         if (f !== 'all') r = r.filter(p => (p.property_type || '').toLowerCase() === f);
 
         if (parsed.type === 'text' && parsed.q) {
@@ -961,10 +938,7 @@
             return a.includes(q) || t.includes(q) || b.includes(q);
           });
         } else if (parsed.type === 'range') {
-          r = r.filter(p => {
-            const price = Number(p.price_amount || 0);
-            return price >= parsed.min && price <= parsed.max;
-          });
+          r = r.filter(p => { const price = Number(p.price_amount || 0); return price >= parsed.min && price <= parsed.max; });
         } else if (parsed.type === 'min') {
           r = r.filter(p => Number(p.price_amount || 0) >= parsed.min);
         } else if (parsed.type === 'max') {
@@ -1070,15 +1044,13 @@
             const lc = l.cost || calculateLeadCost(prop.price_amount || 0, l.lead_type, prop.property_type);
 
             let followUpBadge = '';
-            let showSendBtn = false;
             if (isA && l.approved_at) {
               if (l.follow_up_sent) {
                 followUpBadge = `<span class="badge-followup" title="Sent ${new Date(l.follow_up_sent_at).toLocaleString()}"><i class="fas fa-check"></i> Follow-up sent</span>`;
               } else {
                 const daysSince = (now - new Date(l.approved_at).getTime()) / 86400000;
                 const daysLeft = Math.max(0, 3 - Math.floor(daysSince));
-                followUpBadge = `<span class="badge-followup" title="Auto-sends 3 days after approval"><i class="fas fa-clock"></i> Follow-up in ${daysLeft}d</span>`;
-                showSendBtn = true;
+                followUpBadge = `<span class="badge-followup" title="Auto-sent by Property Hub 3 days after approval"><i class="fas fa-clock"></i> Follow-up in ${daysLeft}d</span>`;
               }
             }
 
@@ -1093,7 +1065,6 @@
               <div class="flex items-center gap-2 flex-wrap">
                 ${isP ? `<button class="unlock-lead-btn unlock-btn" data-lead-id="${l.id}"><i class="fas fa-unlock"></i> Unlock · ${lc.toLocaleString()} UGX</button><button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full" data-lead-id="${l.id}">Reject</button>` : ''}
                 ${isA ? `<button class="view-lead-details text-xs text-blue-600" data-lead-id="${l.id}">View Contact</button>` : ''}
-                ${showSendBtn ? `<button class="send-followup-btn followup-btn" data-lead-id="${l.id}"><i class="fas fa-paper-plane"></i> Send now</button>` : ''}
                 ${isA ? `<button class="remove-lead-btn text-xs text-red-500 font-medium" data-lead-id="${l.id}"><i class="fas fa-trash"></i></button>` : ''}
               </div></div>`;
           });
@@ -1120,7 +1091,7 @@
                   `🎉 Your Request Was Approved`,
                   buildVisitorApprovedEmail(u.visitor_name, pd?.title || 'the property', bp?.business_name, bp?.phone || u.visitor_whatsapp, bp?.email || state.currentUser.email));
               }
-              alert(`✅ Lead unlocked!\n\nVisitor: ${u.visitor_name}\nEmail: ${u.visitor_email}\nWhatsApp: ${u.visitor_whatsapp}\n\nA confirmation email was sent. Our system will automatically send a follow-up in 3 days — you can also send it now with the purple button.`);
+              alert(`✅ Lead unlocked!\n\nVisitor: ${u.visitor_name}\nEmail: ${u.visitor_email}\nWhatsApp: ${u.visitor_whatsapp}\n\nA confirmation email was sent. Our team will send a follow-up in 3 days.`);
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }));
@@ -1142,25 +1113,6 @@
             const { data: l, error } = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', b.dataset.leadId).single();
             if (error) { alert('Error'); return; }
             alert(`Contact:\nName: ${l.visitor_name}\nEmail: ${l.visitor_email}\nWhatsApp: ${l.visitor_whatsapp}\nUnlocked: ${new Date(l.unlocked_at).toLocaleString()}`);
-          }));
-
-          list.querySelectorAll('.send-followup-btn').forEach(b => b.addEventListener('click', async () => {
-            const id = b.dataset.leadId;
-            if (!confirm('Send the follow-up email to this visitor now?')) return;
-            b.disabled = true;
-            b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
-            try {
-              const { error } = await supabase.functions.invoke('send-visitor-followup', {
-                body: { lead_id: id, force: true }
-              });
-              if (error) throw error;
-              alert('✅ Follow-up sent!');
-              loadLeads();
-            } catch (e) {
-              alert('Error: ' + e.message);
-              b.disabled = false;
-              b.innerHTML = '<i class="fas fa-paper-plane"></i> Send now';
-            }
           }));
 
           list.querySelectorAll('.remove-lead-btn').forEach(b => b.addEventListener('click', async () => {
@@ -1418,6 +1370,7 @@
         } catch (e) { $('#profileStatus').textContent = '❌ ' + e.message; }
       });
 
+      // ─── ADD PROPERTY with compressed image upload ───
       $('#addPropertyForm')?.addEventListener('submit', async e => {
         e.preventDefault();
         if (!state.currentUser) { alert('Sign in first.'); return; }
@@ -1431,18 +1384,58 @@
         if (reqV) {
           if (!confirm(`⚠️ Property Verification\n\nVerifying this property costs ${formatPrice(VERIFICATION_FEE)}.\n\nDo you approve this charge?`)) return;
         }
+
         const urls = [];
+
+        // ─── COMPRESSED IMAGE UPLOAD ───
         if (files && files.length > 0) {
-          for (const file of files) {
-            const ext = file.name.split('.').pop();
-            const name = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
-            const path = `${state.currentUser.id}/${name}`;
-            const { error: ue } = await supabase.storage.from('property-media').upload(path, file);
-            if (ue) { alert('Upload failed: ' + ue.message); return; }
-            const { data: ud } = supabase.storage.from('property-media').getPublicUrl(path);
-            urls.push(ud.publicUrl);
+          $('#uploadStatus').className = 'mt-3 text-sm text-indigo-600';
+          $('#uploadStatus').textContent = `Compressing ${files.length} image(s)…`;
+
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (!file.type.startsWith('image/')) continue;
+
+            try {
+              const options = {
+                maxSizeMB: 0.25,
+                maxWidthOrHeight: 1600,
+                useWebWorker: true,
+                fileType: 'image/jpeg',
+                initialQuality: 0.8,
+              };
+
+              const compressedFile = await imageCompression(file, options);
+              const savedPct = Math.round((1 - compressedFile.size / file.size) * 100);
+              console.log(`📸 ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${(compressedFile.size/1024).toFixed(0)}KB (${savedPct}% saved)`);
+
+              $('#uploadStatus').textContent = `Uploading ${i+1} of ${files.length}…`;
+
+              const name = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.jpg`;
+              const path = `${state.currentUser.id}/${name}`;
+
+              const { error: ue } = await supabase.storage
+                .from('property-media')
+                .upload(path, compressedFile, {
+                  contentType: 'image/jpeg',
+                  cacheControl: '31536000',
+                  upsert: false
+                });
+
+              if (ue) { alert('Upload failed: ' + ue.message); return; }
+
+              const { data: ud } = supabase.storage.from('property-media').getPublicUrl(path);
+              urls.push(ud.publicUrl);
+            } catch (err) {
+              console.error('Compression/upload error:', err);
+              alert('Image processing failed: ' + err.message);
+              return;
+            }
           }
+
+          $('#uploadStatus').textContent = `✅ ${urls.length} image(s) ready`;
         }
+
         const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
         try {
           const { data: inserted, error } = await supabase.from('properties').insert({
@@ -1469,6 +1462,7 @@
           }
           alert('✅ Property added!' + (reqV ? `\n\nVerification fee ${formatPrice(VERIFICATION_FEE)} deducted.` : ''));
           $('#addPropertyForm').reset();
+          $('#uploadStatus').textContent = '';
           await loadMyProperties();
           await fetchAllData();
           $('#addPropertyContainer').classList.remove('visible');
@@ -1610,34 +1604,7 @@
           $('#settingsPhone').value = data.phone || '';
         } catch (e) { console.error(e); }
       }
-// Function to inject structured data for a single property
-function injectPropertySchema(property, broker) {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateListing",
-    "name": property.title,
-    "description": `Property for ${property.property_type} in ${property.address}`,
-    "url": `${SITE_URL}#property-${property.id}`,
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": property.address,
-      "addressCountry": "UG"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": property.price_amount,
-      "priceCurrency": "UGX"
-    }
-  };
-  let script = document.getElementById(`schema-${property.id}`);
-  if (script) script.remove();
-  script = document.createElement('script');
-  script.type = 'application/ld+json';
-  script.id = `schema-${property.id}`;
-  script.textContent = JSON.stringify(schema);
-  document.head.appendChild(script);
-}
-      
+
       async function handleRoute() {
         const path = getCurrentPath();
         if (path.startsWith('/broker/')) {
