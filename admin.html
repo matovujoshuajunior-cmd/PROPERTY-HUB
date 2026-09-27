@@ -259,7 +259,7 @@
 
     var SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
     var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
-
+const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
     var supabase = null;
     var currentUser = null;
     var leadFilter = '';
@@ -815,30 +815,78 @@
           };
         });
 
-        box.querySelectorAll('.send-followup-admin').forEach(function(el) {
-          el.onclick = async function() {
-            if (!confirm('Send the follow-up email to this visitor now?')) return;
-            el.disabled = true;
-            el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            try {
-              var r = await supabase.functions.invoke('send-visitor-followup', {
-                body: { lead_id: el.dataset.id, force: true }
-              });
-              if (r.error) throw r.error;
-              alert('✅ Follow-up sent!');
-              loadFollowups();
-            } catch (e) {
-              alert('Error: ' + e.message);
-              el.disabled = false;
-              el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
-            }
-          };
-        });
-      } catch (e) {
-        console.error(e);
-        box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
-      }
+
+				box.querySelectorAll('.send-followup-admin').forEach(function(el) {
+  el.onclick = async function() {
+    if (!confirm('Send the follow-up email to this visitor now?')) return;
+    el.disabled = true;
+    el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+      var leadId = el.dataset.leadId;
+      // Find the lead data we already loaded
+      var lead = data.find(function(x) { return x.id === leadId; });
+      if (!lead) throw new Error('Lead not found');
+
+      var prop = propMap[lead.property_id] || {};
+      var broker = brokerMap[lead.broker_id] || {};
+
+      // Build marketing content per property type
+      var MARKETING = {
+        rental: { title: "Settle in comfortably", items: ["🛋️ Furniture & home appliances", "📶 Internet & cable installation", "🧹 Move-in cleaning & fumigation", "🔒 Home security", "🚚 Verified moving & transport companies"] },
+        property: { title: "Make it truly yours", items: ["🏦 Mortgage & financing advisors", "🛡️ Property insurance & title verification", "🔨 Renovation & interior design", "🛋️ Furniture & appliance packages", "🔑 Legal & conveyancing services"] },
+        guesthouse: { title: "Grow your hospitality business", items: ["🛎️ Hospitality management software", "🧺 Commercial laundry", "📸 Photography & listing optimization", "🚐 Airport pickup & tour partnerships", "📢 Marketing & OTA listing setup"] }
+      };
+      var mk = MARKETING[prop.property_type] || MARKETING.rental;
+
+      var subject = 'Did you find what you needed for "' + (prop.title || 'your property') + '"?';
+      var body = 'Hello ' + (lead.visitor_name || 'there') + ',\n\n' +
+        'A few days ago you connected with ' + (broker.business_name || 'a broker') + ' about:\n\n' +
+        '🏠 ' + (prop.title || 'the property') + '\n' +
+        '📍 ' + (lead.visitor_email ? '' : '') + '\n\n' +
+        '━━━━━━━━━━━━━━━━━━━━━━━\n📝 QUICK CHECK-IN\n━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+        'Did you get what you were looking for?\n\n' +
+        '✅ YES — Please take 30 seconds to rate them.\n\n' +
+        '❌ NO — Browse alternatives: https://propertyhub.dpdns.org/\n\n' +
+        '━━━━━━━━━━━━━━━━━━━━━━━\n🎁 WHILE YOU SETTLE IN\n━━━━━━━━━━━━━━━━━━━━━━━\n' +
+        mk.title + ':\n\n' + mk.items.map(function(i) { return '• ' + i; }).join('\n') +
+        '\n\n— The Property Hub Team';
+
+      // Direct Web3Forms call
+      var res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          email: lead.visitor_email,
+          subject: subject,
+          from_name: 'Property Hub Uganda',
+          message: body,
+          replyto: lead.visitor_email,
+          botcheck: ''
+        })
+      });
+
+      var resp = await res.json();
+      if (!res.ok || !resp.success) throw new Error(resp.message || 'Email failed');
+
+      // Mark as sent in the DB
+      var ur = await supabase.from('lead_requests').update({
+        follow_up_sent: true,
+        follow_up_sent_at: new Date().toISOString()
+      }).eq('id', leadId);
+
+      if (ur.error) throw ur.error;
+
+      alert('✅ Follow-up sent!');
+      loadFollowups();
+    } catch (e) {
+      alert('Error: ' + e.message);
+      el.disabled = false;
+      el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
     }
+  };
+});
 
     async function runFollowupCron() {
       var banner = $('followupBanner');
