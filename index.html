@@ -3,26 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Property Hub Uganda – Find Homes, Rentals & Guesthouses in Kampala & Uganda</title>
   <meta name="description" content="Find houses, rentals, land, and guesthouses for sale and rent across Uganda. Verified listings from trusted brokers in Kampala, Wakiso, Entebbe, and beyond." />
+  <meta name="keywords" content="property Uganda, houses for sale Uganda, rentals Kampala, land for sale Uganda, guesthouses Uganda, apartments Kampala, real estate Uganda" />
   <link rel="canonical" href="https://propertyhub.dpdns.org/" />
-  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <meta name="geo.region" content="UG" />
   <meta name="geo.placename" content="Kampala" />
+  <meta name="theme-color" content="#4f46e5" />
+
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Property Hub Uganda" />
+  <meta property="og:site_name" content="Property Hub Uganda" />
+  <meta property="og:title" content="Property Hub Uganda – Find Homes, Rentals & Guesthouses" />
   <meta property="og:description" content="Verified properties from trusted brokers across Uganda." />
   <meta property="og:url" content="https://propertyhub.dpdns.org/" />
+  <meta property="og:locale" content="en_UG" />
+
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Property Hub Uganda" />
+  <meta name="twitter:description" content="Verified properties from trusted brokers across Uganda." />
+
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
   <link rel="preconnect" href="https://ubkgovgoifgpazkapaxi.supabase.co" />
+  <link rel="dns-prefetch" href="https://images.unsplash.com" />
 
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebSite","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/"}
+  {"@context":"https://schema.org","@type":"WebSite","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","potentialAction":{"@type":"SearchAction","target":"https://propertyhub.dpdns.org/?q={search_term_string}","query-input":"required name=search_term_string"}}
   </script>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":{"@type":"Country","name":"Uganda"}}
+  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","description":"Property Hub Uganda connects property seekers with trusted brokers across Uganda.","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":{"@type":"Country","name":"Uganda"},"priceRange":"UGX"}
   </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,6 +42,7 @@
   <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
 
   <script>
+    // SPA 404 redirect parser
     (function() {
       var p = new URLSearchParams(window.location.search).get('p');
       if (p) { window.history.replaceState(null, '', p); }
@@ -118,6 +131,9 @@
     .quiz-option:hover { border-color:#6366f1; }
     .unlock-btn { background: #10b981; color: white; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; }
     .unlock-btn:hover { background: #059669; }
+    .seo-breadcrumb { font-size: 0.75rem; color: #64748b; margin-bottom: 0.75rem; }
+    .seo-breadcrumb a { color: #4f46e5; text-decoration: none; }
+    .seo-breadcrumb a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -240,7 +256,7 @@
   <div id="reportModal" class="modal-backdrop hidden">
     <div class="modal-content max-w-md">
       <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">🚨 Report Broker</h2><button id="closeReportModal" class="text-slate-400 text-2xl">&times;</button></div>
-      <p class="text-slate-500 text-sm mb-3">Your report is anonymous to the broker. Our team will investigate.</p>
+      <p class="text-slate-500 text-sm mb-3">Your report is anonymous to the broker.</p>
       <form id="reportForm">
         <input type="hidden" id="reportBrokerId" />
         <div class="mb-3"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Your Name (optional)</label><input type="text" id="reportName" class="w-full px-4 py-2 border rounded-xl text-sm" /></div>
@@ -288,6 +304,7 @@
         </div>
 
         <div class="max-w-7xl mx-auto px-4">
+          <div id="seoHeader"></div>
           <div id="trustBanner" class="trust-banner">
             <button id="hideTrustBanner" class="close-banner-btn" title="Hide"><i class="fas fa-times"></i></button>
             <h3><i class="fas fa-shield-alt"></i> How to find a trustworthy broker</h3>
@@ -419,7 +436,7 @@
     <footer class="bg-slate-900 text-slate-300 mt-12">
       <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
         <div><h4 class="text-white font-bold text-lg mb-3">🏠 Property Hub Uganda</h4><p class="text-slate-400">Connecting property seekers with trusted brokers across Uganda.</p></div>
-        <div><h4 class="text-white font-bold mb-3">Popular Searches</h4><ul class="space-y-1 text-slate-400"><li><a href="/?filter=rental" class="hover:text-indigo-300">Rentals in Kampala</a></li><li><a href="/?filter=property" class="hover:text-indigo-300">Houses for sale in Uganda</a></li><li><a href="/?filter=guesthouse" class="hover:text-indigo-300">Guesthouses in Uganda</a></li></ul></div>
+        <div><h4 class="text-white font-bold mb-3">Popular Searches</h4><ul class="space-y-1 text-slate-400" id="footerSeoLinks"></ul></div>
         <div><h4 class="text-white font-bold mb-3">Areas We Cover</h4><p class="text-slate-400">Kampala · Wakiso · Entebbe · Mukono · Jinja · Mbarara · Gulu</p></div>
       </div>
       <div class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">© 2026 Property Hub Uganda.</div>
@@ -433,13 +450,7 @@
 
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
-
-      // ═══════════════════════════════════════════════════════
-      //  🔑 REPLACE THIS WITH YOUR ACTUAL WEB3FORMS KEY
-      //  Get it from https://web3forms.com dashboard
-      // ═══════════════════════════════════════════════════════
       const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
-
       const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org/';
 
@@ -494,7 +505,8 @@
         allProperties: [], filteredProperties: [], myProperties: [],
         currentFilter: 'all', searchQuery: '', currentBrokerId: null,
         currentUser: null, isSignUpMode: false, profilesMap: {},
-        walletBalance: 0, isAdmin: false
+        walletBalance: 0, isAdmin: false,
+        currentSeoSlug: null
       };
 
       function $(s) { return document.querySelector(s); }
@@ -505,30 +517,64 @@
       function renderStars(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '★' : '☆'; return h; }
       function renderStarsSmall(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : '<i class="far fa-star text-slate-300 text-xs"></i>'; return h; }
 
-      function updateSEO(properties) {
-        const count = properties.length;
-        document.title = `${count} Properties for Sale & Rent in Uganda | Property Hub Uganda`;
-        const items = properties.slice(0, 20).map((p, i) => ({
-          "@type": "ListItem", "position": i + 1,
-          "item": { "@type": "RealEstateListing", "name": p.title || "Property", "url": SITE_URL + "#property-" + p.id,
-            "offers": { "@type": "Offer", "price": p.price_amount || 0, "priceCurrency": "UGX" },
-            "address": { "@type": "PostalAddress", "addressLocality": p.address || "Uganda", "addressCountry": "UG" } }
-        }));
-        const schema = { "@context": "https://schema.org", "@type": "ItemList", "numberOfItems": count, "itemListElement": items };
-        let scriptEl = document.getElementById('dynamic-schema');
-        if (!scriptEl) { scriptEl = document.createElement('script'); scriptEl.id = 'dynamic-schema'; scriptEl.type = 'application/ld+json'; document.head.appendChild(scriptEl); }
-        scriptEl.textContent = JSON.stringify(schema);
+      // ─── SEO: Dynamic title + meta description + canonical + OG ───
+      function setSEO(opts) {
+        const { title, description, canonical, ogImage, ogType } = opts;
+        if (title) document.title = title;
+        const setMeta = (attr, key, content) => {
+          let el = document.querySelector(`meta[${attr}="${key}"]`);
+          if (!el) { el = document.createElement('meta'); el.setAttribute(attr, key); document.head.appendChild(el); }
+          el.setAttribute('content', content);
+        };
+        if (description) setMeta('name', 'description', description);
+        if (description) setMeta('property', 'og:description', description);
+        if (title) setMeta('property', 'og:title', title);
+        if (description) setMeta('name', 'twitter:description', description);
+        if (title) setMeta('name', 'twitter:title', title);
+        if (ogImage) { setMeta('property', 'og:image', ogImage); setMeta('name', 'twitter:image', ogImage); }
+        setMeta('property', 'og:type', ogType || 'website');
+        setMeta('property', 'og:url', canonical || SITE_URL);
+
+        // Canonical
+        let link = document.querySelector('link[rel="canonical"]');
+        if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link); }
+        link.href = canonical || SITE_URL;
+
+        // Twitter card
+        setMeta('name', 'twitter:card', 'summary_large_image');
       }
 
+      // ─── SEO: Inject per-property JSON-LD ───
       function injectPropertySchema(property) {
+        const streetAddress = property.address || 'Uganda';
+        const locality = streetAddress.split(',')[0].trim() || 'Uganda';
         const schema = {
-          "@context": "https://schema.org", "@type": "RealEstateListing",
-          "name": property.title || "Property",
-          "description": `Property for ${property.property_type || 'sale/rent'} in ${property.address || 'Uganda'}`,
-          "url": `${SITE_URL}#property-${property.id}`,
-          "address": { "@type": "PostalAddress", "streetAddress": property.address || "Uganda", "addressCountry": "UG" },
-          "offers": { "@type": "Offer", "price": property.price_amount || 0, "priceCurrency": "UGX" }
+          "@context": "https://schema.org",
+          "@type": "RealEstateListing",
+          "name": property.title,
+          "description": `${property.title || 'Property'} in ${streetAddress}. Priced at ${formatPrice(property.price_amount)}. ${property.property_type || ''} listing on Property Hub Uganda.`,
+          "url": `${SITE_URL}?property=${property.id}`,
+          "datePosted": property.created_at ? new Date(property.created_at).toISOString().split('T')[0] : undefined,
+          "image": getImageArray(property).slice(0, 3),
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": streetAddress,
+            "addressLocality": locality,
+            "addressRegion": "Central Region",
+            "addressCountry": "UG"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": property.price_amount,
+            "priceCurrency": "UGX",
+            "availability": "https://schema.org/InStock",
+            "businessFunction": property.property_type === 'rental'
+              ? "http://purl.org/goodrelations/v1#LeaseOut"
+              : "http://purl.org/goodrelations/v1#Sell"
+          }
         };
+        Object.keys(schema).forEach(k => schema[k] === undefined && delete schema[k]);
+
         let el = document.getElementById(`schema-${property.id}`);
         if (el) el.remove();
         el = document.createElement('script');
@@ -538,63 +584,135 @@
         document.head.appendChild(el);
       }
 
-      function navigateTo(url, replace = false) { if (replace) history.replaceState(null, '', url); else history.pushState(null, '', url); handleRoute(); }
-      function getCurrentPath() { return location.pathname + location.search; }
-
-      function showView(view) {
-        ['discoveryView','brokerView','authView','dashboardView'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) { el.classList.remove('view-visible'); el.classList.add('view-hidden'); }
-        });
-        if (view) { view.classList.remove('view-hidden'); view.classList.add('view-visible'); }
+      // ─── SEO: Inject ItemList for the whole listing grid ───
+      function injectListingItemList(properties) {
+        const items = properties.slice(0, 20).map((p, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "item": {
+            "@type": "RealEstateListing",
+            "name": p.title || "Property",
+            "url": `${SITE_URL}?property=${p.id}`,
+            "offers": { "@type": "Offer", "price": p.price_amount || 0, "priceCurrency": "UGX" },
+            "address": { "@type": "PostalAddress", "addressLocality": (p.address || 'Uganda').split(',')[0].trim(), "addressCountry": "UG" }
+          }
+        }));
+        const schema = {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "numberOfItems": properties.length,
+          "itemListElement": items
+        };
+        let el = document.getElementById('dynamic-itemlist');
+        if (el) el.remove();
+        el = document.createElement('script');
+        el.type = 'application/ld+json';
+        el.id = 'dynamic-itemlist';
+        el.textContent = JSON.stringify(schema);
+        document.head.appendChild(el);
       }
 
-      function setAuthMode(signUpMode) {
-        state.isSignUpMode = signUpMode;
-        const sIn=$('#toggleSignIn'), sUp=$('#toggleSignUp'), f=$('#signUpFields'), t=$('#formTitle'), b=$('#submitAuthBtn');
-        if (!sIn||!sUp||!f||!t||!b) return;
-        if (signUpMode) { sUp.classList.add('active'); sIn.classList.remove('active'); f.classList.remove('hidden'); t.innerText='Create Hub Space'; b.innerText='Register Business Hub'; }
-        else { sIn.classList.add('active'); sUp.classList.remove('active'); f.classList.add('hidden'); t.innerText='Welcome Back'; b.innerText='Access Dashboard'; }
+      // ─── SEO: Breadcrumb for filtered / seo views ───
+      function renderSeoHeader(page) {
+        const box = $('#seoHeader');
+        if (!box) return;
+        if (!page) { box.innerHTML = ''; return; }
+        box.innerHTML = `
+          <div class="seo-breadcrumb">
+            <a href="/">Home</a> › <span>${page.h1 || page.title}</span>
+          </div>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-2">${page.h1 || page.title}</h1>
+          <p class="text-slate-600 mb-6">${page.meta_description}</p>
+        `;
       }
 
-      // ═══════════════════════════════════════════════════════
-      //  EMAIL via Web3Forms — called DIRECTLY from browser
-      // ═══════════════════════════════════════════════════════
+      // ─── SEO: Load a seo_page by slug (from ?seo=) ───
+      async function loadSeoPage(slug) {
+        try {
+          const { data, error } = await supabase
+            .from('seo_pages')
+            .select('*')
+            .eq('slug', slug)
+            .eq('is_active', true)
+            .maybeSingle();
+          if (error || !data) return null;
+          state.currentSeoSlug = slug;
+          setSEO({
+            title: data.title,
+            description: data.meta_description,
+            canonical: `${SITE_URL}?seo=${encodeURIComponent(slug)}`
+          });
+          renderSeoHeader(data);
+
+          // Apply filters from the seo_page
+          if (data.page_type === 'location') {
+            state.currentFilter = 'all';
+            state.searchQuery = data.location || '';
+          } else if (data.page_type === 'property_type') {
+            state.currentFilter = data.property_type || 'all';
+            state.searchQuery = data.location || '';
+          } else if (data.page_type === 'price_range') {
+            state.currentFilter = 'all';
+            state.searchQuery = `${data.min_price}-${data.max_price}`;
+          } else if (data.page_type === 'property' && data.property_id) {
+            // Scroll to the property
+            setTimeout(() => {
+              const el = document.getElementById(`property-${data.property_id}`);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 600);
+          }
+          $('#searchInput').value = (data.page_type === 'location' || data.page_type === 'property_type')
+            ? (data.location || '')
+            : '';
+          applyFiltersAndSearch();
+          return data;
+        } catch (e) { console.warn('SEO page load failed:', e.message); return null; }
+      }
+
+      // ─── SEO: Load top seo_pages for footer internal linking ───
+      async function loadFooterSeoLinks() {
+        try {
+          const { data } = await supabase
+            .from('seo_pages')
+            .select('slug, h1, page_type, property_count')
+            .eq('is_active', true)
+            .in('page_type', ['location', 'property_type'])
+            .gte('property_count', 1)
+            .order('property_count', { ascending: false })
+            .limit(12);
+          const list = $('#footerSeoLinks');
+          if (!list || !data || !data.length) return;
+          list.innerHTML = data.map(p => `
+            <li><a href="/?seo=${encodeURIComponent(p.slug)}" class="hover:text-indigo-300">${p.h1 || p.slug} (${p.property_count})</a></li>
+          `).join('');
+        } catch (e) { console.warn(e); }
+      }
+
+      // ─── EMAIL via Web3Forms ───
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
-          const payload = {
-            access_key: WEB3FORMS_KEY,
-            email: to_email,
-            subject: subject,
-            from_name: 'Property Hub Uganda',
-            message: message,
-            replyto: to_email,
-            botcheck: ''
-          };
-
           const res = await fetch('https://api.web3forms.com/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+              access_key: WEB3FORMS_KEY,
+              email: to_email,
+              subject: subject,
+              from_name: 'Property Hub Uganda',
+              message: message,
+              replyto: to_email,
+              botcheck: ''
+            })
           });
-
           const data = await res.json();
-
-          if (!res.ok || !data.success) {
-            throw new Error(data.message || 'Email failed');
-          }
-
-          console.log('📧 Email sent to', to_email);
+          if (!res.ok || !data.success) throw new Error(data.message || 'Email failed');
           return true;
-        } catch (err) {
-          console.error('❌ Email failed for', to_email, '→', err.message);
-          return false;
-        }
+        } catch (err) { console.error('Email failed:', err); return false; }
       }
 
       function buildBrokerLeadEmail(t, a, lt, c) { return `Hello Broker,\n\n🔔 NEW ${lt.toUpperCase()} LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\nA visitor is interested in your property:\n\n🏠 ${t || 'Untitled'}\n📍 ${a || 'Location not specified'}\n\n🔥 Lead Type: ${lt.toUpperCase()}\n💰 Cost to unlock: ${c.toLocaleString()} UGX\n\n━━━━━━━━━━━━━━━━━━━━━━━\nLog in to your dashboard to unlock this lead.\n\n👉 ${SITE_URL}?dashboard=1\n\n— Property Hub Uganda`; }
-      function buildVisitorApprovedEmail(n, t, bn, bp, be) { return `Hello ${n},\n\n🎉 Your request has been APPROVED.\n\nProperty: ${t}\nBroker: ${bn || 'the broker'}\n\n📱 WhatsApp: ${bp || '—'}\n📧 Email: ${be || '—'}\n\n⚠️ Safety: Never pay before viewing the property in person.\n\n${SITE_URL}`; }
-      function buildVisitorRejectedEmail(n, t) { return `Hello ${n},\n\nUnfortunately the broker was unavailable for "${t}".\n\nTry again later: ${SITE_URL}`; }
+      function buildVisitorApprovedEmail(n, t, bn, bp, be) { return `Hello ${n},\n\n🎉 Your request has been APPROVED.\n\nProperty: ${t}\nBroker: ${bn || 'the broker'}\n\n📱 WhatsApp: ${bp || '—'}\n📧 Email: ${be || '—'}\n\n⚠️ Safety: Never pay before viewing in person.\n\n${SITE_URL}`; }
+      function buildVisitorRejectedEmail(n, t) { return `Hello ${n},\n\nUnfortunately the broker was unavailable for "${t}".\n\nTry again: ${SITE_URL}`; }
 
       async function loadWallet() {
         if (!state.currentUser) return;
@@ -638,6 +756,9 @@
         const article = document.createElement('article');
         article.className = 'property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/70 flex flex-col';
         article.id = `property-${property.id}`;
+        article.setAttribute('itemscope', '');
+        article.setAttribute('itemtype', 'https://schema.org/RealEstateListing');
+
         const imageUrl = getImageUrl(property);
         const rating = broker?.average_rating || 0;
         const reviewCount = broker?.review_count || 0;
@@ -668,19 +789,22 @@
         let connectHtml = '';
         if (!showEdit) connectHtml = `<button class="connect-btn bg-indigo-600 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5" data-property-id="${property.id}"><i class="fas fa-handshake"></i> Connect</button>`;
 
+        const locality = (property.address || 'Uganda').split(',')[0].trim();
+        const descriptiveAlt = `${property.title || 'Property'} in ${locality}, Uganda — ${formatPrice(property.price_amount)} on Property Hub`;
+
         article.innerHTML = `
           <div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">
-            <img src="${imageUrl}" alt="${property.title || 'Property'} in ${property.address || 'Uganda'}" class="w-full h-full object-cover" loading="lazy"/>
+            <img src="${imageUrl}" alt="${descriptiveAlt}" class="w-full h-full object-cover" loading="lazy" itemprop="image"/>
             <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full">${property.property_type || 'Property'}</span>
             ${!showEdit && isVerified ? `<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>` : ''}
           </div>
           <div class="p-4 flex flex-col flex-1">
             <div class="flex items-center justify-between flex-wrap gap-1">
-              <h3 class="font-semibold text-slate-800 text-base line-clamp-1">${property.title || 'Untitled'}</h3>
+              <h3 class="font-semibold text-slate-800 text-base line-clamp-1" itemprop="name">${property.title || 'Untitled'}</h3>
               <div class="flex items-center gap-1">${!showEdit ? badgeHtml : ''} ${!showEdit && isTrusted ? trustedHtml : ''}</div>
             </div>
-            <p class="text-indigo-700 font-bold text-sm mt-0.5">${formatPrice(property.price_amount)}</p>
-            <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5"><i class="fas fa-map-pin text-slate-400 text-[10px]"></i>${property.address || 'Location not specified'}</p>
+            <p class="text-indigo-700 font-bold text-sm mt-0.5" itemprop="price" content="${property.price_amount}">${formatPrice(property.price_amount)}</p>
+            <p class="text-slate-500 text-xs flex items-center gap-1 mt-0.5" itemprop="address">${property.address || 'Location not specified'}</p>
             <div class="mt-2 flex items-center gap-2 text-xs">
               <span class="stars text-xs">${renderStars(rating)}</span>
               <span class="text-slate-500">(${reviewCount})</span>
@@ -794,7 +918,17 @@
           enriched.sort((a, b) => b.rankScore - a.rankScore);
           state.allProperties = enriched;
           state.filteredProperties = [...enriched];
-          updateSEO(enriched);
+          injectListingItemList(enriched);
+
+          // Default SEO if no seo_page active
+          if (!state.currentSeoSlug) {
+            setSEO({
+              title: `${enriched.length} Properties for Sale & Rent in Uganda | Property Hub Uganda`,
+              description: `Browse ${enriched.length} verified properties across Uganda. Houses, rentals, land, and guesthouses from trusted brokers. Find your perfect space today.`,
+              canonical: SITE_URL
+            });
+          }
+
           applyFiltersAndSearch();
         } catch (e) { console.error('Fetch error:', e); }
       }
@@ -874,9 +1008,7 @@
           }).select().single();
           if (error) throw error;
           const { data: bd } = await supabase.from('profiles').select('email, business_name').eq('id', pd.owner_id).single();
-          if (bd?.email) {
-            await sendNotificationEmail(bd.email, bd.business_name || 'Broker', `🔔 New ${lt.toUpperCase()} Lead – ${pd.title}`, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
-          }
+          if (bd?.email) await sendNotificationEmail(bd.email, bd.business_name || 'Broker', `🔔 New ${lt.toUpperCase()} Lead – ${pd.title}`, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
           $('#quizModal').classList.add('hidden');
           alert(`✅ Notification Sent!\n\nWe've notified the broker about your interest in "${pd.title}".\n\n📧 Check your email — once they unlock your request, their contact details land in your inbox.`);
           subscribeToLeadRequest(lead.id);
@@ -900,20 +1032,17 @@
         try {
           const { data, error } = await supabase.from('lead_requests').select('*').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
           if (error) throw error;
-
           const propIds = [...new Set((data || []).map(l => l.property_id).filter(Boolean))];
           let propMap = {};
           if (propIds.length) {
             const { data: props } = await supabase.from('properties').select('id, title, price_amount, property_type').in('id', propIds);
             (props || []).forEach(p => { propMap[p.id] = p; });
           }
-
           const list = $('#leadsList'), noMsg = $('#noLeads');
           if (!list || !noMsg) return;
           const vis = (data || []).filter(l => l.status !== 'rejected');
           if (vis.length === 0) { list.innerHTML = ''; noMsg.classList.remove('hidden'); return; }
           noMsg.classList.add('hidden');
-
           const now = Date.now();
           let html = '';
           vis.forEach(l => {
@@ -923,18 +1052,15 @@
             const sl = isA ? '✅ Unlocked' : isP ? '⏳ Pending' : '⏰ Expired';
             const isHot = l.lead_type === 'hot';
             const lc = l.cost || calculateLeadCost(prop.price_amount || 0, l.lead_type, prop.property_type);
-
             let followUpBadge = '';
             if (isA && l.approved_at) {
-              if (l.follow_up_sent) {
-                followUpBadge = `<span class="badge-followup"><i class="fas fa-check"></i> Follow-up sent</span>`;
-              } else {
+              if (l.follow_up_sent) followUpBadge = `<span class="badge-followup"><i class="fas fa-check"></i> Follow-up sent</span>`;
+              else {
                 const daysSince = (now - new Date(l.approved_at).getTime()) / 86400000;
                 const daysLeft = Math.max(0, 3 - Math.floor(daysSince));
                 followUpBadge = `<span class="badge-followup"><i class="fas fa-clock"></i> Follow-up in ${daysLeft}d</span>`;
               }
             }
-
             html += `<div class="verification-property-item" data-lead-id="${l.id}">
               <div class="property-title">${prop.title || 'Unknown'} ${isHot ? '<span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : ''} <span class="text-xs text-slate-400">(${l.lead_type})</span> ${followUpBadge}</div>
               <div><span class="property-status ${sc}">${sl}</span></div>
@@ -945,30 +1071,19 @@
               </div></div>`;
           });
           list.innerHTML = html;
-
           list.querySelectorAll('.unlock-lead-btn').forEach(b => b.addEventListener('click', async () => {
             const id = b.dataset.leadId;
             if (!confirm('Unlock this lead?')) return;
             try {
-              const { data: u, error } = await supabase.from('lead_requests').update({
-                status: 'approved',
-                unlocked_at: new Date().toISOString(),
-                approved_at: new Date().toISOString(),
-                follow_up_sent: false
-              }).eq('id', id).select('visitor_name, visitor_email, visitor_whatsapp, property_id').single();
+              const { data: u, error } = await supabase.from('lead_requests').update({ status: 'approved', unlocked_at: new Date().toISOString(), approved_at: new Date().toISOString(), follow_up_sent: false }).eq('id', id).select('visitor_name, visitor_email, visitor_whatsapp, property_id').single();
               if (error) throw error;
-
               const { data: pd } = await supabase.from('properties').select('title').eq('id', u.property_id).single();
               const { data: bp } = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
-
-              if (u?.visitor_email) {
-                await sendNotificationEmail(u.visitor_email, u.visitor_name, `🎉 Your Request Was Approved`, buildVisitorApprovedEmail(u.visitor_name, pd?.title || 'the property', bp?.business_name, bp?.phone || u.visitor_whatsapp, bp?.email || state.currentUser.email));
-              }
+              if (u?.visitor_email) await sendNotificationEmail(u.visitor_email, u.visitor_name, `🎉 Your Request Was Approved`, buildVisitorApprovedEmail(u.visitor_name, pd?.title || 'the property', bp?.business_name, bp?.phone || u.visitor_whatsapp, bp?.email || state.currentUser.email));
               alert(`✅ Lead unlocked!\n\nVisitor: ${u.visitor_name}\nEmail: ${u.visitor_email}\nWhatsApp: ${u.visitor_whatsapp}`);
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }));
-
           list.querySelectorAll('.reject-lead-btn').forEach(b => b.addEventListener('click', async () => {
             const id = b.dataset.leadId;
             if (!confirm('Reject this lead?')) return;
@@ -980,13 +1095,11 @@
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }));
-
           list.querySelectorAll('.view-lead-details').forEach(b => b.addEventListener('click', async () => {
             const { data: l, error } = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', b.dataset.leadId).single();
             if (error) { alert('Error'); return; }
             alert(`Contact:\nName: ${l.visitor_name}\nEmail: ${l.visitor_email}\nWhatsApp: ${l.visitor_whatsapp}\nUnlocked: ${new Date(l.unlocked_at).toLocaleString()}`);
           }));
-
           list.querySelectorAll('.remove-lead-btn').forEach(b => b.addEventListener('click', async () => {
             if (!confirm('Remove this lead?')) return;
             const { error } = await supabase.from('lead_requests').delete().eq('id', b.dataset.leadId);
@@ -1110,6 +1223,13 @@
           $('#brokerLeadScore').textContent = `⚡ ${b.lead_score || 0}`;
           $('#statTotalReviews').textContent = rc;
           $('#statAvgRating').textContent = r.toFixed(1);
+          // Dynamic SEO for broker page
+          setSEO({
+            title: `${b.business_name || 'Broker'} – Verified Property Broker in Uganda | Property Hub`,
+            description: `View verified properties from ${b.business_name || 'this broker'} on Property Hub Uganda. Ratings: ${r.toFixed(1)}★ from ${rc} reviews.`,
+            canonical: `${SITE_URL}broker/${id}`,
+            ogType: 'profile'
+          });
           $('#rateBrokerBtn').onclick = () => openReviewModal(id);
           $('#viewReviewsBtn').onclick = () => openViewReviewsModal(id);
           $('#reportBrokerBtn').onclick = () => { if (state.currentUser && state.currentUser.id === id) { alert('You cannot report yourself.'); return; } openReportModal(id); };
@@ -1122,7 +1242,7 @@
         } catch (e) { console.error(e); grid.innerHTML = '<div class="text-center py-12 text-red-500">Error.</div>'; }
       }
 
-      function goToDiscovery() { showView($('#discoveryView')); state.currentBrokerId = null; navigateTo('/'); applyFiltersAndSearch(); }
+      function goToDiscovery() { showView($('#discoveryView')); state.currentBrokerId = null; state.currentSeoSlug = null; navigateTo('/'); renderSeoHeader(null); applyFiltersAndSearch(); }
       function navigateToAuth() { showView($('#authView')); navigateTo('/auth'); setAuthMode(false); $('#authForm').reset(); }
 
       function openReviewModal(id) {
@@ -1219,7 +1339,6 @@
         } catch (e) { $('#profileStatus').textContent = '❌ ' + e.message; }
       });
 
-      // ─── ADD PROPERTY with compressed image upload ───
       $('#addPropertyForm')?.addEventListener('submit', async e => {
         e.preventDefault();
         if (!state.currentUser) { alert('Sign in first.'); return; }
@@ -1231,7 +1350,6 @@
         const reqV = $('#addRequestVerification').checked;
         if (!title || !price || !addr) { alert('Fill required fields.'); return; }
         if (reqV) { if (!confirm(`⚠️ Property Verification\n\nCosts ${formatPrice(VERIFICATION_FEE)}. Do you approve?`)) return; }
-
         const urls = [];
         if (files && files.length > 0) {
           $('#uploadStatus').className = 'mt-3 text-sm text-indigo-600';
@@ -1242,8 +1360,6 @@
             try {
               const options = { maxSizeMB: 0.25, maxWidthOrHeight: 1600, useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.8 };
               const compressedFile = await imageCompression(file, options);
-              const savedPct = Math.round((1 - compressedFile.size / file.size) * 100);
-              console.log(`📸 ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${(compressedFile.size/1024).toFixed(0)}KB (${savedPct}% saved)`);
               $('#uploadStatus').textContent = `Uploading ${i+1} of ${files.length}…`;
               const name = `${Date.now()}_${Math.random().toString(36).substr(2,6)}.jpg`;
               const path = `${state.currentUser.id}/${name}`;
@@ -1426,7 +1542,18 @@
         else if (path === '/dashboard') {
           if (state.currentUser) { showView($('#dashboardView')); await loadMyProperties(); await loadWallet(); loadLeads(); }
           else { navigateTo('/auth', true); handleRoute(); }
-        } else { showView($('#discoveryView')); applyFiltersAndSearch(); }
+        } else {
+          // Check for ?seo=slug first
+          const params = new URLSearchParams(window.location.search);
+          const seoSlug = params.get('seo');
+          showView($('#discoveryView'));
+          if (seoSlug) {
+            await loadSeoPage(seoSlug);
+          } else {
+            renderSeoHeader(null);
+            applyFiltersAndSearch();
+          }
+        }
       }
 
       async function init() {
@@ -1493,6 +1620,7 @@
 
         await handleRoute();
         await fetchAllData();
+        await loadFooterSeoLinks();
 
         supabase.channel('properties-live').on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
           console.log('🔄 Properties changed — refreshing…');
