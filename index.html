@@ -519,7 +519,31 @@
 
 function navigateTo(url, replace = false) { if (replace) history.replaceState(null, '', url); else history.pushState(null, '', url); handleRoute(); }
 function getCurrentPath() { return location.pathname + location.search; }
+      // ─── View switching ───
+      function showView(view) {
+        ['discoveryView','brokerView','authView','dashboardView'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.classList.remove('view-visible'); el.classList.add('view-hidden'); }
+        });
+        if (view) { view.classList.remove('view-hidden'); view.classList.add('view-visible'); }
+      }
 
+      // ─── Auth mode toggle (sign in vs sign up) ───
+      function setAuthMode(signUpMode) {
+        state.isSignUpMode = signUpMode;
+        const sIn = $('#toggleSignIn'), sUp = $('#toggleSignUp');
+        const f = $('#signUpFields'), t = $('#formTitle'), b = $('#submitAuthBtn');
+        if (!sIn || !sUp || !f || !t || !b) return;
+        if (signUpMode) {
+          sUp.classList.add('active'); sIn.classList.remove('active');
+          f.classList.remove('hidden');
+          t.innerText = 'Create Hub Space'; b.innerText = 'Register Business Hub';
+        } else {
+          sIn.classList.add('active'); sUp.classList.remove('active');
+          f.classList.add('hidden');
+          t.innerText = 'Welcome Back'; b.innerText = 'Access Dashboard';
+        }
+      }
       // ─── SEO: Dynamic title + meta description + canonical + OG ───
       function setSEO(opts) {
         const { title, description, canonical, ogImage, ogType } = opts;
