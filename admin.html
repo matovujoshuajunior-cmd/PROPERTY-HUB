@@ -955,22 +955,44 @@
       }
     }
 
-    async function regenerateSeoNow() {
-      var banner = $('seoBanner');
-      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
-      banner.textContent = '🧠 Regenerating SEO pages from your properties…';
-      banner.classList.remove('hidden');
-      try {
-        var r = await supabase.rpc('regenerate_seo_pages');
-        if (r.error) throw r.error;
-        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
-        banner.textContent = '✅ SEO pages regenerated.';
-        loadSeoPages();
-      } catch (e) {
-        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-        banner.textContent = '❌ ' + e.message;
-      }
+   async function regenerateSeoNow() {
+  var banner = $('seoBanner');
+  banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
+  banner.textContent = '🧠 Regenerating SEO pages from your properties…';
+  banner.classList.remove('hidden');
+
+  try {
+    // Re-verify session first — if 403, we'll prompt for re-login
+    var sessionCheck = await supabase.auth.getSession();
+    if (!sessionCheck.data || !sessionCheck.data.session) {
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+      banner.textContent = '❌ Session expired. Please sign out and sign in again.';
+      return;
     }
+
+    var r = await supabase.rpc('regenerate_seo_pages');
+
+    if (r.error) {
+      // Detect expired JWT
+      if (r.error.message && (r.error.message.indexOf('JWT') !== -1 || r.error.code === 'PGRST301' || r.error.message.indexOf('403') !== -1)) {
+        await supabase.auth.signOut();
+        currentUser = null;
+        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+        banner.textContent = '❌ Session expired. Redirecting to login…';
+        setTimeout(function() { showAuth(); }, 1500);
+        return;
+      }
+      throw r.error;
+    }
+
+    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
+    banner.textContent = '✅ SEO pages regenerated.';
+    loadSeoPages();
+  } catch (e) {
+    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+    banner.textContent = '❌ ' + e.message;
+  }
+}
 
     async function runCleanup() {
       if (!confirm('Permanently delete all approved & rejected leads older than 30 days?\n\nThis cannot be undone.')) return;
@@ -1119,6 +1141,31 @@
       if (!window.supabase) { alert('Supabase failed to load.'); hideLoading(); return; }
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+      // Keep session fresh — refresh token every 40 minutes
+setInterval(async function() {
+  try {
+    const r = await supabase.auth.refreshSession();
+    if (r.error) console.warn('Session refresh failed:', r.error.message);
+    else console.log('🔄 Session refreshed');
+  } catch (e) { console.warn('Refresh error:', e.message); }
+}, 40 * 60 * 1000);
+
+// Also refresh immediately if the tab was idle for a while
+document.addEventListener('visibilitychange', async function() {
+  if (document.visibilityState === 'visible' && currentUser) {
+    try {
+      const r = await supabase.auth.getSession();
+      if (!r.data || !r.data.session) {
+        await supabase.auth.signOut();
+        currentUser = null;
+        showAuth();
+      } else {
+        await supabase.auth.refreshSession();
+      }
+    } catch (e) { console.warn(e); }
+  }
+});
+
       setupTabs();
 
       var ok = await checkAdmin();
@@ -1161,7 +1208,25 @@
       $('regenerateSeoBtn').addEventListener('click', regenerateSeoNow);
 
       hideLoading();
-
+async function checkAdmin() {
+  try {
+    var r = await supabase.auth.getUser();
+    if (r.error) {
+      // Try refreshing once before giving up
+      await supabase.auth.refreshSession();
+      r = await supabase.auth.getUser();
+      if (r.error) return false;
+    }
+    var user = r.data && r.data.user;
+    if (!user) return false;
+    var pr = await supabase.from('profiles').select('is_admin, business_name').eq('id', user.id).single();
+    if (pr.error || !pr.data || !pr.data.is_admin) return false;
+    currentUser = user;
+    $('adminUserDisplay').textContent = pr.data.business_name || user.email;
+    return true;
+  } catch (e) { return false; }
+}
+      
       setInterval(function() {
         if (!authView.classList.contains('hidden')) return;
         loadStats();
