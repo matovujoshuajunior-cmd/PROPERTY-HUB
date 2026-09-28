@@ -27,7 +27,7 @@
     table { width: 100%; font-size: 0.875rem; }
     table th { text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; }
     table td { padding: 0.75rem 0.5rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-    .btn-sm { padding: 0.2rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; border: none; cursor: pointer; margin: 0.1rem; }
+    .btn-sm { padding: 0.2rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; border: none; cursor: pointer; margin: 0.1rem; display: inline-block; text-decoration: none; }
     .btn-sm.green { background:#10b981;color:#fff; } .btn-sm.red { background:#ef4444;color:#fff; }
     .btn-sm.blue { background:#3b82f6;color:#fff; } .btn-sm.amber { background:#f59e0b;color:#fff; }
     .btn-sm.purple { background:#8b5cf6;color:#fff; }
@@ -61,6 +61,7 @@
     #detailContent img:hover { transform: scale(1.02); }
     .spinner { border: 3px solid #e2e8f0; border-top: 3px solid #4f46e5; border-radius: 50%; width: 32px; height: 32px; animation: spin 0.8s linear infinite; margin: 2rem auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    code { background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 0.35rem; font-size: 0.8rem; color: #1e293b; }
   </style>
 </head>
 <body>
@@ -110,6 +111,7 @@
         <button class="admin-tab" data-tab="verifications">Verifications</button>
         <button class="admin-tab" data-tab="leads">Leads</button>
         <button class="admin-tab" data-tab="followups">📬 Follow-Ups</button>
+        <button class="admin-tab" data-tab="seo">🔍 SEO Pages</button>
         <button class="admin-tab" data-tab="reports">Reports</button>
         <button class="admin-tab" data-tab="transactions">Transactions</button>
         <button class="admin-tab" data-tab="settings">⚙️ Settings</button>
@@ -197,6 +199,29 @@
           <div id="followupStats" class="grid-3 mb-4"></div>
           <div id="followupList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
           <div id="noFollowups" class="hidden text-slate-500 text-sm py-4">No follow-ups found.</div>
+        </div>
+      </div>
+
+      <div id="tab-seo" class="tab-content hidden">
+        <div class="section-card">
+          <div class="flex-between mb-4">
+            <h3>🔍 Programmatic SEO Pages</h3>
+            <div class="flex gap-2 flex-wrap">
+              <select id="seoFilter" class="settings-input" style="width:auto;">
+                <option value="all">All types</option>
+                <option value="location">Location</option>
+                <option value="property_type">Property type</option>
+                <option value="price_range">Price range</option>
+                <option value="property">Individual properties</option>
+              </select>
+              <button id="regenerateSeoBtn" class="btn-sm amber"><i class="fas fa-sync-alt"></i> Regenerate now</button>
+              <button id="refreshSeoBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+          </div>
+          <div id="seoBanner" class="hidden mb-3 text-sm rounded-xl p-3"></div>
+          <div id="seoStats" class="grid-3 mb-4"></div>
+          <div id="seoList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+          <div id="noSeo" class="hidden text-slate-500 text-sm py-4">No SEO pages generated yet.</div>
         </div>
       </div>
 
@@ -352,6 +377,7 @@
           else if (t === 'verifications') loadVerifications();
           else if (t === 'leads') loadLeads();
           else if (t === 'followups') loadFollowups();
+          else if (t === 'seo') loadSeoPages();
           else if (t === 'reports') loadReports();
           else if (t === 'transactions') loadTransactions();
           else if (t === 'settings') loadSettings();
@@ -789,7 +815,6 @@
         html += '</tbody></table>';
         box.innerHTML = html;
 
-        // ─── VIEW handler ───
         box.querySelectorAll('.view-followup').forEach(function(el) {
           el.onclick = function() {
             var lead = data.find(function(x) { return x.id === el.dataset.id; });
@@ -811,7 +836,6 @@
           };
         });
 
-        // ─── SEND handler ───
         box.querySelectorAll('.send-followup-admin').forEach(function(el) {
           el.onclick = async function() {
             if (!confirm('Send the follow-up email to this visitor now?')) return;
@@ -882,6 +906,69 @@
       } catch (e) {
         console.error(e);
         box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+      }
+    }
+
+    async function loadSeoPages() {
+      var box = $('seoList');
+      var no = $('noSeo');
+      var statsBox = $('seoStats');
+      var filter = $('seoFilter').value;
+
+      try {
+        var q = supabase.from('seo_pages').select('*').eq('is_active', true).order('page_type').order('last_updated', { ascending: false });
+        if (filter !== 'all') q = q.eq('page_type', filter);
+
+        var r = await q.limit(500);
+        if (r.error) throw r.error;
+        var data = r.data || [];
+
+        var counts = { location: 0, property_type: 0, price_range: 0, property: 0 };
+        data.forEach(function(p) { counts[p.page_type] = (counts[p.page_type] || 0) + 1; });
+
+        if (statsBox) {
+          statsBox.innerHTML =
+            '<div class="detail-card"><div class="label">Location pages</div><div class="value">' + counts.location + '</div></div>' +
+            '<div class="detail-card"><div class="label">Type pages</div><div class="value">' + counts.property_type + '</div></div>' +
+            '<div class="detail-card"><div class="label">Property pages</div><div class="value">' + counts.property + '</div></div>';
+        }
+
+        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+        no.classList.add('hidden');
+
+        var html = '<table><thead><tr><th>Type</th><th>Title / H1</th><th>Slug</th><th>Count</th><th>Updated</th><th>Link</th></tr></thead><tbody>';
+        data.forEach(function(p) {
+          html += '<tr>' +
+            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(p.page_type === 'property' ? 'approved' : 'active') + '">' + esc(p.page_type) + '</span></td>' +
+            '<td><div class="font-medium">' + esc(p.h1 || p.title) + '</div><div class="text-xs text-slate-500">' + esc((p.meta_description || '').substring(0, 80)) + '…</div></td>' +
+            '<td><code>' + esc(p.slug) + '</code></td>' +
+            '<td>' + (p.property_count || 0) + '</td>' +
+            '<td>' + formatDate(p.last_updated) + '</td>' +
+            '<td><a href="https://propertyhub.dpdns.org/?seo=' + encodeURIComponent(p.slug) + '" target="_blank" class="btn-sm blue">Open</a></td>' +
+          '</tr>';
+        });
+        html += '</tbody></table>';
+        box.innerHTML = html;
+      } catch (e) {
+        console.error(e);
+        box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+      }
+    }
+
+    async function regenerateSeoNow() {
+      var banner = $('seoBanner');
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
+      banner.textContent = '🧠 Regenerating SEO pages from your properties…';
+      banner.classList.remove('hidden');
+      try {
+        var r = await supabase.rpc('regenerate_seo_pages');
+        if (r.error) throw r.error;
+        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
+        banner.textContent = '✅ SEO pages regenerated.';
+        loadSeoPages();
+      } catch (e) {
+        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+        banner.textContent = '❌ ' + e.message;
       }
     }
 
@@ -1064,8 +1151,14 @@
         if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
       });
 
+      // Follow-ups
       $('followupFilter').addEventListener('change', loadFollowups);
       $('refreshFollowupsBtn').addEventListener('click', loadFollowups);
+
+      // SEO
+      $('seoFilter').addEventListener('change', loadSeoPages);
+      $('refreshSeoBtn').addEventListener('click', loadSeoPages);
+      $('regenerateSeoBtn').addEventListener('click', regenerateSeoNow);
 
       hideLoading();
 
@@ -1079,6 +1172,7 @@
         else if (t === 'verifications') loadVerifications();
         else if (t === 'leads') loadLeads();
         else if (t === 'followups') loadFollowups();
+        else if (t === 'seo') loadSeoPages();
         else if (t === 'reports') loadReports();
         else if (t === 'transactions') loadTransactions();
       }, 30000);
