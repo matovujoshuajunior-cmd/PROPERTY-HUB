@@ -5,5 +5,3 @@ Disallow: /dashboard
 Disallow: /auth
 
 Sitemap: https://propertyhub.dpdns.org/sitemap.xml
-Sitemap: https://dpdns.org
-
