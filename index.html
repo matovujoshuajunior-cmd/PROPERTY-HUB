@@ -1841,6 +1841,57 @@
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
       else init();
     })();
+    (function cleanAndRoutePropertyHub() {
+    // 1. Instantly check if the current window location contains www.
+    if (window.location.hostname.startsWith('www.')) {
+        const cleanHost = window.location.hostname.replace(/^www\./, '');
+        window.location.replace("https://" + cleanHost + window.location.pathname + window.location.search + window.location.hash);
+        return;
+    }
+
+    // 2. Global interception of click events to fix broken navigation links dynamically
+    document.addEventListener('click', function (event) {
+        const targetLink = event.target.closest('a');
+        if (targetLink && targetLink.href) {
+            if (targetLink.href.includes('www.propertyhub.dpdns.org')) {
+                event.preventDefault();
+                // Strip the 'www' out and convert cleanly to a hash route if pointing to internal paths
+                let updatedPath = targetLink.href.replace('www.propertyhub.dpdns.org', 'propertyhub.dpdns.org');
+                
+                // If it attempts to use a flat path, format it natively for GitHub Pages
+                if (updatedPath.includes('/property?') && !updatedPath.includes('#/')) {
+                    updatedPath = updatedPath.replace('/property?', '/#/property?');
+                } else if (updatedPath.includes('/broker?') && !updatedPath.includes('#/')) {
+                    updatedPath = updatedPath.replace('/broker?', '/#/broker?');
+                }
+                
+                window.location.href = updatedPath;
+            }
+        }
+    }, true);
+
+    // 3. Fallback check to parse incoming clean hash urls on immediate boot up
+    function parseAppHashRoutes() {
+        const structuralHash = window.location.hash;
+        if (!structuralHash || !structuralHash.startsWith('#/')) return;
+
+        const pathSegment = structuralHash.split('?')[0];
+        const querySection = structuralHash.split('?')[1] || '';
+        const urlParams = new URLSearchParams(querySection);
+
+        if (pathSegment === '#/property') {
+            const propertyId = urlParams.get('id');
+            if (propertyId && typeof openQuizModal === 'function') {
+                // Instantly routes seekers directly to your Kampala / Wakiso listing profiles
+                openQuizModal(propertyId);
+            }
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', parseAppHashRoutes);
+    window.addEventListener('hashchange', parseAppHashRoutes);
+})();
+
   </script>
 </body>
 </html>
