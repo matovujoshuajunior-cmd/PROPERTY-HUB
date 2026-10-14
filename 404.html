@@ -2,11 +2,14 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Property Hub Uganda</title>
-  <meta http-equiv="refresh" content="0;url=/#/">
+  <title>Redirecting…</title>
   <script>
-    window.location.replace('/#/');
+    // GitHub Pages SPA fallback.
+    // Sends the requested path to index.html as ?p=<encoded path>
+    // so index.html can restore the URL before routing.
+    var path = location.pathname + location.search + location.hash;
+    location.replace('/?p=' + encodeURIComponent(path));
   </script>
 </head>
-<body><p>Redirecting to Property Hub…</p></body>
+<body>Redirecting…</body>
 </html>
