@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- ══════════════════════════════════════════════════════════════
-       PRIMARY SEO
-  ══════════════════════════════════════════════════════════════ -->
   <title>Houses for Rent & Land for Sale in Kampala | Property Hub Uganda</title>
   <meta name="description" content="Browse verified houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land for sale in Wakiso. Direct broker contact." />
   <link rel="canonical" href="https://propertyhub.dpdns.org/" />
@@ -16,10 +13,6 @@
   <meta name="theme-color" content="#4f46e5" />
   <meta name="format-detection" content="telephone=no" />
 
-  <!-- ══════════════════════════════════════════════════════════════
-       SOCIAL (Open Graph + Twitter)
-       ⚠️ Replace og-cover.jpg with your real 1200×630 image
-  ══════════════════════════════════════════════════════════════ -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Property Hub Uganda" />
   <meta property="og:title" content="Houses for Rent & Land for Sale in Kampala | Property Hub" />
@@ -36,9 +29,6 @@
   <meta name="twitter:description" content="Find your perfect space in Uganda — verified brokers, real photos, transparent pricing." />
   <meta name="twitter:image" content="https://propertyhub.dpdns.org/og-cover.jpg" />
 
-  <!-- ══════════════════════════════════════════════════════════════
-       ICONS + RESOURCE HINTS
-  ══════════════════════════════════════════════════════════════ -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
@@ -47,13 +37,9 @@
   <link rel="preconnect" href="https://ubkgovgoifgpazkapaxi.supabase.co" crossorigin />
   <link rel="dns-prefetch" href="https://api.web3forms.com" />
 
-  <!-- Preload hero background — improves LCP -->
   <link rel="preload" as="image" fetchpriority="high"
     href="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80&auto=format&fit=crop" />
 
-  <!-- ══════════════════════════════════════════════════════════════
-       STRUCTURED DATA
-  ══════════════════════════════════════════════════════════════ -->
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebSite","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","potentialAction":{"@type":"SearchAction","target":"https://propertyhub.dpdns.org/?q={search_term_string}","query-input":"required name=search_term_string"}}
   </script>
@@ -72,11 +58,43 @@
   </script>
 
   <!-- ══════════════════════════════════════════════════════════════
-       STYLES
-       ⚠️ TODO (Week 2): Replace Tailwind Play CDN with a compiled
-          styles.css. See post-deploy checklist. For now the CDN is
-          kept so the site works immediately.
+       CRITICAL — GitHub Pages SPA routing receiver + legacy hash redirect
+       MUST run before anything else. Do not move or defer this script.
   ══════════════════════════════════════════════════════════════ -->
+  <script>
+  (function() {
+    try {
+      // 1) GitHub Pages 404.html redirect: /?p=%2Fseo%2Ffoo
+      var params = new URLSearchParams(window.location.search);
+      var p = params.get('p');
+      if (p) {
+        var decoded = decodeURIComponent(p);
+        if (decoded.charAt(0) !== '/') decoded = '/' + decoded;
+        history.replaceState(null, '', decoded);
+        return;
+      }
+
+      // 2) Legacy hash routing: #/seo?slug=foo → /seo/foo
+      var h = window.location.hash;
+      if (!h || h.length < 2 || h.charAt(1) !== '/') return;
+      var raw = h.substring(2).split('?');
+      var path = raw[0];
+      var hp = new URLSearchParams(raw[1] || '');
+      var newUrl = '/';
+      if (path === 'seo')            { var s = hp.get('slug'); if (s) newUrl = '/seo/' + encodeURIComponent(s); }
+      else if (path === 'broker')    { var b = hp.get('id');   if (b) newUrl = '/broker/' + encodeURIComponent(b); }
+      else if (path === 'property')  { var pr = hp.get('id');  if (pr) newUrl = '/property/' + encodeURIComponent(pr); }
+      else if (path === 'auth')      { newUrl = '/auth'; }
+      else if (path === 'dashboard') { newUrl = '/dashboard'; }
+      else if (path)                 { newUrl = '/' + path; }
+      history.replaceState(null, '', newUrl);
+    } catch (e) {
+      // Never break the page on routing errors
+      console.warn('Route normalization failed:', e);
+    }
+  })();
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
@@ -188,9 +206,6 @@
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════════════════════════════
-       NOSCRIPT FALLBACK — real content for crawlers without JS
-  ══════════════════════════════════════════════════════════════ -->
   <noscript>
     <div style="max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif;line-height:1.6">
       <h1>Houses for Rent & Land for Sale in Kampala, Wakiso, Entebbe</h1>
@@ -209,24 +224,6 @@
       <p>Please enable JavaScript to browse live listings.</p>
     </div>
   </noscript>
-
-  <!-- Legacy hash URL redirect — runs before render to avoid flicker -->
-  <script>
-    (function() {
-      var h = window.location.hash;
-      if (!h || h.length < 2 || h.charAt(1) !== '/') return;
-      var raw = h.substring(2).split('?');
-      var path = raw[0], params = new URLSearchParams(raw[1] || '');
-      var newUrl = '/';
-      if (path === 'seo')        { var s = params.get('slug'); if (s) newUrl = '/seo/' + encodeURIComponent(s); }
-      else if (path === 'broker')   { var b = params.get('id');   if (b) newUrl = '/broker/' + encodeURIComponent(b); }
-      else if (path === 'property') { var p = params.get('id');   if (p) newUrl = '/property/' + encodeURIComponent(p); }
-      else if (path === 'auth')      newUrl = '/auth';
-      else if (path === 'dashboard') newUrl = '/dashboard';
-      else if (path)                 newUrl = '/' + path;
-      history.replaceState(null, '', newUrl);
-    })();
-  </script>
 
   <div id="loadingOverlay"><div class="loader"></div><p class="text-slate-600 text-sm">Loading Property Hub…</p></div>
   <button id="scrollTopBtn" title="Back to top"><i class="fas fa-arrow-up"></i></button>
@@ -442,7 +439,6 @@
           </div>
           <div id="emptyState" class="hidden text-center py-20">No properties found.</div>
 
-          <!-- Popular searches — crawlable internal links -->
           <section class="mt-12 mb-4">
             <h2 class="text-xl font-bold text-slate-800 mb-3">Popular Property Searches in Uganda</h2>
             <ul class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
@@ -594,7 +590,6 @@
     </footer>
   </div>
 
-  <!-- Deferred scripts — no longer block render -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
   <script>
     (function() {
@@ -668,7 +663,7 @@
       }
 
       // ══════════════════════════════════════════════════════════════
-      //  ROUTING — pathname-based (real URLs)
+      //  ROUTING — pathname-based
       // ══════════════════════════════════════════════════════════════
       function navigateTo(url, replace) {
         if (replace) history.replaceState(null, '', url);
@@ -677,11 +672,10 @@
       }
 
       function parseRoute() {
-        let path = window.location.pathname.replace(/\/+$/, '') || '/';
-        const params = new URLSearchParams(window.location.search);
+        const path = window.location.pathname.replace(/\/+$/, '') || '/';
         let m;
-        if ((m = path.match(/^\/seo\/([^/]+)$/)))     return { view: 'seo', slug: decodeURIComponent(m[1]) };
-        if ((m = path.match(/^\/broker\/([^/]+)$/)))  return { view: 'broker', id: decodeURIComponent(m[1]) };
+        if ((m = path.match(/^\/seo\/([^/]+)$/)))      return { view: 'seo', slug: decodeURIComponent(m[1]) };
+        if ((m = path.match(/^\/broker\/([^/]+)$/)))   return { view: 'broker', id: decodeURIComponent(m[1]) };
         if ((m = path.match(/^\/property\/([^/]+)$/))) return { view: 'property', id: decodeURIComponent(m[1]) };
         if (path === '/auth') return { view: 'auth' };
         if (path === '/dashboard') return { view: 'dashboard' };
@@ -693,7 +687,7 @@
 
       function showView(view) {
         ['discoveryView', 'brokerView', 'authView', 'dashboardView'].forEach(function(id) {
-          var el = document.getElementById(id);
+          const el = document.getElementById(id);
           if (el) { el.classList.remove('view-visible'); el.classList.add('view-hidden'); }
         });
         if (view) { view.classList.remove('view-hidden'); view.classList.add('view-visible'); }
@@ -701,8 +695,8 @@
 
       function setAuthMode(signUpMode) {
         state.isSignUpMode = signUpMode;
-        var sIn = $('#toggleSignIn'), sUp = $('#toggleSignUp');
-        var f = $('#signUpFields'), t = $('#formTitle'), b = $('#submitAuthBtn');
+        const sIn = $('#toggleSignIn'), sUp = $('#toggleSignUp');
+        const f = $('#signUpFields'), t = $('#formTitle'), b = $('#submitAuthBtn');
         if (!sIn || !sUp || !f || !t || !b) return;
         if (signUpMode) {
           sUp.classList.add('active'); sIn.classList.remove('active');
@@ -716,7 +710,7 @@
       }
 
       // ══════════════════════════════════════════════════════════════
-      //  SEO — dynamic title, meta, schema
+      //  SEO helpers
       // ══════════════════════════════════════════════════════════════
       function setSEO(opts) {
         const { title, description, canonical, ogImage, ogType } = opts;
@@ -828,7 +822,6 @@
         if (!box) return;
         if (!page) { box.innerHTML = ''; return; }
         const canonical = SITE_URL + '/seo/' + encodeURIComponent(page.slug);
-        // Breadcrumb schema
         let bcEl = document.getElementById('dynamic-breadcrumb');
         if (bcEl) bcEl.remove();
         bcEl = document.createElement('script');
@@ -1562,11 +1555,10 @@
             showView($('#discoveryView'));
             const data = await loadSeoPage(route.slug);
             if (!data) {
-              // Unknown slug — show home with a soft "not found" message
+              // Unknown slug — fall back to home view
               state.currentSeoSlug = null;
               renderSeoHeader(null);
               applyFiltersAndSearch();
-              // Optionally: window.history.replaceState(null, '', '/');
             }
             break;
           }
@@ -1608,7 +1600,6 @@
         if (!window.supabase) { console.error('Supabase SDK failed to load.'); return; }
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Hide loader as soon as the app boots
         setTimeout(function() {
           const lo = $('#loadingOverlay');
           if (lo) lo.classList.add('hidden');
@@ -1617,10 +1608,8 @@
         try {
           const r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
           if (r.error) console.warn('Cleanup skipped:', r.error.message);
-          else console.log('🧹 Cleanup: ' + (r.data || 0) + ' old lead(s) removed.');
         } catch (e) { console.warn('Cleanup unavailable:', e.message); }
 
-        // Sticky toolbar
         (function() {
           const toolbar = document.getElementById('dashboardToolbar');
           if (!toolbar) return;
@@ -1888,7 +1877,7 @@
           $('#topupStatus').textContent = 'Initiating payment — check your phone for the USSD prompt…';
 
           try {
-            const { data, error } = await supabase.functions.invoke('initiate-deposit', {
+            const { error } = await supabase.functions.invoke('initiate-deposit', {
               body: { profile_id: state.currentUser.id, amount: amount, phone: formattedPhone, provider: provider }
             });
             if (error) throw error;
@@ -1914,24 +1903,9 @@
           }
         });
 
-        // Browser back/forward
         window.addEventListener('popstate', function() { handleRoute(); });
 
-        // First render
-        await handleRoute();
-        await fetchAllData();
-        await loadFooterSeoLinks();
-        await handleRoute(); // re-run after data loaded, to scroll to a property if needed
-
-        supabase.channel('properties-live').on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, function() {
-          console.log('🔄 Properties changed — refreshing…');
-          fetchAllData();
-          if (state.currentUser) { loadMyProperties(); loadPropertyVerificationList(); }
-        }).subscribe(function(status) {
-          if (status === 'SUBSCRIBED') console.log('📡 Live property updates: ON');
-        });
-
-        // Restore session if present
+        // Restore session before first route render
         try {
           const s = await supabase.auth.getSession();
           if (s.data && s.data.session && s.data.session.user) {
@@ -1941,6 +1915,17 @@
             await loadWallet();
           }
         } catch (e) { /* ignore */ }
+
+        // First render
+        await handleRoute();
+        await fetchAllData();
+        await loadFooterSeoLinks();
+        await handleRoute(); // re-run to correctly render deep links once data is loaded
+
+        supabase.channel('properties-live').on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, function() {
+          fetchAllData();
+          if (state.currentUser) { loadMyProperties(); loadPropertyVerificationList(); }
+        }).subscribe();
 
         console.log('✅ Ready');
       }
