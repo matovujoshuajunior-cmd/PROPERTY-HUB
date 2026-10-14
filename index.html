@@ -61,7 +61,6 @@
   <script>
   (function() {
     try {
-      // GitHub Pages 404.html redirect: /?p=%2Fseo%2Ffoo
       var params = new URLSearchParams(window.location.search);
       var p = params.get('p');
       if (p) {
@@ -71,7 +70,6 @@
         return;
       }
 
-      // Legacy hash routing: #/seo?slug=foo → /seo/foo
       var h = window.location.hash;
       if (!h || h.length < 2 || h.charAt(1) !== '/') return;
       var raw = h.substring(2).split('?');
@@ -91,7 +89,28 @@
   })();
   </script>
 
-  <link rel="stylesheet" href="/styles.css">
+  <!-- Tailwind: use compiled styles.css if available, otherwise fall back to CDN -->
+  <link rel="stylesheet" href="/styles.css" id="compiled-tailwind" />
+  <script>
+  (function() {
+    function loadCdn() {
+      if (window.__tailwindCdnLoaded) return;
+      window.__tailwindCdnLoaded = true;
+      var s = document.createElement('script');
+      s.src = 'https://cdn.tailwindcss.com';
+      document.head.appendChild(s);
+    }
+    var link = document.getElementById('compiled-tailwind');
+    if (link) {
+      link.addEventListener('error', loadCdn);
+      // Safety net: if after 1.5s we still can't tell it loaded, we don't force CDN.
+      // Just rely on the error event.
+    } else {
+      loadCdn();
+    }
+  })();
+  </script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
   <style>
@@ -198,7 +217,6 @@
     .pre-render-fallback { color: #64748b; font-size: 0.9rem; padding: 1rem 0; }
     .pre-render-fallback h2 { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
     .pre-render-fallback p { margin-bottom: 0.4rem; line-height: 1.5; }
-    /* Guide-style compact content for SEO pages */
     .seo-content { color: #334155; line-height: 1.75; font-size: 0.95rem; margin-top: 0.5rem; }
     .seo-content h2 { font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 1.5rem 0 0.6rem; }
     .seo-content h3 { font-size: 1rem; font-weight: 600; color: #1e293b; margin: 1rem 0 0.4rem; }
@@ -391,9 +409,6 @@
     <main>
       <section id="discoveryView" class="view view-visible">
 
-        <!-- ══════════════════════════════════════════════════════════
-             HERO — simple, tagline-first, keyword-rich subheading
-        ══════════════════════════════════════════════════════════ -->
         <div class="relative bg-slate-900 text-white overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
           <div class="absolute inset-0 hero-gradient"></div>
@@ -450,9 +465,6 @@
           </div>
           <div id="emptyState" class="hidden text-center py-20">No properties found.</div>
 
-          <!-- ══════════════════════════════════════════════════════════
-               POPULAR GUIDES — crawlable links to static SEO pages
-          ══════════════════════════════════════════════════════════ -->
           <section class="mt-12 mb-4">
             <h2 class="text-xl font-bold text-slate-800 mb-1">Popular Property Guides in Uganda</h2>
             <p class="text-slate-500 text-sm mb-4">In-depth guides to help you find a place in Uganda's most searched neighborhoods.</p>
@@ -462,6 +474,11 @@
               <li><a class="text-indigo-600 hover:underline" href="/guides/cheap-rooms-kikoni/">Cheap rooms for rent in Kikoni</a></li>
               <li><a class="text-indigo-600 hover:underline" href="/guides/rooms-wandegeya/">Rooms for rent in Wandegeya</a></li>
               <li><a class="text-indigo-600 hover:underline" href="/guides/student-hostels-katanga/">Student hostels in Katanga</a></li>
+              <li><a class="text-indigo-600 hover:underline" href="/guides/apartments-naalya/">2 bedroom apartments in Naalya</a></li>
+              <li><a class="text-indigo-600 hover:underline" href="/guides/apartments-ntinda/">Apartments for rent in Ntinda</a></li>
+              <li><a class="text-indigo-600 hover:underline" href="/guides/rentals-bukoto/">Houses &amp; apartments in Bukoto</a></li>
+              <li><a class="text-indigo-600 hover:underline" href="/guides/bungalows-kisaasi/">Bungalows for sale in Kisaasi</a></li>
+              <li><a class="text-indigo-600 hover:underline" href="/guides/guesthouses-entebbe-airport/">Guesthouses near Entebbe Airport</a></li>
             </ul>
           </section>
         </section>
@@ -882,20 +899,9 @@
       }
 
       async function loadFooterSeoLinks() {
-        try {
-          const r = await supabase.from('seo_pages')
-            .select('slug, h1, page_type, property_count')
-            .eq('is_active', true)
-            .in('page_type', ['location', 'property_type'])
-            .gte('property_count', 1)
-            .order('property_count', { ascending: false })
-            .limit(12);
-          const list = $('#footerSeoLinks');
-          if (!list || !r.data || !r.data.length) return;
-          // Static guide links come first; the dynamic list is not shown here since
-          // the footer has dedicated static links now. This function is kept for
-          // potential future use but does not overwrite the static footer.
-        } catch (e) { console.warn(e); }
+        // Static guide links are now hard-coded in the footer; this stays
+        // for future use but doesn't overwrite them.
+        return;
       }
 
       async function sendNotificationEmail(to_email, to_name, subject, message) {
@@ -1895,7 +1901,6 @@
 
         window.addEventListener('popstate', function() { handleRoute(); });
 
-        // Restore session
         try {
           const s = await supabase.auth.getSession();
           if (s.data && s.data.session && s.data.session.user) {
@@ -1906,20 +1911,18 @@
           }
         } catch (e) { /* ignore */ }
 
-        // Pre-fill search from ?search= (from static guide pages)
+        // Pre-fill search from ?search=
         const qp = new URLSearchParams(window.location.search);
         const searchParam = qp.get('search');
         if (searchParam) {
           const si = $('#searchInput');
           if (si) si.value = searchParam;
           state.searchQuery = searchParam;
-          // Clean the URL so it doesn't linger
           history.replaceState(null, '', '/');
         }
 
         await handleRoute();
         await fetchAllData();
-        await loadFooterSeoLinks();
         await handleRoute();
 
         supabase.channel('properties-live').on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, function() {
