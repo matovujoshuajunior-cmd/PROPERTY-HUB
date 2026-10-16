@@ -13,7 +13,6 @@
   <meta name="theme-color" content="#4f46e5" />
   <meta name="format-detection" content="telephone=no" />
 
-  <!-- Google Search Console verification — paste your real content value here -->
   <meta name="google-site-verification" content="PASTE_YOUR_GOOGLE_VERIFICATION_CODE_HERE" />
 
   <meta property="og:type" content="website" />
@@ -25,7 +24,6 @@
   <meta property="og:image" content="https://propertyhub.dpdns.org/og-cover.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Property Hub Uganda — find your perfect space" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Find Your Perfect Space | Property Hub Uganda" />
@@ -46,21 +44,18 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebSite","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","potentialAction":{"@type":"SearchAction","target":"https://propertyhub.dpdns.org/?search={search_term_string}","query-input":"required name=search_term_string"}}
   </script>
-
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","description":"Property Hub Uganda connects property seekers with verified brokers across Uganda.","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":[{"@type":"City","name":"Kampala"},{"@type":"City","name":"Wakiso"},{"@type":"City","name":"Entebbe"},{"@type":"City","name":"Mukono"},{"@type":"City","name":"Jinja"}],"priceRange":"UGX"}
+  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":[{"@type":"City","name":"Kampala"},{"@type":"City","name":"Wakiso"},{"@type":"City","name":"Entebbe"},{"@type":"City","name":"Mukono"}],"priceRange":"UGX"}
   </script>
-
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-    {"@type":"Question","name":"How do I find a trustworthy property broker in Uganda?","acceptedAnswer":{"@type":"Answer","text":"Look for Verified and Trusted badges on Property Hub Uganda. Verified means our team reviewed the listing. Trusted means the broker has a 4-star rating or higher with at least 10 reviews. Always read reviews and never pay before viewing the property in person."}},
-    {"@type":"Question","name":"Where can I find cheap houses for rent in Kampala?","acceptedAnswer":{"@type":"Answer","text":"Property Hub Uganda lists verified rentals across Kampala including Naalya, Ntinda, Bukoto, Kira, Kisaasi, and Mukono, with prices starting under 300,000 UGX per month for single rooms and 500,000 UGX for 2-bedroom apartments."}},
-    {"@type":"Question","name":"Are there guesthouses near Entebbe Airport?","acceptedAnswer":{"@type":"Answer","text":"Yes. Property Hub Uganda lists guesthouses in Entebbe close to the international airport with transparent pricing, photos, and broker ratings."}},
-    {"@type":"Question","name":"How do I avoid rental scams in Kampala?","acceptedAnswer":{"@type":"Answer","text":"Never send money before viewing the property in person. Prefer Verified listings, check the broker's reviews and Trusted badge, meet at the property during daylight, and request the landlord's contact directly."}}
+    {"@type":"Question","name":"How do I find a trustworthy property broker in Uganda?","acceptedAnswer":{"@type":"Answer","text":"Look for Verified and Trusted badges on Property Hub Uganda. Always read reviews and never pay before viewing the property in person."}},
+    {"@type":"Question","name":"Where can I find cheap houses for rent in Kampala?","acceptedAnswer":{"@type":"Answer","text":"Property Hub Uganda lists verified rentals across Kampala including Naalya, Ntinda, Bukoto, Kira, Kisaasi, and Mukono, with prices starting under 300,000 UGX per month."}},
+    {"@type":"Question","name":"Are there guesthouses near Entebbe Airport?","acceptedAnswer":{"@type":"Answer","text":"Yes. Property Hub Uganda lists guesthouses in Entebbe close to the international airport with transparent pricing and broker ratings."}},
+    {"@type":"Question","name":"How do I avoid rental scams in Kampala?","acceptedAnswer":{"@type":"Answer","text":"Never send money before viewing the property in person. Prefer Verified listings and check the broker's reviews."}}
   ]}
   </script>
 
-  <!-- GitHub Pages SPA routing receiver + legacy hash redirect. Must run first. -->
   <script>
   (function() {
     try {
@@ -72,7 +67,6 @@
         history.replaceState(null, '', decoded);
         return;
       }
-
       var h = window.location.hash;
       if (!h || h.length < 2 || h.charAt(1) !== '/') return;
       var raw = h.substring(2).split('?');
@@ -84,15 +78,13 @@
       else if (path === 'property')  { var pr = hp.get('id');  if (pr) newUrl = '/property/' + encodeURIComponent(pr); }
       else if (path === 'auth')      { newUrl = '/auth'; }
       else if (path === 'dashboard') { newUrl = '/dashboard'; }
+      else if (path === 'onboarding'){ newUrl = '/onboarding'; }
       else if (path)                 { newUrl = '/' + path; }
       history.replaceState(null, '', newUrl);
-    } catch (e) {
-      console.warn('Route normalization failed:', e);
-    }
+    } catch (e) { console.warn('Route normalization failed:', e); }
   })();
   </script>
 
-  <!-- Tailwind: use compiled styles.css if available, otherwise fall back to CDN -->
   <link rel="stylesheet" href="/styles.css" id="compiled-tailwind" />
   <script>
   (function() {
@@ -104,11 +96,7 @@
       document.head.appendChild(s);
     }
     var link = document.getElementById('compiled-tailwind');
-    if (link) {
-      link.addEventListener('error', loadCdn);
-    } else {
-      loadCdn();
-    }
+    if (link) { link.addEventListener('error', loadCdn); } else { loadCdn(); }
   })();
   </script>
 
@@ -156,17 +144,10 @@
     .wallet-pill .wallet-label { color: #94a3b8; font-weight: 400; font-size: 0.6rem; text-transform: uppercase; }
     .dashboard-toolbar .toolbar-btn { padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: #f1f5f9; color: #1e293b; white-space: nowrap; transition: background 0.15s, transform 0.1s; min-width: 42px; min-height: 42px; }
     .dashboard-toolbar .toolbar-btn:hover { background: #e2e8f0; }
-    .dashboard-toolbar .toolbar-btn:active { transform: scale(0.96); }
     .dashboard-toolbar .toolbar-btn.primary { background: #4f46e5; color: white; }
-    .dashboard-toolbar .toolbar-btn.primary:hover { background: #4338ca; }
     .dashboard-toolbar .toolbar-btn.green { background: #10b981; color: white; }
-    .dashboard-toolbar .toolbar-btn.green:hover { background: #059669; }
     .dashboard-toolbar .toolbar-btn.amber { background: #f59e0b; color: white; }
-    .dashboard-toolbar .toolbar-btn.amber:hover { background: #d97706; }
     .dashboard-toolbar .toolbar-btn-dark { background: #334155; color: white; }
-    .dashboard-toolbar .toolbar-btn-dark:hover { background: #1e293b; }
-    .dashboard-toolbar .toolbar-btn i { font-size: 1rem; line-height: 1; }
-    .dashboard-toolbar .wallet-currency { font-size: 0.75rem; color: #cbd5e1; }
     @media (max-width: 1023px) { .dashboard-toolbar .btn-label { display: none; } .dashboard-toolbar .toolbar-btn { padding: 0.6rem; } }
     @media (max-width: 640px) {
       .dashboard-toolbar { top: 60px; padding: 0.6rem 0.75rem; gap: 0.5rem; border-radius: 1rem; flex-direction: column; align-items: stretch; }
@@ -205,32 +186,45 @@
     .trust-mini.visible { display: flex; }
     .trust-mini button { color: #065f46; font-weight: 600; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 0; }
     .close-banner-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: rgba(6,95,70,0.1); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #065f46; font-size: 0.9rem; }
-    .close-banner-btn:hover { background: rgba(6,95,70,0.2); }
     .quiz-question { background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;margin-bottom:0.75rem; }
     .quiz-question p.q-title { font-weight:600;color:#1e293b;font-size:0.875rem;margin-bottom:0.5rem; }
     .quiz-option { display:inline-flex;align-items:center;gap:0.4rem;font-size:0.8rem;background:#fff;padding:0.3rem 0.75rem;border-radius:9999px;border:1px solid #e2e8f0;margin:0.2rem;cursor:pointer; }
-    .quiz-option:hover { border-color:#6366f1; }
     .unlock-btn { background: #10b981; color: white; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; }
-    .unlock-btn:hover { background: #059669; }
     .seo-breadcrumb { font-size: 0.75rem; color: #64748b; margin-bottom: 0.75rem; }
     .seo-breadcrumb a { color: #4f46e5; text-decoration: none; }
-    .seo-breadcrumb a:hover { text-decoration: underline; }
     .pre-render-fallback { color: #64748b; font-size: 0.9rem; padding: 1rem 0; }
     .pre-render-fallback h2 { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
-    .pre-render-fallback p { margin-bottom: 0.4rem; line-height: 1.5; }
-    .seo-content { color: #334155; line-height: 1.75; font-size: 0.95rem; margin-top: 0.5rem; }
-    .seo-content h2 { font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 1.5rem 0 0.6rem; }
-    .seo-content h3 { font-size: 1rem; font-weight: 600; color: #1e293b; margin: 1rem 0 0.4rem; }
-    .seo-content p { margin-bottom: 0.85rem; }
-    .seo-content ul, .seo-content ol { margin: 0.5rem 0 1rem 1.35rem; }
-    .seo-content ul { list-style: disc; }
-    .seo-content ol { list-style: decimal; }
-    .seo-content li { margin-bottom: 0.35rem; }
-    .seo-content a { color: #4f46e5; text-decoration: underline; }
-    .seo-content strong { color: #0f172a; font-weight: 600; }
     .hero-trust-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
     .hero-trust-chips span { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; backdrop-filter: blur(4px); }
     .hero-trust-chips i { color: #34d399; font-size: 0.75rem; }
+    /* Chatbot */
+    #chatBubble { position: fixed; bottom: 90px; right: 30px; z-index: 1001; background: #4f46e5; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; box-shadow: 0 12px 30px rgba(79,70,229,0.35); cursor: pointer; border: none; transition: transform 0.15s; }
+    #chatBubble:hover { transform: scale(1.08); }
+    #chatBubble .chat-badge { position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 0.65rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+    #chatPanel { position: fixed; bottom: 90px; right: 30px; z-index: 1002; width: min(380px, calc(100vw - 20px)); max-height: min(560px, calc(100vh - 120px)); background: white; border-radius: 1.25rem; box-shadow: 0 20px 60px rgba(0,0,0,0.25); display: none; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; }
+    #chatPanel.open { display: flex; }
+    #chatHeader { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
+    #chatHeader .chat-title { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
+    #chatHeader .chat-subtitle { font-size: 0.7rem; color: #c7d2fe; margin-top: 0.1rem; }
+    #chatClose { background: rgba(255,255,255,0.15); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    #chatMessages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem; background: #f8fafc; }
+    .chat-msg { max-width: 85%; padding: 0.65rem 0.9rem; border-radius: 1rem; font-size: 0.85rem; line-height: 1.5; word-wrap: break-word; }
+    .chat-msg.bot { background: white; color: #1e293b; align-self: flex-start; border: 1px solid #e2e8f0; border-bottom-left-radius: 0.25rem; }
+    .chat-msg.user { background: #4f46e5; color: white; align-self: flex-end; border-bottom-right-radius: 0.25rem; }
+    .chat-msg a { color: #4f46e5; text-decoration: underline; }
+    .chat-msg.user a { color: #c7d2fe; }
+    #chatQuickReplies { padding: 0.5rem 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem; background: white; border-top: 1px solid #f1f5f9; max-height: 110px; overflow-y: auto; }
+    .chat-quick-btn { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
+    .chat-quick-btn:hover { background: #e0e7ff; }
+    #chatInputRow { display: flex; gap: 0.5rem; padding: 0.75rem; border-top: 1px solid #e2e8f0; background: white; }
+    #chatInput { flex: 1; border: 1px solid #e2e8f0; border-radius: 9999px; padding: 0.55rem 1rem; font-size: 0.85rem; outline: none; }
+    #chatInput:focus { border-color: #4f46e5; }
+    #chatSend { background: #4f46e5; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    #chatSend:hover { background: #4338ca; }
+    @media (max-width: 640px) {
+      #chatBubble { bottom: 90px; right: 20px; width: 52px; height: 52px; }
+      #chatPanel { right: 10px; bottom: 90px; }
+    }
   </style>
 </head>
 <body>
@@ -238,23 +232,39 @@
   <noscript>
     <div style="max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif;line-height:1.6">
       <h1>Find Your Perfect Space — Property Hub Uganda</h1>
-      <p>Browse verified houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land for sale in Wakiso. Direct contact with trusted brokers across Uganda.</p>
-      <h2>Featured Guides</h2>
+      <p>Browse verified houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land for sale in Wakiso.</p>
       <ul>
         <li><a href="/guides/single-rooms-near-makerere/">Single rooms near Makerere University</a></li>
         <li><a href="/guides/hostels-near-mulago/">Hostels near Mulago Hospital</a></li>
         <li><a href="/guides/cheap-rooms-kikoni/">Cheap rooms for rent in Kikoni</a></li>
-        <li><a href="/guides/rooms-wandegeya/">Rooms for rent in Wandegeya</a></li>
-        <li><a href="/guides/student-hostels-katanga/">Student hostels in Katanga</a></li>
       </ul>
-      <h2>Areas We Cover</h2>
-      <p>Kampala · Wakiso · Entebbe · Mukono · Kira · Naalya · Ntinda · Kololo · Naguru · Muyenga · Bukoto · Jinja · Mbarara · Gulu</p>
       <p>Please enable JavaScript to browse live listings.</p>
     </div>
   </noscript>
 
   <div id="loadingOverlay"><div class="loader"></div><p class="text-slate-600 text-sm">Loading Property Hub…</p></div>
   <button id="scrollTopBtn" title="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+  <!-- Chatbot -->
+  <button id="chatBubble" title="Chat with us" aria-label="Open chat">
+    <i class="fas fa-comments"></i>
+    <span class="chat-badge" id="chatBadge">1</span>
+  </button>
+  <div id="chatPanel" role="dialog" aria-label="Chat assistant">
+    <div id="chatHeader">
+      <div>
+        <div class="chat-title"><i class="fas fa-headset"></i> Property Hub Assistant</div>
+        <div class="chat-subtitle" id="chatContext">Here to help you find a place</div>
+      </div>
+      <button id="chatClose" aria-label="Close chat">&times;</button>
+    </div>
+    <div id="chatMessages"></div>
+    <div id="chatQuickReplies"></div>
+    <div id="chatInputRow">
+      <input id="chatInput" type="text" placeholder="Type a question…" autocomplete="off" />
+      <button id="chatSend" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
 
   <div id="securityNotification" class="security-notification">
     <div class="flex items-start gap-3">
@@ -409,7 +419,6 @@
 
     <main>
       <section id="discoveryView" class="view view-visible">
-
         <div class="relative bg-slate-900 text-white overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
           <div class="absolute inset-0 hero-gradient"></div>
@@ -417,13 +426,11 @@
             <div class="max-w-2xl">
               <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Find Your Perfect Space</h1>
               <p class="mt-3 text-slate-200 text-base md:text-lg">Rentals, apartments, guesthouses, and land across Kampala, Wakiso, and Entebbe — from verified brokers.</p>
-
               <div class="mt-6 relative">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                 <input id="searchInput" type="text" placeholder="Search by area, price, or broker…" class="w-full pl-12 pr-12 py-3 rounded-xl text-slate-800" />
                 <button id="clearSearchBtn" title="Clear" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100"><i class="fas fa-times"></i></button>
               </div>
-
               <div class="hero-trust-chips">
                 <span><i class="fas fa-check-circle"></i> Verified brokers</span>
                 <span><i class="fas fa-bolt"></i> Direct contact</span>
@@ -529,6 +536,65 @@
         </div>
       </section>
 
+      <section id="onboardingView" class="view view-hidden">
+        <div class="max-w-3xl mx-auto px-4 py-10">
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-10">
+            <div class="text-center mb-8">
+              <div class="text-5xl mb-3">🎉</div>
+              <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800">Welcome to Property Hub</h1>
+              <p class="text-slate-500 mt-2">Here's how to start getting leads in 5 minutes.</p>
+            </div>
+
+            <div class="space-y-5">
+              <div class="flex gap-4 items-start">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">1</div>
+                <div>
+                  <h3 class="font-bold text-slate-800">Add your first property</h3>
+                  <p class="text-sm text-slate-600 mt-1">Click <strong>Add Property</strong> in your dashboard. Enter the title, price, type, and area. Upload 2–3 clear photos. That's it — your listing is live on the site.</p>
+                </div>
+              </div>
+              <div class="flex gap-4 items-start">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">2</div>
+                <div>
+                  <h3 class="font-bold text-slate-800">Get verified (recommended)</h3>
+                  <p class="text-sm text-slate-600 mt-1">Verified listings rank higher and get more clicks. Cost: 5,000 UGX from your wallet. This protects visitors from scams and builds your reputation.</p>
+                </div>
+              </div>
+              <div class="flex gap-4 items-start">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">3</div>
+                <div>
+                  <h3 class="font-bold text-slate-800">Receive leads</h3>
+                  <p class="text-sm text-slate-600 mt-1">When a visitor is interested in your property, they fill a short quiz. You'll be notified by <strong>SMS</strong> and <strong>email</strong>. Each lead is scored: <strong>Hot</strong>, <strong>Warm</strong>, or <strong>Cold</strong>.</p>
+                </div>
+              </div>
+              <div class="flex gap-4 items-start">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">4</div>
+                <div>
+                  <h3 class="font-bold text-slate-800">Unlock serious leads</h3>
+                  <p class="text-sm text-slate-600 mt-1">You decide which leads to unlock. Hot leads cost more, cold leads cost less. Unlock fee comes from your wallet. Once unlocked, you see the visitor's name, email, and WhatsApp number — and they see your contact too.</p>
+                </div>
+              </div>
+              <div class="flex gap-4 items-start">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center">✓</div>
+                <div>
+                  <h3 class="font-bold text-slate-800">Top up your wallet</h3>
+                  <p class="text-sm text-slate-600 mt-1">Click <strong>Top Up</strong> on your dashboard to add funds via MTN MoMo or Airtel Money. Wallet pays for verifications and lead unlocks.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+              <strong>💡 Pro tip:</strong> Listings with 3+ photos and detailed titles like <em>"2 Bedroom Apartment in Naalya under 800k"</em> get 4× more views than vague titles.
+            </div>
+
+            <div class="mt-8 flex flex-col sm:flex-row gap-3">
+              <button id="onboardingDoneBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold">Got it — take me to my dashboard →</button>
+              <button id="onboardingSkipBtn" class="text-sm text-slate-500 px-4 py-3">Skip for now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="dashboardView" class="view view-hidden">
         <div class="max-w-5xl mx-auto px-4 py-8">
           <div class="flex items-center justify-between mb-6"><h2 class="text-xl font-bold">📋 My Properties</h2><button id="logoutBtn" class="text-sm text-red-500">Sign Out</button></div>
@@ -546,6 +612,7 @@
               <button id="dashboardAddPropertyBtn" class="toolbar-btn primary" title="Add property"><i class="fas fa-plus-circle"></i><span class="btn-label">Add Property</span></button>
               <button id="dashboardPropertyVerificationBtn" class="toolbar-btn amber" title="Verification"><i class="fas fa-shield-alt"></i><span class="btn-label">Verification</span></button>
               <button id="dashboardLeadsBtn" class="toolbar-btn green" title="Leads"><i class="fas fa-users"></i><span class="btn-label">Leads</span></button>
+              <button id="dashboardHelpBtn" class="toolbar-btn toolbar-btn-dark" title="How to use"><i class="fas fa-question-circle"></i><span class="btn-label">Help</span></button>
             </div>
           </div>
 
@@ -614,7 +681,7 @@
         </div>
         <div>
           <h4 class="text-white font-bold mb-3">Areas We Cover</h4>
-          <p class="text-slate-400">Kampala · Wakiso · Entebbe · Mukono · Kira · Naalya · Ntinda · Kololo · Naguru · Muyenga · Bukoto · Jinja · Mbarara · Gulu</p>
+          <p class="text-slate-400">Kampala · Wakiso · Entebbe · Mukono · Kira · Naalya · Ntinda · Kololo · Naguru · Muyenga · Bukoto · Jinja</p>
         </div>
       </div>
       <div class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">© 2026 Property Hub Uganda.</div>
@@ -645,7 +712,8 @@
         allProperties: [], filteredProperties: [], myProperties: [],
         currentFilter: 'all', searchQuery: '', currentBrokerId: null,
         currentUser: null, isSignUpMode: false, profilesMap: {},
-        walletBalance: 0, isAdmin: false, currentSeoSlug: null
+        walletBalance: 0, isAdmin: false, currentSeoSlug: null,
+        chatContext: 'visitor'
       };
 
       function $(s) { return document.querySelector(s); }
@@ -707,6 +775,7 @@
         if ((m = path.match(/^\/property\/([^/]+)$/))) return { view: 'property', id: decodeURIComponent(m[1]) };
         if (path === '/auth') return { view: 'auth' };
         if (path === '/dashboard') return { view: 'dashboard' };
+        if (path === '/onboarding') return { view: 'onboarding' };
         if (path === '/' || path === '/index.html') return { view: 'home' };
         const slug = path.substring(1);
         if (slug) return { view: 'seo', slug };
@@ -714,7 +783,7 @@
       }
 
       function showView(view) {
-        ['discoveryView', 'brokerView', 'authView', 'dashboardView'].forEach(function(id) {
+        ['discoveryView', 'brokerView', 'authView', 'dashboardView', 'onboardingView'].forEach(function(id) {
           const el = document.getElementById(id);
           if (el) { el.classList.remove('view-visible'); el.classList.add('view-hidden'); }
         });
@@ -756,7 +825,6 @@
         let link = document.querySelector('link[rel="canonical"]');
         if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link); }
         link.href = canonical || (SITE_URL + window.location.pathname);
-        setMeta('name', 'twitter:card', 'summary_large_image');
       }
 
       function buildPropertyTitle(p) {
@@ -772,38 +840,30 @@
         const typeLabel = p.property_type === 'rental' ? 'rental'
                         : p.property_type === 'guesthouse' ? 'guesthouse'
                         : 'property for sale';
-        return `Find this ${typeLabel} in ${locality}, Uganda at ${formatPrice(p.price_amount)}. Verified broker, real photos, transparent pricing. Connect directly through Property Hub Uganda.`;
+        return `Find this ${typeLabel} in ${locality}, Uganda at ${formatPrice(p.price_amount)}. Verified broker, real photos, transparent pricing.`;
       }
 
       function injectPropertySchema(property) {
         const streetAddress = property.address || 'Uganda';
         const locality = streetAddress.split(',')[0].trim() || 'Uganda';
-        const typeLabel = property.property_type === 'rental' ? 'for rent'
-                        : property.property_type === 'guesthouse' ? 'guesthouse'
-                        : 'for sale';
         const schema = {
           "@context": "https://schema.org",
           "@type": "RealEstateListing",
           "name": property.title,
-          "description": `${property.title || 'Property'} ${typeLabel} in ${streetAddress}. Priced at ${formatPrice(property.price_amount)}. Listing on Property Hub Uganda.`,
           "url": SITE_URL + '/property/' + property.id,
-          "datePosted": property.created_at ? new Date(property.created_at).toISOString().split('T')[0] : undefined,
           "image": getImageArray(property).slice(0, 3),
           "address": {
             "@type": "PostalAddress",
             "streetAddress": streetAddress,
             "addressLocality": locality,
-            "addressRegion": "Central Region",
             "addressCountry": "UG"
           },
           "offers": {
             "@type": "Offer",
             "price": property.price_amount,
-            "priceCurrency": "UGX",
-            "availability": "https://schema.org/InStock"
+            "priceCurrency": "UGX"
           }
         };
-        Object.keys(schema).forEach(k => { if (schema[k] === undefined) delete schema[k]; });
         let el = document.getElementById('schema-' + property.id);
         if (el) el.remove();
         el = document.createElement('script');
@@ -816,29 +876,16 @@
       function injectListingItemList(properties) {
         const items = properties.slice(0, 20).map(function(p, i) {
           return {
-            "@type": "ListItem",
-            "position": i + 1,
-            "item": {
-              "@type": "RealEstateListing",
-              "name": p.title || "Property",
-              "url": SITE_URL + '/property/' + p.id,
-              "offers": { "@type": "Offer", "price": p.price_amount || 0, "priceCurrency": "UGX" },
-              "address": { "@type": "PostalAddress", "addressLocality": (p.address || 'Uganda').split(',')[0].trim(), "addressCountry": "UG" }
-            }
+            "@type": "ListItem", "position": i + 1,
+            "item": { "@type": "RealEstateListing", "name": p.title || "Property", "url": SITE_URL + '/property/' + p.id }
           };
         });
-        const schema = {
-          "@context": "https://schema.org",
-          "@type": "ItemList",
-          "numberOfItems": properties.length,
-          "itemListElement": items
-        };
         let el = document.getElementById('dynamic-itemlist');
         if (el) el.remove();
         el = document.createElement('script');
         el.type = 'application/ld+json';
         el.id = 'dynamic-itemlist';
-        el.textContent = JSON.stringify(schema);
+        el.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", "numberOfItems": properties.length, "itemListElement": items });
         document.head.appendChild(el);
       }
 
@@ -846,22 +893,8 @@
         const box = $('#seoHeader');
         if (!box) return;
         if (!page) { box.innerHTML = ''; return; }
-        const canonical = SITE_URL + '/seo/' + encodeURIComponent(page.slug);
-        let bcEl = document.getElementById('dynamic-breadcrumb');
-        if (bcEl) bcEl.remove();
-        bcEl = document.createElement('script');
-        bcEl.type = 'application/ld+json';
-        bcEl.id = 'dynamic-breadcrumb';
-        bcEl.textContent = JSON.stringify({
-          "@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
-            {"@type":"ListItem","position":1,"name":"Home","item":SITE_URL + "/"},
-            {"@type":"ListItem","position":2,"name":page.h1 || page.title,"item":canonical}
-          ]
-        });
-        document.head.appendChild(bcEl);
-
         box.innerHTML =
-          '<nav class="seo-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> › <span>' + (page.h1 || page.title) + '</span></nav>' +
+          '<nav class="seo-breadcrumb"><a href="/">Home</a> › <span>' + (page.h1 || page.title) + '</span></nav>' +
           '<h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-2">' + (page.h1 || page.title) + '</h1>' +
           '<p class="text-slate-600 mb-2">' + page.meta_description + '</p>';
       }
@@ -872,50 +905,26 @@
           if (r.error || !r.data) return null;
           const data = r.data;
           state.currentSeoSlug = slug;
-          setSEO({
-            title: data.title,
-            description: data.meta_description,
-            canonical: SITE_URL + '/seo/' + encodeURIComponent(slug)
-          });
+          setSEO({ title: data.title, description: data.meta_description, canonical: SITE_URL + '/seo/' + encodeURIComponent(slug) });
           renderSeoHeader(data);
-          if (data.page_type === 'location') {
-            state.currentFilter = 'all';
-            state.searchQuery = data.location || '';
-          } else if (data.page_type === 'property_type') {
-            state.currentFilter = data.property_type || 'all';
-            state.searchQuery = data.location || '';
-          } else if (data.page_type === 'price_range') {
-            state.currentFilter = 'all';
-            state.searchQuery = data.min_price + '-' + data.max_price;
-          } else if (data.page_type === 'property' && data.property_id) {
-            setTimeout(function() {
-              var el = document.getElementById('property-' + data.property_id);
-              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 600);
-          }
+          if (data.page_type === 'location') { state.currentFilter = 'all'; state.searchQuery = data.location || ''; }
+          else if (data.page_type === 'property_type') { state.currentFilter = data.property_type || 'all'; state.searchQuery = data.location || ''; }
+          else if (data.page_type === 'price_range') { state.currentFilter = 'all'; state.searchQuery = data.min_price + '-' + data.max_price; }
           var si = $('#searchInput');
           if (si) si.value = (data.page_type === 'location' || data.page_type === 'property_type') ? (data.location || '') : '';
           applyFiltersAndSearch();
           return data;
-        } catch (e) { console.warn('SEO page load failed:', e.message); return null; }
+        } catch (e) { return null; }
       }
 
-      // ══════════════════════════════════════════════════════════════
-      //  SMS via Supabase Edge Function (key stays on server)
-      // ══════════════════════════════════════════════════════════════
       async function sendSMS(phone, message) {
         if (!phone) return false;
         try {
-          const { data, error } = await supabase.functions.invoke('send-sms', {
-            body: { phone: phone, message: message }
-          });
+          const { data, error } = await supabase.functions.invoke('send-sms', { body: { phone: phone, message: message } });
           if (error) throw error;
           console.log('📱 SMS result:', data);
           return data && data.status === 'success';
-        } catch (err) {
-          console.error('SMS failed:', err);
-          return false;
-        }
+        } catch (err) { console.error('SMS failed:', err); return false; }
       }
 
       async function sendNotificationEmail(to_email, to_name, subject, message) {
@@ -923,11 +932,7 @@
           const res = await fetch('https://api.web3forms.com/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-              access_key: WEB3FORMS_KEY, email: to_email, subject: subject,
-              from_name: 'Property Hub Uganda', message: message,
-              replyto: to_email, botcheck: ''
-            })
+            body: JSON.stringify({ access_key: WEB3FORMS_KEY, email: to_email, subject: subject, from_name: 'Property Hub Uganda', message: message, replyto: to_email, botcheck: '' })
           });
           const data = await res.json();
           if (!res.ok || !data.success) throw new Error(data.message || 'Email failed');
@@ -936,7 +941,7 @@
       }
 
       function buildBrokerLeadEmail(t, a, lt, c) {
-        return 'Hello Broker,\n\n🔔 NEW ' + lt.toUpperCase() + ' LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\n🏠 ' + (t || 'Untitled') + '\n📍 ' + (a || 'Location not specified') + '\n\n🔥 Lead Type: ' + lt.toUpperCase() + '\n💰 Cost to unlock: ' + c.toLocaleString() + ' UGX\n\n━━━━━━━━━━━━━━━━━━━━━━━\nLog in to your dashboard to unlock this lead.\n\n👉 ' + SITE_URL + '/dashboard\n\n— Property Hub Uganda';
+        return 'Hello Broker,\n\n🔔 NEW ' + lt.toUpperCase() + ' LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\n🏠 ' + (t || 'Untitled') + '\n📍 ' + (a || 'Location not specified') + '\n\n🔥 Lead Type: ' + lt.toUpperCase() + '\n💰 Cost to unlock: ' + c.toLocaleString() + ' UGX\n\nLog in to your dashboard to unlock this lead.\n\n👉 ' + SITE_URL + '/dashboard\n\n— Property Hub Uganda';
       }
       function buildVisitorApprovedEmail(n, t, bn, bp, be) {
         return 'Hello ' + n + ',\n\n🎉 Your request has been APPROVED.\n\nProperty: ' + t + '\nBroker: ' + (bn || 'the broker') + '\n\n📱 WhatsApp: ' + (bp || '—') + '\n📧 Email: ' + (be || '—') + '\n\n⚠️ Safety: Never pay before viewing in person.\n\n' + SITE_URL;
@@ -967,13 +972,10 @@
         else if (property.verification_status === 'pending') score += 30;
         else if (property.verification_status === 'rejected') score -= 50;
         if (broker) {
-          const rating = broker.average_rating || 0;
-          const reviewCount = broker.review_count || 0;
-          const leadScore = broker.lead_score || 0;
-          score += rating * 10;
-          score += Math.min(reviewCount, 50) * 0.5;
+          score += (broker.average_rating || 0) * 10;
+          score += Math.min(broker.review_count || 0, 50) * 0.5;
           if (isTrustedBroker(broker)) score += 25;
-          score += leadScore / 2;
+          score += (broker.lead_score || 0) / 2;
           score -= (reportCount || 0) * 8;
         }
         if (property.created_at) {
@@ -1088,12 +1090,10 @@
         if (!grid) return;
         grid.innerHTML = '';
         if (!list || list.length === 0) {
-          grid.innerHTML = '<div class="md:col-span-2 lg:col-span-3 pre-render-fallback"><h2>No properties match your search right now</h2><p>Try searching for <strong>cheap houses for rent in Kampala</strong>, <strong>apartments in Naalya</strong>, <strong>guesthouses in Entebbe</strong>, or <strong>land for sale in Wakiso</strong>. New listings are added daily.</p></div>';
-          const es = $('#emptyState'); if (es) es.classList.add('hidden');
+          grid.innerHTML = '<div class="md:col-span-2 lg:col-span-3 pre-render-fallback"><h2>No properties match your search right now</h2><p>Try searching for <strong>cheap houses for rent in Kampala</strong>, <strong>apartments in Naalya</strong>, or <strong>land for sale in Wakiso</strong>. New listings are added daily.</p></div>';
           const pc = $('#propertyCount'); if (pc) pc.textContent = '0 listings';
           return;
         }
-        const es = $('#emptyState'); if (es) es.classList.add('hidden');
         const pc = $('#propertyCount'); if (pc) pc.textContent = list.length + ' listing' + (list.length > 1 ? 's' : '');
         list.forEach(function(p) {
           const broker = p.broker || state.profilesMap[p.owner_id] || null;
@@ -1154,11 +1154,10 @@
           state.allProperties = enriched;
           state.filteredProperties = enriched.slice();
           injectListingItemList(enriched);
-
           if (!state.currentSeoSlug) {
             setSEO({
               title: 'Houses for Rent, Apartments & Land for Sale in Uganda | Property Hub',
-              description: 'Browse ' + enriched.length + ' verified properties across Uganda. Cheap houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land in Wakiso.',
+              description: 'Browse ' + enriched.length + ' verified properties across Uganda.',
               canonical: SITE_URL + '/'
             });
           }
@@ -1242,24 +1241,19 @@
             expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
           }).select().single();
           if (leadR.error) throw leadR.error;
-
-          // Get broker's email + phone
           const bdR = await supabase.from('profiles').select('email, phone, business_name').eq('id', pd.owner_id).single();
           if (bdR.data) {
-            // Email
             if (bdR.data.email) {
               await sendNotificationEmail(bdR.data.email, bdR.data.business_name || 'Broker', '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
             }
-            // SMS to broker
             if (bdR.data.phone) {
               const shortTitle = String(pd.title || 'Property').substring(0, 30);
-              const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/#/dashboard';
+              const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/dashboard';
               await sendSMS(bdR.data.phone, smsText);
             }
           }
-
           $('#quizModal').classList.add('hidden');
-          alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".\n\n📧 Check your email and SMS for their contact details.');
+          alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".');
         } catch (e) { console.error(e); alert('Error: ' + e.message); }
       }
 
@@ -1312,11 +1306,7 @@
               const u = uR.data;
               const pdR = await supabase.from('properties').select('title').eq('id', u.property_id).single();
               const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
-
-              // Email visitor
               if (u.visitor_email) await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', buildVisitorApprovedEmail(u.visitor_name, (pdR.data && pdR.data.title) || 'the property', bpR.data && bpR.data.business_name, (bpR.data && bpR.data.phone) || u.visitor_whatsapp, (bpR.data && bpR.data.email) || state.currentUser.email));
-
-              // SMS visitor
               if (u.visitor_whatsapp) {
                 const brokerPhone = (bpR.data && bpR.data.phone) || '';
                 const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
@@ -1327,11 +1317,10 @@
                   if (!cleanPhone.startsWith('256')) cleanPhone = '256' + cleanPhone;
                   waLink = 'https://wa.me/' + cleanPhone;
                 }
-                const smsText = 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : 'Login: ' + SITE_URL + '/#/dashboard');
+                const smsText = 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : '');
                 await sendSMS(u.visitor_whatsapp, smsText);
               }
-
-              alert('✅ Lead unlocked!\n\nVisitor: ' + u.visitor_name + '\nEmail: ' + u.visitor_email);
+              alert('✅ Lead unlocked!\n\nVisitor: ' + u.visitor_name);
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }); });
@@ -1400,7 +1389,7 @@
       }
 
       function openVerificationModal(pid, ptype) {
-        if (state.walletBalance < VERIFICATION_FEE) { alert('⚠️ Insufficient wallet balance.\n\nVerification costs ' + formatPrice(VERIFICATION_FEE) + '.\nYour balance: ' + formatPrice(state.walletBalance) + '.'); return; }
+        if (state.walletBalance < VERIFICATION_FEE) { alert('⚠️ Insufficient wallet balance.\n\nVerification costs ' + formatPrice(VERIFICATION_FEE) + '.'); return; }
         if (!confirm('⚠️ Property Verification\n\nCosts ' + formatPrice(VERIFICATION_FEE) + '. Do you approve?')) return;
         $('#verifPropertyId').value = pid;
         $('#verifPropertyType').value = ptype || 'rental';
@@ -1450,12 +1439,7 @@
           $('#brokerLeadScore').textContent = '⚡ ' + (b.lead_score || 0);
           $('#statTotalReviews').textContent = rc;
           $('#statAvgRating').textContent = r.toFixed(1);
-          setSEO({
-            title: (b.business_name || 'Broker') + ' – Verified Property Broker in Uganda | Property Hub',
-            description: 'View verified properties from ' + (b.business_name || 'this broker') + ' on Property Hub Uganda. Ratings: ' + r.toFixed(1) + '★ from ' + rc + ' reviews.',
-            canonical: SITE_URL + '/broker/' + encodeURIComponent(id),
-            ogType: 'profile'
-          });
+          setSEO({ title: (b.business_name || 'Broker') + ' – Verified Property Broker in Uganda | Property Hub', description: 'View verified properties from ' + (b.business_name || 'this broker') + ' on Property Hub Uganda.', canonical: SITE_URL + '/broker/' + encodeURIComponent(id), ogType: 'profile' });
           $('#rateBrokerBtn').onclick = function() { openReviewModal(id); };
           $('#viewReviewsBtn').onclick = function() { openViewReviewsModal(id); };
           $('#reportBrokerBtn').onclick = function() { if (state.currentUser && state.currentUser.id === id) { alert('You cannot report yourself.'); return; } openReportModal(id); };
@@ -1465,14 +1449,10 @@
           $('#brokerEmptyState').classList.add('hidden');
           const sorted = prR.data.map(function(p) { return Object.assign({}, p, { rankScore: calculateRankScore(p, b) }); }).sort(function(a, c) { return c.rankScore - a.rankScore; });
           sorted.forEach(function(p) { grid.appendChild(createPropertyCard(p, b, false, false)); });
-        } catch (e) { console.error(e); grid.innerHTML = '<div class="text-center py-12 text-red-500">Error.</div>'; }
+        } catch (e) { grid.innerHTML = '<div class="text-center py-12 text-red-500">Error.</div>'; }
       }
 
-      function goToDiscovery() {
-        state.currentBrokerId = null;
-        state.currentSeoSlug = null;
-        navigateTo('/');
-      }
+      function goToDiscovery() { state.currentBrokerId = null; state.currentSeoSlug = null; navigateTo('/'); }
       function navigateToAuth() { navigateTo('/auth'); }
 
       function openReviewModal(id) { $('#reviewBrokerId').value = id; $('#reviewRating').value = 5; $('#reviewComment').value = ''; $('#reviewClientName').value = ''; $('#reviewClientEmail').value = ''; updateStarUI(5); $('#reviewFormContainer').classList.remove('hidden'); $('#reviewModal').classList.remove('hidden'); loadReviewsForModal(id); }
@@ -1483,7 +1463,6 @@
         $('#noReviewsMessage').classList.add('hidden');
         try {
           const r = await supabase.from('reviews').select('*').eq('broker_id', id).order('created_at', { ascending: false });
-          if (r.error) throw r.error;
           if (!r.data || r.data.length === 0) { list.innerHTML = ''; $('#noReviewsMessage').classList.remove('hidden'); return; }
           let h = '';
           r.data.forEach(function(rv) {
@@ -1523,7 +1502,7 @@
         images.forEach(function(url, i) {
           const d = document.createElement('div');
           d.className = 'image-thumb';
-          d.innerHTML = '<img src="' + url + '" alt="Property photo preview" /><button class="remove-img" data-index="' + i + '">&times;</button>';
+          d.innerHTML = '<img src="' + url + '" alt="preview" /><button class="remove-img" data-index="' + i + '">&times;</button>';
           d.querySelector('.remove-img').addEventListener('click', function() { images.splice(i, 1); renderEditImagePreviews(images); });
           c.appendChild(d);
         });
@@ -1559,7 +1538,8 @@
             await loadWallet();
             await fetchAllData();
             loadLeads();
-            navigateTo('/dashboard');
+            const seenOnboarding = localStorage.getItem('ph_onboarding_seen_' + r.data.user.id);
+            if (!seenOnboarding) { navigateTo('/onboarding'); } else { navigateTo('/dashboard'); }
           } catch (e) { alert('Signin failed: ' + e.message); }
         }
       }
@@ -1568,11 +1548,9 @@
         const email = $('#emailInput').value.trim();
         if (!email) { alert('Enter your email above first, then click "Forgot password".'); return; }
         try {
-          const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: SITE_URL + '/auth'
-          });
+          const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL + '/auth' });
           if (error) throw error;
-          alert('✅ Password reset email sent to ' + email + '\n\nCheck your inbox and click the link to set a new password.');
+          alert('✅ Password reset email sent to ' + email);
         } catch (e) { alert('Failed: ' + e.message); }
       }
 
@@ -1597,24 +1575,22 @@
             showView($('#authView'));
             setAuthMode(false);
             break;
+          case 'onboarding':
+            if (state.currentUser) { showView($('#onboardingView')); }
+            else { navigateTo('/auth', true); }
+            break;
           case 'dashboard':
             if (state.currentUser) {
               showView($('#dashboardView'));
               await loadMyProperties();
               await loadWallet();
               loadLeads();
-            } else {
-              navigateTo('/auth', true);
-            }
+            } else { navigateTo('/auth', true); }
             break;
           case 'seo': {
             showView($('#discoveryView'));
             const data = await loadSeoPage(route.slug);
-            if (!data) {
-              state.currentSeoSlug = null;
-              renderSeoHeader(null);
-              applyFiltersAndSearch();
-            }
+            if (!data) { state.currentSeoSlug = null; renderSeoHeader(null); applyFiltersAndSearch(); }
             break;
           }
           case 'property': {
@@ -1623,13 +1599,7 @@
             applyFiltersAndSearch();
             if (route.id) {
               const p = state.allProperties.find(function(x) { return String(x.id) === String(route.id); });
-              if (p) {
-                setSEO({
-                  title: buildPropertyTitle(p),
-                  description: buildPropertyDescription(p),
-                  canonical: SITE_URL + '/property/' + encodeURIComponent(p.id)
-                });
-              }
+              if (p) { setSEO({ title: buildPropertyTitle(p), description: buildPropertyDescription(p), canonical: SITE_URL + '/property/' + encodeURIComponent(p.id) }); }
               setTimeout(function() {
                 var el = document.getElementById('property-' + route.id);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1645,6 +1615,179 @@
             applyFiltersAndSearch();
             break;
         }
+        updateChatContext();
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      //  CHATBOT
+      // ══════════════════════════════════════════════════════════════
+      const CHAT_KB_VISITOR = [
+        {
+          keywords: ['find', 'search', 'browse', 'looking for', 'how do i look', 'apartment', 'house', 'room'],
+          reply: 'Easy! Type an area or price in the search bar at the top of the page. You can try things like <strong>"Naalya"</strong>, <strong>"under 500k"</strong>, or <strong>"2 bedroom"</strong>. Want me to suggest a popular area?',
+          quick: ['Show me popular areas', 'How do I contact a broker?', 'Is this site safe?']
+        },
+        {
+          keywords: ['contact', 'broker', 'reach', 'talk to', 'connect', 'message'],
+          reply: 'Find a listing you like, then click the blue <strong>Connect</strong> button. Fill a short 4-question quiz about your plans. The broker gets notified and approves you — then you see their WhatsApp number and they see yours.',
+          quick: ['How much does it cost?', 'Is this site safe?', 'Show me how to search']
+        },
+        {
+          keywords: ['safe', 'scam', 'trust', 'verified', 'legit', 'fraud'],
+          reply: 'We protect you three ways:<br>• <strong>Verified badge</strong> = our team reviewed the property<br>• <strong>Trusted badge</strong> = broker has 4★+ from 10+ reviews<br>• <strong>Never pay before viewing</strong> — always meet at the property in person',
+          quick: ['Show me verified listings', 'How do I report a broker?', 'How do I search?']
+        },
+        {
+          keywords: ['price', 'cost', 'fee', 'pay', 'charge', 'free'],
+          reply: 'Browsing is <strong>100% free</strong> for visitors. You never pay us anything. If a broker asks for a "viewing fee" before showing you the property, that\'s a scam — report them.',
+          quick: ['Is this site safe?', 'How do I contact a broker?', 'Show me listings']
+        },
+        {
+          keywords: ['list', 'add', 'post', 'broker portal', 'sign up', 'register', 'i am a broker'],
+          reply: 'Are you a broker or landlord? Click <strong>Broker Portal</strong> in the top right. Register for free, then add your properties. You only pay a small fee when you unlock a serious lead.',
+          quick: ['How does broker pricing work?', 'Is this site safe?', 'Show me listings']
+        },
+        {
+          keywords: ['area', 'location', 'where', 'cover', 'neighborhood'],
+          reply: 'We cover <strong>Kampala, Wakiso, Entebbe, Mukono, Kira, Naalya, Ntinda, Kololo, Naguru, Muyenga, Bukoto, Jinja</strong> and more. Popular right now: Kikoni, Mulago, Katanga, Naalya, Ntinda.',
+          quick: ['Show me listings', 'How do I contact a broker?', 'Is this site safe?']
+        },
+        {
+          keywords: ['report', 'complain', 'problem', 'bad broker'],
+          reply: 'To report a broker: open their profile (click their name on any listing), then click the red <strong>Report</strong> button. Reports are anonymous. We investigate every one.',
+          quick: ['Is this site safe?', 'How do I search?', 'Show me listings']
+        },
+        {
+          keywords: ['hi', 'hello', 'hey', 'help', 'start'],
+          reply: 'Hi! I\'m the Property Hub assistant. I can help you find a place, contact a broker, or explain how the site works. What do you need?',
+          quick: ['How do I search?', 'How do I contact a broker?', 'Is this site safe?']
+        }
+      ];
+
+      const CHAT_KB_BROKER = [
+        {
+          keywords: ['add', 'property', 'list', 'new', 'post', 'upload'],
+          reply: 'Click <strong>Add Property</strong> in your dashboard toolbar. Fill in the title, price, type, and area. Upload 2–3 photos. Your listing goes live immediately.',
+          quick: ['How do I get verified?', 'How do leads work?', 'How do I top up?']
+        },
+        {
+          keywords: ['verif', 'verified', 'verify', 'badge', 'trusted'],
+          reply: 'Click <strong>Verification</strong> in your toolbar. Pay 5,000 UGX from your wallet. Submit landlord name, phone, and LC1 contact. Verified listings rank higher and get up to 3× more clicks.',
+          quick: ['How do I add a property?', 'How do leads work?', 'How do I top up?']
+        },
+        {
+          keywords: ['lead', 'unlock', 'approve', 'reject', 'customer', 'visitor'],
+          reply: 'When a visitor is interested, you\'ll get an SMS + email. Open your dashboard → click <strong>Leads</strong>. You\'ll see each lead with a score: <strong>Hot</strong> (best), <strong>Warm</strong>, <strong>Cold</strong>. Click <strong>Unlock</strong> to reveal their contact and share yours.',
+          quick: ['How does pricing work?', 'How do I add a property?', 'How do I top up?']
+        },
+        {
+          keywords: ['price', 'cost', 'fee', 'charge', 'pay', 'wallet', 'money', 'ugx'],
+          reply: 'Two costs only:<br>• <strong>Verification</strong>: 5,000 UGX per property (optional but recommended)<br>• <strong>Lead unlock</strong>: from ~1,750 UGX for cold leads, up to ~5,000+ for hot leads<br><br>All deducted from your wallet. No monthly fees.',
+          quick: ['How do I top up?', 'How do leads work?', 'How do I get verified?']
+        },
+        {
+          keywords: ['top up', 'deposit', 'add money', 'wallet', 'mtn', 'airtel'],
+          reply: 'Click <strong>Top Up</strong> next to your wallet balance. Enter the amount and your MTN MoMo or Airtel Money number. You\'ll get a prompt on your phone — approve it and your wallet updates in seconds.',
+          quick: ['How does pricing work?', 'How do leads work?', 'How do I add a property?']
+        },
+        {
+          keywords: ['more leads', 'boost', 'rank', 'higher', 'visible'],
+          reply: 'Three things boost your ranking:<br>1. Get <strong>Verified</strong> (biggest boost)<br>2. Add <strong>3+ clear photos</strong> and detailed titles<br>3. Collect <strong>positive reviews</strong> from past clients<br><br>You can also click <strong>Boost</strong> on any listing to climb higher.',
+          quick: ['How do I get verified?', 'How do I add a property?', 'How does pricing work?']
+        },
+        {
+          keywords: ['help', 'hi', 'hello', 'stuck', 'how'],
+          reply: 'Hi! I\'m here to help you get leads. Ask me about adding properties, verification, leads, or wallet top-up.',
+          quick: ['How do I add a property?', 'How do leads work?', 'How does pricing work?']
+        }
+      ];
+
+      function updateChatContext() {
+        const dashboardVisible = $('#dashboardView') && $('#dashboardView').classList.contains('view-visible');
+        const onboardingVisible = $('#onboardingView') && $('#onboardingView').classList.contains('view-visible');
+        state.chatContext = (dashboardVisible || onboardingVisible) ? 'broker' : 'visitor';
+        const subEl = $('#chatContext');
+        if (subEl) subEl.textContent = state.chatContext === 'broker'
+          ? 'Here to help you get leads'
+          : 'Here to help you find a place';
+      }
+
+      function chatOpen() {
+        $('#chatPanel').classList.add('open');
+        $('#chatBubble').style.display = 'none';
+        const badge = $('#chatBadge');
+        if (badge) badge.style.display = 'none';
+        if (!$('#chatMessages').dataset.initialized) {
+          chatReset();
+          $('#chatMessages').dataset.initialized = '1';
+        }
+      }
+
+      function chatClose() {
+        $('#chatPanel').classList.remove('open');
+        $('#chatBubble').style.display = 'flex';
+      }
+
+      function chatReset() {
+        const msgs = $('#chatMessages');
+        msgs.innerHTML = '';
+        const welcome = state.chatContext === 'broker'
+          ? 'Welcome! I can walk you through adding properties, getting verified, or unlocking leads. What do you need?'
+          : 'Hi! I can help you find a place, contact a broker, or explain how the site works. What do you need?';
+        chatAddMessage('bot', welcome);
+        chatShowQuickReplies(state.chatContext === 'broker'
+          ? ['How do I add a property?', 'How do leads work?', 'How does pricing work?', 'How do I top up?']
+          : ['How do I search?', 'How do I contact a broker?', 'Is this site safe?', 'How much does it cost?']);
+      }
+
+      function chatAddMessage(who, html) {
+        const msgs = $('#chatMessages');
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + who;
+        div.innerHTML = html;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+      }
+
+      function chatShowQuickReplies(list) {
+        const box = $('#chatQuickReplies');
+        box.innerHTML = '';
+        (list || []).forEach(function(q) {
+          const b = document.createElement('button');
+          b.className = 'chat-quick-btn';
+          b.textContent = q;
+          b.addEventListener('click', function() { chatAsk(q); });
+          box.appendChild(b);
+        });
+      }
+
+      function chatFindReply(text) {
+        const t = text.toLowerCase();
+        const kb = state.chatContext === 'broker' ? CHAT_KB_BROKER : CHAT_KB_VISITOR;
+        let best = null, bestScore = 0;
+        kb.forEach(function(item) {
+          let score = 0;
+          item.keywords.forEach(function(k) { if (t.indexOf(k) !== -1) score += k.length; });
+          if (score > bestScore) { bestScore = score; best = item; }
+        });
+        if (best) return best;
+        return {
+          reply: state.chatContext === 'broker'
+            ? 'I\'m not sure about that one. Try asking about <strong>adding a property</strong>, <strong>verification</strong>, <strong>leads</strong>, or <strong>pricing</strong>. For anything else, email support@propertyhub.dpdns.org.'
+            : 'I\'m not sure about that one. Try asking about <strong>searching</strong>, <strong>contacting a broker</strong>, or <strong>safety</strong>. For anything else, email support@propertyhub.dpdns.org.',
+          quick: state.chatContext === 'broker'
+            ? ['How do I add a property?', 'How do leads work?', 'How does pricing work?']
+            : ['How do I search?', 'How do I contact a broker?', 'Is this site safe?']
+        };
+      }
+
+      function chatAsk(text) {
+        chatAddMessage('user', text);
+        const r = chatFindReply(text);
+        setTimeout(function() {
+          chatAddMessage('bot', r.reply);
+          chatShowQuickReplies(r.quick || []);
+        }, 250);
       }
 
       async function init() {
@@ -1657,10 +1800,7 @@
           if (lo) lo.classList.add('hidden');
         }, 400);
 
-        try {
-          const r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
-          if (r.error) console.warn('Cleanup skipped:', r.error.message);
-        } catch (e) { console.warn('Cleanup unavailable:', e.message); }
+        try { await supabase.rpc('cleanup_old_leads', { p_days: 30 }); } catch (e) {}
 
         (function() {
           const toolbar = document.getElementById('dashboardToolbar');
@@ -1735,9 +1875,37 @@
         $('#dashboardAddPropertyBtn') && $('#dashboardAddPropertyBtn').addEventListener('click', toggleAddPropertyForm);
         $('#dashboardPropertyVerificationBtn') && $('#dashboardPropertyVerificationBtn').addEventListener('click', togglePropertyVerificationForm);
         $('#dashboardLeadsBtn') && $('#dashboardLeadsBtn').addEventListener('click', toggleLeadsPanel);
+        $('#dashboardHelpBtn') && $('#dashboardHelpBtn').addEventListener('click', function() { navigateTo('/onboarding'); });
+        $('#onboardingDoneBtn') && $('#onboardingDoneBtn').addEventListener('click', function() {
+          if (state.currentUser) localStorage.setItem('ph_onboarding_seen_' + state.currentUser.id, '1');
+          navigateTo('/dashboard');
+        });
+        $('#onboardingSkipBtn') && $('#onboardingSkipBtn').addEventListener('click', function() {
+          if (state.currentUser) localStorage.setItem('ph_onboarding_seen_' + state.currentUser.id, '1');
+          navigateTo('/dashboard');
+        });
         $('#cancelProfileEditBtn') && $('#cancelProfileEditBtn').addEventListener('click', function() { $('#profileFormContainer').classList.remove('visible'); });
         $('#refreshWalletBtn') && $('#refreshWalletBtn').addEventListener('click', loadWallet);
         $('#refreshLeadsBtn') && $('#refreshLeadsBtn').addEventListener('click', loadLeads);
+
+        // Chatbot wiring
+        $('#chatBubble') && $('#chatBubble').addEventListener('click', chatOpen);
+        $('#chatClose') && $('#chatClose').addEventListener('click', chatClose);
+        $('#chatSend') && $('#chatSend').addEventListener('click', function() {
+          const v = $('#chatInput').value.trim();
+          if (!v) return;
+          $('#chatInput').value = '';
+          chatAsk(v);
+        });
+        $('#chatInput') && $('#chatInput').addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const v = $('#chatInput').value.trim();
+            if (!v) return;
+            $('#chatInput').value = '';
+            chatAsk(v);
+          }
+        });
 
         $('#profileSettingsForm') && $('#profileSettingsForm').addEventListener('submit', async function(e) {
           e.preventDefault();
@@ -1779,23 +1947,20 @@
               const file = files[i];
               if (file.type.indexOf('image/') !== 0) continue;
               try {
-                const options = { maxSizeMB: 0.25, maxWidthOrHeight: 1600, useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.8 };
-                const compressedFile = await window.imageCompression(file, options);
+                const compressedFile = await window.imageCompression(file, { maxSizeMB: 0.25, maxWidthOrHeight: 1600, useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.8 });
                 $('#uploadStatus').textContent = 'Uploading ' + (i + 1) + ' of ' + files.length + '…';
                 const name = Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg';
                 const path = state.currentUser.id + '/' + name;
                 const uR = await supabase.storage.from('property-media').upload(path, compressedFile, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false });
                 if (uR.error) { alert('Upload failed: ' + uR.error.message); return; }
-                const urlR = supabase.storage.from('property-media').getPublicUrl(path);
-                urls.push(urlR.data.publicUrl);
-              } catch (err) { console.error(err); alert('Image failed: ' + err.message); return; }
+                urls.push(supabase.storage.from('property-media').getPublicUrl(path).data.publicUrl);
+              } catch (err) { alert('Image failed: ' + err.message); return; }
             }
-            $('#uploadStatus').textContent = '✅ ' + urls.length + ' image(s) ready';
           }
           const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
           try {
             const insR = await supabase.from('properties').insert({
-              title: title, price_amount: price, property_type: dbType, address: addr,
+              title, price_amount: price, property_type: dbType, address: addr,
               media_urls: urls, is_verified: false,
               verification_status: reqV ? 'pending' : 'unverified',
               owner_id: state.currentUser.id, is_paused: false
@@ -1804,13 +1969,12 @@
             const inserted = insR.data;
             if (reqV && inserted && inserted.id) {
               const wR = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE, p_type: 'verification_fee', p_reference: inserted.id, p_description: 'Property verification fee' });
-              if (wR.error) alert('Property saved, but fee charge failed: ' + wR.error.message);
-              else {
+              if (!wR.error) {
                 await supabase.from('property_verification_requests').insert({ property_id: inserted.id, broker_id: state.currentUser.id, submitted_data: {}, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
                 await loadWallet();
               }
             }
-            alert('✅ Property added!' + (reqV ? '\n\nVerification fee ' + formatPrice(VERIFICATION_FEE) + ' deducted.' : ''));
+            alert('✅ Property added!');
             $('#addPropertyForm').reset();
             $('#uploadStatus').textContent = '';
             await loadMyProperties();
@@ -1830,7 +1994,7 @@
           if (!title || !price || !addr) { alert('Fill fields.'); return; }
           const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
           try {
-            const r = await supabase.from('properties').update({ title: title, price_amount: price, property_type: dbType, address: addr }).eq('id', id);
+            const r = await supabase.from('properties').update({ title, price_amount: price, property_type: dbType, address: addr }).eq('id', id);
             if (r.error) throw r.error;
             alert('✅ Updated!');
             $('#editModal').classList.add('hidden');
@@ -1853,14 +2017,13 @@
           try {
             const wR = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE, p_type: 'verification_fee', p_reference: pid, p_description: 'Property verification fee' });
             if (wR.error) throw new Error(wR.error.message);
-            const rR = await supabase.from('property_verification_requests').insert({ property_id: pid, broker_id: state.currentUser.id, submitted_data: data, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
-            if (rR.error) throw rR.error;
+            await supabase.from('property_verification_requests').insert({ property_id: pid, broker_id: state.currentUser.id, submitted_data: data, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
             await supabase.from('properties').update({ verification_status: 'pending' }).eq('id', pid);
             await loadWallet();
             await loadPropertyVerificationList();
             await loadMyProperties();
             $('#verifStatus').className = 'mt-3 text-sm text-emerald-600';
-            $('#verifStatus').textContent = '✅ Submitted! ' + formatPrice(VERIFICATION_FEE) + ' deducted.';
+            $('#verifStatus').textContent = '✅ Submitted!';
             setTimeout(function() { $('#propertyVerificationModal').classList.add('hidden'); }, 2500);
           } catch (e) { $('#verifStatus').className = 'mt-3 text-sm text-red-600'; $('#verifStatus').textContent = '❌ ' + e.message; }
         });
@@ -1873,9 +2036,8 @@
           const name = $('#reviewClientName').value.trim();
           const email = $('#reviewClientEmail').value.trim() || null;
           if (!name) { alert('Enter your name.'); return; }
-          if (!rating || rating < 1 || rating > 5) { alert('Select rating 1-5.'); return; }
           try {
-            const r = await supabase.from('reviews').insert({ broker_id: bid, rating: rating, comment: comment, client_name: name, visitor_email: email });
+            const r = await supabase.from('reviews').insert({ broker_id: bid, rating, comment, client_name: name, visitor_email: email });
             if (r.error) throw r.error;
             alert('✅ Review submitted!');
             await loadReviewsForModal(bid);
@@ -1901,9 +2063,8 @@
           const rn = $('#reportName').value.trim() || 'Anonymous';
           const re = $('#reportEmail').value.trim() || null;
           if (!reason || !desc) { $('#reportStatus').textContent = 'Fill reason and description.'; $('#reportStatus').className = 'mt-3 text-sm text-red-600'; return; }
-          $('#reportStatus').textContent = 'Submitting...'; $('#reportStatus').className = 'mt-3 text-sm text-indigo-600';
           try {
-            const r = await supabase.from('reports').insert({ reporter_id: state.currentUser ? state.currentUser.id : null, reporter_name: rn, reporter_email: re, broker_id: bid, reason: reason, description: desc, status: 'pending' });
+            const r = await supabase.from('reports').insert({ reporter_id: state.currentUser ? state.currentUser.id : null, reporter_name: rn, reporter_email: re, broker_id: bid, reason, description: desc, status: 'pending' });
             if (r.error) throw r.error;
             $('#reportStatus').textContent = '✅ Report submitted.'; $('#reportStatus').className = 'mt-3 text-sm text-emerald-600';
             setTimeout(function() { $('#reportModal').classList.add('hidden'); }, 2500);
@@ -1921,23 +2082,16 @@
           const provider = $('#topupProvider').value;
           if (!amount || amount < 1000) { $('#topupStatus').className = 'mt-3 text-sm text-red-600'; $('#topupStatus').textContent = 'Minimum 1,000 UGX.'; return; }
           if (!phone) { $('#topupStatus').className = 'mt-3 text-sm text-red-600'; $('#topupStatus').textContent = 'Phone number required.'; return; }
-
           let formattedPhone = phone.replace(/\D/g, '');
           if (formattedPhone.startsWith('0')) formattedPhone = '256' + formattedPhone.slice(1);
           if (!formattedPhone.startsWith('256')) formattedPhone = '256' + formattedPhone;
-
           $('#topupStatus').className = 'mt-3 text-sm text-indigo-600';
-          $('#topupStatus').textContent = 'Initiating payment — check your phone for the USSD prompt…';
-
+          $('#topupStatus').textContent = 'Initiating payment — check your phone…';
           try {
-            const { error } = await supabase.functions.invoke('initiate-deposit', {
-              body: { profile_id: state.currentUser.id, amount: amount, phone: formattedPhone, provider: provider }
-            });
+            const { error } = await supabase.functions.invoke('initiate-deposit', { body: { profile_id: state.currentUser.id, amount, phone: formattedPhone, provider } });
             if (error) throw error;
-
             $('#topupStatus').className = 'mt-3 text-sm text-emerald-600';
-            $('#topupStatus').textContent = '✅ Payment prompt sent! Enter your PIN on your phone to complete the deposit.';
-
+            $('#topupStatus').textContent = '✅ Payment prompt sent! Enter your PIN.';
             let attempts = 0;
             const poll = setInterval(async function() {
               attempts++;
@@ -1949,7 +2103,6 @@
               }
               if (attempts > 30) clearInterval(poll);
             }, 4000);
-
           } catch (err) {
             $('#topupStatus').className = 'mt-3 text-sm text-red-600';
             $('#topupStatus').textContent = '❌ ' + err.message;
@@ -1966,7 +2119,7 @@
             await loadProfileSettings();
             await loadWallet();
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) {}
 
         const qp = new URLSearchParams(window.location.search);
         const searchParam = qp.get('search');
