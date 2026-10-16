@@ -13,6 +13,9 @@
   <meta name="theme-color" content="#4f46e5" />
   <meta name="format-detection" content="telephone=no" />
 
+  <!-- Google Search Console verification — paste your real content value here -->
+  <meta name="google-site-verification" content="PASTE_YOUR_GOOGLE_VERIFICATION_CODE_HERE" />
+
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Property Hub Uganda" />
   <meta property="og:title" content="Find Your Perfect Space | Property Hub Uganda" />
@@ -45,14 +48,14 @@
   </script>
 
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","description":"Property Hub Uganda connects property seekers with verified brokers across Uganda. Find cheap houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land for sale in Wakiso.","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":[{"@type":"City","name":"Kampala"},{"@type":"City","name":"Wakiso"},{"@type":"City","name":"Entebbe"},{"@type":"City","name":"Mukono"},{"@type":"City","name":"Jinja"}],"priceRange":"UGX"}
+  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","description":"Property Hub Uganda connects property seekers with verified brokers across Uganda.","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":[{"@type":"City","name":"Kampala"},{"@type":"City","name":"Wakiso"},{"@type":"City","name":"Entebbe"},{"@type":"City","name":"Mukono"},{"@type":"City","name":"Jinja"}],"priceRange":"UGX"}
   </script>
 
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
     {"@type":"Question","name":"How do I find a trustworthy property broker in Uganda?","acceptedAnswer":{"@type":"Answer","text":"Look for Verified and Trusted badges on Property Hub Uganda. Verified means our team reviewed the listing. Trusted means the broker has a 4-star rating or higher with at least 10 reviews. Always read reviews and never pay before viewing the property in person."}},
     {"@type":"Question","name":"Where can I find cheap houses for rent in Kampala?","acceptedAnswer":{"@type":"Answer","text":"Property Hub Uganda lists verified rentals across Kampala including Naalya, Ntinda, Bukoto, Kira, Kisaasi, and Mukono, with prices starting under 300,000 UGX per month for single rooms and 500,000 UGX for 2-bedroom apartments."}},
-    {"@type":"Question","name":"Are there guesthouses near Entebbe Airport?","acceptedAnswer":{"@type":"Answer","text":"Yes. Property Hub Uganda lists guesthouses in Entebbe close to the international airport with transparent pricing, photos, and broker ratings so you can book with confidence."}},
+    {"@type":"Question","name":"Are there guesthouses near Entebbe Airport?","acceptedAnswer":{"@type":"Answer","text":"Yes. Property Hub Uganda lists guesthouses in Entebbe close to the international airport with transparent pricing, photos, and broker ratings."}},
     {"@type":"Question","name":"How do I avoid rental scams in Kampala?","acceptedAnswer":{"@type":"Answer","text":"Never send money before viewing the property in person. Prefer Verified listings, check the broker's reviews and Trusted badge, meet at the property during daylight, and request the landlord's contact directly."}}
   ]}
   </script>
@@ -103,8 +106,6 @@
     var link = document.getElementById('compiled-tailwind');
     if (link) {
       link.addEventListener('error', loadCdn);
-      // Safety net: if after 1.5s we still can't tell it loaded, we don't force CDN.
-      // Just rely on the error event.
     } else {
       loadCdn();
     }
@@ -459,8 +460,6 @@
             <div id="crawlerFallback" class="md:col-span-2 lg:col-span-3 pre-render-fallback">
               <h2>Live Ugandan Property Listings — Loading</h2>
               <p>Discover verified rentals, apartments, guesthouses, and land for sale across <strong>Kampala, Wakiso, Kira, Naalya, Ntinda, Kololo, Naguru, Muyenga, Bukoto, Entebbe, Mukono, and Jinja</strong> on Property Hub Uganda.</p>
-              <p>Browse <strong>cheap single rooms for rent in Kikoni near Makerere</strong>, <strong>2 bedroom apartments for rent in Naalya under 800k</strong>, <strong>affordable guesthouses in Entebbe near the airport</strong>, and <strong>titled plots of land for sale in Wakiso starting at 15 million</strong>.</p>
-              <p>Every listing connects you directly to a verified broker with ratings and reviews. Never pay before viewing. Prefer Verified listings for maximum safety.</p>
             </div>
           </div>
           <div id="emptyState" class="hidden text-center py-20">No properties found.</div>
@@ -522,7 +521,10 @@
             <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="emailInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
             <div><label class="block text-xs font-bold mb-1">Password</label><input type="password" id="passwordInput" required class="w-full px-4 py-2.5 rounded-xl border" /></div>
             <button type="submit" id="submitAuthBtn" class="w-full bg-indigo-600 text-white py-3 rounded-xl">Access Dashboard</button>
-            <button type="button" id="backToSearchBtn" class="w-full text-center text-xs">← Back to search</button>
+            <div class="flex items-center justify-between">
+              <button type="button" id="forgotPasswordBtn" class="text-xs text-indigo-600 hover:underline">Forgot password?</button>
+              <button type="button" id="backToSearchBtn" class="text-xs">← Back to search</button>
+            </div>
           </form>
         </div>
       </section>
@@ -627,8 +629,6 @@
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
-      const YOOLA_API_KEY = 'ZU2a4A98fqezUXh1EN8FVFNj9Wp18h2u6SV98dEo4wHSZ18N9oRh2D1H07EQbS7k';
-const YOOLA_SENDER = 'YoolaSMS';
       const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org';
 
@@ -900,38 +900,24 @@ const YOOLA_SENDER = 'YoolaSMS';
         } catch (e) { console.warn('SEO page load failed:', e.message); return null; }
       }
 
-      async function loadFooterSeoLinks() {
-        // Static guide links are now hard-coded in the footer; this stays
-        // for future use but doesn't overwrite them.
-        return;
+      // ══════════════════════════════════════════════════════════════
+      //  SMS via Supabase Edge Function (key stays on server)
+      // ══════════════════════════════════════════════════════════════
+      async function sendSMS(phone, message) {
+        if (!phone) return false;
+        try {
+          const { data, error } = await supabase.functions.invoke('send-sms', {
+            body: { phone: phone, message: message }
+          });
+          if (error) throw error;
+          console.log('📱 SMS result:', data);
+          return data && data.status === 'success';
+        } catch (err) {
+          console.error('SMS failed:', err);
+          return false;
+        }
       }
-async function sendSMS(phone, message) {
-  if (!phone) return false;
-  // Clean phone: convert 07XX... to 2567XX...
-  let p = String(phone).replace(/\D/g, '');
-  if (p.startsWith('0')) p = '256' + p.slice(1);
-  if (!p.startsWith('256')) p = '256' + p;
 
-  try {
-    const res = await fetch('https://yoolasms.com/api/v1/send.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        phone: p,
-        message: message,
-        api_key: YOOLA_API_KEY,
-        sender: YOOLA_SENDER
-      })
-    });
-    const data = await res.json();
-    console.log('📱 SMS result:', data);
-    return data.status === 'success';
-  } catch (err) {
-    console.error('SMS failed:', err);
-    return false;
-  }
-}
-    
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const res = await fetch('https://api.web3forms.com/submit', {
@@ -1256,21 +1242,24 @@ async function sendSMS(phone, message) {
             expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
           }).select().single();
           if (leadR.error) throw leadR.error;
+
+          // Get broker's email + phone
           const bdR = await supabase.from('profiles').select('email, phone, business_name').eq('id', pd.owner_id).single();
-if (bdR.data) {
-  // Email (existing)
-  if (bdR.data.email) {
-    await sendNotificationEmail(bdR.data.email, bdR.data.business_name || 'Broker', '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
-  }
-  // SMS (new)
-  if (bdR.data.phone) {
-    const shortTitle = (pd.title || 'Property').substring(0, 30);
-    const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: https://propertyhub.dpdns.org/#/dashboard';
-    await sendSMS(bdR.data.phone, smsText);
-  }
-}
+          if (bdR.data) {
+            // Email
+            if (bdR.data.email) {
+              await sendNotificationEmail(bdR.data.email, bdR.data.business_name || 'Broker', '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
+            }
+            // SMS to broker
+            if (bdR.data.phone) {
+              const shortTitle = String(pd.title || 'Property').substring(0, 30);
+              const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/#/dashboard';
+              await sendSMS(bdR.data.phone, smsText);
+            }
+          }
+
           $('#quizModal').classList.add('hidden');
-          alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".\n\n📧 Check your email for their contact details.');
+          alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".\n\n📧 Check your email and SMS for their contact details.');
         } catch (e) { console.error(e); alert('Error: ' + e.message); }
       }
 
@@ -1323,7 +1312,25 @@ if (bdR.data) {
               const u = uR.data;
               const pdR = await supabase.from('properties').select('title').eq('id', u.property_id).single();
               const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
+
+              // Email visitor
               if (u.visitor_email) await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', buildVisitorApprovedEmail(u.visitor_name, (pdR.data && pdR.data.title) || 'the property', bpR.data && bpR.data.business_name, (bpR.data && bpR.data.phone) || u.visitor_whatsapp, (bpR.data && bpR.data.email) || state.currentUser.email));
+
+              // SMS visitor
+              if (u.visitor_whatsapp) {
+                const brokerPhone = (bpR.data && bpR.data.phone) || '';
+                const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
+                let waLink = '';
+                if (brokerPhone) {
+                  let cleanPhone = String(brokerPhone).replace(/\D/g, '');
+                  if (cleanPhone.startsWith('0')) cleanPhone = '256' + cleanPhone.slice(1);
+                  if (!cleanPhone.startsWith('256')) cleanPhone = '256' + cleanPhone;
+                  waLink = 'https://wa.me/' + cleanPhone;
+                }
+                const smsText = 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : 'Login: ' + SITE_URL + '/#/dashboard');
+                await sendSMS(u.visitor_whatsapp, smsText);
+              }
+
               alert('✅ Lead unlocked!\n\nVisitor: ' + u.visitor_name + '\nEmail: ' + u.visitor_email);
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
@@ -1340,13 +1347,6 @@ if (bdR.data) {
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }); });
-          if (u.visitor_whatsapp) {
-  const brokerPhone = (bpR.data && bpR.data.phone) || '';
-  const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
-  const waLink = brokerPhone ? 'https://wa.me/' + String(brokerPhone).replace(/\D/g, '').replace(/^0/, '256') : '';
-  const smsText = 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : 'Login to see contact: https://propertyhub.dpdns.org/#/dashboard');
-  await sendSMS(u.visitor_whatsapp, smsText);
-}
           list.querySelectorAll('.view-lead-details').forEach(function(b) { b.addEventListener('click', async function() {
             const r2 = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', b.dataset.leadId).single();
             if (r2.error) { alert('Error'); return; }
@@ -1541,9 +1541,9 @@ if (bdR.data) {
           const ph = $('#phoneInput').value.trim();
           if (!bn) { alert('Enter Business Name.'); return; }
           try {
-            const r = await supabase.auth.signUp({ email: email, password: pw, options: { data: { business_name: bn, account_type: at, phone: ph } } });
+            const r = await supabase.auth.signUp({ email: email, password: pw, options: { data: { business_name: bn, account_type: at, phone: ph }, emailRedirectTo: SITE_URL + '/auth' } });
             if (r.error) throw r.error;
-            alert('✅ Account created!');
+            alert('✅ Account created!\n\nCheck your email to confirm your account before signing in.');
             setAuthMode(false);
             $('#authForm').reset();
           } catch (e) { alert('Signup failed: ' + e.message); }
@@ -1562,6 +1562,18 @@ if (bdR.data) {
             navigateTo('/dashboard');
           } catch (e) { alert('Signin failed: ' + e.message); }
         }
+      }
+
+      async function handlePasswordReset() {
+        const email = $('#emailInput').value.trim();
+        if (!email) { alert('Enter your email above first, then click "Forgot password".'); return; }
+        try {
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: SITE_URL + '/auth'
+          });
+          if (error) throw error;
+          alert('✅ Password reset email sent to ' + email + '\n\nCheck your inbox and click the link to set a new password.');
+        } catch (e) { alert('Failed: ' + e.message); }
       }
 
       async function loadProfileSettings() {
@@ -1668,6 +1680,7 @@ if (bdR.data) {
         $('#toggleSignIn') && $('#toggleSignIn').addEventListener('click', function() { setAuthMode(false); });
         $('#toggleSignUp') && $('#toggleSignUp').addEventListener('click', function() { setAuthMode(true); });
         $('#backToSearchBtn') && $('#backToSearchBtn').addEventListener('click', goToDiscovery);
+        $('#forgotPasswordBtn') && $('#forgotPasswordBtn').addEventListener('click', handlePasswordReset);
         $('#logoutBtn') && $('#logoutBtn').addEventListener('click', async function() {
           await supabase.auth.signOut();
           state.currentUser = null;
@@ -1955,7 +1968,6 @@ if (bdR.data) {
           }
         } catch (e) { /* ignore */ }
 
-        // Pre-fill search from ?search=
         const qp = new URLSearchParams(window.location.search);
         const searchParam = qp.get('search');
         if (searchParam) {
