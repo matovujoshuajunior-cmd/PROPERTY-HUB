@@ -627,6 +627,8 @@
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
+      const YOOLA_API_KEY = 'ZU2a4A98fqezUXh1EN8FVFNj9Wp18h2u6SV98dEo4wHSZ18N9oRh2D1H07EQbS7k';
+const YOOLA_SENDER = 'YoolaSMS';
       const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org';
 
@@ -903,7 +905,33 @@
         // for future use but doesn't overwrite them.
         return;
       }
+async function sendSMS(phone, message) {
+  if (!phone) return false;
+  // Clean phone: convert 07XX... to 2567XX...
+  let p = String(phone).replace(/\D/g, '');
+  if (p.startsWith('0')) p = '256' + p.slice(1);
+  if (!p.startsWith('256')) p = '256' + p;
 
+  try {
+    const res = await fetch('https://yoolasms.com/api/v1/send.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: p,
+        message: message,
+        api_key: YOOLA_API_KEY,
+        sender: YOOLA_SENDER
+      })
+    });
+    const data = await res.json();
+    console.log('📱 SMS result:', data);
+    return data.status === 'success';
+  } catch (err) {
+    console.error('SMS failed:', err);
+    return false;
+  }
+}
+    
       async function sendNotificationEmail(to_email, to_name, subject, message) {
         try {
           const res = await fetch('https://api.web3forms.com/submit', {
@@ -1228,10 +1256,19 @@
             expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
           }).select().single();
           if (leadR.error) throw leadR.error;
-          const bdR = await supabase.from('profiles').select('email, business_name').eq('id', pd.owner_id).single();
-          if (bdR.data && bdR.data.email) {
-            await sendNotificationEmail(bdR.data.email, bdR.data.business_name || 'Broker', '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
-          }
+          const bdR = await supabase.from('profiles').select('email, phone, business_name').eq('id', pd.owner_id).single();
+if (bdR.data) {
+  // Email (existing)
+  if (bdR.data.email) {
+    await sendNotificationEmail(bdR.data.email, bdR.data.business_name || 'Broker', '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
+  }
+  // SMS (new)
+  if (bdR.data.phone) {
+    const shortTitle = (pd.title || 'Property').substring(0, 30);
+    const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: https://propertyhub.dpdns.org/#/dashboard';
+    await sendSMS(bdR.data.phone, smsText);
+  }
+}
           $('#quizModal').classList.add('hidden');
           alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".\n\n📧 Check your email for their contact details.');
         } catch (e) { console.error(e); alert('Error: ' + e.message); }
@@ -1303,6 +1340,13 @@
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }); });
+          if (u.visitor_whatsapp) {
+  const brokerPhone = (bpR.data && bpR.data.phone) || '';
+  const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
+  const waLink = brokerPhone ? 'https://wa.me/' + String(brokerPhone).replace(/\D/g, '').replace(/^0/, '256') : '';
+  const smsText = 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : 'Login to see contact: https://propertyhub.dpdns.org/#/dashboard');
+  await sendSMS(u.visitor_whatsapp, smsText);
+}
           list.querySelectorAll('.view-lead-details').forEach(function(b) { b.addEventListener('click', async function() {
             const r2 = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', b.dataset.leadId).single();
             if (r2.error) { alert('Error'); return; }
