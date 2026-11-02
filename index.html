@@ -1895,6 +1895,21 @@ function buildWaLink(phone) {
         if (!window.supabase) { console.error('Supabase SDK failed to load.'); return; }
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// In init(), after supabase client is created:
+let LIVE_FEE = 5000, LIVE_RATE_UNIT = 150000, LIVE_RATE = {hot:5000,warm:3250,cold:1750}, LIVE_GUEST_PCT = 0.04, LIVE_MIN_TOPUP = 1000;
+try {
+  const ps = await supabase.from('platform_settings').select('key,value');
+  (ps.data || []).forEach(row => {
+    if (row.key === 'verification_fee')        LIVE_FEE = Number(row.value);
+    if (row.key === 'lead_rate_unit')          LIVE_RATE_UNIT = Number(row.value);
+    if (row.key === 'lead_rate_hot')           LIVE_RATE.hot = Number(row.value);
+    if (row.key === 'lead_rate_warm')          LIVE_RATE.warm = Number(row.value);
+    if (row.key === 'lead_rate_cold')          LIVE_RATE.cold = Number(row.value);
+    if (row.key === 'guesthouse_lead_percent') LIVE_GUEST_PCT = Number(row.value);
+    if (row.key === 'wallet_min_topup')        LIVE_MIN_TOPUP = Number(row.value);
+  });
+} catch(_) {}
+        
 // Load live pricing from admin-configured platform_settings
 try {
   var psRes = await supabase.from('platform_settings').select('key,value');
