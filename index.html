@@ -688,7 +688,22 @@
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
-     
+
+async function logNotification(leadId, recipientType, email, template, subject, status, errMsg, categoriesShown) {
+  try {
+    await supabase.from('notification_log').insert({
+      lead_id: leadId || null,
+      recipient_type: recipientType,
+      recipient_email: email,
+      template: template,
+      subject: subject,
+      status: status,
+      error_message: errMsg || null,
+      categories_shown: categoriesShown || null
+    });
+  } catch (_) { /* non-fatal */ }
+}
+    
       const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org';
 
