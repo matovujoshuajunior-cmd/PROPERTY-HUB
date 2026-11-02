@@ -1074,159 +1074,176 @@ async function fixMissingProfiles() {
       } catch (e) { console.error(e); box.innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>'; }
     }
 
-    // ══════════════════════════════════════════════════════════════
-    //  FOLLOW-UPS
-    // ══════════════════════════════════════════════════════════════
-    async function loadFollowups() {
-      var box = $('followupList');
-      var no = $('noFollowups');
-      var statsBox = $('followupStats');
-      var filter = $('followupFilter').value;
+async function loadFollowups() {
+  var box = $('followupList');
+  var no = $('noFollowups');
+  var statsBox = $('followupStats');
+  var filter = $('followupFilter').value;
 
-      try {
-        var q = supabase.from('lead_requests')
-          .select('*')
-          .eq('status', 'approved')
-          .order('approved_at', { ascending: false });
+  try {
+    var q = supabase.from('lead_requests')
+      .select('*')
+      .eq('status', 'approved')
+      .order('approved_at', { ascending: false });
 
-        if (filter === 'pending') q = q.eq('follow_up_sent', false);
-        else if (filter === 'sent') q = q.eq('follow_up_sent', true);
+    if (filter === 'pending') q = q.eq('follow_up_sent', false);
+    else if (filter === 'sent') q = q.eq('follow_up_sent', true);
 
-        var r = await q.limit(200);
-        if (r.error) throw r.error;
-        var data = r.data || [];
+    var r = await q.limit(200);
+    if (r.error) throw r.error;
+    var data = r.data || [];
 
-        var now = Date.now();
-        if (filter === 'due') {
-          data = data.filter(function(l) {
-            if (!l.approved_at || l.follow_up_sent) return false;
-            var days = (now - new Date(l.approved_at).getTime()) / 86400000;
-            return days >= 3;
-          });
+    var now = Date.now();
+    if (filter === 'due') {
+      data = data.filter(function(l) {
+        if (!l.approved_at || l.follow_up_sent) return false;
+        var days = (now - new Date(l.approved_at).getTime()) / 86400000;
+        return days >= 3;
+      });
+    }
+
+    var totalApproved = data.length;
+    var pending = data.filter(function(l) { return !l.follow_up_sent; }).length;
+    var sent = data.filter(function(l) { return l.follow_up_sent; }).length;
+
+    if (statsBox) {
+      statsBox.innerHTML =
+        '<div class="detail-card"><div class="label">Total Approved</div><div class="value">' + totalApproved + '</div></div>' +
+        '<div class="detail-card"><div class="label">Pending Follow-Up</div><div class="value text-amber-600">' + pending + '</div></div>' +
+        '<div class="detail-card"><div class="label">Sent</div><div class="value text-emerald-600">' + sent + '</div></div>';
+    }
+
+    if (!data.length) {
+      box.innerHTML = '';
+      no.classList.remove('hidden');
+      return;
+    }
+    no.classList.add('hidden');
+
+    var propIds = [], brokerIds = [];
+    data.forEach(function(l) {
+      if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
+      if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
+    });
+
+    var propMap = {}, brokerMap = {};
+    if (propIds.length) {
+      var rp = await supabase.from('properties').select('id, title, property_type, address').in('id', propIds);
+      (rp.data || []).forEach(function(p) { propMap[p.id] = p; });
+    }
+    if (brokerIds.length) {
+      var rb = await supabase.from('profiles').select('id, business_name, phone, email').in('id', brokerIds);
+      (rb.data || []).forEach(function(b) { brokerMap[b.id] = b; });
+    }
+
+    var html = '<table><thead><tr>' +
+      '<th>Visitor</th><th>Property</th><th>Broker</th><th>Approved</th><th>Status</th><th>Actions</th>' +
+      '</tr></thead><tbody>';
+
+    data.forEach(function(l) {
+      var prop = propMap[l.property_id] || {};
+      var broker = brokerMap[l.broker_id] || {};
+      var daysSince = l.approved_at ? Math.floor((now - new Date(l.approved_at).getTime()) / 86400000) : 0;
+      var daysLeft = Math.max(0, 3 - daysSince);
+
+      var statusBadge;
+      if (l.follow_up_sent) {
+        statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('approved') + '">✅ Sent</span>';
+      } else if (daysLeft > 0) {
+        statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('pending') + '">⏳ In ' + daysLeft + 'd</span>';
+      } else {
+        statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('rejected') + '">🔔 Due now</span>';
+      }
+
+      var hasEmail = !!(l.visitor_email && String(l.visitor_email).trim());
+      var emailWarn = (!hasEmail && !l.follow_up_sent) ? '<div class="text-xs text-red-500 mt-0.5">⚠️ No email — cannot send</div>' : '';
+
+      html += '<tr>' +
+        '<td><div class="font-medium">' + esc(l.visitor_name || '—') + '</div><div class="text-xs text-slate-500">' + esc(l.visitor_email || 'No email') + '</div>' + emailWarn + '</td>' +
+        '<td>' + esc(prop.title || '—') + '<div class="text-xs text-slate-500">' + esc(prop.property_type || '') + '</div></td>' +
+        '<td>' + esc(broker.business_name || '—') + '</td>' +
+        '<td>' + formatDate(l.approved_at) + '<div class="text-xs text-slate-500">' + daysSince + 'd ago</div></td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td>' +
+          '<button class="btn-sm blue view-followup" data-id="' + l.id + '">View</button>' +
+          (!l.follow_up_sent && hasEmail ? '<button class="btn-sm green send-followup-admin" data-id="' + l.id + '"><i class="fas fa-paper-plane"></i> Send</button>' : '') +
+        '</td></tr>';
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+
+    box.querySelectorAll('.view-followup').forEach(function(el) {
+      el.onclick = function() {
+        var lead = data.find(function(x) { return x.id === el.dataset.id; });
+        if (!lead) return;
+        var prop = propMap[lead.property_id] || {};
+        var broker = brokerMap[lead.broker_id] || {};
+        alert(
+          'Follow-Up Details\n━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+          'Visitor: ' + (lead.visitor_name || '—') + '\n' +
+          'Email: ' + (lead.visitor_email || '(none)') + '\n' +
+          'WhatsApp: ' + (lead.visitor_whatsapp || '—') + '\n\n' +
+          'Property: ' + (prop.title || '—') + '\n' +
+          'Type: ' + (prop.property_type || '—') + '\n' +
+          'Broker: ' + (broker.business_name || '—') + '\n\n' +
+          'Approved: ' + formatDate(lead.approved_at) + '\n' +
+          'Follow-up sent: ' + (lead.follow_up_sent ? 'Yes (' + formatDate(lead.follow_up_sent_at) + ')' : 'No')
+        );
+      };
+    });
+
+    box.querySelectorAll('.send-followup-admin').forEach(function(el) {
+      el.onclick = async function() {
+        var leadId = el.dataset.id;
+        var lead = data.find(function(x) { return x.id === leadId; });
+        if (!lead) return alert('Lead not found');
+        if (!lead.visitor_email) return alert('❌ This lead has no email address. Cannot send follow-up.');
+        if (!confirm('Send follow-up to ' + lead.visitor_email + '?')) return;
+
+        el.disabled = true;
+        el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        try {
+          var prop = propMap[lead.property_id] || {};
+          var broker = brokerMap[lead.broker_id] || {};
+          var built = await buildFollowupEmail(lead, prop, broker);
+          var result = await sendEmailNotification(lead.visitor_email, built.subject, built.body, 'followup:' + leadId);
+
+          await logNotification(
+            leadId,
+            'visitor',
+            lead.visitor_email,
+            'followup',
+            built.subject,
+            result.success ? 'sent' : 'failed',
+            result.success ? null : result.error,
+            built.categories
+          );
+
+          if (!result.success) throw new Error(result.error);
+
+          var ur = await supabase.from('lead_requests').update({
+            follow_up_sent: true,
+            follow_up_sent_at: new Date().toISOString(),
+            followup_type: 'partner'
+          }).eq('id', leadId);
+          if (ur.error) throw ur.error;
+
+          alert('✅ Follow-up sent to ' + lead.visitor_email);
+          loadFollowups();
+        } catch (e) {
+          alert('❌ Failed to send: ' + e.message);
+          el.disabled = false;
+          el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
         }
+      };
+    });
 
-        var totalApproved = data.length;
-        var pending = data.filter(function(l) { return !l.follow_up_sent; }).length;
-        var sent = data.filter(function(l) { return l.follow_up_sent; }).length;
-
-        if (statsBox) {
-          statsBox.innerHTML =
-            '<div class="detail-card"><div class="label">Total Approved</div><div class="value">' + totalApproved + '</div></div>' +
-            '<div class="detail-card"><div class="label">Pending Follow-Up</div><div class="value text-amber-600">' + pending + '</div></div>' +
-            '<div class="detail-card"><div class="label">Sent</div><div class="value text-emerald-600">' + sent + '</div></div>';
-        }
-
-        if (!data.length) {
-          box.innerHTML = '';
-          no.classList.remove('hidden');
-          return;
-        }
-        no.classList.add('hidden');
-
-        var propIds = [], brokerIds = [];
-        data.forEach(function(l) {
-          if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
-          if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
-        });
-
-        var propMap = {}, brokerMap = {};
-        if (propIds.length) {
-          var rp = await supabase.from('properties').select('id, title, property_type').in('id', propIds);
-          (rp.data || []).forEach(function(p) { propMap[p.id] = p; });
-        }
-        if (brokerIds.length) {
-          var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
-          (rb.data || []).forEach(function(b) { brokerMap[b.id] = b; });
-        }
-
-        var html = '<table><thead><tr>' +
-          '<th>Visitor</th><th>Property</th><th>Broker</th><th>Approved</th><th>Status</th><th>Actions</th>' +
-          '</tr></thead><tbody>';
-
-        data.forEach(function(l) {
-          var prop = propMap[l.property_id] || {};
-          var broker = brokerMap[l.broker_id] || {};
-          var daysSince = l.approved_at ? Math.floor((now - new Date(l.approved_at).getTime()) / 86400000) : 0;
-          var daysLeft = Math.max(0, 3 - daysSince);
-
-          var statusBadge;
-          if (l.follow_up_sent) {
-            statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('approved') + '">✅ Sent</span>';
-          } else if (daysLeft > 0) {
-            statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('pending') + '">⏳ In ' + daysLeft + 'd</span>';
-          } else {
-            statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('rejected') + '">🔔 Due now</span>';
-          }
-
-          var hasEmail = !!(l.visitor_email && String(l.visitor_email).trim());
-          var emailWarn = (!hasEmail && !l.follow_up_sent) ? '<div class="text-xs text-red-500 mt-0.5">⚠️ No email — cannot send</div>' : '';
-
-          html += '<tr>' +
-            '<td><div class="font-medium">' + esc(l.visitor_name || '—') + '</div><div class="text-xs text-slate-500">' + esc(l.visitor_email || 'No email') + '</div>' + emailWarn + '</td>' +
-            '<td>' + esc(prop.title || '—') + '<div class="text-xs text-slate-500">' + esc(prop.property_type || '') + '</div></td>' +
-            '<td>' + esc(broker.business_name || '—') + '</td>' +
-            '<td>' + formatDate(l.approved_at) + '<div class="text-xs text-slate-500">' + daysSince + 'd ago</div></td>' +
-            '<td>' + statusBadge + '</td>' +
-            '<td>' +
-              '<button class="btn-sm blue view-followup" data-id="' + l.id + '">View</button>' +
-              (!l.follow_up_sent && hasEmail ? '<button class="btn-sm green send-followup-admin" data-id="' + l.id + '"><i class="fas fa-paper-plane"></i> Send</button>' : '') +
-            '</td></tr>';
-        });
-        html += '</tbody></table>';
-        box.innerHTML = html;
-
-        box.querySelectorAll('.view-followup').forEach(function(el) {
-          el.onclick = function() {
-            var lead = data.find(function(x) { return x.id === el.dataset.id; });
-            if (!lead) return;
-            var prop = propMap[lead.property_id] || {};
-            var broker = brokerMap[lead.broker_id] || {};
-            alert(
-              'Follow-Up Details\n━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-              'Visitor: ' + (lead.visitor_name || '—') + '\n' +
-              'Email: ' + (lead.visitor_email || '(none)') + '\n' +
-              'WhatsApp: ' + (lead.visitor_whatsapp || '—') + '\n\n' +
-              'Property: ' + (prop.title || '—') + '\n' +
-              'Type: ' + (prop.property_type || '—') + '\n' +
-              'Broker: ' + (broker.business_name || '—') + '\n\n' +
-              'Approved: ' + formatDate(lead.approved_at) + '\n' +
-              'Follow-up sent: ' + (lead.follow_up_sent ? 'Yes (' + formatDate(lead.follow_up_sent_at) + ')' : 'No')
-            );
-          };
-        });
-
-        box.querySelectorAll('.send-followup-admin').forEach(function(el) {
-          el.onclick = async function() {
-            var leadId = el.dataset.id;
-            var lead = data.find(function(x) { return x.id === leadId; });
-            if (!lead) return alert('Lead not found');
-            if (!lead.visitor_email) return alert('❌ This lead has no email address. Cannot send follow-up.');
-            if (!confirm('Send follow-up to ' + lead.visitor_email + '?')) return;
-
-            el.disabled = true;
-            el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-try {
-  var prop = propMap[lead.property_id] || {};
-  var broker = brokerMap[lead.broker_id] || {};
-  var built = await buildFollowupEmail(lead, prop, broker);
-  var result = await sendEmailNotification(lead.visitor_email, built.subject, built.body, 'followup:' + leadId);
-  await logNotification(leadId, 'visitor', lead.visitor_email, 'followup', built.subject,
-    result.success ? 'sent' : 'failed', result.success ? null : result.error, built.categories);
-  if (!result.success) throw new Error(result.error);
-  var ur = await supabase.from('lead_requests').update({
-    follow_up_sent: true,
-    follow_up_sent_at: new Date().toISOString(),
-    followup_type: 'partner'
-  }).eq('id', leadId);
-  if (ur.error) throw ur.error;
-  alert('✅ Follow-up sent to ' + lead.visitor_email);
-  loadFollowups();
-} catch (e) {
-  alert('❌ Failed to send: ' + e.message);
-  el.disabled = false;
-  el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+  } catch (e) {
+    console.error(e);
+    box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+  }
 }
-
     // ══════════════════════════════════════════════════════════════
     //  SEO
     // ══════════════════════════════════════════════════════════════
@@ -1677,7 +1694,8 @@ try {
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
-  })();
+  
+          })();
   </script>
 </body>
 </html>
