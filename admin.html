@@ -418,6 +418,21 @@
     var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
     var WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
 
+async function logNotification(leadId, recipientType, email, template, subject, status, errMsg, categoriesShown) {
+  try {
+    await supabase.from('notification_log').insert({
+      lead_id: leadId || null,
+      recipient_type: recipientType,
+      recipient_email: email,
+      template: template,
+      subject: subject,
+      status: status,
+      error_message: errMsg || null,
+      categories_shown: categoriesShown || null
+    });
+  } catch (_) { /* non-fatal */ }
+}
+    
     var supabase = null;
     var currentUser = null;
     var leadFilter = '';
@@ -653,6 +668,65 @@
   }
 }
 
+async function buildFollowupEmail(lead, prop, broker) {
+  var seg = prop.property_type === 'guesthouse' ? 'guesthouse'
+          : prop.property_type === 'property'    ? 'buyer'
+          : 'renter';
+
+  var partners = [];
+  try {
+    var r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
+    if (!r.error && r.data) partners = r.data;
+  } catch (_) {}
+
+  var byCat = {};
+  partners.forEach(function(p) {
+    if (!byCat[p.category_name]) byCat[p.category_name] = { emoji: p.category_emoji, items: [] };
+    if (byCat[p.category_name].items.length < 2) byCat[p.category_name].items.push(p);
+  });
+  var catNames = Object.keys(byCat);
+
+  var servicesBlock = '';
+  if (catNames.length) {
+    catNames.forEach(function(name) {
+      var c = byCat[name];
+      servicesBlock += '\n' + c.emoji + ' ' + name + '\n';
+      c.items.forEach(function(p) {
+        servicesBlock += '   • ' + p.provider_name + (p.tagline ? ' — ' + p.tagline : '') + '\n' +
+                        '     ' + p.url + '\n' +
+                        (p.discount_code ? '     💰 Code: ' + p.discount_code + '\n' : '');
+      });
+    });
+  } else {
+    servicesBlock = '\nBrowse verified partners: https://propertyhub.dpdns.org/services/\n';
+  }
+
+  var subject = 'Did you find what you needed in ' + (prop.address || 'Kampala').split(',')[0].trim() + '?';
+  var body =
+    'Hello ' + lead.visitor_name + ',\n\n' +
+    '3 days ago you connected with ' + (broker.business_name || 'a broker') + ' about:\n\n' +
+    '🏠 ' + (prop.title || 'the property') + '\n\n' +
+    '────────────────────────────────────────\n' +
+    '📝 QUICK CHECK-IN — 1 minute\n' +
+    '────────────────────────────────────────\n\n' +
+    'Did you get the place?\n\n' +
+    '  ✅ YES — please rate the broker so other renters benefit:\n' +
+    '     https://propertyhub.dpdns.org/broker/' + lead.broker_id + '\n\n' +
+    '  🤔 STILL LOOKING — see similar properties:\n' +
+    '     https://propertyhub.dpdns.org/?search=' + encodeURIComponent((prop.address || '').split(',')[0].trim()) + '\n\n' +
+    '  ❌ NO — browse new listings:\n' +
+    '     https://propertyhub.dpdns.org/\n\n' +
+    '────────────────────────────────────────\n' +
+    '🎁 SERVICES YOU MIGHT NEED\n' +
+    '────────────────────────────────────────\n' +
+    servicesBlock + '\n' +
+    '────────────────────────────────────────\n\n' +
+    'These are vetted partners we trust. Using them keeps Property Hub free for you.\n\n' +
+    '— The Property Hub Team';
+
+  return { subject: subject, body: body, categories: catNames.slice() };
+}
+    
 // Backfill missing profiles — one click from the dashboard
 async function fixMissingProfiles() {
   var btn = $('fixMissingProfilesBtn');
@@ -1131,52 +1205,27 @@ async function fixMissingProfiles() {
 
             el.disabled = true;
             el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            try {
-              var prop = propMap[lead.property_id] || {};
-              var broker = brokerMap[lead.broker_id] || {};
-              var MARKETING = {
-                rental: { title: 'Settle in comfortably', items: ['🛋️ Furniture & home appliances', '📶 Internet & cable installation', '🧹 Move-in cleaning & fumigation', '🔒 Home security', '🚚 Verified moving & transport companies'] },
-                property: { title: 'Make it truly yours', items: ['🏦 Mortgage & financing advisors', '🛡️ Property insurance & title verification', '🔨 Renovation & interior design', '🛋️ Furniture & appliance packages', '🔑 Legal & conveyancing services'] },
-                guesthouse: { title: 'Grow your hospitality business', items: ['🛎️ Hospitality management software', '🧺 Commercial laundry', '📸 Photography & listing optimization', '🚐 Airport pickup & tour partnerships', '📢 Marketing & OTA listing setup'] }
-              };
-              var mk = MARKETING[prop.property_type] || MARKETING.rental;
-              var subject = 'Did you find what you needed for "' + (prop.title || 'your property') + '"?';
-              var body = 'Hello ' + (lead.visitor_name || 'there') + ',\n\n' +
-                'A few days ago you connected with ' + (broker.business_name || 'a broker') + ' about:\n\n' +
-                '🏠 ' + (prop.title || 'the property') + '\n\n' +
-                '━━━━━━━━━━━━━━━━━━━━━━━\n📝 QUICK CHECK-IN\n━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-                'Did you get what you were looking for?\n\n' +
-                '✅ YES — Please take 30 seconds to rate them.\n\n' +
-                '❌ NO — Browse alternatives: https://propertyhub.dpdns.org/\n\n' +
-                '━━━━━━━━━━━━━━━━━━━━━━━\n🎁 WHILE YOU SETTLE IN\n━━━━━━━━━━━━━━━━━━━━━━━\n' +
-                mk.title + ':\n\n' + mk.items.map(function(i) { return '• ' + i; }).join('\n') +
-                '\n\n— The Property Hub Team';
-
-              var result = await sendEmailNotification(lead.visitor_email, subject, body, 'followup:' + leadId);
-              if (!result.success) throw new Error(result.error);
-
-              var ur = await supabase.from('lead_requests').update({
-                follow_up_sent: true,
-                follow_up_sent_at: new Date().toISOString()
-              }).eq('id', leadId);
-              if (ur.error) throw ur.error;
-
-              alert('✅ Follow-up sent to ' + lead.visitor_email);
-              loadFollowups();
-            } catch (e) {
-              alert('❌ Failed to send: ' + e.message);
-              el.disabled = false;
-              el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
-            }
-          };
-        });
-
-      } catch (e) {
-        console.error(e);
-        box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
-      }
-    }
+try {
+  var prop = propMap[lead.property_id] || {};
+  var broker = brokerMap[lead.broker_id] || {};
+  var built = await buildFollowupEmail(lead, prop, broker);
+  var result = await sendEmailNotification(lead.visitor_email, built.subject, built.body, 'followup:' + leadId);
+  await logNotification(leadId, 'visitor', lead.visitor_email, 'followup', built.subject,
+    result.success ? 'sent' : 'failed', result.success ? null : result.error, built.categories);
+  if (!result.success) throw new Error(result.error);
+  var ur = await supabase.from('lead_requests').update({
+    follow_up_sent: true,
+    follow_up_sent_at: new Date().toISOString(),
+    followup_type: 'partner'
+  }).eq('id', leadId);
+  if (ur.error) throw ur.error;
+  alert('✅ Follow-up sent to ' + lead.visitor_email);
+  loadFollowups();
+} catch (e) {
+  alert('❌ Failed to send: ' + e.message);
+  el.disabled = false;
+  el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+}
 
     // ══════════════════════════════════════════════════════════════
     //  SEO
