@@ -703,17 +703,39 @@ async function logNotification(leadId, recipientType, email, template, subject, 
     });
   } catch (_) { /* non-fatal */ }
 }
-    
-      const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org';
 
-      const HOT_RATE_PER_150K = 5000;
-      const LEAD_RATE_PER_150K = {
-        hot:  HOT_RATE_PER_150K,
-        warm: Math.round(HOT_RATE_PER_150K * 0.65),
-        cold: Math.round(HOT_RATE_PER_150K * 0.35)
-      };
-      const GUESTHOUSE_LEAD_PERCENT = 0.04;
+    // Defaults — overridden at boot from the admin's Pricing tab
+let VERIFICATION_FEE = 5000;
+let LEAD_RATE_PER_150K = { hot: 5000, warm: 3250, cold: 1750 };
+let GUESTHOUSE_LEAD_PERCENT = 0.04;
+let LEAD_RATE_UNIT = 150000;
+let WALLET_MIN_TOPUP = 1000;
+let LEAD_CLEANUP_DAYS = 30;
+
+async function loadPlatformSettings() {
+  try {
+    const r = await supabase.from('platform_settings').select('key,value');
+    if (r.error || !r.data) return;
+    const m = {};
+    r.data.forEach(x => { m[x.key] = x.value; });
+    if (m.verification_fee != null)        VERIFICATION_FEE = Number(m.verification_fee);
+    if (m.lead_rate_hot != null)           LEAD_RATE_PER_150K.hot = Number(m.lead_rate_hot);
+    if (m.lead_rate_warm != null)          LEAD_RATE_PER_150K.warm = Number(m.lead_rate_warm);
+    if (m.lead_rate_cold != null)          LEAD_RATE_PER_150K.cold = Number(m.lead_rate_cold);
+    if (m.guesthouse_lead_percent != null) GUESTHOUSE_LEAD_PERCENT = Number(m.guesthouse_lead_percent);
+    if (m.lead_rate_unit != null)          LEAD_RATE_UNIT = Number(m.lead_rate_unit);
+    if (m.wallet_min_topup != null)        WALLET_MIN_TOPUP = Number(m.wallet_min_topup);
+    if (m.lead_cleanup_days != null)       LEAD_CLEANUP_DAYS = Number(m.lead_cleanup_days);
+    console.log('💵 Live pricing loaded:', {
+      verification_fee: VERIFICATION_FEE,
+      lead_rates: LEAD_RATE_PER_150K,
+      guest_pct: GUESTHOUSE_LEAD_PERCENT
+    });
+  } catch (e) {
+    console.warn('Pricing load failed — using defaults:', e.message);
+  }
+}  
 
       let supabase = null;
       const state = {
@@ -732,12 +754,13 @@ async function logNotification(leadId, recipientType, email, template, subject, 
       function renderStars(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '★' : '☆'; return h; }
       function renderStarsSmall(r) { let h=''; for(let i=0;i<5;i++) h += i<r ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : '<i class="far fa-star text-slate-300 text-xs"></i>'; return h; }
 
-      function calculateLeadCost(price, lt, pt) {
-        price = Number(price) || 0;
-        if (pt === 'guesthouse') return Math.round(price * GUESTHOUSE_LEAD_PERCENT);
-        const units = Math.max(1, Math.ceil(price / 150000));
-        return units * (LEAD_RATE_PER_150K[lt] || LEAD_RATE_PER_150K.warm);
-      }
+    function calculateLeadCost(price, lt, pt) {
+  price = Number(price) || 0;
+  if (pt === 'guesthouse') return Math.round(price * GUESTHOUSE_LEAD_PERCENT);
+  const units = Math.max(1, Math.ceil(price / LEAD_RATE_UNIT));
+  return units * (LEAD_RATE_PER_150K[lt] || LEAD_RATE_PER_150K.warm);
+}
+        
 
       function parseNumberToken(s) {
         s = String(s).trim().toLowerCase().replace(/[, ]/g, '');
@@ -1895,6 +1918,8 @@ function buildWaLink(phone) {
         if (!window.supabase) { console.error('Supabase SDK failed to load.'); return; }
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+await loadPlatformSettings();
+        
 // In init(), after supabase client is created:
 let LIVE_FEE = 5000, LIVE_RATE_UNIT = 150000, LIVE_RATE = {hot:5000,warm:3250,cold:1750}, LIVE_GUEST_PCT = 0.04, LIVE_MIN_TOPUP = 1000;
 try {
