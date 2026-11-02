@@ -57,11 +57,16 @@
     .detail-field .label { font-weight: 600; color: #1e293b; font-size: 0.8rem; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
     .detail-field .value { color: #475569; word-break: break-word; font-size: 0.9rem; }
     .settings-input { width: 100%; padding: 0.6rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; font-size: 0.875rem; }
+    .settings-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 0.25rem; }
     #detailContent img { transition: transform 0.2s; }
     #detailContent img:hover { transform: scale(1.02); }
     .spinner { border: 3px solid #e2e8f0; border-top: 3px solid #4f46e5; border-radius: 50%; width: 32px; height: 32px; animation: spin 0.8s linear infinite; margin: 2rem auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
     code { background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 0.35rem; font-size: 0.8rem; color: #1e293b; }
+    .price-card { background: linear-gradient(135deg,#4f46e5,#4338ca); color:white; padding:1.25rem; border-radius:1rem; }
+    .price-card .num { font-size:2rem; font-weight:800; line-height:1; }
+    .price-card .lbl { font-size:.75rem; opacity:.8; text-transform:uppercase; }
+    .notice-box { background:#eef2ff; border:1px solid #c7d2fe; border-radius:.75rem; padding:.85rem 1rem; font-size:.85rem; color:#3730a3; }
   </style>
 </head>
 <body>
@@ -114,6 +119,7 @@
         <button class="admin-tab" data-tab="seo">🔍 SEO Pages</button>
         <button class="admin-tab" data-tab="reports">Reports</button>
         <button class="admin-tab" data-tab="transactions">Transactions</button>
+        <button class="admin-tab" data-tab="pricing">💰 Pricing</button>
         <button class="admin-tab" data-tab="settings">⚙️ Settings</button>
       </div>
 
@@ -241,13 +247,113 @@
         </div>
       </div>
 
+      <div id="tab-pricing" class="tab-content hidden">
+        <div class="section-card">
+          <div class="flex-between mb-4">
+            <div>
+              <h3>💰 Pricing Configuration</h3>
+              <p class="text-sm text-slate-500 mt-1">Set all prices used across Property Hub. Changes apply to <strong>new</strong> transactions immediately.</p>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <button id="reloadPricingBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Reload</button>
+              <button id="savePricingBtn" class="btn-sm green"><i class="fas fa-save"></i> Save pricing</button>
+            </div>
+          </div>
+
+          <div id="pricingCurrentSummary" class="grid-3 mb-4"></div>
+
+          <div class="grid-3">
+            <div>
+              <label class="settings-label">Verification fee (UGX)</label>
+              <input type="number" id="priceVerifFee" class="settings-input" min="0" step="500" />
+              <p class="text-xs text-slate-500 mt-1">Charged per property when a broker submits for verification.</p>
+            </div>
+            <div>
+              <label class="settings-label">Lead base unit (UGX)</label>
+              <input type="number" id="priceLeadUnit" class="settings-input" min="10000" step="10000" />
+              <p class="text-xs text-slate-500 mt-1">Property price is divided by this to compute lead "units".</p>
+            </div>
+            <div>
+              <label class="settings-label">Guesthouse lead % (0–1)</label>
+              <input type="number" id="priceGuestPercent" class="settings-input" min="0" max="1" step="0.01" />
+              <p class="text-xs text-slate-500 mt-1">For guesthouses, lead cost = property price × this percentage.</p>
+            </div>
+            <div>
+              <label class="settings-label">Lead — 🔥 HOT (per unit, UGX)</label>
+              <input type="number" id="priceLeadHot" class="settings-input" min="0" step="100" />
+              <p class="text-xs text-slate-500 mt-1">Best quality leads — highest price.</p>
+            </div>
+            <div>
+              <label class="settings-label">Lead — 🌤 WARM (per unit, UGX)</label>
+              <input type="number" id="priceLeadWarm" class="settings-input" min="0" step="100" />
+              <p class="text-xs text-slate-500 mt-1">Interested but comparing — mid price.</p>
+            </div>
+            <div>
+              <label class="settings-label">Lead — ❄️ COLD (per unit, UGX)</label>
+              <input type="number" id="priceLeadCold" class="settings-input" min="0" step="100" />
+              <p class="text-xs text-slate-500 mt-1">Just browsing — lowest price.</p>
+            </div>
+            <div>
+              <label class="settings-label">Min wallet top-up (UGX)</label>
+              <input type="number" id="priceMinTopup" class="settings-input" min="100" step="100" />
+              <p class="text-xs text-slate-500 mt-1">Smallest allowed deposit into a broker's wallet.</p>
+            </div>
+            <div>
+              <label class="settings-label">Lead cleanup (days)</label>
+              <input type="number" id="priceCleanupDays" class="settings-input" min="1" />
+              <p class="text-xs text-slate-500 mt-1">Approved/rejected leads are purged after this many days.</p>
+            </div>
+          </div>
+
+          <div id="pricingStatus" class="mt-3 text-sm"></div>
+
+          <div class="notice-box mt-4">
+            <strong>⚠️ Heads up:</strong> <code>index.html</code> currently uses hardcoded constants (<code>VERIFICATION_FEE</code>, <code>LEAD_RATE_PER_150K</code>). To make these settings take effect on the live site, <code>index.html</code> must fetch <code>platform_settings</code> on load. Until then, treat this tab as the source of truth and update <code>index.html</code>'s constants to match.
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>📊 Lead Cost Preview</h3>
+          <p class="text-sm text-slate-500 mb-4">See exactly what a lead will cost with the values above before you save.</p>
+          <div class="grid-3">
+            <div>
+              <label class="settings-label">Property price (UGX)</label>
+              <input type="number" id="previewPrice" class="settings-input" value="500000" step="50000" min="0" />
+            </div>
+            <div>
+              <label class="settings-label">Property type</label>
+              <select id="previewType" class="settings-input">
+                <option value="rental">Rental</option>
+                <option value="property">Property (for sale)</option>
+                <option value="guesthouse">Guesthouse</option>
+              </select>
+            </div>
+            <div>
+              <label class="settings-label">Lead quality</label>
+              <select id="previewQuality" class="settings-input">
+                <option value="hot">🔥 Hot</option>
+                <option value="warm">🌤 Warm</option>
+                <option value="cold">❄️ Cold</option>
+              </select>
+            </div>
+          </div>
+          <div id="previewResult" class="mt-4 p-4 bg-white rounded-xl border border-slate-200 text-sm"></div>
+        </div>
+      </div>
+
       <div id="tab-settings" class="tab-content hidden">
         <div class="section-card">
           <h3>⚙️ Platform Settings</h3>
-          <p class="text-sm text-slate-500 mb-4">These values control pricing and site behaviour across Property Hub.</p>
+          <p class="text-sm text-slate-500 mb-4">Basic platform behaviour. For pricing, use the <strong>💰 Pricing</strong> tab.</p>
           <div class="grid-3">
-            <div><label class="text-xs font-bold uppercase text-slate-500">Verification fee (UGX)</label><input type="number" id="setVerifFee" class="settings-input" min="0" /></div>
-            <div><label class="text-xs font-bold uppercase text-slate-500">Lead cleanup (days)</label><input type="number" id="setCleanupDays" class="settings-input" min="1" /></div>
+            <div>
+              <label class="settings-label">Verification fee (UGX)</label>
+              <input type="number" id="setVerifFee" class="settings-input" min="0" />
+            </div>
+            <div>
+              <label class="settings-label">Lead cleanup (days)</label>
+              <input type="number" id="setCleanupDays" class="settings-input" min="1" />
+            </div>
           </div>
           <div class="mt-4 flex gap-2 flex-wrap">
             <button id="saveSettingsBtn" class="btn-sm green"><i class="fas fa-save"></i> Save settings</button>
@@ -255,6 +361,22 @@
           </div>
           <div id="settingsStatus" class="mt-3 text-sm"></div>
         </div>
+
+        <div class="section-card">
+          <h3>🧪 Notification Test</h3>
+          <p class="text-sm text-slate-500 mb-4">Verify Web3Forms email is working before relying on it for real leads.</p>
+          <div class="grid-3">
+            <div style="grid-column: span 2;">
+              <label class="settings-label">Send test to</label>
+              <input type="email" id="testEmailTo" class="settings-input" placeholder="you@example.com" />
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+              <button id="testEmailBtn" class="btn-sm blue"><i class="fas fa-paper-plane"></i> Send test email</button>
+            </div>
+          </div>
+          <div id="testEmailStatus" class="mt-3 text-sm"></div>
+        </div>
+
         <div class="section-card">
           <h3>🧹 Lead Cleanup</h3>
           <p class="text-sm text-slate-500 mb-3">Approved and rejected leads are automatically removed 30 days after creation. You can also trigger it manually.</p>
@@ -302,6 +424,44 @@
       return map[status] || 'b-unverified';
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  FIXED: notification helper — validates email, surfaces real errors
+    // ══════════════════════════════════════════════════════════════
+    async function sendEmailNotification(to, subject, body, context) {
+      context = context || 'notification';
+      if (!to) return { success: false, error: 'No recipient email address provided (' + context + ')' };
+      var trimmed = String(to).trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+        return { success: false, error: 'Invalid recipient email: "' + trimmed + '" (' + context + ')' };
+      }
+      try {
+        var res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            email: trimmed,
+            subject: subject,
+            from_name: 'Property Hub Uganda',
+            message: body,
+            replyto: trimmed,
+            botcheck: ''
+          })
+        });
+        var rawText = await res.text();
+        var data = null;
+        try { data = JSON.parse(rawText); } catch (_) {}
+        if (!res.ok) {
+          return { success: false, error: 'HTTP ' + res.status + ' — ' + (data && data.message ? data.message : rawText.substring(0, 200)), raw: rawText };
+        }
+        if (!data) return { success: false, error: 'Non-JSON response from Web3Forms: ' + rawText.substring(0, 200) };
+        if (!data.success) return { success: false, error: data.message || 'Web3Forms rejected the email', raw: data };
+        return { success: true, data: data };
+      } catch (e) {
+        return { success: false, error: e.message || 'Network error' };
+      }
+    }
+
     function waitForSupabase() {
       return new Promise(function(resolve) {
         if (window.supabase) return resolve();
@@ -313,13 +473,21 @@
       });
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  AUTH
+    // ══════════════════════════════════════════════════════════════
     async function checkAdmin() {
       try {
         var r = await supabase.auth.getUser();
+        if (r.error) {
+          await supabase.auth.refreshSession();
+          r = await supabase.auth.getUser();
+          if (r.error) return false;
+        }
         var user = r.data && r.data.user;
-        if (!user) throw new Error('Not logged in');
+        if (!user) return false;
         var pr = await supabase.from('profiles').select('is_admin, business_name').eq('id', user.id).single();
-        if (pr.error || !pr.data || !pr.data.is_admin) throw new Error('Not admin');
+        if (pr.error || !pr.data || !pr.data.is_admin) return false;
         currentUser = user;
         $('adminUserDisplay').textContent = pr.data.business_name || user.email;
         return true;
@@ -361,6 +529,7 @@
       loadTransactions();
       loadLeads();
       loadSettings();
+      loadPricing();
     }
 
     function setupTabs() {
@@ -380,11 +549,15 @@
           else if (t === 'seo') loadSeoPages();
           else if (t === 'reports') loadReports();
           else if (t === 'transactions') loadTransactions();
+          else if (t === 'pricing') loadPricing();
           else if (t === 'settings') loadSettings();
         });
       });
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  STATS
+    // ══════════════════════════════════════════════════════════════
     async function loadStats() {
       try {
         var res = await Promise.all([
@@ -400,6 +573,9 @@
       } catch (e) { console.error(e); }
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  BROKERS
+    // ══════════════════════════════════════════════════════════════
     async function loadBrokers() {
       var box = $('brokerList'), no = $('noBrokers');
       try {
@@ -517,6 +693,9 @@
       } catch (e) { console.error(e); }
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  VERIFICATIONS — notifies broker on approve/reject
+    // ══════════════════════════════════════════════════════════════
     async function loadVerifications() {
       var box = $('verificationList'), no = $('noVerifications');
       try {
@@ -654,18 +833,52 @@
         }).eq('id', reqId);
         if (r1.error) throw r1.error;
 
+        var propTitle = 'the property';
+        var brokerEmail = null;
+        var brokerName = null;
+
         if (propId) {
           var r2 = await supabase.from('properties').update({
             is_verified: status === 'approved',
             verification_status: status
           }).eq('id', propId);
           if (r2.error) throw r2.error;
+
+          var pRes = await supabase.from('properties').select('title, owner_id').eq('id', propId).maybeSingle();
+          if (pRes.data) {
+            propTitle = pRes.data.title || propTitle;
+            var bRes = await supabase.from('profiles').select('email, business_name').eq('id', pRes.data.owner_id).maybeSingle();
+            if (bRes.data) { brokerEmail = bRes.data.email; brokerName = bRes.data.business_name; }
+          }
         }
-        alert('✅ Verification ' + status + '.');
+
+        var notifResult = { success: false, error: 'skipped' };
+        if (brokerEmail) {
+          var subject, body;
+          if (status === 'approved') {
+            subject = '✅ Your listing is verified — ' + propTitle;
+            body = 'Hello ' + (brokerName || 'Broker') + ',\n\nGreat news! Your property "' + propTitle + '" has been APPROVED and is now live on Property Hub Uganda.\n\nWhat this means:\n• Your listing now shows a green Verified badge\n• It ranks higher in search results\n• Visitors trust verified listings more\n\nView it: https://propertyhub.dpdns.org/property/' + propId + '\n\n— Property Hub Team';
+          } else {
+            subject = '❌ Verification update — ' + propTitle;
+            body = 'Hello ' + (brokerName || 'Broker') + ',\n\nYour verification request for "' + propTitle + '" was not approved.\n\nThis is usually because:\n• The title document could not be verified\n• The landlord contact was unreachable\n• Photos did not match the described property\n\nPlease update your listing in your dashboard and re-submit for verification.\n\nDashboard: https://propertyhub.dpdns.org/dashboard\n\n— Property Hub Team';
+          }
+          notifResult = await sendEmailNotification(brokerEmail, subject, body, 'verification:' + reqId);
+        }
+
+        var msg = '✅ Verification ' + status + '.';
+        if (brokerEmail) {
+          msg += notifResult.success ? ' Email sent to broker.' : ' ⚠️ Email failed: ' + notifResult.error;
+        } else {
+          msg += ' (No broker email — notification skipped.)';
+        }
+        alert(msg);
         loadVerifications(); loadStats();
       } catch (e) { alert('Error: ' + e.message); }
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  LEADS
+    // ══════════════════════════════════════════════════════════════
     async function loadLeads() {
       var box = $('leadsList'), no = $('noLeads');
       try {
@@ -720,6 +933,9 @@
       } catch (e) { console.error(e); box.innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>'; }
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  FOLLOW-UPS
+    // ══════════════════════════════════════════════════════════════
     async function loadFollowups() {
       var box = $('followupList');
       var no = $('noFollowups');
@@ -801,15 +1017,18 @@
             statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('rejected') + '">🔔 Due now</span>';
           }
 
+          var hasEmail = !!(l.visitor_email && String(l.visitor_email).trim());
+          var emailWarn = (!hasEmail && !l.follow_up_sent) ? '<div class="text-xs text-red-500 mt-0.5">⚠️ No email — cannot send</div>' : '';
+
           html += '<tr>' +
-            '<td><div class="font-medium">' + esc(l.visitor_name || '—') + '</div><div class="text-xs text-slate-500">' + esc(l.visitor_email || '') + '</div></td>' +
+            '<td><div class="font-medium">' + esc(l.visitor_name || '—') + '</div><div class="text-xs text-slate-500">' + esc(l.visitor_email || 'No email') + '</div>' + emailWarn + '</td>' +
             '<td>' + esc(prop.title || '—') + '<div class="text-xs text-slate-500">' + esc(prop.property_type || '') + '</div></td>' +
             '<td>' + esc(broker.business_name || '—') + '</td>' +
             '<td>' + formatDate(l.approved_at) + '<div class="text-xs text-slate-500">' + daysSince + 'd ago</div></td>' +
             '<td>' + statusBadge + '</td>' +
             '<td>' +
               '<button class="btn-sm blue view-followup" data-id="' + l.id + '">View</button>' +
-              (!l.follow_up_sent ? '<button class="btn-sm green send-followup-admin" data-id="' + l.id + '"><i class="fas fa-paper-plane"></i> Send</button>' : '') +
+              (!l.follow_up_sent && hasEmail ? '<button class="btn-sm green send-followup-admin" data-id="' + l.id + '"><i class="fas fa-paper-plane"></i> Send</button>' : '') +
             '</td></tr>';
         });
         html += '</tbody></table>';
@@ -822,10 +1041,9 @@
             var prop = propMap[lead.property_id] || {};
             var broker = brokerMap[lead.broker_id] || {};
             alert(
-              'Follow-Up Details\n' +
-              '━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+              'Follow-Up Details\n━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
               'Visitor: ' + (lead.visitor_name || '—') + '\n' +
-              'Email: ' + (lead.visitor_email || '—') + '\n' +
+              'Email: ' + (lead.visitor_email || '(none)') + '\n' +
               'WhatsApp: ' + (lead.visitor_whatsapp || '—') + '\n\n' +
               'Property: ' + (prop.title || '—') + '\n' +
               'Type: ' + (prop.property_type || '—') + '\n' +
@@ -838,25 +1056,24 @@
 
         box.querySelectorAll('.send-followup-admin').forEach(function(el) {
           el.onclick = async function() {
-            if (!confirm('Send the follow-up email to this visitor now?')) return;
+            var leadId = el.dataset.id;
+            var lead = data.find(function(x) { return x.id === leadId; });
+            if (!lead) return alert('Lead not found');
+            if (!lead.visitor_email) return alert('❌ This lead has no email address. Cannot send follow-up.');
+            if (!confirm('Send follow-up to ' + lead.visitor_email + '?')) return;
+
             el.disabled = true;
             el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
-              var leadId = el.dataset.id;
-              var lead = data.find(function(x) { return x.id === leadId; });
-              if (!lead) throw new Error('Lead not found');
-
               var prop = propMap[lead.property_id] || {};
               var broker = brokerMap[lead.broker_id] || {};
-
               var MARKETING = {
-                rental: { title: "Settle in comfortably", items: ["🛋️ Furniture & home appliances", "📶 Internet & cable installation", "🧹 Move-in cleaning & fumigation", "🔒 Home security", "🚚 Verified moving & transport companies"] },
-                property: { title: "Make it truly yours", items: ["🏦 Mortgage & financing advisors", "🛡️ Property insurance & title verification", "🔨 Renovation & interior design", "🛋️ Furniture & appliance packages", "🔑 Legal & conveyancing services"] },
-                guesthouse: { title: "Grow your hospitality business", items: ["🛎️ Hospitality management software", "🧺 Commercial laundry", "📸 Photography & listing optimization", "🚐 Airport pickup & tour partnerships", "📢 Marketing & OTA listing setup"] }
+                rental: { title: 'Settle in comfortably', items: ['🛋️ Furniture & home appliances', '📶 Internet & cable installation', '🧹 Move-in cleaning & fumigation', '🔒 Home security', '🚚 Verified moving & transport companies'] },
+                property: { title: 'Make it truly yours', items: ['🏦 Mortgage & financing advisors', '🛡️ Property insurance & title verification', '🔨 Renovation & interior design', '🛋️ Furniture & appliance packages', '🔑 Legal & conveyancing services'] },
+                guesthouse: { title: 'Grow your hospitality business', items: ['🛎️ Hospitality management software', '🧺 Commercial laundry', '📸 Photography & listing optimization', '🚐 Airport pickup & tour partnerships', '📢 Marketing & OTA listing setup'] }
               };
               var mk = MARKETING[prop.property_type] || MARKETING.rental;
-
               var subject = 'Did you find what you needed for "' + (prop.title || 'your property') + '"?';
               var body = 'Hello ' + (lead.visitor_name || 'there') + ',\n\n' +
                 'A few days ago you connected with ' + (broker.business_name || 'a broker') + ' about:\n\n' +
@@ -869,34 +1086,19 @@
                 mk.title + ':\n\n' + mk.items.map(function(i) { return '• ' + i; }).join('\n') +
                 '\n\n— The Property Hub Team';
 
-              var res = await fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({
-                  access_key: WEB3FORMS_KEY,
-                  email: lead.visitor_email,
-                  subject: subject,
-                  from_name: 'Property Hub Uganda',
-                  message: body,
-                  replyto: lead.visitor_email,
-                  botcheck: ''
-                })
-              });
-
-              var resp = await res.json();
-              if (!res.ok || !resp.success) throw new Error(resp.message || 'Email failed');
+              var result = await sendEmailNotification(lead.visitor_email, subject, body, 'followup:' + leadId);
+              if (!result.success) throw new Error(result.error);
 
               var ur = await supabase.from('lead_requests').update({
                 follow_up_sent: true,
                 follow_up_sent_at: new Date().toISOString()
               }).eq('id', leadId);
-
               if (ur.error) throw ur.error;
 
-              alert('✅ Follow-up sent!');
+              alert('✅ Follow-up sent to ' + lead.visitor_email);
               loadFollowups();
             } catch (e) {
-              alert('Error: ' + e.message);
+              alert('❌ Failed to send: ' + e.message);
               el.disabled = false;
               el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
             }
@@ -909,33 +1111,28 @@
       }
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  SEO
+    // ══════════════════════════════════════════════════════════════
     async function loadSeoPages() {
-      var box = $('seoList');
-      var no = $('noSeo');
-      var statsBox = $('seoStats');
+      var box = $('seoList'), no = $('noSeo'), statsBox = $('seoStats');
       var filter = $('seoFilter').value;
-
       try {
         var q = supabase.from('seo_pages').select('*').eq('is_active', true).order('page_type').order('last_updated', { ascending: false });
         if (filter !== 'all') q = q.eq('page_type', filter);
-
         var r = await q.limit(500);
         if (r.error) throw r.error;
         var data = r.data || [];
-
         var counts = { location: 0, property_type: 0, price_range: 0, property: 0 };
         data.forEach(function(p) { counts[p.page_type] = (counts[p.page_type] || 0) + 1; });
-
         if (statsBox) {
           statsBox.innerHTML =
             '<div class="detail-card"><div class="label">Location pages</div><div class="value">' + counts.location + '</div></div>' +
             '<div class="detail-card"><div class="label">Type pages</div><div class="value">' + counts.property_type + '</div></div>' +
             '<div class="detail-card"><div class="label">Property pages</div><div class="value">' + counts.property + '</div></div>';
         }
-
         if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
         no.classList.add('hidden');
-
         var html = '<table><thead><tr><th>Type</th><th>Title / H1</th><th>Slug</th><th>Count</th><th>Updated</th><th>Link</th></tr></thead><tbody>';
         data.forEach(function(p) {
           html += '<tr>' +
@@ -955,45 +1152,41 @@
       }
     }
 
-   async function regenerateSeoNow() {
-  var banner = $('seoBanner');
-  banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
-  banner.textContent = '🧠 Regenerating SEO pages from your properties…';
-  banner.classList.remove('hidden');
-
-  try {
-    // Re-verify session first — if 403, we'll prompt for re-login
-    var sessionCheck = await supabase.auth.getSession();
-    if (!sessionCheck.data || !sessionCheck.data.session) {
-      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-      banner.textContent = '❌ Session expired. Please sign out and sign in again.';
-      return;
-    }
-
-    var r = await supabase.rpc('regenerate_seo_pages');
-
-    if (r.error) {
-      // Detect expired JWT
-      if (r.error.message && (r.error.message.indexOf('JWT') !== -1 || r.error.code === 'PGRST301' || r.error.message.indexOf('403') !== -1)) {
-        await supabase.auth.signOut();
-        currentUser = null;
+    async function regenerateSeoNow() {
+      var banner = $('seoBanner');
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
+      banner.textContent = '🧠 Regenerating SEO pages…';
+      banner.classList.remove('hidden');
+      try {
+        var sessionCheck = await supabase.auth.getSession();
+        if (!sessionCheck.data || !sessionCheck.data.session) {
+          banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+          banner.textContent = '❌ Session expired. Please sign out and sign in again.';
+          return;
+        }
+        var r = await supabase.rpc('regenerate_seo_pages');
+        if (r.error) {
+          if (r.error.message && (r.error.message.indexOf('JWT') !== -1 || r.error.code === 'PGRST301')) {
+            await supabase.auth.signOut(); currentUser = null;
+            banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+            banner.textContent = '❌ Session expired. Redirecting to login…';
+            setTimeout(function() { showAuth(); }, 1500);
+            return;
+          }
+          throw r.error;
+        }
+        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
+        banner.textContent = '✅ SEO pages regenerated.';
+        loadSeoPages();
+      } catch (e) {
         banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-        banner.textContent = '❌ Session expired. Redirecting to login…';
-        setTimeout(function() { showAuth(); }, 1500);
-        return;
+        banner.textContent = '❌ ' + e.message;
       }
-      throw r.error;
     }
 
-    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
-    banner.textContent = '✅ SEO pages regenerated.';
-    loadSeoPages();
-  } catch (e) {
-    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-    banner.textContent = '❌ ' + e.message;
-  }
-}
-
+    // ══════════════════════════════════════════════════════════════
+    //  CLEANUP / REPORTS / TRANSACTIONS
+    // ══════════════════════════════════════════════════════════════
     async function runCleanup() {
       if (!confirm('Permanently delete all approved & rejected leads older than 30 days?\n\nThis cannot be undone.')) return;
       var banner = $('cleanupBanner');
@@ -1047,12 +1240,8 @@
         });
         html += '</tbody></table>';
         box.innerHTML = html;
-        box.querySelectorAll('.resolve-report').forEach(function(el){
-          el.onclick = function(){ handleReport(el.dataset.id, 'resolved'); };
-        });
-        box.querySelectorAll('.dismiss-report').forEach(function(el){
-          el.onclick = function(){ handleReport(el.dataset.id, 'dismissed'); };
-        });
+        box.querySelectorAll('.resolve-report').forEach(function(el){ el.onclick = function(){ handleReport(el.dataset.id, 'resolved'); }; });
+        box.querySelectorAll('.dismiss-report').forEach(function(el){ el.onclick = function(){ handleReport(el.dataset.id, 'dismissed'); }; });
       } catch (e) { console.error(e); box.innerHTML = '<p class="text-red-500 text-sm">Error loading reports.</p>'; }
     }
 
@@ -1078,7 +1267,6 @@
         var data = r.data || [];
         if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
         no.classList.add('hidden');
-
         var ids = [];
         data.forEach(function(x){ if (x.profile_id && ids.indexOf(x.profile_id) === -1) ids.push(x.profile_id); });
         var pMap = {};
@@ -1086,7 +1274,6 @@
           var rp = await supabase.from('profiles').select('id, business_name, email').in('id', ids);
           (rp.data || []).forEach(function(p){ pMap[p.id] = p; });
         }
-
         var html = '<table><thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead><tbody>';
         data.forEach(function(x){
           var u = pMap[x.profile_id] || {};
@@ -1104,6 +1291,106 @@
       } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading transactions.</p>'; }
     }
 
+    // ══════════════════════════════════════════════════════════════
+    //  💰 PRICING
+    // ══════════════════════════════════════════════════════════════
+    async function loadPricing() {
+      try {
+        var r = await supabase.from('platform_settings').select('key,value');
+        if (r.error) throw r.error;
+        var map = {};
+        (r.data || []).forEach(function(x){ map[x.key] = x.value; });
+
+        $('priceVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
+        $('priceLeadUnit').value = map.lead_rate_unit != null ? map.lead_rate_unit : 150000;
+        $('priceGuestPercent').value = map.guesthouse_lead_percent != null ? map.guesthouse_lead_percent : 0.04;
+        $('priceLeadHot').value = map.lead_rate_hot != null ? map.lead_rate_hot : 5000;
+        $('priceLeadWarm').value = map.lead_rate_warm != null ? map.lead_rate_warm : 3250;
+        $('priceLeadCold').value = map.lead_rate_cold != null ? map.lead_rate_cold : 1750;
+        $('priceMinTopup').value = map.wallet_min_topup != null ? map.wallet_min_topup : 1000;
+        $('priceCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
+
+        if ($('setVerifFee')) $('setVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
+        if ($('setCleanupDays')) $('setCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
+
+        renderPricingSummary(map);
+        updatePreview();
+      } catch (e) { console.warn('Pricing load failed:', e); }
+    }
+
+    function renderPricingSummary(map) {
+      var box = $('pricingCurrentSummary');
+      if (!box) return;
+      box.innerHTML =
+        '<div class="price-card"><div class="lbl">Verification fee</div><div class="num">' + Number(map.verification_fee || 5000).toLocaleString() + '</div><div class="lbl" style="margin-top:.25rem;">UGX / property</div></div>' +
+        '<div class="price-card" style="background:linear-gradient(135deg,#059669,#047857);"><div class="lbl">HOT lead / unit</div><div class="num">' + Number(map.lead_rate_hot || 5000).toLocaleString() + '</div><div class="lbl" style="margin-top:.25rem;">UGX (per ' + (Number(map.lead_rate_unit || 150000) / 1000) + 'k base)</div></div>' +
+        '<div class="price-card" style="background:linear-gradient(135deg,#d97706,#b45309);"><div class="lbl">Guesthouse lead</div><div class="num">' + (Number(map.guesthouse_lead_percent || 0.04) * 100).toFixed(1) + '%</div><div class="lbl" style="margin-top:.25rem;">of property price</div></div>';
+    }
+
+    function getPricingFromForm() {
+      return {
+        verification_fee: Number($('priceVerifFee').value) || 5000,
+        lead_rate_unit: Number($('priceLeadUnit').value) || 150000,
+        guesthouse_lead_percent: Number($('priceGuestPercent').value) || 0.04,
+        lead_rate_hot: Number($('priceLeadHot').value) || 5000,
+        lead_rate_warm: Number($('priceLeadWarm').value) || 3250,
+        lead_rate_cold: Number($('priceLeadCold').value) || 1750,
+        wallet_min_topup: Number($('priceMinTopup').value) || 1000,
+        lead_cleanup_days: Number($('priceCleanupDays').value) || 30
+      };
+    }
+
+    function updatePreview() {
+      var price = Number($('previewPrice').value) || 0;
+      var type = $('previewType').value;
+      var quality = $('previewQuality').value;
+      var p = getPricingFromForm();
+      var result, formula;
+      if (type === 'guesthouse') {
+        result = Math.round(price * p.guesthouse_lead_percent);
+        formula = 'price × ' + (p.guesthouse_lead_percent * 100).toFixed(1) + '%';
+      } else {
+        var units = Math.max(1, Math.ceil(price / p.lead_rate_unit));
+        var rate = quality === 'hot' ? p.lead_rate_hot : quality === 'warm' ? p.lead_rate_warm : p.lead_rate_cold;
+        result = units * rate;
+        formula = units + ' unit(s) × ' + rate.toLocaleString() + ' UGX';
+      }
+      var box = $('previewResult');
+      if (box) {
+        box.innerHTML =
+          '<div class="font-semibold text-slate-800 mb-1">Lead cost: <span class="text-indigo-600">' + result.toLocaleString() + ' UGX</span></div>' +
+          '<div class="text-xs text-slate-500">' + formula + ' · Property: ' + price.toLocaleString() + ' UGX · ' + type + ' · ' + quality + '</div>';
+      }
+    }
+
+    async function savePricing() {
+      var st = $('pricingStatus');
+      st.className = 'mt-3 text-sm text-indigo-600';
+      st.textContent = 'Saving…';
+      try {
+        var p = getPricingFromForm();
+        var updates = Object.keys(p).map(function(k) {
+          return { key: k, value: p[k], updated_at: new Date().toISOString() };
+        });
+        for (var i = 0; i < updates.length; i++) {
+          var u = updates[i];
+          var r = await supabase.from('platform_settings').upsert(u, { onConflict: 'key' });
+          if (r.error) throw r.error;
+        }
+        st.className = 'mt-3 text-sm text-emerald-600';
+        st.textContent = '✅ Pricing saved. (' + updates.length + ' settings)';
+        if ($('setVerifFee')) $('setVerifFee').value = p.verification_fee;
+        if ($('setCleanupDays')) $('setCleanupDays').value = p.lead_cleanup_days;
+        renderPricingSummary(p);
+      } catch (e) {
+        st.className = 'mt-3 text-sm text-red-600';
+        st.textContent = '❌ ' + e.message;
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  SETTINGS + NOTIFICATION TEST
+    // ══════════════════════════════════════════════════════════════
     async function loadSettings() {
       try {
         var r = await supabase.from('platform_settings').select('key,value');
@@ -1129,9 +1416,38 @@
           if (r.error) throw r.error;
         }
         st.textContent = '✅ Settings saved.'; st.className = 'mt-3 text-sm text-emerald-600';
+        loadPricing();
       } catch (e) { st.textContent = '❌ ' + e.message; st.className = 'mt-3 text-sm text-red-600'; }
     }
 
+    async function sendTestEmail() {
+      var to = $('testEmailTo').value.trim();
+      var st = $('testEmailStatus');
+      if (!to) {
+        st.className = 'mt-3 text-sm text-red-600';
+        st.textContent = '❌ Enter a recipient email first.';
+        return;
+      }
+      st.className = 'mt-3 text-sm text-indigo-600';
+      st.textContent = '📤 Sending test email…';
+      var result = await sendEmailNotification(
+        to,
+        '✅ Property Hub email test',
+        'This is a test email from Property Hub Admin.\n\nIf you can read this, email notifications are working correctly.\n\nSent at: ' + new Date().toLocaleString('en-UG'),
+        'test'
+      );
+      if (result.success) {
+        st.className = 'mt-3 text-sm text-emerald-600';
+        st.textContent = '✅ Test email sent to ' + to + '. Check inbox (and spam).';
+      } else {
+        st.className = 'mt-3 text-sm text-red-600';
+        st.textContent = '❌ Failed: ' + result.error;
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  INIT
+    // ══════════════════════════════════════════════════════════════
     async function init() {
       authView = $('authView');
       dashboardView = $('dashboardView');
@@ -1141,30 +1457,28 @@
       if (!window.supabase) { alert('Supabase failed to load.'); hideLoading(); return; }
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // Keep session fresh — refresh token every 40 minutes
-setInterval(async function() {
-  try {
-    const r = await supabase.auth.refreshSession();
-    if (r.error) console.warn('Session refresh failed:', r.error.message);
-    else console.log('🔄 Session refreshed');
-  } catch (e) { console.warn('Refresh error:', e.message); }
-}, 40 * 60 * 1000);
+      // Session keep-alive
+      setInterval(async function() {
+        try {
+          var r = await supabase.auth.refreshSession();
+          if (r.error) console.warn('Session refresh failed:', r.error.message);
+        } catch (e) { console.warn('Refresh error:', e.message); }
+      }, 40 * 60 * 1000);
 
-// Also refresh immediately if the tab was idle for a while
-document.addEventListener('visibilitychange', async function() {
-  if (document.visibilityState === 'visible' && currentUser) {
-    try {
-      const r = await supabase.auth.getSession();
-      if (!r.data || !r.data.session) {
-        await supabase.auth.signOut();
-        currentUser = null;
-        showAuth();
-      } else {
-        await supabase.auth.refreshSession();
-      }
-    } catch (e) { console.warn(e); }
-  }
-});
+      document.addEventListener('visibilitychange', async function() {
+        if (document.visibilityState === 'visible' && currentUser) {
+          try {
+            var r = await supabase.auth.getSession();
+            if (!r.data || !r.data.session) {
+              await supabase.auth.signOut();
+              currentUser = null;
+              showAuth();
+            } else {
+              await supabase.auth.refreshSession();
+            }
+          } catch (e) { console.warn(e); }
+        }
+      });
 
       setupTabs();
 
@@ -1207,26 +1521,27 @@ document.addEventListener('visibilitychange', async function() {
       $('refreshSeoBtn').addEventListener('click', loadSeoPages);
       $('regenerateSeoBtn').addEventListener('click', regenerateSeoNow);
 
+      // Pricing tab
+      $('savePricingBtn').addEventListener('click', savePricing);
+      $('reloadPricingBtn').addEventListener('click', loadPricing);
+      ['priceVerifFee','priceLeadUnit','priceGuestPercent','priceLeadHot','priceLeadWarm','priceLeadCold','priceMinTopup','priceCleanupDays'].forEach(function(id){
+        var el = $(id);
+        if (el) el.addEventListener('input', updatePreview);
+      });
+      ['previewPrice','previewType','previewQuality'].forEach(function(id){
+        var el = $(id);
+        if (el) {
+          el.addEventListener('input', updatePreview);
+          el.addEventListener('change', updatePreview);
+        }
+      });
+
+      // Notification test
+      $('testEmailBtn').addEventListener('click', sendTestEmail);
+
       hideLoading();
-async function checkAdmin() {
-  try {
-    var r = await supabase.auth.getUser();
-    if (r.error) {
-      // Try refreshing once before giving up
-      await supabase.auth.refreshSession();
-      r = await supabase.auth.getUser();
-      if (r.error) return false;
-    }
-    var user = r.data && r.data.user;
-    if (!user) return false;
-    var pr = await supabase.from('profiles').select('is_admin, business_name').eq('id', user.id).single();
-    if (pr.error || !pr.data || !pr.data.is_admin) return false;
-    currentUser = user;
-    $('adminUserDisplay').textContent = pr.data.business_name || user.email;
-    return true;
-  } catch (e) { return false; }
-}
-      
+
+      // Auto-refresh active tab every 30s
       setInterval(function() {
         if (!authView.classList.contains('hidden')) return;
         loadStats();
