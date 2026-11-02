@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Property Hub – Admin Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
@@ -31,6 +32,7 @@
     .btn-sm.green { background:#10b981;color:#fff; } .btn-sm.red { background:#ef4444;color:#fff; }
     .btn-sm.blue { background:#3b82f6;color:#fff; } .btn-sm.amber { background:#f59e0b;color:#fff; }
     .btn-sm.purple { background:#8b5cf6;color:#fff; }
+    .btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
     .auth-card { max-width: 400px; margin: 4rem auto; background: white; border-radius: 2rem; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
     .auth-card h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
     .auth-card input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 1rem; margin-bottom: 1rem; outline: none; font-size: 0.875rem; }
@@ -71,1617 +73,515 @@
 </head>
 <body>
 
-  <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center flex-col gap-4">
-    <div class="spinner" style="width:48px;height:48px;border-width:4px;"></div>
-    <p class="text-slate-600 text-sm">Loading Admin Dashboard…</p>
-  </div>
+<div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center flex-col gap-4">
+  <div class="spinner" style="width:48px;height:48px;border-width:4px;"></div>
+  <p class="text-slate-600 text-sm">Loading Admin Dashboard…</p>
+</div>
 
-  <div id="authView" class="min-h-screen flex items-center justify-center p-4">
-    <div class="auth-card">
-      <h1>🔐 Admin Login</h1>
-      <p class="text-slate-500 text-sm mb-4">Sign in with your admin account.</p>
-      <form id="loginForm">
-        <input type="email" id="adminEmail" placeholder="Email address" required />
-        <input type="password" id="adminPassword" placeholder="Password" required />
-        <button type="submit">Sign In</button>
-        <div id="loginError" class="error hidden"></div>
-      </form>
-    </div>
-  </div>
-
-  <div id="dashboardView" class="hidden">
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
-        <div class="flex items-center gap-2">
-          <span class="text-xl font-bold text-slate-800">🏠 Property<span class="text-indigo-600">Hub</span></span>
-          <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Admin</span>
-        </div>
-        <div class="flex items-center gap-4">
-          <span class="text-sm text-slate-600" id="adminUserDisplay">Admin</span>
-          <button id="logoutBtn" class="text-sm text-red-500 font-medium">Sign Out</button>
-        </div>
-      </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-8">
-      <div class="grid-4 mb-6">
-        <div class="stat-card"><div class="icon"><i class="fas fa-users"></i></div><div class="value" id="statBrokers">0</div><div class="label">Total Brokers</div></div>
-        <div class="stat-card"><div class="icon"><i class="fas fa-home text-indigo-500"></i></div><div class="value" id="statProperties">0</div><div class="label">Total Properties</div></div>
-        <div class="stat-card"><div class="icon"><i class="fas fa-clock text-amber-500"></i></div><div class="value" id="statPendingVerifications">0</div><div class="label">Pending Verifications</div></div>
-        <div class="stat-card"><div class="icon"><i class="fas fa-handshake text-emerald-500"></i></div><div class="value" id="statLeads">0</div><div class="label">Active Leads</div></div>
-      </div>
-
-      <div class="flex flex-wrap gap-2 mb-6">
-        <button class="admin-tab active" data-tab="brokers">Brokers</button>
-        <button class="admin-tab" data-tab="verifications">Verifications</button>
-        <button class="admin-tab" data-tab="leads">Leads</button>
-        <button class="admin-tab" data-tab="followups">📬 Follow-Ups</button>
-        <button class="admin-tab" data-tab="seo">🔍 SEO Pages</button>
-        <button class="admin-tab" data-tab="reports">Reports</button>
-        <button class="admin-tab" data-tab="transactions">Transactions</button>
-        <button class="admin-tab" data-tab="pricing">💰 Pricing</button>
-        <button class="admin-tab" data-tab="settings">⚙️ Settings</button>
-      </div>
-
-      <div id="tab-brokers" class="tab-content">
-  <div class="section-card">
-    <h3>👥 All Brokers</h3>
-
-    <div id="brokerSyncBanner" class="hidden mb-3 text-sm rounded-xl p-3 bg-amber-50 border border-amber-200 text-amber-900 flex items-start justify-between gap-3">
-      <div>
-        <strong>⚠️ Profile rows missing.</strong>
-        <span id="brokerSyncText"></span>
-      </div>
-      <button id="fixMissingProfilesBtn" class="btn-sm amber whitespace-nowrap">
-        <i class="fas fa-wrench"></i> Fix now
-      </button>
-    </div>
-
-    <div id="brokerCountSummary" class="mb-2 text-xs text-slate-500"></div>
-    <div id="brokerList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-    <div id="noBrokers" class="hidden text-slate-500 text-sm py-4">No brokers found.</div>
+<div id="authView" class="min-h-screen flex items-center justify-center p-4">
+  <div class="auth-card">
+    <h1>🔐 Admin Login</h1>
+    <p class="text-slate-500 text-sm mb-4">Sign in with your admin account.</p>
+    <form id="loginForm">
+      <input type="email" id="adminEmail" placeholder="Email address" required />
+      <input type="password" id="adminPassword" placeholder="Password" required />
+      <button type="submit">Sign In</button>
+      <div id="loginError" class="error hidden"></div>
+    </form>
   </div>
 </div>
 
-      <div id="brokerDetailView" class="hidden">
-        <div class="section-card">
-          <button class="back-btn" id="backToBrokerList"><i class="fas fa-arrow-left"></i> Back to Brokers</button>
-          <div class="profile-header">
-            <div class="profile-avatar"><i class="fas fa-user"></i></div>
-            <div>
-              <h2 id="detailBusinessName" class="text-xl font-bold">Loading...</h2>
-              <div class="text-sm text-slate-500" id="detailEmail">Email: —</div>
-              <div class="text-sm text-slate-500" id="detailPhone">Phone: —</div>
-            </div>
-            <div class="ml-auto flex gap-2 flex-wrap" id="detailActions"></div>
-          </div>
-          <div class="detail-grid">
-            <div class="detail-card"><div class="label">Status</div><div class="value" id="detailStatus">—</div></div>
-            <div class="detail-card"><div class="label">Verification</div><div class="value" id="detailVerification">—</div></div>
-            <div class="detail-card"><div class="label">Properties</div><div class="value" id="detailPropertyCount">0</div></div>
-            <div class="detail-card"><div class="label">Wallet</div><div class="value" id="detailWalletBalance">0 UGX</div></div>
-            <div class="detail-card"><div class="label">Lead Score</div><div class="value" id="detailLeadScore">0</div></div>
-            <div class="detail-card"><div class="label">Avg Rating</div><div class="value" id="detailAvgRating">0.0 ⭐</div></div>
-          </div>
-          <div class="mt-6"><h4 class="font-semibold mb-2">📋 Properties</h4><div id="detailProperties" class="table-wrap"></div></div>
-          <div class="mt-6"><h4 class="font-semibold mb-2">📨 Lead Requests</h4><div id="detailLeads" class="table-wrap"></div></div>
-          <div class="mt-6"><h4 class="font-semibold mb-2">⭐ Reviews</h4><div id="detailReviews" class="table-wrap"></div></div>
-          <div class="mt-6"><h4 class="font-semibold mb-2">🚨 Reports Against</h4><div id="detailReports" class="table-wrap"></div></div>
-          <div class="mt-6"><h4 class="font-semibold mb-2">💰 Transactions</h4><div id="detailTransactions" class="table-wrap"></div></div>
-        </div>
+<div id="dashboardView" class="hidden">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
+      <div class="flex items-center gap-2">
+        <span class="text-xl font-bold text-slate-800">🏠 Property<span class="text-indigo-600">Hub</span></span>
+        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Admin</span>
       </div>
-
-      <div id="tab-verifications" class="tab-content hidden">
-        <div class="section-card">
-          <h3>🏠 Pending Property Verifications</h3>
-          <div id="verificationList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-          <div id="noVerifications" class="hidden text-slate-500 text-sm py-4">No pending property verifications.</div>
-        </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-slate-600" id="adminUserDisplay">Admin</span>
+        <button id="logoutBtn" class="text-sm text-red-500 font-medium">Sign Out</button>
       </div>
-
-      <div id="tab-leads" class="tab-content hidden">
-        <div class="section-card">
-          <div class="flex-between mb-4">
-            <h3>📨 All Lead Requests</h3>
-            <div class="flex gap-2 items-center flex-wrap">
-              <select id="leadStatusFilter" class="settings-input" style="width:auto;">
-                <option value="">All statuses</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
-              <button id="runCleanupBtn" class="btn-sm red"><i class="fas fa-broom"></i> Run cleanup (30d)</button>
-            </div>
-          </div>
-          <div id="cleanupBanner" class="hidden mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800"></div>
-          <div id="leadsList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-          <div id="noLeads" class="hidden text-slate-500 text-sm py-4">No leads found.</div>
-        </div>
-      </div>
-
-      <div id="tab-followups" class="tab-content hidden">
-        <div class="section-card">
-          <div class="flex-between mb-4">
-            <h3>📬 Visitor Follow-Ups</h3>
-            <div class="flex gap-2 items-center flex-wrap">
-              <select id="followupFilter" class="settings-input" style="width:auto;">
-                <option value="pending">Pending only</option>
-                <option value="due">Due now (3+ days)</option>
-                <option value="sent">Sent</option>
-                <option value="all">All approved</option>
-              </select>
-              <button id="refreshFollowupsBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-          </div>
-          <div id="followupBanner" class="hidden mb-3 text-sm rounded-xl p-3"></div>
-          <div id="followupStats" class="grid-3 mb-4"></div>
-          <div id="followupList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-          <div id="noFollowups" class="hidden text-slate-500 text-sm py-4">No follow-ups found.</div>
-        </div>
-      </div>
-
-      <div id="tab-seo" class="tab-content hidden">
-        <div class="section-card">
-          <div class="flex-between mb-4">
-            <h3>🔍 Programmatic SEO Pages</h3>
-            <div class="flex gap-2 flex-wrap">
-              <select id="seoFilter" class="settings-input" style="width:auto;">
-                <option value="all">All types</option>
-                <option value="location">Location</option>
-                <option value="property_type">Property type</option>
-                <option value="price_range">Price range</option>
-                <option value="property">Individual properties</option>
-              </select>
-              <button id="regenerateSeoBtn" class="btn-sm amber"><i class="fas fa-sync-alt"></i> Regenerate now</button>
-              <button id="refreshSeoBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-          </div>
-          <div id="seoBanner" class="hidden mb-3 text-sm rounded-xl p-3"></div>
-          <div id="seoStats" class="grid-3 mb-4"></div>
-          <div id="seoList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-          <div id="noSeo" class="hidden text-slate-500 text-sm py-4">No SEO pages generated yet.</div>
-        </div>
-      </div>
-
-      <div id="tab-reports" class="tab-content hidden">
-        <div class="section-card">
-          <h3>🚨 All Reports</h3>
-          <div id="reportList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-          <div id="noReports" class="hidden text-slate-500 text-sm py-4">No reports found.</div>
-        </div>
-      </div>
-
-      <div id="tab-transactions" class="tab-content hidden">
-        <div class="section-card">
-          <h3>💰 All Wallet Transactions</h3>
-          <div id="transactionList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-          <div id="noTransactions" class="hidden text-slate-500 text-sm py-4">No transactions found.</div>
-        </div>
-      </div>
-
-      <div id="tab-pricing" class="tab-content hidden">
-        <div class="section-card">
-          <div class="flex-between mb-4">
-            <div>
-              <h3>💰 Pricing Configuration</h3>
-              <p class="text-sm text-slate-500 mt-1">Set all prices used across Property Hub. Changes apply to <strong>new</strong> transactions immediately.</p>
-            </div>
-            <div class="flex gap-2 flex-wrap">
-              <button id="reloadPricingBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Reload</button>
-              <button id="savePricingBtn" class="btn-sm green"><i class="fas fa-save"></i> Save pricing</button>
-            </div>
-          </div>
-
-          <div id="pricingCurrentSummary" class="grid-3 mb-4"></div>
-
-          <div class="grid-3">
-            <div>
-              <label class="settings-label">Verification fee (UGX)</label>
-              <input type="number" id="priceVerifFee" class="settings-input" min="0" step="500" />
-              <p class="text-xs text-slate-500 mt-1">Charged per property when a broker submits for verification.</p>
-            </div>
-            <div>
-              <label class="settings-label">Lead base unit (UGX)</label>
-              <input type="number" id="priceLeadUnit" class="settings-input" min="10000" step="10000" />
-              <p class="text-xs text-slate-500 mt-1">Property price is divided by this to compute lead "units".</p>
-            </div>
-            <div>
-              <label class="settings-label">Guesthouse lead % (0–1)</label>
-              <input type="number" id="priceGuestPercent" class="settings-input" min="0" max="1" step="0.01" />
-              <p class="text-xs text-slate-500 mt-1">For guesthouses, lead cost = property price × this percentage.</p>
-            </div>
-            <div>
-              <label class="settings-label">Lead — 🔥 HOT (per unit, UGX)</label>
-              <input type="number" id="priceLeadHot" class="settings-input" min="0" step="100" />
-              <p class="text-xs text-slate-500 mt-1">Best quality leads — highest price.</p>
-            </div>
-            <div>
-              <label class="settings-label">Lead — 🌤 WARM (per unit, UGX)</label>
-              <input type="number" id="priceLeadWarm" class="settings-input" min="0" step="100" />
-              <p class="text-xs text-slate-500 mt-1">Interested but comparing — mid price.</p>
-            </div>
-            <div>
-              <label class="settings-label">Lead — ❄️ COLD (per unit, UGX)</label>
-              <input type="number" id="priceLeadCold" class="settings-input" min="0" step="100" />
-              <p class="text-xs text-slate-500 mt-1">Just browsing — lowest price.</p>
-            </div>
-            <div>
-              <label class="settings-label">Min wallet top-up (UGX)</label>
-              <input type="number" id="priceMinTopup" class="settings-input" min="100" step="100" />
-              <p class="text-xs text-slate-500 mt-1">Smallest allowed deposit into a broker's wallet.</p>
-            </div>
-            <div>
-              <label class="settings-label">Lead cleanup (days)</label>
-              <input type="number" id="priceCleanupDays" class="settings-input" min="1" />
-              <p class="text-xs text-slate-500 mt-1">Approved/rejected leads are purged after this many days.</p>
-            </div>
-          </div>
-
-          <div id="pricingStatus" class="mt-3 text-sm"></div>
-
-          <div class="notice-box mt-4">
-            <strong>⚠️ Heads up:</strong> <code>index.html</code> currently uses hardcoded constants (<code>VERIFICATION_FEE</code>, <code>LEAD_RATE_PER_150K</code>). To make these settings take effect on the live site, <code>index.html</code> must fetch <code>platform_settings</code> on load. Until then, treat this tab as the source of truth and update <code>index.html</code>'s constants to match.
-          </div>
-        </div>
-
-        <div class="section-card">
-          <h3>📊 Lead Cost Preview</h3>
-          <p class="text-sm text-slate-500 mb-4">See exactly what a lead will cost with the values above before you save.</p>
-          <div class="grid-3">
-            <div>
-              <label class="settings-label">Property price (UGX)</label>
-              <input type="number" id="previewPrice" class="settings-input" value="500000" step="50000" min="0" />
-            </div>
-            <div>
-              <label class="settings-label">Property type</label>
-              <select id="previewType" class="settings-input">
-                <option value="rental">Rental</option>
-                <option value="property">Property (for sale)</option>
-                <option value="guesthouse">Guesthouse</option>
-              </select>
-            </div>
-            <div>
-              <label class="settings-label">Lead quality</label>
-              <select id="previewQuality" class="settings-input">
-                <option value="hot">🔥 Hot</option>
-                <option value="warm">🌤 Warm</option>
-                <option value="cold">❄️ Cold</option>
-              </select>
-            </div>
-          </div>
-          <div id="previewResult" class="mt-4 p-4 bg-white rounded-xl border border-slate-200 text-sm"></div>
-        </div>
-      </div>
-
-      <div id="tab-settings" class="tab-content hidden">
-        <div class="section-card">
-          <h3>⚙️ Platform Settings</h3>
-          <p class="text-sm text-slate-500 mb-4">Basic platform behaviour. For pricing, use the <strong>💰 Pricing</strong> tab.</p>
-          <div class="grid-3">
-            <div>
-              <label class="settings-label">Verification fee (UGX)</label>
-              <input type="number" id="setVerifFee" class="settings-input" min="0" />
-            </div>
-            <div>
-              <label class="settings-label">Lead cleanup (days)</label>
-              <input type="number" id="setCleanupDays" class="settings-input" min="1" />
-            </div>
-          </div>
-          <div class="mt-4 flex gap-2 flex-wrap">
-            <button id="saveSettingsBtn" class="btn-sm green"><i class="fas fa-save"></i> Save settings</button>
-            <button id="refreshStatsBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh stats</button>
-          </div>
-          <div id="settingsStatus" class="mt-3 text-sm"></div>
-        </div>
-
-        <div class="section-card">
-          <h3>🧪 Notification Test</h3>
-          <p class="text-sm text-slate-500 mb-4">Verify Web3Forms email is working before relying on it for real leads.</p>
-          <div class="grid-3">
-            <div style="grid-column: span 2;">
-              <label class="settings-label">Send test to</label>
-              <input type="email" id="testEmailTo" class="settings-input" placeholder="you@example.com" />
-            </div>
-            <div style="display:flex;align-items:flex-end;">
-              <button id="testEmailBtn" class="btn-sm blue"><i class="fas fa-paper-plane"></i> Send test email</button>
-            </div>
-          </div>
-          <div id="testEmailStatus" class="mt-3 text-sm"></div>
-        </div>
-
-        <div class="section-card">
-          <h3>🧹 Lead Cleanup</h3>
-          <p class="text-sm text-slate-500 mb-3">Approved and rejected leads are automatically removed 30 days after creation. You can also trigger it manually.</p>
-          <button id="runCleanupBtn2" class="btn-sm red"><i class="fas fa-trash"></i> Purge old leads now</button>
-          <div id="cleanupStatus" class="mt-3 text-sm"></div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <div id="verificationDetailModal" class="modal-backdrop hidden">
-    <div class="modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-slate-800">📄 Verification Details</h2>
-        <button id="closeDetailModal" class="text-slate-400 text-2xl">&times;</button>
-      </div>
-      <div id="detailContent"><div class="spinner"></div></div>
     </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid-4 mb-6">
+      <div class="stat-card"><div class="icon"><i class="fas fa-users"></i></div><div class="value" id="statBrokers">0</div><div class="label">Total Brokers</div></div>
+      <div class="stat-card"><div class="icon"><i class="fas fa-home text-indigo-500"></i></div><div class="value" id="statProperties">0</div><div class="label">Total Properties</div></div>
+      <div class="stat-card"><div class="icon"><i class="fas fa-clock text-amber-500"></i></div><div class="value" id="statPendingVerifications">0</div><div class="label">Pending Verifications</div></div>
+      <div class="stat-card"><div class="icon"><i class="fas fa-handshake text-emerald-500"></i></div><div class="value" id="statLeads">0</div><div class="label">Active Leads</div></div>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mb-6">
+      <button class="admin-tab active" data-tab="brokers">Brokers</button>
+      <button class="admin-tab" data-tab="verifications">Verifications</button>
+      <button class="admin-tab" data-tab="leads">Leads</button>
+      <button class="admin-tab" data-tab="followups">📬 Follow-Ups</button>
+      <button class="admin-tab" data-tab="seo">🔍 SEO Pages</button>
+      <button class="admin-tab" data-tab="reports">Reports</button>
+      <button class="admin-tab" data-tab="transactions">Transactions</button>
+      <button class="admin-tab" data-tab="pricing">💰 Pricing</button>
+      <button class="admin-tab" data-tab="partners">🤝 Partners</button>
+      <button class="admin-tab" data-tab="settings">⚙️ Settings</button>
+    </div>
+
+    <!-- BROKERS -->
+    <div id="tab-brokers" class="tab-content">
+      <div class="section-card">
+        <h3>👥 All Brokers</h3>
+        <div id="brokerSyncBanner" class="hidden mb-3 text-sm rounded-xl p-3 bg-amber-50 border border-amber-200 text-amber-900 flex items-start justify-between gap-3">
+          <div>
+            <strong>⚠️ Profile rows missing.</strong>
+            <span id="brokerSyncText"></span>
+          </div>
+          <button id="fixMissingProfilesBtn" class="btn-sm amber whitespace-nowrap"><i class="fas fa-wrench"></i> Fix now</button>
+        </div>
+        <div id="brokerCountSummary" class="mb-2 text-xs text-slate-500"></div>
+        <div id="brokerList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+        <div id="noBrokers" class="hidden text-slate-500 text-sm py-4">No brokers found.</div>
+      </div>
+    </div>
+
+    <!-- BROKER DETAIL -->
+    <div id="brokerDetailView" class="hidden">
+      <div class="section-card">
+        <button class="back-btn" id="backToBrokerList"><i class="fas fa-arrow-left"></i> Back to Brokers</button>
+        <div class="profile-header">
+          <div class="profile-avatar"><i class="fas fa-user"></i></div>
+          <div>
+            <h2 id="detailBusinessName" class="text-xl font-bold">Loading...</h2>
+            <div class="text-sm text-slate-500" id="detailEmail">Email: —</div>
+            <div class="text-sm text-slate-500" id="detailPhone">Phone: —</div>
+          </div>
+          <div class="ml-auto flex gap-2 flex-wrap" id="detailActions"></div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-card"><div class="label">Status</div><div class="value" id="detailStatus">—</div></div>
+          <div class="detail-card"><div class="label">Verification</div><div class="value" id="detailVerification">—</div></div>
+          <div class="detail-card"><div class="label">Properties</div><div class="value" id="detailPropertyCount">0</div></div>
+          <div class="detail-card"><div class="label">Wallet</div><div class="value" id="detailWalletBalance">0 UGX</div></div>
+          <div class="detail-card"><div class="label">Lead Score</div><div class="value" id="detailLeadScore">0</div></div>
+          <div class="detail-card"><div class="label">Avg Rating</div><div class="value" id="detailAvgRating">0.0 ⭐</div></div>
+        </div>
+        <div class="mt-6"><h4 class="font-semibold mb-2">📋 Properties</h4><div id="detailProperties" class="table-wrap"></div></div>
+        <div class="mt-6"><h4 class="font-semibold mb-2">📨 Lead Requests</h4><div id="detailLeads" class="table-wrap"></div></div>
+        <div class="mt-6"><h4 class="font-semibold mb-2">⭐ Reviews</h4><div id="detailReviews" class="table-wrap"></div></div>
+        <div class="mt-6"><h4 class="font-semibold mb-2">🚨 Reports Against</h4><div id="detailReports" class="table-wrap"></div></div>
+        <div class="mt-6"><h4 class="font-semibold mb-2">💰 Transactions</h4><div id="detailTransactions" class="table-wrap"></div></div>
+      </div>
+    </div>
+
+    <!-- VERIFICATIONS -->
+    <div id="tab-verifications" class="tab-content hidden">
+      <div class="section-card">
+        <h3>🏠 Pending Property Verifications</h3>
+        <div id="verificationList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+        <div id="noVerifications" class="hidden text-slate-500 text-sm py-4">No pending property verifications.</div>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div id="tab-leads" class="tab-content hidden">
+      <div class="section-card">
+        <div class="flex-between mb-4">
+          <h3>📨 All Lead Requests</h3>
+          <div class="flex gap-2 items-center flex-wrap">
+            <select id="leadStatusFilter" class="settings-input" style="width:auto;">
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <button id="runCleanupBtn" class="btn-sm red"><i class="fas fa-broom"></i> Run cleanup (30d)</button>
+          </div>
+        </div>
+        <div id="cleanupBanner" class="hidden mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800"></div>
+        <div id="leadsList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+        <div id="noLeads" class="hidden text-slate-500 text-sm py-4">No leads found.</div>
+      </div>
+    </div>
+
+    <!-- FOLLOW-UPS -->
+    <div id="tab-followups" class="tab-content hidden">
+      <div class="section-card">
+        <div class="flex-between mb-4">
+          <h3>📬 Visitor Follow-Ups</h3>
+          <div class="flex gap-2 items-center flex-wrap">
+            <select id="followupFilter" class="settings-input" style="width:auto;">
+              <option value="pending">Pending only</option>
+              <option value="due">Due now (3+ days)</option>
+              <option value="sent">Sent</option>
+              <option value="all">All approved</option>
+            </select>
+            <button id="refreshFollowupsBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+        </div>
+        <div id="followupBanner" class="hidden mb-3 text-sm rounded-xl p-3"></div>
+        <div id="followupStats" class="grid-3 mb-4"></div>
+        <div id="followupList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+        <div id="noFollowups" class="hidden text-slate-500 text-sm py-4">No follow-ups found.</div>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div id="tab-seo" class="tab-content hidden">
+      <div class="section-card">
+        <div class="flex-between mb-4">
+          <h3>🔍 Programmatic SEO Pages</h3>
+          <div class="flex gap-2 flex-wrap">
+            <select id="seoFilter" class="settings-input" style="width:auto;">
+              <option value="all">All types</option>
+              <option value="location">Location</option>
+              <option value="property_type">Property type</option>
+              <option value="price_range">Price range</option>
+              <option value="property">Individual properties</option>
+            </select>
+            <button id="regenerateSeoBtn" class="btn-sm amber"><i class="fas fa-sync-alt"></i> Regenerate now</button>
+            <button id="refreshSeoBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+        </div>
+        <div id="seoBanner" class="hidden mb-3 text-sm rounded-xl p-3"></div>
+        <div id="seoStats" class="grid-3 mb-4"></div>
+        <div id="seoList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+        <div id="noSeo" class="hidden text-slate-500 text-sm py-4">No SEO pages generated yet.</div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="tab-reports" class="tab-content hidden">
+      <div class="section-card">
+        <h3>🚨 All Reports</h3>
+        <div id="reportList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+        <div id="noReports" class="hidden text-slate-500 text-sm py-4">No reports found.</div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div id="tab-transactions" class="tab-content hidden">
+      <div class="section-card">
+        <h3>💰 All Wallet Transactions</h3>
+        <div id="transactionList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+        <div id="noTransactions" class="hidden text-slate-500 text-sm py-4">No transactions found.</div>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div id="tab-pricing" class="tab-content hidden">
+      <div class="section-card">
+        <div class="flex-between mb-4">
+          <div>
+            <h3>💰 Pricing Configuration</h3>
+            <p class="text-sm text-slate-500 mt-1">Set all prices used across Property Hub. Changes apply to <strong>new</strong> transactions immediately.</p>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button id="reloadPricingBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Reload</button>
+            <button id="savePricingBtn" class="btn-sm green"><i class="fas fa-save"></i> Save pricing</button>
+          </div>
+        </div>
+        <div id="pricingCurrentSummary" class="grid-3 mb-4"></div>
+        <div class="grid-3">
+          <div>
+            <label class="settings-label">Verification fee (UGX)</label>
+            <input type="number" id="priceVerifFee" class="settings-input" min="0" step="500" />
+            <p class="text-xs text-slate-500 mt-1">Charged per property when a broker submits for verification.</p>
+          </div>
+          <div>
+            <label class="settings-label">Lead base unit (UGX)</label>
+            <input type="number" id="priceLeadUnit" class="settings-input" min="10000" step="10000" />
+            <p class="text-xs text-slate-500 mt-1">Property price is divided by this to compute lead "units".</p>
+          </div>
+          <div>
+            <label class="settings-label">Guesthouse lead % (0–1)</label>
+            <input type="number" id="priceGuestPercent" class="settings-input" min="0" max="1" step="0.01" />
+            <p class="text-xs text-slate-500 mt-1">For guesthouses, lead cost = property price × this percentage.</p>
+          </div>
+          <div>
+            <label class="settings-label">Lead — 🔥 HOT (per unit, UGX)</label>
+            <input type="number" id="priceLeadHot" class="settings-input" min="0" step="100" />
+          </div>
+          <div>
+            <label class="settings-label">Lead — 🌤 WARM (per unit, UGX)</label>
+            <input type="number" id="priceLeadWarm" class="settings-input" min="0" step="100" />
+          </div>
+          <div>
+            <label class="settings-label">Lead — ❄️ COLD (per unit, UGX)</label>
+            <input type="number" id="priceLeadCold" class="settings-input" min="0" step="100" />
+          </div>
+          <div>
+            <label class="settings-label">Min wallet top-up (UGX)</label>
+            <input type="number" id="priceMinTopup" class="settings-input" min="100" step="100" />
+          </div>
+          <div>
+            <label class="settings-label">Lead cleanup (days)</label>
+            <input type="number" id="priceCleanupDays" class="settings-input" min="1" />
+          </div>
+        </div>
+        <div id="pricingStatus" class="mt-3 text-sm"></div>
+        <div class="notice-box mt-4">
+          <strong>⚠️ Heads up:</strong> <code>index.html</code> currently uses hardcoded constants. To make these settings take effect on the live site, <code>index.html</code> must fetch <code>platform_settings</code> on load.
+        </div>
+      </div>
+      <div class="section-card">
+        <h3>📊 Lead Cost Preview</h3>
+        <div class="grid-3">
+          <div>
+            <label class="settings-label">Property price (UGX)</label>
+            <input type="number" id="previewPrice" class="settings-input" value="500000" step="50000" min="0" />
+          </div>
+          <div>
+            <label class="settings-label">Property type</label>
+            <select id="previewType" class="settings-input">
+              <option value="rental">Rental</option>
+              <option value="property">Property (for sale)</option>
+              <option value="guesthouse">Guesthouse</option>
+            </select>
+          </div>
+          <div>
+            <label class="settings-label">Lead quality</label>
+            <select id="previewQuality" class="settings-input">
+              <option value="hot">🔥 Hot</option>
+              <option value="warm">🌤 Warm</option>
+              <option value="cold">❄️ Cold</option>
+            </select>
+          </div>
+        </div>
+        <div id="previewResult" class="mt-4 p-4 bg-white rounded-xl border border-slate-200 text-sm"></div>
+      </div>
+    </div>
+
+    <!-- PARTNERS -->
+    <div id="tab-partners" class="tab-content hidden">
+      <div class="section-card">
+        <div class="flex-between mb-4">
+          <div>
+            <h3>🤝 Service Partners</h3>
+            <p class="text-sm text-slate-500 mt-1">Categorized providers shown in follow-up emails, matched by property type.</p>
+          </div>
+          <div class="flex gap-2">
+            <button id="addCategoryBtn" class="btn-sm green"><i class="fas fa-plus"></i> Category</button>
+            <button id="addProviderBtn" class="btn-sm blue"><i class="fas fa-plus"></i> Provider</button>
+            <button id="refreshPartnersBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i></button>
+          </div>
+        </div>
+        <div id="partnerStats" class="grid-3 mb-4"></div>
+        <div id="partnerList"><p class="text-slate-500 text-sm">Loading…</p></div>
+      </div>
+      <div class="section-card">
+        <h3>📬 Recent Notifications</h3>
+        <div id="notifLog"><p class="text-slate-500 text-sm">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="tab-settings" class="tab-content hidden">
+      <div class="section-card">
+        <h3>⚙️ Platform Settings</h3>
+        <p class="text-sm text-slate-500 mb-4">Basic platform behaviour. For pricing, use the <strong>💰 Pricing</strong> tab.</p>
+        <div class="grid-3">
+          <div>
+            <label class="settings-label">Verification fee (UGX)</label>
+            <input type="number" id="setVerifFee" class="settings-input" min="0" />
+          </div>
+          <div>
+            <label class="settings-label">Lead cleanup (days)</label>
+            <input type="number" id="setCleanupDays" class="settings-input" min="1" />
+          </div>
+        </div>
+        <div class="mt-4 flex gap-2 flex-wrap">
+          <button id="saveSettingsBtn" class="btn-sm green"><i class="fas fa-save"></i> Save settings</button>
+          <button id="refreshStatsBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i> Refresh stats</button>
+        </div>
+        <div id="settingsStatus" class="mt-3 text-sm"></div>
+      </div>
+      <div class="section-card">
+        <h3>🧪 Notification Test</h3>
+        <p class="text-sm text-slate-500 mb-4">Verify Web3Forms email is working before relying on it for real leads.</p>
+        <div class="grid-3">
+          <div style="grid-column: span 2;">
+            <label class="settings-label">Send test to</label>
+            <input type="email" id="testEmailTo" class="settings-input" placeholder="you@example.com" />
+          </div>
+          <div style="display:flex;align-items:flex-end;">
+            <button id="testEmailBtn" class="btn-sm blue"><i class="fas fa-paper-plane"></i> Send test email</button>
+          </div>
+        </div>
+        <div id="testEmailStatus" class="mt-3 text-sm"></div>
+      </div>
+      <div class="section-card">
+        <h3>🧹 Lead Cleanup</h3>
+        <p class="text-sm text-slate-500 mb-3">Approved and rejected leads are automatically removed 30 days after creation.</p>
+        <button id="runCleanupBtn2" class="btn-sm red"><i class="fas fa-trash"></i> Purge old leads now</button>
+        <div id="cleanupStatus" class="mt-3 text-sm"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="verificationDetailModal" class="modal-backdrop hidden">
+  <div class="modal-content">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-slate-800">📄 Verification Details</h2>
+      <button id="closeDetailModal" class="text-slate-400 text-2xl">&times;</button>
+    </div>
+    <div id="detailContent"><div class="spinner"></div></div>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-  <script>
-  (function() {
-    'use strict';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script>
+(function() {
+  'use strict';
 
-    var SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
-    var WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
+  var SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+  var WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
 
-async function logNotification(leadId, recipientType, email, template, subject, status, errMsg, categoriesShown) {
-  try {
-    await supabase.from('notification_log').insert({
-      lead_id: leadId || null,
-      recipient_type: recipientType,
-      recipient_email: email,
-      template: template,
-      subject: subject,
-      status: status,
-      error_message: errMsg || null,
-      categories_shown: categoriesShown || null
-    });
-  } catch (_) { /* non-fatal */ }
-}
-    
-    var supabase = null;
-    var currentUser = null;
-    var leadFilter = '';
+  var supabase = null;
+  var currentUser = null;
+  var leadFilter = '';
+  var authView, dashboardView, loadingOverlay;
 
-    var authView, dashboardView, loadingOverlay;
+  function $(id) { return document.getElementById(id); }
+  function hideLoading() { if (loadingOverlay) loadingOverlay.classList.add('hidden'); }
+  function showError(msg) { var el = $('loginError'); if (el) { el.textContent = msg; el.classList.remove('hidden'); } }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function formatDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-UG', { day:'numeric', month:'short', year:'numeric' }); }
+  function formatDateTime(d) { if (!d) return '—'; return new Date(d).toLocaleString('en-UG', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+  function formatCurrency(a) { return Number(a || 0).toLocaleString('en-UG') + ' UGX'; }
+  function badge(status) {
+    var map = { pending:'b-pending', approved:'b-approved', rejected:'b-rejected', verified:'b-verified', unverified:'b-unverified', blocked:'b-blocked', active:'b-active', hot:'b-hot', warm:'b-warm', cold:'b-cold', followup:'b-followup' };
+    return map[status] || 'b-unverified';
+  }
 
-    function $(id) { return document.getElementById(id); }
-    function hideLoading() { if (loadingOverlay) loadingOverlay.classList.add('hidden'); }
-    function showError(msg) { var el = $('loginError'); if (el) { el.textContent = msg; el.classList.remove('hidden'); } }
-    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-    function formatDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-UG', { day:'numeric', month:'short', year:'numeric' }); }
-    function formatDateTime(d) { if (!d) return '—'; return new Date(d).toLocaleString('en-UG', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
-    function formatCurrency(a) { return Number(a || 0).toLocaleString('en-UG') + ' UGX'; }
-    function badge(status) {
-      var map = { pending:'b-pending', approved:'b-approved', rejected:'b-rejected', verified:'b-verified', unverified:'b-unverified', blocked:'b-blocked', active:'b-active', hot:'b-hot', warm:'b-warm', cold:'b-cold', followup:'b-followup' };
-      return map[status] || 'b-unverified';
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  FIXED: notification helper — validates email, surfaces real errors
-    // ══════════════════════════════════════════════════════════════
-    async function sendEmailNotification(to, subject, body, context) {
-      context = context || 'notification';
-      if (!to) return { success: false, error: 'No recipient email address provided (' + context + ')' };
-      var trimmed = String(to).trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-        return { success: false, error: 'Invalid recipient email: "' + trimmed + '" (' + context + ')' };
-      }
-      try {
-        var res = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            email: trimmed,
-            subject: subject,
-            from_name: 'Property Hub Uganda',
-            message: body,
-            replyto: trimmed,
-            botcheck: ''
-          })
-        });
-        var rawText = await res.text();
-        var data = null;
-        try { data = JSON.parse(rawText); } catch (_) {}
-        if (!res.ok) {
-          return { success: false, error: 'HTTP ' + res.status + ' — ' + (data && data.message ? data.message : rawText.substring(0, 200)), raw: rawText };
-        }
-        if (!data) return { success: false, error: 'Non-JSON response from Web3Forms: ' + rawText.substring(0, 200) };
-        if (!data.success) return { success: false, error: data.message || 'Web3Forms rejected the email', raw: data };
-        return { success: true, data: data };
-      } catch (e) {
-        return { success: false, error: e.message || 'Network error' };
-      }
-    }
-
-    function waitForSupabase() {
-      return new Promise(function(resolve) {
-        if (window.supabase) return resolve();
-        var n = 0;
-        var iv = setInterval(function() {
-          n++;
-          if (window.supabase || n > 30) { clearInterval(iv); resolve(); }
-        }, 100);
-      });
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  AUTH
-    // ══════════════════════════════════════════════════════════════
-    async function checkAdmin() {
-      try {
-        var r = await supabase.auth.getUser();
-        if (r.error) {
-          await supabase.auth.refreshSession();
-          r = await supabase.auth.getUser();
-          if (r.error) return false;
-        }
-        var user = r.data && r.data.user;
-        if (!user) return false;
-        var pr = await supabase.from('profiles').select('is_admin, business_name').eq('id', user.id).single();
-        if (pr.error || !pr.data || !pr.data.is_admin) return false;
-        currentUser = user;
-        $('adminUserDisplay').textContent = pr.data.business_name || user.email;
-        return true;
-      } catch (e) { return false; }
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      $('loginError').classList.add('hidden');
-      var email = $('adminEmail').value.trim();
-      var password = $('adminPassword').value;
-      try {
-        var r = await supabase.auth.signInWithPassword({ email: email, password: password });
-        if (r.error) throw r.error;
-        if (!(await checkAdmin())) { await supabase.auth.signOut(); showError('You do not have admin privileges.'); return; }
-        showDashboard();
-      } catch (err) { showError(err.message); }
-    }
-
-    async function handleLogout() {
-      await supabase.auth.signOut();
-      currentUser = null;
-      showAuth();
-    }
-
-    function showAuth() {
-      authView.classList.remove('hidden');
-      dashboardView.classList.add('hidden');
-      $('loginForm').reset();
-    }
-
-    function showDashboard() {
-      authView.classList.add('hidden');
-      dashboardView.classList.remove('hidden');
-      loadStats();
-      loadBrokers();
-      loadVerifications();
-      loadReports();
-      loadTransactions();
-      loadLeads();
-      loadSettings();
-      loadPricing();
-    }
-
-    function setupTabs() {
-      var tabs = document.querySelectorAll('.admin-tab');
-      tabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          tabs.forEach(function(t){ t.classList.remove('active'); });
-          tab.classList.add('active');
-          document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.add('hidden'); });
-          var target = $('tab-' + tab.dataset.tab);
-          if (target) target.classList.remove('hidden');
-          var t = tab.dataset.tab;
-          if (t === 'brokers') loadBrokers();
-          else if (t === 'verifications') loadVerifications();
-          else if (t === 'leads') loadLeads();
-          else if (t === 'followups') loadFollowups();
-          else if (t === 'seo') loadSeoPages();
-          else if (t === 'reports') loadReports();
-          else if (t === 'transactions') loadTransactions();
-          else if (t === 'pricing') loadPricing();
-          else if (t === 'settings') loadSettings();
-        });
-      });
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  STATS
-    // ══════════════════════════════════════════════════════════════
-    async function loadStats() {
-      try {
-        var res = await Promise.all([
-          supabase.from('profiles').select('id', { count:'exact', head:true }),
-          supabase.from('properties').select('id', { count:'exact', head:true }),
-          supabase.from('property_verification_requests').select('id', { count:'exact', head:true }).eq('status','pending'),
-          supabase.from('lead_requests').select('id', { count:'exact', head:true }).in('status', ['pending','approved'])
-        ]);
-        $('statBrokers').textContent = res[0].count || 0;
-        $('statProperties').textContent = res[1].count || 0;
-        $('statPendingVerifications').textContent = res[2].count || 0;
-        $('statLeads').textContent = res[3].count || 0;
-      } catch (e) { console.error(e); }
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  BROKERS
-    // ══════════════════════════════════════════════════════════════
-    async function loadBrokers() {
-  var box = $('brokerList'), no = $('noBrokers');
-  var banner = $('brokerSyncBanner');
-  var summary = $('brokerCountSummary');
-  try {
-    // 1. Load profiles
-    var r = await supabase.from('profiles').select('*').order('created_at', { ascending:false });
-    if (r.error) throw r.error;
-    var data = r.data || [];
-
-    // 2. Diagnostic — how many auth users exist vs how many profile rows
-    var authCount = null;
+  async function logNotification(leadId, recipientType, email, template, subject, status, errMsg, categoriesShown) {
     try {
-      var cnt = await supabase.rpc('count_auth_users');
-      if (!cnt.error && typeof cnt.data === 'number') authCount = cnt.data;
-    } catch (_) { /* RPC may not be installed — skip */ }
-
-    if (summary) {
-      summary.textContent = authCount != null
-        ? data.length + ' profile row(s) · ' + authCount + ' auth user(s) in the database'
-        : data.length + ' profile row(s)';
-    }
-
-    // 3. Show warning banner if there is a mismatch
-    if (banner) {
-      if (authCount != null && data.length < authCount) {
-        var missing = authCount - data.length;
-        var txt = $('brokerSyncText');
-        if (txt) txt.textContent = missing + ' auth user(s) have no profile row — they will not appear below until backfilled.';
-        banner.classList.remove('hidden');
-      } else {
-        banner.classList.add('hidden');
-      }
-    }
-
-    if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
-    no.classList.add('hidden');
-
-    var html = '<table><thead><tr><th>Business</th><th>Email</th><th>Phone</th><th>Verified</th><th>Blocked</th><th>Actions</th></tr></thead><tbody>';
-    data.forEach(function(b) {
-      html += '<tr>' +
-        '<td class="font-medium">' + esc(b.business_name || 'Unnamed') + '</td>' +
-        '<td>' + esc(b.email || '—') + '</td>' +
-        '<td>' + esc(b.phone || '—') + '</td>' +
-        '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span></td>' +
-        '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span></td>' +
-        '<td>' +
-          '<button class="btn-sm blue view-broker" data-id="' + b.id + '">View</button>' +
-          (b.is_verified ? '<button class="btn-sm amber unverify-broker" data-id="' + b.id + '">Unverify</button>' : '<button class="btn-sm green verify-broker" data-id="' + b.id + '">Verify</button>') +
-          (b.is_blocked ? '<button class="btn-sm green unblock-broker" data-id="' + b.id + '">Unblock</button>' : '<button class="btn-sm red block-broker" data-id="' + b.id + '">Block</button>') +
-        '</td></tr>';
-    });
-    html += '</tbody></table>';
-    box.innerHTML = html;
-
-    box.querySelectorAll('.view-broker').forEach(function(x){ x.onclick = function(){ showBrokerDetail(x.dataset.id); }; });
-    box.querySelectorAll('.verify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'verify'); }; });
-    box.querySelectorAll('.unverify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unverify'); }; });
-    box.querySelectorAll('.block-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'block'); }; });
-    box.querySelectorAll('.unblock-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unblock'); }; });
-  } catch (e) {
-    box.innerHTML = '<p class="text-red-500 text-sm">Error loading brokers: ' + esc(e.message) + '</p>';
-  }
-}
-
-async function buildFollowupEmail(lead, prop, broker) {
-  var seg = prop.property_type === 'guesthouse' ? 'guesthouse'
-          : prop.property_type === 'property'    ? 'buyer'
-          : 'renter';
-
-  var partners = [];
-  try {
-    var r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
-    if (!r.error && r.data) partners = r.data;
-  } catch (_) {}
-
-  var byCat = {};
-  partners.forEach(function(p) {
-    if (!byCat[p.category_name]) byCat[p.category_name] = { emoji: p.category_emoji, items: [] };
-    if (byCat[p.category_name].items.length < 2) byCat[p.category_name].items.push(p);
-  });
-  var catNames = Object.keys(byCat);
-
-  var servicesBlock = '';
-  if (catNames.length) {
-    catNames.forEach(function(name) {
-      var c = byCat[name];
-      servicesBlock += '\n' + c.emoji + ' ' + name + '\n';
-      c.items.forEach(function(p) {
-        servicesBlock += '   • ' + p.provider_name + (p.tagline ? ' — ' + p.tagline : '') + '\n' +
-                        '     ' + p.url + '\n' +
-                        (p.discount_code ? '     💰 Code: ' + p.discount_code + '\n' : '');
+      await supabase.from('notification_log').insert({
+        lead_id: leadId || null,
+        recipient_type: recipientType,
+        recipient_email: email,
+        template: template,
+        subject: subject,
+        status: status,
+        error_message: errMsg || null,
+        categories_shown: categoriesShown || null
       });
-    });
-  } else {
-    servicesBlock = '\nBrowse verified partners: https://propertyhub.dpdns.org/services/\n';
+    } catch (_) { /* non-fatal */ }
   }
 
-  var subject = 'Did you find what you needed in ' + (prop.address || 'Kampala').split(',')[0].trim() + '?';
-  var body =
-    'Hello ' + lead.visitor_name + ',\n\n' +
-    '3 days ago you connected with ' + (broker.business_name || 'a broker') + ' about:\n\n' +
-    '🏠 ' + (prop.title || 'the property') + '\n\n' +
-    '────────────────────────────────────────\n' +
-    '📝 QUICK CHECK-IN — 1 minute\n' +
-    '────────────────────────────────────────\n\n' +
-    'Did you get the place?\n\n' +
-    '  ✅ YES — please rate the broker so other renters benefit:\n' +
-    '     https://propertyhub.dpdns.org/broker/' + lead.broker_id + '\n\n' +
-    '  🤔 STILL LOOKING — see similar properties:\n' +
-    '     https://propertyhub.dpdns.org/?search=' + encodeURIComponent((prop.address || '').split(',')[0].trim()) + '\n\n' +
-    '  ❌ NO — browse new listings:\n' +
-    '     https://propertyhub.dpdns.org/\n\n' +
-    '────────────────────────────────────────\n' +
-    '🎁 SERVICES YOU MIGHT NEED\n' +
-    '────────────────────────────────────────\n' +
-    servicesBlock + '\n' +
-    '────────────────────────────────────────\n\n' +
-    'These are vetted partners we trust. Using them keeps Property Hub free for you.\n\n' +
-    '— The Property Hub Team';
-
-  return { subject: subject, body: body, categories: catNames.slice() };
-}
-    
-// Backfill missing profiles — one click from the dashboard
-async function fixMissingProfiles() {
-  var btn = $('fixMissingProfilesBtn');
-  if (!btn) return;
-  if (!confirm('Create profile rows for any auth users that are missing one?\n\nThis will NOT overwrite existing profiles.')) return;
-  var original = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing…';
-  try {
-    var r = await supabase.rpc('backfill_missing_profiles');
-    if (r.error) throw r.error;
-    var n = r.data || 0;
-    alert('✅ Created ' + n + ' missing profile row(s).');
-    await loadBrokers();
-    await loadStats();
-  } catch (e) {
-    alert('❌ ' + e.message);
-    btn.disabled = false;
-    btn.innerHTML = original;
+  async function sendEmailNotification(to, subject, body, context) {
+    context = context || 'notification';
+    if (!to) return { success: false, error: 'No recipient email address provided (' + context + ')' };
+    var trimmed = String(to).trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      return { success: false, error: 'Invalid recipient email: "' + trimmed + '" (' + context + ')' };
+    }
+    try {
+      var res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          email: trimmed,
+          subject: subject,
+          from_name: 'Property Hub Uganda',
+          message: body,
+          replyto: trimmed,
+          botcheck: ''
+        })
+      });
+      var rawText = await res.text();
+      var data = null;
+      try { data = JSON.parse(rawText); } catch (_) {}
+      if (!res.ok) {
+        return { success: false, error: 'HTTP ' + res.status + ' — ' + (data && data.message ? data.message : rawText.substring(0, 200)) };
+      }
+      if (!data) return { success: false, error: 'Non-JSON response from Web3Forms' };
+      if (!data.success) return { success: false, error: data.message || 'Web3Forms rejected the email' };
+      return { success: true, data: data };
+    } catch (e) {
+      return { success: false, error: e.message || 'Network error' };
+    }
   }
-}
 
-    async function handleBrokerAction(id, action) {
-      if (!confirm('Are you sure you want to ' + action + ' this broker?')) return;
-      try {
-        var u = {};
-        if (action === 'verify') u.is_verified = true;
-        else if (action === 'unverify') u.is_verified = false;
-        else if (action === 'block') u.is_blocked = true;
-        else if (action === 'unblock') u.is_blocked = false;
-        var r = await supabase.from('profiles').update(u).eq('id', id);
-        if (r.error) throw r.error;
-        alert('✅ Broker ' + action + 'd.');
-        loadBrokers(); loadStats();
-      } catch (e) { alert('Error: ' + e.message); }
-    }
-
-    async function showBrokerDetail(id) {
-      $('tab-brokers').classList.add('hidden');
-      $('brokerDetailView').classList.remove('hidden');
-      try {
-        var rb = await supabase.from('profiles').select('*').eq('id', id).single();
-        if (rb.error) throw rb.error;
-        var b = rb.data;
-
-        $('detailBusinessName').textContent = b.business_name || 'Unnamed';
-        $('detailEmail').textContent = 'Email: ' + (b.email || '—');
-        $('detailPhone').textContent = 'Phone: ' + (b.phone || '—');
-        $('detailStatus').innerHTML = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span>';
-        $('detailVerification').innerHTML = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span>';
-        $('detailWalletBalance').textContent = formatCurrency(b.wallet_balance || 0);
-        $('detailLeadScore').textContent = b.lead_score || 0;
-        $('detailAvgRating').textContent = ((b.average_rating||0).toFixed(1)) + ' ⭐';
-
-        $('detailActions').innerHTML =
-          (b.is_verified ? '<button class="btn-sm amber" id="dv-unverify">Unverify</button>' : '<button class="btn-sm green" id="dv-verify">Verify</button>') +
-          (b.is_blocked ? '<button class="btn-sm green" id="dv-unblock">Unblock</button>' : '<button class="btn-sm red" id="dv-block">Block</button>');
-
-        var dv = $('dv-verify'); if (dv) dv.onclick = function(){ handleBrokerAction(b.id,'verify').then(function(){ showBrokerDetail(b.id); }); };
-        var duv = $('dv-unverify'); if (duv) duv.onclick = function(){ handleBrokerAction(b.id,'unverify').then(function(){ showBrokerDetail(b.id); }); };
-        var db = $('dv-block'); if (db) db.onclick = function(){ handleBrokerAction(b.id,'block').then(function(){ showBrokerDetail(b.id); }); };
-        var dub = $('dv-unblock'); if (dub) dub.onclick = function(){ handleBrokerAction(b.id,'unblock').then(function(){ showBrokerDetail(b.id); }); };
-
-        var rp = await supabase.from('properties').select('*').eq('owner_id', b.id);
-        var props = rp.data || [];
-        $('detailPropertyCount').textContent = props.length;
-        $('detailProperties').innerHTML = !props.length ? '<p class="text-slate-500 text-sm">No properties.</p>' :
-          '<table><thead><tr><th>Title</th><th>Price</th><th>Type</th><th>Verified</th></tr></thead><tbody>' +
-          props.map(function(p){
-            return '<tr><td>' + esc(p.title||'—') + '</td><td>' + formatCurrency(p.price_amount) + '</td><td>' + esc(p.property_type||'—') + '</td><td>' + (p.is_verified?'✅':'❌') + '</td></tr>';
-          }).join('') + '</tbody></table>';
-
-        var rl = await supabase.from('lead_requests').select('*').eq('broker_id', b.id).order('created_at', { ascending:false }).limit(20);
-        var leads = rl.data || [];
-        $('detailLeads').innerHTML = !leads.length ? '<p class="text-slate-500 text-sm">No leads.</p>' :
-          '<table><thead><tr><th>Visitor</th><th>Type</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
-          leads.map(function(l){
-            return '<tr><td>' + esc(l.visitor_name||'—') + '</td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.lead_type) + '">' + esc(l.lead_type||'—') + '</span></td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.status) + '">' + esc(l.status) + '</span></td><td>' + formatDate(l.created_at) + '</td></tr>';
-          }).join('') + '</tbody></table>';
-
-        var rr = await supabase.from('reviews').select('*').eq('broker_id', b.id).order('created_at', { ascending:false });
-        var revs = rr.data || [];
-        $('detailReviews').innerHTML = !revs.length ? '<p class="text-slate-500 text-sm">No reviews.</p>' :
-          '<table><thead><tr><th>Rating</th><th>Comment</th><th>Date</th></tr></thead><tbody>' +
-          revs.map(function(x){
-            return '<tr><td>' + x.rating + '⭐</td><td>' + esc(x.comment||'—') + '</td><td>' + formatDate(x.created_at) + '</td></tr>';
-          }).join('') + '</tbody></table>';
-
-        var rrep = await supabase.from('reports').select('*').eq('broker_id', b.id);
-        var reps = rrep.data || [];
-        $('detailReports').innerHTML = !reps.length ? '<p class="text-slate-500 text-sm">No reports.</p>' :
-          '<table><thead><tr><th>Reason</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
-          reps.map(function(x){
-            return '<tr><td>' + esc(x.reason) + '</td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status) + '">' + esc(x.status) + '</span></td><td>' + formatDate(x.created_at) + '</td></tr>';
-          }).join('') + '</tbody></table>';
-
-        var rt = await supabase.from('wallet_transactions').select('*').eq('profile_id', b.id).order('created_at', { ascending:false }).limit(20);
-        var txs = rt.data || [];
-        $('detailTransactions').innerHTML = !txs.length ? '<p class="text-slate-500 text-sm">No transactions.</p>' :
-          '<table><thead><tr><th>Amount</th><th>Type</th><th>Date</th></tr></thead><tbody>' +
-          txs.map(function(t){
-            var color = t.amount < 0 ? 'text-red-500' : 'text-emerald-600';
-            return '<tr><td class="' + color + ' font-medium">' + (t.amount < 0 ? '' : '+') + Number(t.amount).toLocaleString() + ' UGX</td><td>' + esc((t.type||'').toUpperCase()) + '</td><td>' + formatDate(t.created_at) + '</td></tr>';
-          }).join('') + '</tbody></table>';
-      } catch (e) { console.error(e); }
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  VERIFICATIONS — notifies broker on approve/reject
-    // ══════════════════════════════════════════════════════════════
-    async function loadVerifications() {
-      var box = $('verificationList'), no = $('noVerifications');
-      try {
-        var r = await supabase.from('property_verification_requests').select('*').eq('status','pending').order('created_at', { ascending:false });
-        if (r.error) throw r.error;
-        var reqs = r.data || [];
-        if (!reqs.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
-        no.classList.add('hidden');
-
-        var propIds = [], brokerIds = [];
-        reqs.forEach(function(x){
-          if (x.property_id && propIds.indexOf(x.property_id) === -1) propIds.push(x.property_id);
-          if (x.broker_id && brokerIds.indexOf(x.broker_id) === -1) brokerIds.push(x.broker_id);
-        });
-
-        var propMap = {}, brokerMap = {};
-        if (propIds.length) {
-          var rp = await supabase.from('properties').select('id, title, address, property_type').in('id', propIds);
-          (rp.data || []).forEach(function(p){ propMap[p.id] = p; });
-        }
-        if (brokerIds.length) {
-          var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
-          (rb.data || []).forEach(function(b){ brokerMap[b.id] = b; });
-        }
-
-        var html = '<table><thead><tr><th>Property</th><th>Broker</th><th>Type</th><th>Fee</th><th>Actions</th></tr></thead><tbody>';
-        reqs.forEach(function(x){
-          var prop = propMap[x.property_id] || {};
-          var broker = brokerMap[x.broker_id] || {};
-          html += '<tr>' +
-            '<td><div class="font-medium">' + esc(prop.title || 'Unknown') + '</div><div class="text-xs text-slate-500">' + esc(prop.address || '') + '</div></td>' +
-            '<td>' + esc(broker.business_name || 'Unknown') + '</td>' +
-            '<td>' + esc(prop.property_type || '—') + '</td>' +
-            '<td>' + (x.fee_paid ? '✅ ' + formatCurrency(x.fee_amount) : '❌') + '</td>' +
-            '<td>' +
-              '<button class="btn-sm blue view-details" data-id="' + x.id + '">View</button>' +
-              '<button class="btn-sm green approve-prop" data-id="' + x.id + '" data-prop="' + x.property_id + '">Approve</button>' +
-              '<button class="btn-sm red reject-prop" data-id="' + x.id + '" data-prop="' + x.property_id + '">Reject</button>' +
-            '</td></tr>';
-        });
-        html += '</tbody></table>';
-        box.innerHTML = html;
-        box.querySelectorAll('.view-details').forEach(function(el){ el.onclick = function(){ openVerificationDetail(el.dataset.id); }; });
-        box.querySelectorAll('.approve-prop').forEach(function(el){ el.onclick = function(){ handleVerification(el.dataset.id, el.dataset.prop, 'approved'); }; });
-        box.querySelectorAll('.reject-prop').forEach(function(el){ el.onclick = function(){ handleVerification(el.dataset.id, el.dataset.prop, 'rejected'); }; });
-      } catch (e) {
-        console.error(e);
-        box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
-      }
-    }
-
-    async function openVerificationDetail(reqId) {
-      var modal = $('verificationDetailModal');
-      var content = $('detailContent');
-      content.innerHTML = '<div class="spinner"></div>';
-      modal.classList.remove('hidden');
-      try {
-        var rr = await supabase.from('property_verification_requests').select('*').eq('id', reqId).single();
-        if (rr.error) { content.innerHTML = '<p class="text-red-500 text-sm">Could not load: ' + esc(rr.error.message) + '</p>'; return; }
-        var req = rr.data;
-
-        var property = null;
-        if (req.property_id) {
-          var rp = await supabase.from('properties').select('title, address, property_type, media_urls').eq('id', req.property_id).maybeSingle();
-          property = rp.data;
-        }
-        var broker = null;
-        if (req.broker_id) {
-          var rb = await supabase.from('profiles').select('business_name, email, phone').eq('id', req.broker_id).maybeSingle();
-          broker = rb.data;
-        }
-
-        var isImage = function(v) { return typeof v === 'string' && (/res\.cloudinary\.com/.test(v) || /\.(jpg|jpeg|png|webp|gif|bmp|svg)(\?.*)?$/i.test(v)); };
-        var isUrl = function(v) { return typeof v === 'string' && /^https?:\/\//.test(v); };
-
-        var h = '';
-        h += '<div class="detail-field"><span class="label">Property</span><span class="value">' + esc(property && property.title || '—') + '</span></div>';
-        h += '<div class="detail-field"><span class="label">Address</span><span class="value">' + esc(property && property.address || '—') + '</span></div>';
-        h += '<div class="detail-field"><span class="label">Broker</span><span class="value">' + esc(broker && broker.business_name || '—') + '</span></div>';
-        h += '<div class="detail-field"><span class="label">Broker Contact</span><span class="value">' + esc(broker && broker.phone || '—') + ' · ' + esc(broker && broker.email || '—') + '</span></div>';
-        h += '<div class="detail-field"><span class="label">Status</span><span class="value">' + esc(req.status) + '</span></div>';
-        h += '<div class="detail-field"><span class="label">Fee Paid</span><span class="value">' + (req.fee_paid ? '✅ ' + formatCurrency(req.fee_amount) : '❌ Not paid') + '</span></div>';
-        h += '<div class="detail-field"><span class="label">Submitted</span><span class="value">' + formatDateTime(req.created_at) + '</span></div>';
-
-        var propImgs = property && property.media_urls ? (Array.isArray(property.media_urls) ? property.media_urls : [property.media_urls]) : [];
-        if (propImgs.length) {
-          h += '<div class="detail-field"><span class="label">Property Images (' + propImgs.length + ')</span><div class="value" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.4rem;">';
-          propImgs.forEach(function(u){
-            h += '<a href="' + esc(u) + '" target="_blank" rel="noopener"><img src="' + esc(u) + '" style="width:130px;height:100px;object-fit:cover;border-radius:0.6rem;border:1px solid #e2e8f0;"/></a>';
-          });
-          h += '</div></div>';
-        }
-
-        var data = req.submitted_data || {};
-        var keys = Object.keys(data);
-        h += '<h4 class="font-semibold mt-4 mb-2 text-slate-800">📋 Submitted Verification Data</h4>';
-        if (!keys.length) {
-          h += '<p class="text-slate-500 text-sm">No additional data provided.</p>';
-        } else {
-          keys.forEach(function(k){
-            var v = data[k];
-            var label = k.replace(/([A-Z])/g, ' $1').replace(/^./, function(s){ return s.toUpperCase(); }).trim();
-            var display = '';
-            if (isImage(v)) {
-              display = '<div style="margin-top:0.5rem;"><a href="' + esc(v) + '" target="_blank" rel="noopener"><img src="' + esc(v) + '" style="max-width:100%;max-height:320px;border-radius:0.75rem;border:1px solid #e2e8f0;display:block;"/></a><a href="' + esc(v) + '" target="_blank" rel="noopener" style="font-size:0.75rem;color:#4f46e5;text-decoration:underline;margin-top:0.3rem;display:inline-block;">Open full size ↗</a></div>';
-            } else if (Array.isArray(v)) {
-              display = v.map(function(item){
-                if (isImage(item)) return '<a href="' + esc(item) + '" target="_blank" rel="noopener" style="display:inline-block;margin:0.25rem;"><img src="' + esc(item) + '" style="width:130px;height:100px;object-fit:cover;border-radius:0.6rem;border:1px solid #e2e8f0;"/></a>';
-                if (isUrl(item)) return '<a href="' + esc(item) + '" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:underline;">' + esc(item) + '</a>';
-                return esc(item);
-              }).join(' ');
-            } else if (isUrl(v)) {
-              display = '<a href="' + esc(v) + '" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:underline;">' + esc(v) + '</a>';
-            } else {
-              display = esc(v || '—');
-            }
-            h += '<div class="detail-field"><span class="label">' + esc(label) + '</span><span class="value">' + display + '</span></div>';
-          });
-        }
-
-        content.innerHTML = h;
-      } catch (err) {
-        console.error(err);
-        content.innerHTML = '<p class="text-red-500 text-sm">Unexpected error: ' + esc(err.message) + '</p>';
-      }
-    }
-
-    async function handleVerification(reqId, propId, status) {
-      if (!confirm('Mark this verification as ' + status + '?')) return;
-      try {
-        var r1 = await supabase.from('property_verification_requests').update({
-          status: status,
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: currentUser.id
-        }).eq('id', reqId);
-        if (r1.error) throw r1.error;
-
-        var propTitle = 'the property';
-        var brokerEmail = null;
-        var brokerName = null;
-
-        if (propId) {
-          var r2 = await supabase.from('properties').update({
-            is_verified: status === 'approved',
-            verification_status: status
-          }).eq('id', propId);
-          if (r2.error) throw r2.error;
-
-          var pRes = await supabase.from('properties').select('title, owner_id').eq('id', propId).maybeSingle();
-          if (pRes.data) {
-            propTitle = pRes.data.title || propTitle;
-            var bRes = await supabase.from('profiles').select('email, business_name').eq('id', pRes.data.owner_id).maybeSingle();
-            if (bRes.data) { brokerEmail = bRes.data.email; brokerName = bRes.data.business_name; }
-          }
-        }
-
-        var notifResult = { success: false, error: 'skipped' };
-        if (brokerEmail) {
-          var subject, body;
-          if (status === 'approved') {
-            subject = '✅ Your listing is verified — ' + propTitle;
-            body = 'Hello ' + (brokerName || 'Broker') + ',\n\nGreat news! Your property "' + propTitle + '" has been APPROVED and is now live on Property Hub Uganda.\n\nWhat this means:\n• Your listing now shows a green Verified badge\n• It ranks higher in search results\n• Visitors trust verified listings more\n\nView it: https://propertyhub.dpdns.org/property/' + propId + '\n\n— Property Hub Team';
-          } else {
-            subject = '❌ Verification update — ' + propTitle;
-            body = 'Hello ' + (brokerName || 'Broker') + ',\n\nYour verification request for "' + propTitle + '" was not approved.\n\nThis is usually because:\n• The title document could not be verified\n• The landlord contact was unreachable\n• Photos did not match the described property\n\nPlease update your listing in your dashboard and re-submit for verification.\n\nDashboard: https://propertyhub.dpdns.org/dashboard\n\n— Property Hub Team';
-          }
-          notifResult = await sendEmailNotification(brokerEmail, subject, body, 'verification:' + reqId);
-        }
-
-        var msg = '✅ Verification ' + status + '.';
-        if (brokerEmail) {
-          msg += notifResult.success ? ' Email sent to broker.' : ' ⚠️ Email failed: ' + notifResult.error;
-        } else {
-          msg += ' (No broker email — notification skipped.)';
-        }
-        alert(msg);
-        loadVerifications(); loadStats();
-      } catch (e) { alert('Error: ' + e.message); }
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  LEADS
-    // ══════════════════════════════════════════════════════════════
-    async function loadLeads() {
-      var box = $('leadsList'), no = $('noLeads');
-      try {
-        var q = supabase.from('lead_requests').select('*').order('created_at', { ascending:false });
-        if (leadFilter) q = q.eq('status', leadFilter);
-        var r = await q;
-        if (r.error) throw r.error;
-        var data = r.data || [];
-        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
-        no.classList.add('hidden');
-
-        var propIds = [], brokerIds = [];
-        data.forEach(function(l){
-          if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
-          if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
-        });
-        var propMap = {}, brokerMap = {};
-        if (propIds.length) {
-          var rp = await supabase.from('properties').select('id, title').in('id', propIds);
-          (rp.data || []).forEach(function(p){ propMap[p.id] = p; });
-        }
-        if (brokerIds.length) {
-          var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
-          (rb.data || []).forEach(function(b){ brokerMap[b.id] = b; });
-        }
-
-        var html = '<table><thead><tr><th>Property</th><th>Broker</th><th>Visitor</th><th>Type</th><th>Cost</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
-        data.forEach(function(l){
-          var age = Math.floor((Date.now() - new Date(l.created_at).getTime()) / 86400000);
-          var ageClass = age >= 30 ? 'text-red-600 font-bold' : age >= 25 ? 'text-amber-600' : 'text-slate-500';
-          html += '<tr>' +
-            '<td>' + esc(propMap[l.property_id] && propMap[l.property_id].title || '—') + '</td>' +
-            '<td>' + esc(brokerMap[l.broker_id] && brokerMap[l.broker_id].business_name || '—') + '</td>' +
-            '<td>' + esc(l.visitor_name || '—') + '</td>' +
-            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.lead_type) + '">' + esc(l.lead_type||'—') + '</span></td>' +
-            '<td>' + formatCurrency(l.cost || 0) + '</td>' +
-            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.status) + '">' + esc(l.status) + '</span></td>' +
-            '<td class="' + ageClass + '">' + formatDate(l.created_at) + ' (' + age + 'd)</td>' +
-            '<td>' + (l.status === 'pending' ? '<button class="btn-sm red del-lead" data-id="' + l.id + '">Delete</button>' : '') + '</td>' +
-            '</tr>';
-        });
-        html += '</tbody></table>';
-        box.innerHTML = html;
-        box.querySelectorAll('.del-lead').forEach(function(el){
-          el.onclick = async function(){
-            if (!confirm('Delete this lead?')) return;
-            var r = await supabase.from('lead_requests').delete().eq('id', el.dataset.id);
-            if (r.error) return alert('Error: ' + r.error.message);
-            loadLeads(); loadStats();
-          };
-        });
-      } catch (e) { console.error(e); box.innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>'; }
-    }
-
-async function loadFollowups() {
-  var box = $('followupList');
-  var no = $('noFollowups');
-  var statsBox = $('followupStats');
-  var filter = $('followupFilter').value;
-
-  try {
-    var q = supabase.from('lead_requests')
-      .select('*')
-      .eq('status', 'approved')
-      .order('approved_at', { ascending: false });
-
-    if (filter === 'pending') q = q.eq('follow_up_sent', false);
-    else if (filter === 'sent') q = q.eq('follow_up_sent', true);
-
-    var r = await q.limit(200);
-    if (r.error) throw r.error;
-    var data = r.data || [];
-
-    var now = Date.now();
-    if (filter === 'due') {
-      data = data.filter(function(l) {
-        if (!l.approved_at || l.follow_up_sent) return false;
-        var days = (now - new Date(l.approved_at).getTime()) / 86400000;
-        return days >= 3;
-      });
-    }
-
-    var totalApproved = data.length;
-    var pending = data.filter(function(l) { return !l.follow_up_sent; }).length;
-    var sent = data.filter(function(l) { return l.follow_up_sent; }).length;
-
-    if (statsBox) {
-      statsBox.innerHTML =
-        '<div class="detail-card"><div class="label">Total Approved</div><div class="value">' + totalApproved + '</div></div>' +
-        '<div class="detail-card"><div class="label">Pending Follow-Up</div><div class="value text-amber-600">' + pending + '</div></div>' +
-        '<div class="detail-card"><div class="label">Sent</div><div class="value text-emerald-600">' + sent + '</div></div>';
-    }
-
-    if (!data.length) {
-      box.innerHTML = '';
-      no.classList.remove('hidden');
-      return;
-    }
-    no.classList.add('hidden');
-
-    var propIds = [], brokerIds = [];
-    data.forEach(function(l) {
-      if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
-      if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
+  function waitForSupabase() {
+    return new Promise(function(resolve) {
+      if (window.supabase) return resolve();
+      var n = 0;
+      var iv = setInterval(function() {
+        n++;
+        if (window.supabase || n > 30) { clearInterval(iv); resolve(); }
+      }, 100);
     });
-
-    var propMap = {}, brokerMap = {};
-    if (propIds.length) {
-      var rp = await supabase.from('properties').select('id, title, property_type, address').in('id', propIds);
-      (rp.data || []).forEach(function(p) { propMap[p.id] = p; });
-    }
-    if (brokerIds.length) {
-      var rb = await supabase.from('profiles').select('id, business_name, phone, email').in('id', brokerIds);
-      (rb.data || []).forEach(function(b) { brokerMap[b.id] = b; });
-    }
-
-    var html = '<table><thead><tr>' +
-      '<th>Visitor</th><th>Property</th><th>Broker</th><th>Approved</th><th>Status</th><th>Actions</th>' +
-      '</tr></thead><tbody>';
-
-    data.forEach(function(l) {
-      var prop = propMap[l.property_id] || {};
-      var broker = brokerMap[l.broker_id] || {};
-      var daysSince = l.approved_at ? Math.floor((now - new Date(l.approved_at).getTime()) / 86400000) : 0;
-      var daysLeft = Math.max(0, 3 - daysSince);
-
-      var statusBadge;
-      if (l.follow_up_sent) {
-        statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('approved') + '">✅ Sent</span>';
-      } else if (daysLeft > 0) {
-        statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('pending') + '">⏳ In ' + daysLeft + 'd</span>';
-      } else {
-        statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('rejected') + '">🔔 Due now</span>';
-      }
-
-      var hasEmail = !!(l.visitor_email && String(l.visitor_email).trim());
-      var emailWarn = (!hasEmail && !l.follow_up_sent) ? '<div class="text-xs text-red-500 mt-0.5">⚠️ No email — cannot send</div>' : '';
-
-      html += '<tr>' +
-        '<td><div class="font-medium">' + esc(l.visitor_name || '—') + '</div><div class="text-xs text-slate-500">' + esc(l.visitor_email || 'No email') + '</div>' + emailWarn + '</td>' +
-        '<td>' + esc(prop.title || '—') + '<div class="text-xs text-slate-500">' + esc(prop.property_type || '') + '</div></td>' +
-        '<td>' + esc(broker.business_name || '—') + '</td>' +
-        '<td>' + formatDate(l.approved_at) + '<div class="text-xs text-slate-500">' + daysSince + 'd ago</div></td>' +
-        '<td>' + statusBadge + '</td>' +
-        '<td>' +
-          '<button class="btn-sm blue view-followup" data-id="' + l.id + '">View</button>' +
-          (!l.follow_up_sent && hasEmail ? '<button class="btn-sm green send-followup-admin" data-id="' + l.id + '"><i class="fas fa-paper-plane"></i> Send</button>' : '') +
-        '</td></tr>';
-    });
-    html += '</tbody></table>';
-    box.innerHTML = html;
-
-    box.querySelectorAll('.view-followup').forEach(function(el) {
-      el.onclick = function() {
-        var lead = data.find(function(x) { return x.id === el.dataset.id; });
-        if (!lead) return;
-        var prop = propMap[lead.property_id] || {};
-        var broker = brokerMap[lead.broker_id] || {};
-        alert(
-          'Follow-Up Details\n━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-          'Visitor: ' + (lead.visitor_name || '—') + '\n' +
-          'Email: ' + (lead.visitor_email || '(none)') + '\n' +
-          'WhatsApp: ' + (lead.visitor_whatsapp || '—') + '\n\n' +
-          'Property: ' + (prop.title || '—') + '\n' +
-          'Type: ' + (prop.property_type || '—') + '\n' +
-          'Broker: ' + (broker.business_name || '—') + '\n\n' +
-          'Approved: ' + formatDate(lead.approved_at) + '\n' +
-          'Follow-up sent: ' + (lead.follow_up_sent ? 'Yes (' + formatDate(lead.follow_up_sent_at) + ')' : 'No')
-        );
-      };
-    });
-
-    box.querySelectorAll('.send-followup-admin').forEach(function(el) {
-      el.onclick = async function() {
-        var leadId = el.dataset.id;
-        var lead = data.find(function(x) { return x.id === leadId; });
-        if (!lead) return alert('Lead not found');
-        if (!lead.visitor_email) return alert('❌ This lead has no email address. Cannot send follow-up.');
-        if (!confirm('Send follow-up to ' + lead.visitor_email + '?')) return;
-
-        el.disabled = true;
-        el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-        try {
-          var prop = propMap[lead.property_id] || {};
-          var broker = brokerMap[lead.broker_id] || {};
-          var built = await buildFollowupEmail(lead, prop, broker);
-          var result = await sendEmailNotification(lead.visitor_email, built.subject, built.body, 'followup:' + leadId);
-
-          await logNotification(
-            leadId,
-            'visitor',
-            lead.visitor_email,
-            'followup',
-            built.subject,
-            result.success ? 'sent' : 'failed',
-            result.success ? null : result.error,
-            built.categories
-          );
-
-          if (!result.success) throw new Error(result.error);
-
-          var ur = await supabase.from('lead_requests').update({
-            follow_up_sent: true,
-            follow_up_sent_at: new Date().toISOString(),
-            followup_type: 'partner'
-          }).eq('id', leadId);
-          if (ur.error) throw ur.error;
-
-          alert('✅ Follow-up sent to ' + lead.visitor_email);
-          loadFollowups();
-        } catch (e) {
-          alert('❌ Failed to send: ' + e.message);
-          el.disabled = false;
-          el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
-        }
-      };
-    });
-
-  } catch (e) {
-    console.error(e);
-    box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
   }
-}
-    // ══════════════════════════════════════════════════════════════
-    //  SEO
-    // ══════════════════════════════════════════════════════════════
-    async function loadSeoPages() {
-      var box = $('seoList'), no = $('noSeo'), statsBox = $('seoStats');
-      var filter = $('seoFilter').value;
-      try {
-        var q = supabase.from('seo_pages').select('*').eq('is_active', true).order('page_type').order('last_updated', { ascending: false });
-        if (filter !== 'all') q = q.eq('page_type', filter);
-        var r = await q.limit(500);
-        if (r.error) throw r.error;
-        var data = r.data || [];
-        var counts = { location: 0, property_type: 0, price_range: 0, property: 0 };
-        data.forEach(function(p) { counts[p.page_type] = (counts[p.page_type] || 0) + 1; });
-        if (statsBox) {
-          statsBox.innerHTML =
-            '<div class="detail-card"><div class="label">Location pages</div><div class="value">' + counts.location + '</div></div>' +
-            '<div class="detail-card"><div class="label">Type pages</div><div class="value">' + counts.property_type + '</div></div>' +
-            '<div class="detail-card"><div class="label">Property pages</div><div class="value">' + counts.property + '</div></div>';
-        }
-        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
-        no.classList.add('hidden');
-        var html = '<table><thead><tr><th>Type</th><th>Title / H1</th><th>Slug</th><th>Count</th><th>Updated</th><th>Link</th></tr></thead><tbody>';
-        data.forEach(function(p) {
-          html += '<tr>' +
-            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(p.page_type === 'property' ? 'approved' : 'active') + '">' + esc(p.page_type) + '</span></td>' +
-            '<td><div class="font-medium">' + esc(p.h1 || p.title) + '</div><div class="text-xs text-slate-500">' + esc((p.meta_description || '').substring(0, 80)) + '…</div></td>' +
-            '<td><code>' + esc(p.slug) + '</code></td>' +
-            '<td>' + (p.property_count || 0) + '</td>' +
-            '<td>' + formatDate(p.last_updated) + '</td>' +
-            '<td><a href="https://propertyhub.dpdns.org/?seo=' + encodeURIComponent(p.slug) + '" target="_blank" class="btn-sm blue">Open</a></td>' +
-          '</tr>';
-        });
-        html += '</tbody></table>';
-        box.innerHTML = html;
-      } catch (e) {
-        console.error(e);
-        box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+
+  async function checkAdmin() {
+    try {
+      var r = await supabase.auth.getUser();
+      if (r.error) {
+        await supabase.auth.refreshSession();
+        r = await supabase.auth.getUser();
+        if (r.error) return false;
       }
-    }
+      var user = r.data && r.data.user;
+      if (!user) return false;
+      var pr = await supabase.from('profiles').select('is_admin, business_name').eq('id', user.id).single();
+      if (pr.error || !pr.data || !pr.data.is_admin) return false;
+      currentUser = user;
+      $('adminUserDisplay').textContent = pr.data.business_name || user.email;
+      return true;
+    } catch (e) { return false; }
+  }
 
-    async function regenerateSeoNow() {
-      var banner = $('seoBanner');
-      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
-      banner.textContent = '🧠 Regenerating SEO pages…';
-      banner.classList.remove('hidden');
-      try {
-        var sessionCheck = await supabase.auth.getSession();
-        if (!sessionCheck.data || !sessionCheck.data.session) {
-          banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-          banner.textContent = '❌ Session expired. Please sign out and sign in again.';
-          return;
-        }
-        var r = await supabase.rpc('regenerate_seo_pages');
-        if (r.error) {
-          if (r.error.message && (r.error.message.indexOf('JWT') !== -1 || r.error.code === 'PGRST301')) {
-            await supabase.auth.signOut(); currentUser = null;
-            banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-            banner.textContent = '❌ Session expired. Redirecting to login…';
-            setTimeout(function() { showAuth(); }, 1500);
-            return;
-          }
-          throw r.error;
-        }
-        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
-        banner.textContent = '✅ SEO pages regenerated.';
-        loadSeoPages();
-      } catch (e) {
-        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-        banner.textContent = '❌ ' + e.message;
-      }
-    }
+  async function handleLogin(e) {
+    e.preventDefault();
+    $('loginError').classList.add('hidden');
+    var email = $('adminEmail').value.trim();
+    var password = $('adminPassword').value;
+    try {
+      var r = await supabase.auth.signInWithPassword({ email: email, password: password });
+      if (r.error) throw r.error;
+      if (!(await checkAdmin())) { await supabase.auth.signOut(); showError('You do not have admin privileges.'); return; }
+      showDashboard();
+    } catch (err) { showError(err.message); }
+  }
 
-    // ══════════════════════════════════════════════════════════════
-    //  CLEANUP / REPORTS / TRANSACTIONS
-    // ══════════════════════════════════════════════════════════════
-    async function runCleanup() {
-      if (!confirm('Permanently delete all approved & rejected leads older than 30 days?\n\nThis cannot be undone.')) return;
-      var banner = $('cleanupBanner');
-      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
-      banner.textContent = '🧹 Running cleanup…';
-      banner.classList.remove('hidden');
-      try {
-        var r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
-        if (r.error) throw r.error;
-        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
-        banner.textContent = '✅ Cleanup complete. ' + (r.data || 0) + ' lead(s) permanently deleted.';
-        loadLeads(); loadStats();
-      } catch (e) {
-        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
-        banner.textContent = '❌ Cleanup failed: ' + e.message;
-      }
-    }
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    currentUser = null;
+    showAuth();
+  }
 
-    async function loadReports() {
-      var box = $('reportList'), no = $('noReports');
-      try {
-        var r = await supabase.from('reports').select('*').order('created_at', { ascending:false });
-        if (r.error) throw r.error;
-        var data = r.data || [];
-        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
-        no.classList.add('hidden');
+  function showAuth() {
+    authView.classList.remove('hidden');
+    dashboardView.classList.add('hidden');
+    $('loginForm').reset();
+  }
 
-        var ids = [];
-        data.forEach(function(x){
-          if (x.reporter_id && ids.indexOf(x.reporter_id) === -1) ids.push(x.reporter_id);
-          if (x.broker_id && ids.indexOf(x.broker_id) === -1) ids.push(x.broker_id);
-        });
-        var pMap = {};
-        if (ids.length) {
-          var rp = await supabase.from('profiles').select('id, business_name, email').in('id', ids);
-          (rp.data || []).forEach(function(p){ pMap[p.id] = p; });
-        }
+  function showDashboard() {
+    authView.classList.add('hidden');
+    dashboardView.classList.remove('hidden');
+    loadStats();
+    loadBrokers();
+    loadVerifications();
+    loadReports();
+    loadTransactions();
+    loadLeads();
+    loadSettings();
+    loadPricing();
+  }
 
-        var html = '<table><thead><tr><th>Reporter</th><th>Broker</th><th>Reason</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
-        data.forEach(function(x){
-          var reporter = pMap[x.reporter_id] || {};
-          var broker = pMap[x.broker_id] || {};
-          html += '<tr>' +
-            '<td>' + esc(reporter.business_name || reporter.email || x.reporter_name || 'Anonymous') + '</td>' +
-            '<td>' + esc(broker.business_name || 'Unknown') + '</td>' +
-            '<td>' + esc(x.reason) + '</td>' +
-            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status) + '">' + esc(x.status) + '</span></td>' +
-            '<td>' + formatDate(x.created_at) + '</td>' +
-            '<td>' + (x.status === 'pending' ? '<button class="btn-sm green resolve-report" data-id="' + x.id + '">Resolve</button><button class="btn-sm red dismiss-report" data-id="' + x.id + '">Dismiss</button>' : '') + '</td>' +
-            '</tr>';
-        });
-        html += '</tbody></table>';
-        box.innerHTML = html;
-        box.querySelectorAll('.resolve-report').forEach(function(el){ el.onclick = function(){ handleReport(el.dataset.id, 'resolved'); }; });
-        box.querySelectorAll('.dismiss-report').forEach(function(el){ el.onclick = function(){ handleReport(el.dataset.id, 'dismissed'); }; });
-      } catch (e) { console.error(e); box.innerHTML = '<p class="text-red-500 text-sm">Error loading reports.</p>'; }
-    }
-
-    async function handleReport(id, status) {
-      if (!confirm('Mark as ' + status + '?')) return;
-      try {
-        var r = await supabase.from('reports').update({
-          status: status,
-          resolved_at: new Date().toISOString(),
-          resolved_by: currentUser ? currentUser.id : null
-        }).eq('id', id);
-        if (r.error) throw r.error;
-        loadReports(); loadStats();
-      } catch (e) { alert('Error: ' + e.message); }
-    }
-
-    async function loadTransactions() {
-      var box = $('transactionList'), no = $('noTransactions');
-      try {
-        var r = await supabase.from('wallet_transactions').select('*').order('created_at', { ascending:false }).limit(100);
-        if (r.error && r.error.code === '42P01') { box.innerHTML = '<p class="text-slate-500 text-sm">Table not set up yet.</p>'; no.classList.add('hidden'); return; }
-        if (r.error) throw r.error;
-        var data = r.data || [];
-        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
-        no.classList.add('hidden');
-        var ids = [];
-        data.forEach(function(x){ if (x.profile_id && ids.indexOf(x.profile_id) === -1) ids.push(x.profile_id); });
-        var pMap = {};
-        if (ids.length) {
-          var rp = await supabase.from('profiles').select('id, business_name, email').in('id', ids);
-          (rp.data || []).forEach(function(p){ pMap[p.id] = p; });
-        }
-        var html = '<table><thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead><tbody>';
-        data.forEach(function(x){
-          var u = pMap[x.profile_id] || {};
-          var color = x.amount < 0 ? 'text-red-500' : 'text-emerald-600';
-          html += '<tr>' +
-            '<td>' + esc(u.business_name || u.email || 'Unknown') + '</td>' +
-            '<td class="' + color + ' font-medium">' + (x.amount < 0 ? '' : '+') + Number(x.amount).toLocaleString() + ' UGX</td>' +
-            '<td>' + esc((x.type||'').replace('_',' ').toUpperCase()) + '</td>' +
-            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status || 'active') + '">' + esc(x.status || '—') + '</span></td>' +
-            '<td>' + formatDate(x.created_at) + '</td>' +
-            '</tr>';
-        });
-        html += '</tbody></table>';
-        box.innerHTML = html;
-      } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading transactions.</p>'; }
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  💰 PRICING
-    // ══════════════════════════════════════════════════════════════
-    async function loadPricing() {
-      try {
-        var r = await supabase.from('platform_settings').select('key,value');
-        if (r.error) throw r.error;
-        var map = {};
-        (r.data || []).forEach(function(x){ map[x.key] = x.value; });
-
-        $('priceVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
-        $('priceLeadUnit').value = map.lead_rate_unit != null ? map.lead_rate_unit : 150000;
-        $('priceGuestPercent').value = map.guesthouse_lead_percent != null ? map.guesthouse_lead_percent : 0.04;
-        $('priceLeadHot').value = map.lead_rate_hot != null ? map.lead_rate_hot : 5000;
-        $('priceLeadWarm').value = map.lead_rate_warm != null ? map.lead_rate_warm : 3250;
-        $('priceLeadCold').value = map.lead_rate_cold != null ? map.lead_rate_cold : 1750;
-        $('priceMinTopup').value = map.wallet_min_topup != null ? map.wallet_min_topup : 1000;
-        $('priceCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
-
-        if ($('setVerifFee')) $('setVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
-        if ($('setCleanupDays')) $('setCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
-
-        renderPricingSummary(map);
-        updatePreview();
-      } catch (e) { console.warn('Pricing load failed:', e); }
-    }
-
-    function renderPricingSummary(map) {
-      var box = $('pricingCurrentSummary');
-      if (!box) return;
-      box.innerHTML =
-        '<div class="price-card"><div class="lbl">Verification fee</div><div class="num">' + Number(map.verification_fee || 5000).toLocaleString() + '</div><div class="lbl" style="margin-top:.25rem;">UGX / property</div></div>' +
-        '<div class="price-card" style="background:linear-gradient(135deg,#059669,#047857);"><div class="lbl">HOT lead / unit</div><div class="num">' + Number(map.lead_rate_hot || 5000).toLocaleString() + '</div><div class="lbl" style="margin-top:.25rem;">UGX (per ' + (Number(map.lead_rate_unit || 150000) / 1000) + 'k base)</div></div>' +
-        '<div class="price-card" style="background:linear-gradient(135deg,#d97706,#b45309);"><div class="lbl">Guesthouse lead</div><div class="num">' + (Number(map.guesthouse_lead_percent || 0.04) * 100).toFixed(1) + '%</div><div class="lbl" style="margin-top:.25rem;">of property price</div></div>';
-    }
-
-    function getPricingFromForm() {
-      return {
-        verification_fee: Number($('priceVerifFee').value) || 5000,
-        lead_rate_unit: Number($('priceLeadUnit').value) || 150000,
-        guesthouse_lead_percent: Number($('priceGuestPercent').value) || 0.04,
-        lead_rate_hot: Number($('priceLeadHot').value) || 5000,
-        lead_rate_warm: Number($('priceLeadWarm').value) || 3250,
-        lead_rate_cold: Number($('priceLeadCold').value) || 1750,
-        wallet_min_topup: Number($('priceMinTopup').value) || 1000,
-        lead_cleanup_days: Number($('priceCleanupDays').value) || 30
-      };
-    }
-
-    function updatePreview() {
-      var price = Number($('previewPrice').value) || 0;
-      var type = $('previewType').value;
-      var quality = $('previewQuality').value;
-      var p = getPricingFromForm();
-      var result, formula;
-      if (type === 'guesthouse') {
-        result = Math.round(price * p.guesthouse_lead_percent);
-        formula = 'price × ' + (p.guesthouse_lead_percent * 100).toFixed(1) + '%';
-      } else {
-        var units = Math.max(1, Math.ceil(price / p.lead_rate_unit));
-        var rate = quality === 'hot' ? p.lead_rate_hot : quality === 'warm' ? p.lead_rate_warm : p.lead_rate_cold;
-        result = units * rate;
-        formula = units + ' unit(s) × ' + rate.toLocaleString() + ' UGX';
-      }
-      var box = $('previewResult');
-      if (box) {
-        box.innerHTML =
-          '<div class="font-semibold text-slate-800 mb-1">Lead cost: <span class="text-indigo-600">' + result.toLocaleString() + ' UGX</span></div>' +
-          '<div class="text-xs text-slate-500">' + formula + ' · Property: ' + price.toLocaleString() + ' UGX · ' + type + ' · ' + quality + '</div>';
-      }
-    }
-
-    async function savePricing() {
-      var st = $('pricingStatus');
-      st.className = 'mt-3 text-sm text-indigo-600';
-      st.textContent = 'Saving…';
-      try {
-        var p = getPricingFromForm();
-        var updates = Object.keys(p).map(function(k) {
-          return { key: k, value: p[k], updated_at: new Date().toISOString() };
-        });
-        for (var i = 0; i < updates.length; i++) {
-          var u = updates[i];
-          var r = await supabase.from('platform_settings').upsert(u, { onConflict: 'key' });
-          if (r.error) throw r.error;
-        }
-        st.className = 'mt-3 text-sm text-emerald-600';
-        st.textContent = '✅ Pricing saved. (' + updates.length + ' settings)';
-        if ($('setVerifFee')) $('setVerifFee').value = p.verification_fee;
-        if ($('setCleanupDays')) $('setCleanupDays').value = p.lead_cleanup_days;
-        renderPricingSummary(p);
-      } catch (e) {
-        st.className = 'mt-3 text-sm text-red-600';
-        st.textContent = '❌ ' + e.message;
-      }
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  SETTINGS + NOTIFICATION TEST
-    // ══════════════════════════════════════════════════════════════
-    async function loadSettings() {
-      try {
-        var r = await supabase.from('platform_settings').select('key,value');
-        if (r.error) throw r.error;
-        var map = {};
-        (r.data || []).forEach(function(x){ map[x.key] = x.value; });
-        $('setVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
-        $('setCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
-      } catch (e) { console.warn('Settings load failed:', e.message); }
-    }
-
-    async function saveSettings() {
-      var st = $('settingsStatus');
-      st.textContent = 'Saving…'; st.className = 'mt-3 text-sm text-indigo-600';
-      var updates = [
-        { key: 'verification_fee',  value: Number($('setVerifFee').value) || 5000 },
-        { key: 'lead_cleanup_days', value: Number($('setCleanupDays').value) || 30 }
-      ];
-      try {
-        for (var i = 0; i < updates.length; i++) {
-          var u = updates[i];
-          var r = await supabase.from('platform_settings').upsert({ key: u.key, value: u.value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-          if (r.error) throw r.error;
-        }
-        st.textContent = '✅ Settings saved.'; st.className = 'mt-3 text-sm text-emerald-600';
-        loadPricing();
-      } catch (e) { st.textContent = '❌ ' + e.message; st.className = 'mt-3 text-sm text-red-600'; }
-    }
-
-    async function sendTestEmail() {
-      var to = $('testEmailTo').value.trim();
-      var st = $('testEmailStatus');
-      if (!to) {
-        st.className = 'mt-3 text-sm text-red-600';
-        st.textContent = '❌ Enter a recipient email first.';
-        return;
-      }
-      st.className = 'mt-3 text-sm text-indigo-600';
-      st.textContent = '📤 Sending test email…';
-      var result = await sendEmailNotification(
-        to,
-        '✅ Property Hub email test',
-        'This is a test email from Property Hub Admin.\n\nIf you can read this, email notifications are working correctly.\n\nSent at: ' + new Date().toLocaleString('en-UG'),
-        'test'
-      );
-      if (result.success) {
-        st.className = 'mt-3 text-sm text-emerald-600';
-        st.textContent = '✅ Test email sent to ' + to + '. Check inbox (and spam).';
-      } else {
-        st.className = 'mt-3 text-sm text-red-600';
-        st.textContent = '❌ Failed: ' + result.error;
-      }
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    //  INIT
-    // ══════════════════════════════════════════════════════════════
-    async function init() {
-      authView = $('authView');
-      dashboardView = $('dashboardView');
-      loadingOverlay = $('loadingOverlay');
-
-      await waitForSupabase();
-      if (!window.supabase) { alert('Supabase failed to load.'); hideLoading(); return; }
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      // Session keep-alive
-      setInterval(async function() {
-        try {
-          var r = await supabase.auth.refreshSession();
-          if (r.error) console.warn('Session refresh failed:', r.error.message);
-        } catch (e) { console.warn('Refresh error:', e.message); }
-      }, 40 * 60 * 1000);
-
-      document.addEventListener('visibilitychange', async function() {
-        if (document.visibilityState === 'visible' && currentUser) {
-          try {
-            var r = await supabase.auth.getSession();
-            if (!r.data || !r.data.session) {
-              await supabase.auth.signOut();
-              currentUser = null;
-              showAuth();
-            } else {
-              await supabase.auth.refreshSession();
-            }
-          } catch (e) { console.warn(e); }
-        }
-      });
-
-      setupTabs();
-
-      var ok = await checkAdmin();
-      if (ok) showDashboard(); else showAuth();
-
-      $('loginForm').addEventListener('submit', handleLogin);
-      $('logoutBtn').addEventListener('click', handleLogout);
-      $('backToBrokerList').addEventListener('click', function() {
-        $('brokerDetailView').classList.add('hidden');
-        $('tab-brokers').classList.remove('hidden');
-        loadBrokers();
-      });
-      $('leadStatusFilter').addEventListener('change', function(e){ leadFilter = e.target.value; loadLeads(); });
-      $('fixMissingProfilesBtn').addEventListener('click', fixMissingProfiles);
-      $('runCleanupBtn').addEventListener('click', runCleanup);
-      $('runCleanupBtn2').addEventListener('click', async function() {
-        var st = $('cleanupStatus');
-        st.textContent = '🧹 Running…'; st.className = 'mt-3 text-sm text-indigo-600';
-        try {
-          var r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
-          if (r.error) throw r.error;
-          st.textContent = '✅ Deleted ' + (r.data || 0) + ' old lead(s).';
-          st.className = 'mt-3 text-sm text-emerald-600';
-          loadLeads(); loadStats();
-        } catch (e) { st.textContent = '❌ ' + e.message; st.className = 'mt-3 text-sm text-red-600'; }
-      });
-      $('saveSettingsBtn').addEventListener('click', saveSettings);
-      $('refreshStatsBtn').addEventListener('click', loadStats);
-      $('closeDetailModal').addEventListener('click', function(){ $('verificationDetailModal').classList.add('hidden'); });
-      $('verificationDetailModal').addEventListener('click', function(e){
-        if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
-      });
-
-      // Follow-ups
-      $('followupFilter').addEventListener('change', loadFollowups);
-      $('refreshFollowupsBtn').addEventListener('click', loadFollowups);
-
-      // SEO
-      $('seoFilter').addEventListener('change', loadSeoPages);
-      $('refreshSeoBtn').addEventListener('click', loadSeoPages);
-      $('regenerateSeoBtn').addEventListener('click', regenerateSeoNow);
-
-      // Pricing tab
-      $('savePricingBtn').addEventListener('click', savePricing);
-      $('reloadPricingBtn').addEventListener('click', loadPricing);
-      ['priceVerifFee','priceLeadUnit','priceGuestPercent','priceLeadHot','priceLeadWarm','priceLeadCold','priceMinTopup','priceCleanupDays'].forEach(function(id){
-        var el = $(id);
-        if (el) el.addEventListener('input', updatePreview);
-      });
-      ['previewPrice','previewType','previewQuality'].forEach(function(id){
-        var el = $(id);
-        if (el) {
-          el.addEventListener('input', updatePreview);
-          el.addEventListener('change', updatePreview);
-        }
-      });
-
-      // Notification test
-      $('testEmailBtn').addEventListener('click', sendTestEmail);
-
-      hideLoading();
-
-      // Auto-refresh active tab every 30s
-      setInterval(function() {
-        if (!authView.classList.contains('hidden')) return;
-        loadStats();
-        var active = document.querySelector('.admin-tab.active');
-        if (!active) return;
-        var t = active.dataset.tab;
+  function setupTabs() {
+    var tabs = document.querySelectorAll('.admin-tab');
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabs.forEach(function(t){ t.classList.remove('active'); });
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.add('hidden'); });
+        var target = $('tab-' + tab.dataset.tab);
+        if (target) target.classList.remove('hidden');
+        var t = tab.dataset.tab;
         if (t === 'brokers') loadBrokers();
         else if (t === 'verifications') loadVerifications();
         else if (t === 'leads') loadLeads();
@@ -1689,13 +589,1198 @@ async function loadFollowups() {
         else if (t === 'seo') loadSeoPages();
         else if (t === 'reports') loadReports();
         else if (t === 'transactions') loadTransactions();
-      }, 30000);
+        else if (t === 'pricing') loadPricing();
+        else if (t === 'partners') loadPartners();
+        else if (t === 'settings') loadSettings();
+      });
+    });
+  }
+
+  async function loadStats() {
+    try {
+      var res = await Promise.all([
+        supabase.from('profiles').select('id', { count:'exact', head:true }),
+        supabase.from('properties').select('id', { count:'exact', head:true }),
+        supabase.from('property_verification_requests').select('id', { count:'exact', head:true }).eq('status','pending'),
+        supabase.from('lead_requests').select('id', { count:'exact', head:true }).in('status', ['pending','approved'])
+      ]);
+      $('statBrokers').textContent = res[0].count || 0;
+      $('statProperties').textContent = res[1].count || 0;
+      $('statPendingVerifications').textContent = res[2].count || 0;
+      $('statLeads').textContent = res[3].count || 0;
+    } catch (e) { console.error(e); }
+  }
+
+  async function loadBrokers() {
+    var box = $('brokerList'), no = $('noBrokers');
+    var banner = $('brokerSyncBanner');
+    var summary = $('brokerCountSummary');
+    try {
+      var r = await supabase.from('profiles').select('*').order('created_at', { ascending:false });
+      if (r.error) throw r.error;
+      var data = r.data || [];
+
+      var authCount = null;
+      try {
+        var cnt = await supabase.rpc('count_auth_users');
+        if (!cnt.error && typeof cnt.data === 'number') authCount = cnt.data;
+      } catch (_) {}
+
+      if (summary) {
+        summary.textContent = authCount != null
+          ? data.length + ' profile row(s) · ' + authCount + ' auth user(s) in the database'
+          : data.length + ' profile row(s)';
+      }
+      if (banner) {
+        if (authCount != null && data.length < authCount) {
+          var txt = $('brokerSyncText');
+          if (txt) txt.textContent = (authCount - data.length) + ' auth user(s) have no profile row — they will not appear below until backfilled.';
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
+
+      if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+      no.classList.add('hidden');
+
+      var html = '<table><thead><tr><th>Business</th><th>Email</th><th>Phone</th><th>Verified</th><th>Blocked</th><th>Actions</th></tr></thead><tbody>';
+      data.forEach(function(b) {
+        html += '<tr>' +
+          '<td class="font-medium">' + esc(b.business_name || 'Unnamed') + '</td>' +
+          '<td>' + esc(b.email || '—') + '</td>' +
+          '<td>' + esc(b.phone || '—') + '</td>' +
+          '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span></td>' +
+          '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span></td>' +
+          '<td>' +
+            '<button class="btn-sm blue view-broker" data-id="' + b.id + '">View</button>' +
+            (b.is_verified ? '<button class="btn-sm amber unverify-broker" data-id="' + b.id + '">Unverify</button>' : '<button class="btn-sm green verify-broker" data-id="' + b.id + '">Verify</button>') +
+            (b.is_blocked ? '<button class="btn-sm green unblock-broker" data-id="' + b.id + '">Unblock</button>' : '<button class="btn-sm red block-broker" data-id="' + b.id + '">Block</button>') +
+          '</td></tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+
+      box.querySelectorAll('.view-broker').forEach(function(x){ x.onclick = function(){ showBrokerDetail(x.dataset.id); }; });
+      box.querySelectorAll('.verify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'verify'); }; });
+      box.querySelectorAll('.unverify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unverify'); }; });
+      box.querySelectorAll('.block-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'block'); }; });
+      box.querySelectorAll('.unblock-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unblock'); }; });
+    } catch (e) {
+      box.innerHTML = '<p class="text-red-500 text-sm">Error loading brokers: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function handleBrokerAction(id, action) {
+    if (!confirm('Are you sure you want to ' + action + ' this broker?')) return;
+    try {
+      var u = {};
+      if (action === 'verify') u.is_verified = true;
+      else if (action === 'unverify') u.is_verified = false;
+      else if (action === 'block') u.is_blocked = true;
+      else if (action === 'unblock') u.is_blocked = false;
+      var r = await supabase.from('profiles').update(u).eq('id', id);
+      if (r.error) throw r.error;
+      alert('✅ Broker ' + action + 'd.');
+      loadBrokers(); loadStats();
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async function fixMissingProfiles() {
+    var btn = $('fixMissingProfilesBtn');
+    if (!btn) return;
+    if (!confirm('Create profile rows for any auth users that are missing one?\n\nThis will NOT overwrite existing profiles.')) return;
+    var original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing…';
+    try {
+      var r = await supabase.rpc('backfill_missing_profiles');
+      if (r.error) throw r.error;
+      alert('✅ Created ' + (r.data || 0) + ' missing profile row(s).');
+      await loadBrokers();
+      await loadStats();
+    } catch (e) {
+      alert('❌ ' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
+  }
+
+  async function showBrokerDetail(id) {
+    $('tab-brokers').classList.add('hidden');
+    $('brokerDetailView').classList.remove('hidden');
+    try {
+      var rb = await supabase.from('profiles').select('*').eq('id', id).single();
+      if (rb.error) throw rb.error;
+      var b = rb.data;
+
+      $('detailBusinessName').textContent = b.business_name || 'Unnamed';
+      $('detailEmail').textContent = 'Email: ' + (b.email || '—');
+      $('detailPhone').textContent = 'Phone: ' + (b.phone || '—');
+      $('detailStatus').innerHTML = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span>';
+      $('detailVerification').innerHTML = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span>';
+      $('detailWalletBalance').textContent = formatCurrency(b.wallet_balance || 0);
+      $('detailLeadScore').textContent = b.lead_score || 0;
+      $('detailAvgRating').textContent = ((b.average_rating||0).toFixed(1)) + ' ⭐';
+
+      $('detailActions').innerHTML =
+        (b.is_verified ? '<button class="btn-sm amber" id="dv-unverify">Unverify</button>' : '<button class="btn-sm green" id="dv-verify">Verify</button>') +
+        (b.is_blocked ? '<button class="btn-sm green" id="dv-unblock">Unblock</button>' : '<button class="btn-sm red" id="dv-block">Block</button>');
+
+      var dv = $('dv-verify'); if (dv) dv.onclick = function(){ handleBrokerAction(b.id,'verify').then(function(){ showBrokerDetail(b.id); }); };
+      var duv = $('dv-unverify'); if (duv) duv.onclick = function(){ handleBrokerAction(b.id,'unverify').then(function(){ showBrokerDetail(b.id); }); };
+      var db = $('dv-block'); if (db) db.onclick = function(){ handleBrokerAction(b.id,'block').then(function(){ showBrokerDetail(b.id); }); };
+      var dub = $('dv-unblock'); if (dub) dub.onclick = function(){ handleBrokerAction(b.id,'unblock').then(function(){ showBrokerDetail(b.id); }); };
+
+      var rp = await supabase.from('properties').select('*').eq('owner_id', b.id);
+      var props = rp.data || [];
+      $('detailPropertyCount').textContent = props.length;
+      $('detailProperties').innerHTML = !props.length ? '<p class="text-slate-500 text-sm">No properties.</p>' :
+        '<table><thead><tr><th>Title</th><th>Price</th><th>Type</th><th>Verified</th></tr></thead><tbody>' +
+        props.map(function(p){
+          return '<tr><td>' + esc(p.title||'—') + '</td><td>' + formatCurrency(p.price_amount) + '</td><td>' + esc(p.property_type||'—') + '</td><td>' + (p.is_verified?'✅':'❌') + '</td></tr>';
+        }).join('') + '</tbody></table>';
+
+      var rl = await supabase.from('lead_requests').select('*').eq('broker_id', b.id).order('created_at', { ascending:false }).limit(20);
+      var leads = rl.data || [];
+      $('detailLeads').innerHTML = !leads.length ? '<p class="text-slate-500 text-sm">No leads.</p>' :
+        '<table><thead><tr><th>Visitor</th><th>Type</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+        leads.map(function(l){
+          return '<tr><td>' + esc(l.visitor_name||'—') + '</td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.lead_type) + '">' + esc(l.lead_type||'—') + '</span></td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.status) + '">' + esc(l.status) + '</span></td><td>' + formatDate(l.created_at) + '</td></tr>';
+        }).join('') + '</tbody></table>';
+
+      var rr = await supabase.from('reviews').select('*').eq('broker_id', b.id).order('created_at', { ascending:false });
+      var revs = rr.data || [];
+      $('detailReviews').innerHTML = !revs.length ? '<p class="text-slate-500 text-sm">No reviews.</p>' :
+        '<table><thead><tr><th>Rating</th><th>Comment</th><th>Date</th></tr></thead><tbody>' +
+        revs.map(function(x){
+          return '<tr><td>' + x.rating + '⭐</td><td>' + esc(x.comment||'—') + '</td><td>' + formatDate(x.created_at) + '</td></tr>';
+        }).join('') + '</tbody></table>';
+
+      var rrep = await supabase.from('reports').select('*').eq('broker_id', b.id);
+      var reps = rrep.data || [];
+      $('detailReports').innerHTML = !reps.length ? '<p class="text-slate-500 text-sm">No reports.</p>' :
+        '<table><thead><tr><th>Reason</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+        reps.map(function(x){
+          return '<tr><td>' + esc(x.reason) + '</td><td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status) + '">' + esc(x.status) + '</span></td><td>' + formatDate(x.created_at) + '</td></tr>';
+        }).join('') + '</tbody></table>';
+
+      var rt = await supabase.from('wallet_transactions').select('*').eq('profile_id', b.id).order('created_at', { ascending:false }).limit(20);
+      var txs = rt.data || [];
+      $('detailTransactions').innerHTML = !txs.length ? '<p class="text-slate-500 text-sm">No transactions.</p>' :
+        '<table><thead><tr><th>Amount</th><th>Type</th><th>Date</th></tr></thead><tbody>' +
+        txs.map(function(t){
+          var color = t.amount < 0 ? 'text-red-500' : 'text-emerald-600';
+          return '<tr><td class="' + color + ' font-medium">' + (t.amount < 0 ? '' : '+') + Number(t.amount).toLocaleString() + ' UGX</td><td>' + esc((t.type||'').toUpperCase()) + '</td><td>' + formatDate(t.created_at) + '</td></tr>';
+        }).join('') + '</tbody></table>';
+    } catch (e) { console.error(e); }
+  }
+
+  async function loadVerifications() {
+    var box = $('verificationList'), no = $('noVerifications');
+    try {
+      var r = await supabase.from('property_verification_requests').select('*').eq('status','pending').order('created_at', { ascending:false });
+      if (r.error) throw r.error;
+      var reqs = r.data || [];
+      if (!reqs.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+      no.classList.add('hidden');
+
+      var propIds = [], brokerIds = [];
+      reqs.forEach(function(x){
+        if (x.property_id && propIds.indexOf(x.property_id) === -1) propIds.push(x.property_id);
+        if (x.broker_id && brokerIds.indexOf(x.broker_id) === -1) brokerIds.push(x.broker_id);
+      });
+
+      var propMap = {}, brokerMap = {};
+      if (propIds.length) {
+        var rp = await supabase.from('properties').select('id, title, address, property_type').in('id', propIds);
+        (rp.data || []).forEach(function(p){ propMap[p.id] = p; });
+      }
+      if (brokerIds.length) {
+        var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
+        (rb.data || []).forEach(function(b){ brokerMap[b.id] = b; });
+      }
+
+      var html = '<table><thead><tr><th>Property</th><th>Broker</th><th>Type</th><th>Fee</th><th>Actions</th></tr></thead><tbody>';
+      reqs.forEach(function(x){
+        var prop = propMap[x.property_id] || {};
+        var broker = brokerMap[x.broker_id] || {};
+        html += '<tr>' +
+          '<td><div class="font-medium">' + esc(prop.title || 'Unknown') + '</div><div class="text-xs text-slate-500">' + esc(prop.address || '') + '</div></td>' +
+          '<td>' + esc(broker.business_name || 'Unknown') + '</td>' +
+          '<td>' + esc(prop.property_type || '—') + '</td>' +
+          '<td>' + (x.fee_paid ? '✅ ' + formatCurrency(x.fee_amount) : '❌') + '</td>' +
+          '<td>' +
+            '<button class="btn-sm blue view-details" data-id="' + x.id + '">View</button>' +
+            '<button class="btn-sm green approve-prop" data-id="' + x.id + '" data-prop="' + x.property_id + '">Approve</button>' +
+            '<button class="btn-sm red reject-prop" data-id="' + x.id + '" data-prop="' + x.property_id + '">Reject</button>' +
+          '</td></tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+      box.querySelectorAll('.view-details').forEach(function(el){ el.onclick = function(){ openVerificationDetail(el.dataset.id); }; });
+      box.querySelectorAll('.approve-prop').forEach(function(el){ el.onclick = function(){ handleVerification(el.dataset.id, el.dataset.prop, 'approved'); }; });
+      box.querySelectorAll('.reject-prop').forEach(function(el){ el.onclick = function(){ handleVerification(el.dataset.id, el.dataset.prop, 'rejected'); }; });
+    } catch (e) {
+      box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function openVerificationDetail(reqId) {
+    var modal = $('verificationDetailModal');
+    var content = $('detailContent');
+    content.innerHTML = '<div class="spinner"></div>';
+    modal.classList.remove('hidden');
+    try {
+      var rr = await supabase.from('property_verification_requests').select('*').eq('id', reqId).single();
+      if (rr.error) { content.innerHTML = '<p class="text-red-500 text-sm">Could not load: ' + esc(rr.error.message) + '</p>'; return; }
+      var req = rr.data;
+
+      var property = null;
+      if (req.property_id) {
+        var rp = await supabase.from('properties').select('title, address, property_type, media_urls').eq('id', req.property_id).maybeSingle();
+        property = rp.data;
+      }
+      var broker = null;
+      if (req.broker_id) {
+        var rb = await supabase.from('profiles').select('business_name, email, phone').eq('id', req.broker_id).maybeSingle();
+        broker = rb.data;
+      }
+
+      var isImage = function(v) { return typeof v === 'string' && (/res\.cloudinary\.com/.test(v) || /\.(jpg|jpeg|png|webp|gif|bmp|svg)(\?.*)?$/i.test(v)); };
+      var isUrl = function(v) { return typeof v === 'string' && /^https?:\/\//.test(v); };
+
+      var h = '';
+      h += '<div class="detail-field"><span class="label">Property</span><span class="value">' + esc(property && property.title || '—') + '</span></div>';
+      h += '<div class="detail-field"><span class="label">Address</span><span class="value">' + esc(property && property.address || '—') + '</span></div>';
+      h += '<div class="detail-field"><span class="label">Broker</span><span class="value">' + esc(broker && broker.business_name || '—') + '</span></div>';
+      h += '<div class="detail-field"><span class="label">Broker Contact</span><span class="value">' + esc(broker && broker.phone || '—') + ' · ' + esc(broker && broker.email || '—') + '</span></div>';
+      h += '<div class="detail-field"><span class="label">Status</span><span class="value">' + esc(req.status) + '</span></div>';
+      h += '<div class="detail-field"><span class="label">Fee Paid</span><span class="value">' + (req.fee_paid ? '✅ ' + formatCurrency(req.fee_amount) : '❌ Not paid') + '</span></div>';
+      h += '<div class="detail-field"><span class="label">Submitted</span><span class="value">' + formatDateTime(req.created_at) + '</span></div>';
+
+      var propImgs = property && property.media_urls ? (Array.isArray(property.media_urls) ? property.media_urls : [property.media_urls]) : [];
+      if (propImgs.length) {
+        h += '<div class="detail-field"><span class="label">Property Images (' + propImgs.length + ')</span><div class="value" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.4rem;">';
+        propImgs.forEach(function(u){
+          h += '<a href="' + esc(u) + '" target="_blank" rel="noopener"><img src="' + esc(u) + '" style="width:130px;height:100px;object-fit:cover;border-radius:0.6rem;border:1px solid #e2e8f0;"/></a>';
+        });
+        h += '</div></div>';
+      }
+
+      var data = req.submitted_data || {};
+      var keys = Object.keys(data);
+      h += '<h4 class="font-semibold mt-4 mb-2 text-slate-800">📋 Submitted Verification Data</h4>';
+      if (!keys.length) {
+        h += '<p class="text-slate-500 text-sm">No additional data provided.</p>';
+      } else {
+        keys.forEach(function(k){
+          var v = data[k];
+          var label = k.replace(/([A-Z])/g, ' $1').replace(/^./, function(s){ return s.toUpperCase(); }).trim();
+          var display = '';
+          if (isImage(v)) {
+            display = '<div style="margin-top:0.5rem;"><a href="' + esc(v) + '" target="_blank" rel="noopener"><img src="' + esc(v) + '" style="max-width:100%;max-height:320px;border-radius:0.75rem;border:1px solid #e2e8f0;display:block;"/></a><a href="' + esc(v) + '" target="_blank" rel="noopener" style="font-size:0.75rem;color:#4f46e5;text-decoration:underline;margin-top:0.3rem;display:inline-block;">Open full size ↗</a></div>';
+          } else if (Array.isArray(v)) {
+            display = v.map(function(item){
+              if (isImage(item)) return '<a href="' + esc(item) + '" target="_blank" rel="noopener" style="display:inline-block;margin:0.25rem;"><img src="' + esc(item) + '" style="width:130px;height:100px;object-fit:cover;border-radius:0.6rem;border:1px solid #e2e8f0;"/></a>';
+              if (isUrl(item)) return '<a href="' + esc(item) + '" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:underline;">' + esc(item) + '</a>';
+              return esc(item);
+            }).join(' ');
+          } else if (isUrl(v)) {
+            display = '<a href="' + esc(v) + '" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:underline;">' + esc(v) + '</a>';
+          } else {
+            display = esc(v || '—');
+          }
+          h += '<div class="detail-field"><span class="label">' + esc(label) + '</span><span class="value">' + display + '</span></div>';
+        });
+      }
+
+      content.innerHTML = h;
+    } catch (err) {
+      content.innerHTML = '<p class="text-red-500 text-sm">Unexpected error: ' + esc(err.message) + '</p>';
+    }
+  }
+
+  async function handleVerification(reqId, propId, status) {
+    if (!confirm('Mark this verification as ' + status + '?')) return;
+    try {
+      var r1 = await supabase.from('property_verification_requests').update({
+        status: status,
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: currentUser.id
+      }).eq('id', reqId);
+      if (r1.error) throw r1.error;
+
+      var propTitle = 'the property';
+      var brokerEmail = null;
+      var brokerName = null;
+
+      if (propId) {
+        var r2 = await supabase.from('properties').update({
+          is_verified: status === 'approved',
+          verification_status: status
+        }).eq('id', propId);
+        if (r2.error) throw r2.error;
+
+        var pRes = await supabase.from('properties').select('title, owner_id').eq('id', propId).maybeSingle();
+        if (pRes.data) {
+          propTitle = pRes.data.title || propTitle;
+          var bRes = await supabase.from('profiles').select('email, business_name').eq('id', pRes.data.owner_id).maybeSingle();
+          if (bRes.data) { brokerEmail = bRes.data.email; brokerName = bRes.data.business_name; }
+        }
+      }
+
+      var notifResult = { success: false, error: 'skipped' };
+      if (brokerEmail) {
+        var subject, body;
+        if (status === 'approved') {
+          subject = '✅ Your listing is verified — ' + propTitle;
+          body = 'Hello ' + (brokerName || 'Broker') + ',\n\nGreat news! Your property "' + propTitle + '" has been APPROVED and is now live on Property Hub Uganda.\n\nView it: https://propertyhub.dpdns.org/property/' + propId + '\n\n— Property Hub Team';
+        } else {
+          subject = '❌ Verification update — ' + propTitle;
+          body = 'Hello ' + (brokerName || 'Broker') + ',\n\nYour verification request for "' + propTitle + '" was not approved.\n\nPlease update your listing in your dashboard and re-submit.\n\nDashboard: https://propertyhub.dpdns.org/dashboard\n\n— Property Hub Team';
+        }
+        notifResult = await sendEmailNotification(brokerEmail, subject, body, 'verification:' + reqId);
+      }
+
+      var msg = '✅ Verification ' + status + '.';
+      if (brokerEmail) {
+        msg += notifResult.success ? ' Email sent.' : ' ⚠️ Email failed: ' + notifResult.error;
+      } else {
+        msg += ' (No broker email.)';
+      }
+      alert(msg);
+      loadVerifications(); loadStats();
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async function loadLeads() {
+    var box = $('leadsList'), no = $('noLeads');
+    try {
+      var q = supabase.from('lead_requests').select('*').order('created_at', { ascending:false });
+      if (leadFilter) q = q.eq('status', leadFilter);
+      var r = await q;
+      if (r.error) throw r.error;
+      var data = r.data || [];
+      if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+      no.classList.add('hidden');
+
+      var propIds = [], brokerIds = [];
+      data.forEach(function(l){
+        if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
+        if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
+      });
+      var propMap = {}, brokerMap = {};
+      if (propIds.length) {
+        var rp = await supabase.from('properties').select('id, title').in('id', propIds);
+        (rp.data || []).forEach(function(p){ propMap[p.id] = p; });
+      }
+      if (brokerIds.length) {
+        var rb = await supabase.from('profiles').select('id, business_name').in('id', brokerIds);
+        (rb.data || []).forEach(function(b){ brokerMap[b.id] = b; });
+      }
+
+      var html = '<table><thead><tr><th>Property</th><th>Broker</th><th>Visitor</th><th>Type</th><th>Cost</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
+      data.forEach(function(l){
+        var age = Math.floor((Date.now() - new Date(l.created_at).getTime()) / 86400000);
+        var ageClass = age >= 30 ? 'text-red-600 font-bold' : age >= 25 ? 'text-amber-600' : 'text-slate-500';
+        html += '<tr>' +
+          '<td>' + esc(propMap[l.property_id] && propMap[l.property_id].title || '—') + '</td>' +
+          '<td>' + esc(brokerMap[l.broker_id] && brokerMap[l.broker_id].business_name || '—') + '</td>' +
+          '<td>' + esc(l.visitor_name || '—') + '</td>' +
+          '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.lead_type) + '">' + esc(l.lead_type||'—') + '</span></td>' +
+          '<td>' + formatCurrency(l.cost || 0) + '</td>' +
+          '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(l.status) + '">' + esc(l.status) + '</span></td>' +
+          '<td class="' + ageClass + '">' + formatDate(l.created_at) + ' (' + age + 'd)</td>' +
+          '<td>' + (l.status === 'pending' ? '<button class="btn-sm red del-lead" data-id="' + l.id + '">Delete</button>' : '') + '</td>' +
+          '</tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+      box.querySelectorAll('.del-lead').forEach(function(el){
+        el.onclick = async function(){
+          if (!confirm('Delete this lead?')) return;
+          var r = await supabase.from('lead_requests').delete().eq('id', el.dataset.id);
+          if (r.error) return alert('Error: ' + r.error.message);
+          loadLeads(); loadStats();
+        };
+      });
+    } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>'; }
+  }
+
+  async function buildFollowupEmail(lead, prop, broker) {
+    var seg = prop.property_type === 'guesthouse' ? 'guesthouse'
+            : prop.property_type === 'property'    ? 'buyer'
+            : 'renter';
+
+    var partners = [];
+    try {
+      var r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
+      if (!r.error && r.data) partners = r.data;
+    } catch (_) {}
+
+    var byCat = {};
+    partners.forEach(function(p) {
+      if (!byCat[p.category_name]) byCat[p.category_name] = { emoji: p.category_emoji, items: [] };
+      if (byCat[p.category_name].items.length < 2) byCat[p.category_name].items.push(p);
+    });
+    var catNames = Object.keys(byCat);
+
+    var servicesBlock = '';
+    if (catNames.length) {
+      catNames.forEach(function(name) {
+        var c = byCat[name];
+        servicesBlock += '\n' + c.emoji + ' ' + name + '\n';
+        c.items.forEach(function(p) {
+          servicesBlock += '   • ' + p.provider_name + (p.tagline ? ' — ' + p.tagline : '') + '\n' +
+                          '     ' + p.url + '\n' +
+                          (p.discount_code ? '     💰 Code: ' + p.discount_code + '\n' : '');
+        });
+      });
+    } else {
+      servicesBlock = '\nBrowse verified partners: https://propertyhub.dpdns.org/services/\n';
     }
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
-  
-          })();
-  </script>
+    var subject = 'Did you find what you needed in ' + (prop.address || 'Kampala').split(',')[0].trim() + '?';
+    var body =
+      'Hello ' + lead.visitor_name + ',\n\n' +
+      '3 days ago you connected with ' + (broker.business_name || 'a broker') + ' about:\n\n' +
+      '🏠 ' + (prop.title || 'the property') + '\n\n' +
+      '────────────────────────────────────────\n' +
+      '📝 QUICK CHECK-IN — 1 minute\n' +
+      '────────────────────────────────────────\n\n' +
+      'Did you get the place?\n\n' +
+      '  ✅ YES — please rate the broker so other renters benefit:\n' +
+      '     https://propertyhub.dpdns.org/broker/' + lead.broker_id + '\n\n' +
+      '  🤔 STILL LOOKING — see similar properties:\n' +
+      '     https://propertyhub.dpdns.org/?search=' + encodeURIComponent((prop.address || '').split(',')[0].trim()) + '\n\n' +
+      '  ❌ NO — browse new listings:\n' +
+      '     https://propertyhub.dpdns.org/\n\n' +
+      '────────────────────────────────────────\n' +
+      '🎁 SERVICES YOU MIGHT NEED\n' +
+      '────────────────────────────────────────\n' +
+      servicesBlock + '\n' +
+      '────────────────────────────────────────\n\n' +
+      'These are vetted partners we trust. Using them keeps Property Hub free for you.\n\n' +
+      '— The Property Hub Team';
+
+    return { subject: subject, body: body, categories: catNames.slice() };
+  }
+
+  async function loadFollowups() {
+    var box = $('followupList');
+    var no = $('noFollowups');
+    var statsBox = $('followupStats');
+    var filter = $('followupFilter').value;
+
+    try {
+      var q = supabase.from('lead_requests')
+        .select('*')
+        .eq('status', 'approved')
+        .order('approved_at', { ascending: false });
+
+      if (filter === 'pending') q = q.eq('follow_up_sent', false);
+      else if (filter === 'sent') q = q.eq('follow_up_sent', true);
+
+      var r = await q.limit(200);
+      if (r.error) throw r.error;
+      var data = r.data || [];
+
+      var now = Date.now();
+      if (filter === 'due') {
+        data = data.filter(function(l) {
+          if (!l.approved_at || l.follow_up_sent) return false;
+          var days = (now - new Date(l.approved_at).getTime()) / 86400000;
+          return days >= 3;
+        });
+      }
+
+      var totalApproved = data.length;
+      var pendingCount = data.filter(function(l) { return !l.follow_up_sent; }).length;
+      var sentCount = data.filter(function(l) { return l.follow_up_sent; }).length;
+
+      if (statsBox) {
+        statsBox.innerHTML =
+          '<div class="detail-card"><div class="label">Total Approved</div><div class="value">' + totalApproved + '</div></div>' +
+          '<div class="detail-card"><div class="label">Pending Follow-Up</div><div class="value text-amber-600">' + pendingCount + '</div></div>' +
+          '<div class="detail-card"><div class="label">Sent</div><div class="value text-emerald-600">' + sentCount + '</div></div>';
+      }
+
+      if (!data.length) {
+        box.innerHTML = '';
+        no.classList.remove('hidden');
+        return;
+      }
+      no.classList.add('hidden');
+
+      var propIds = [], brokerIds = [];
+      data.forEach(function(l) {
+        if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
+        if (l.broker_id && brokerIds.indexOf(l.broker_id) === -1) brokerIds.push(l.broker_id);
+      });
+
+      var propMap = {}, brokerMap = {};
+      if (propIds.length) {
+        var rp = await supabase.from('properties').select('id, title, property_type, address').in('id', propIds);
+        (rp.data || []).forEach(function(p) { propMap[p.id] = p; });
+      }
+      if (brokerIds.length) {
+        var rb = await supabase.from('profiles').select('id, business_name, phone, email').in('id', brokerIds);
+        (rb.data || []).forEach(function(b) { brokerMap[b.id] = b; });
+      }
+
+      var html = '<table><thead><tr>' +
+        '<th>Visitor</th><th>Property</th><th>Broker</th><th>Approved</th><th>Status</th><th>Actions</th>' +
+        '</tr></thead><tbody>';
+
+      data.forEach(function(l) {
+        var prop = propMap[l.property_id] || {};
+        var broker = brokerMap[l.broker_id] || {};
+        var daysSince = l.approved_at ? Math.floor((now - new Date(l.approved_at).getTime()) / 86400000) : 0;
+        var daysLeft = Math.max(0, 3 - daysSince);
+
+        var statusBadge;
+        if (l.follow_up_sent) {
+          statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('approved') + '">✅ Sent</span>';
+        } else if (daysLeft > 0) {
+          statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('pending') + '">⏳ In ' + daysLeft + 'd</span>';
+        } else {
+          statusBadge = '<span class="text-xs px-2 py-0.5 rounded-full ' + badge('rejected') + '">🔔 Due now</span>';
+        }
+
+        var hasEmail = !!(l.visitor_email && String(l.visitor_email).trim());
+        var emailWarn = (!hasEmail && !l.follow_up_sent) ? '<div class="text-xs text-red-500 mt-0.5">⚠️ No email — cannot send</div>' : '';
+
+        html += '<tr>' +
+          '<td><div class="font-medium">' + esc(l.visitor_name || '—') + '</div><div class="text-xs text-slate-500">' + esc(l.visitor_email || 'No email') + '</div>' + emailWarn + '</td>' +
+          '<td>' + esc(prop.title || '—') + '<div class="text-xs text-slate-500">' + esc(prop.property_type || '') + '</div></td>' +
+          '<td>' + esc(broker.business_name || '—') + '</td>' +
+          '<td>' + formatDate(l.approved_at) + '<div class="text-xs text-slate-500">' + daysSince + 'd ago</div></td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td>' +
+            '<button class="btn-sm blue view-followup" data-id="' + l.id + '">View</button>' +
+            (!l.follow_up_sent && hasEmail ? '<button class="btn-sm green send-followup-admin" data-id="' + l.id + '"><i class="fas fa-paper-plane"></i> Send</button>' : '') +
+          '</td></tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+
+      box.querySelectorAll('.view-followup').forEach(function(el) {
+        el.onclick = function() {
+          var lead = data.find(function(x) { return x.id === el.dataset.id; });
+          if (!lead) return;
+          var prop = propMap[lead.property_id] || {};
+          var broker = brokerMap[lead.broker_id] || {};
+          alert(
+            'Follow-Up Details\n━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+            'Visitor: ' + (lead.visitor_name || '—') + '\n' +
+            'Email: ' + (lead.visitor_email || '(none)') + '\n' +
+            'WhatsApp: ' + (lead.visitor_whatsapp || '—') + '\n\n' +
+            'Property: ' + (prop.title || '—') + '\n' +
+            'Type: ' + (prop.property_type || '—') + '\n' +
+            'Broker: ' + (broker.business_name || '—') + '\n\n' +
+            'Approved: ' + formatDate(lead.approved_at) + '\n' +
+            'Follow-up sent: ' + (lead.follow_up_sent ? 'Yes (' + formatDate(lead.follow_up_sent_at) + ')' : 'No')
+          );
+        };
+      });
+
+      box.querySelectorAll('.send-followup-admin').forEach(function(el) {
+        el.onclick = async function() {
+          var leadId = el.dataset.id;
+          var lead = data.find(function(x) { return x.id === leadId; });
+          if (!lead) return alert('Lead not found');
+          if (!lead.visitor_email) return alert('❌ This lead has no email address.');
+          if (!confirm('Send follow-up to ' + lead.visitor_email + '?')) return;
+
+          el.disabled = true;
+          el.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+          try {
+            var prop = propMap[lead.property_id] || {};
+            var broker = brokerMap[lead.broker_id] || {};
+            var built = await buildFollowupEmail(lead, prop, broker);
+            var result = await sendEmailNotification(lead.visitor_email, built.subject, built.body, 'followup:' + leadId);
+
+            await logNotification(
+              leadId, 'visitor', lead.visitor_email, 'followup', built.subject,
+              result.success ? 'sent' : 'failed',
+              result.success ? null : result.error,
+              built.categories
+            );
+
+            if (!result.success) throw new Error(result.error);
+
+            var ur = await supabase.from('lead_requests').update({
+              follow_up_sent: true,
+              follow_up_sent_at: new Date().toISOString(),
+              followup_type: 'partner'
+            }).eq('id', leadId);
+            if (ur.error) throw ur.error;
+
+            alert('✅ Follow-up sent to ' + lead.visitor_email);
+            loadFollowups();
+          } catch (e) {
+            alert('❌ Failed to send: ' + e.message);
+            el.disabled = false;
+            el.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+          }
+        };
+      });
+
+    } catch (e) {
+      box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function loadSeoPages() {
+    var box = $('seoList'), no = $('noSeo'), statsBox = $('seoStats');
+    var filter = $('seoFilter').value;
+    try {
+      var q = supabase.from('seo_pages').select('*').eq('is_active', true).order('page_type').order('last_updated', { ascending: false });
+      if (filter !== 'all') q = q.eq('page_type', filter);
+      var r = await q.limit(500);
+      if (r.error) throw r.error;
+      var data = r.data || [];
+      var counts = { location: 0, property_type: 0, price_range: 0, property: 0 };
+      data.forEach(function(p) { counts[p.page_type] = (counts[p.page_type] || 0) + 1; });
+      if (statsBox) {
+        statsBox.innerHTML =
+          '<div class="detail-card"><div class="label">Location pages</div><div class="value">' + counts.location + '</div></div>' +
+          '<div class="detail-card"><div class="label">Type pages</div><div class="value">' + counts.property_type + '</div></div>' +
+          '<div class="detail-card"><div class="label">Property pages</div><div class="value">' + counts.property + '</div></div>';
+      }
+      if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+      no.classList.add('hidden');
+      var html = '<table><thead><tr><th>Type</th><th>Title / H1</th><th>Slug</th><th>Count</th><th>Updated</th><th>Link</th></tr></thead><tbody>';
+      data.forEach(function(p) {
+        html += '<tr>' +
+          '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(p.page_type === 'property' ? 'approved' : 'active') + '">' + esc(p.page_type) + '</span></td>' +
+          '<td><div class="font-medium">' + esc(p.h1 || p.title) + '</div><div class="text-xs text-slate-500">' + esc((p.meta_description || '').substring(0, 80)) + '…</div></td>' +
+          '<td><code>' + esc(p.slug) + '</code></td>' +
+          '<td>' + (p.property_count || 0) + '</td>' +
+          '<td>' + formatDate(p.last_updated) + '</td>' +
+          '<td><a href="https://propertyhub.dpdns.org/?seo=' + encodeURIComponent(p.slug) + '" target="_blank" class="btn-sm blue">Open</a></td>' +
+        '</tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+    } catch (e) {
+      box.innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function regenerateSeoNow() {
+    var banner = $('seoBanner');
+    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
+    banner.textContent = '🧠 Regenerating SEO pages…';
+    banner.classList.remove('hidden');
+    try {
+      var sessionCheck = await supabase.auth.getSession();
+      if (!sessionCheck.data || !sessionCheck.data.session) {
+        banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+        banner.textContent = '❌ Session expired. Please sign out and sign in again.';
+        return;
+      }
+      var r = await supabase.rpc('regenerate_seo_pages');
+      if (r.error) {
+        if (r.error.message && (r.error.message.indexOf('JWT') !== -1 || r.error.code === 'PGRST301')) {
+          await supabase.auth.signOut(); currentUser = null;
+          banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+          banner.textContent = '❌ Session expired. Redirecting to login…';
+          setTimeout(function() { showAuth(); }, 1500);
+          return;
+        }
+        throw r.error;
+      }
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
+      banner.textContent = '✅ SEO pages regenerated.';
+      loadSeoPages();
+    } catch (e) {
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+      banner.textContent = '❌ ' + e.message;
+    }
+  }
+
+  async function runCleanup() {
+    if (!confirm('Permanently delete all approved & rejected leads older than 30 days?')) return;
+    var banner = $('cleanupBanner');
+    banner.className = 'mb-3 text-sm rounded-xl p-3 bg-indigo-50 border border-indigo-200 text-indigo-800';
+    banner.textContent = '🧹 Running cleanup…';
+    banner.classList.remove('hidden');
+    try {
+      var r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
+      if (r.error) throw r.error;
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-emerald-50 border border-emerald-200 text-emerald-800';
+      banner.textContent = '✅ Cleanup complete. ' + (r.data || 0) + ' lead(s) deleted.';
+      loadLeads(); loadStats();
+    } catch (e) {
+      banner.className = 'mb-3 text-sm rounded-xl p-3 bg-red-50 border border-red-200 text-red-800';
+      banner.textContent = '❌ Cleanup failed: ' + e.message;
+    }
+  }
+
+  async function loadReports() {
+    var box = $('reportList'), no = $('noReports');
+    try {
+      var r = await supabase.from('reports').select('*').order('created_at', { ascending:false });
+      if (r.error) throw r.error;
+      var data = r.data || [];
+      if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+      no.classList.add('hidden');
+
+      var ids = [];
+      data.forEach(function(x){
+        if (x.reporter_id && ids.indexOf(x.reporter_id) === -1) ids.push(x.reporter_id);
+        if (x.broker_id && ids.indexOf(x.broker_id) === -1) ids.push(x.broker_id);
+      });
+      var pMap = {};
+      if (ids.length) {
+        var rp = await supabase.from('profiles').select('id, business_name, email').in('id', ids);
+        (rp.data || []).forEach(function(p){ pMap[p.id] = p; });
+      }
+
+      var html = '<table><thead><tr><th>Reporter</th><th>Broker</th><th>Reason</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+      data.forEach(function(x){
+        var reporter = pMap[x.reporter_id] || {};
+        var broker = pMap[x.broker_id] || {};
+        html += '<tr>' +
+          '<td>' + esc(reporter.business_name || reporter.email || x.reporter_name || 'Anonymous') + '</td>' +
+          '<td>' + esc(broker.business_name || 'Unknown') + '</td>' +
+          '<td>' + esc(x.reason) + '</td>' +
+          '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status) + '">' + esc(x.status) + '</span></td>' +
+          '<td>' + formatDate(x.created_at) + '</td>' +
+          '<td>' + (x.status === 'pending' ? '<button class="btn-sm green resolve-report" data-id="' + x.id + '">Resolve</button><button class="btn-sm red dismiss-report" data-id="' + x.id + '">Dismiss</button>' : '') + '</td>' +
+          '</tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+      box.querySelectorAll('.resolve-report').forEach(function(el){ el.onclick = function(){ handleReport(el.dataset.id, 'resolved'); }; });
+      box.querySelectorAll('.dismiss-report').forEach(function(el){ el.onclick = function(){ handleReport(el.dataset.id, 'dismissed'); }; });
+    } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading reports.</p>'; }
+  }
+
+  async function handleReport(id, status) {
+    if (!confirm('Mark as ' + status + '?')) return;
+    try {
+      var r = await supabase.from('reports').update({
+        status: status,
+        resolved_at: new Date().toISOString(),
+        resolved_by: currentUser ? currentUser.id : null
+      }).eq('id', id);
+      if (r.error) throw r.error;
+      loadReports(); loadStats();
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async function loadTransactions() {
+    var box = $('transactionList'), no = $('noTransactions');
+    try {
+      var r = await supabase.from('wallet_transactions').select('*').order('created_at', { ascending:false }).limit(100);
+      if (r.error && r.error.code === '42P01') { box.innerHTML = '<p class="text-slate-500 text-sm">Table not set up yet.</p>'; no.classList.add('hidden'); return; }
+      if (r.error) throw r.error;
+      var data = r.data || [];
+      if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+      no.classList.add('hidden');
+      var ids = [];
+      data.forEach(function(x){ if (x.profile_id && ids.indexOf(x.profile_id) === -1) ids.push(x.profile_id); });
+      var pMap = {};
+      if (ids.length) {
+        var rp = await supabase.from('profiles').select('id, business_name, email').in('id', ids);
+        (rp.data || []).forEach(function(p){ pMap[p.id] = p; });
+      }
+      var html = '<table><thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead><tbody>';
+      data.forEach(function(x){
+        var u = pMap[x.profile_id] || {};
+        var color = x.amount < 0 ? 'text-red-500' : 'text-emerald-600';
+        html += '<tr>' +
+          '<td>' + esc(u.business_name || u.email || 'Unknown') + '</td>' +
+          '<td class="' + color + ' font-medium">' + (x.amount < 0 ? '' : '+') + Number(x.amount).toLocaleString() + ' UGX</td>' +
+          '<td>' + esc((x.type||'').replace('_',' ').toUpperCase()) + '</td>' +
+          '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(x.status || 'active') + '">' + esc(x.status || '—') + '</span></td>' +
+          '<td>' + formatDate(x.created_at) + '</td>' +
+          '</tr>';
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+    } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading transactions.</p>'; }
+  }
+
+  async function loadPricing() {
+    try {
+      var r = await supabase.from('platform_settings').select('key,value');
+      if (r.error) throw r.error;
+      var map = {};
+      (r.data || []).forEach(function(x){ map[x.key] = x.value; });
+
+      $('priceVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
+      $('priceLeadUnit').value = map.lead_rate_unit != null ? map.lead_rate_unit : 150000;
+      $('priceGuestPercent').value = map.guesthouse_lead_percent != null ? map.guesthouse_lead_percent : 0.04;
+      $('priceLeadHot').value = map.lead_rate_hot != null ? map.lead_rate_hot : 5000;
+      $('priceLeadWarm').value = map.lead_rate_warm != null ? map.lead_rate_warm : 3250;
+      $('priceLeadCold').value = map.lead_rate_cold != null ? map.lead_rate_cold : 1750;
+      $('priceMinTopup').value = map.wallet_min_topup != null ? map.wallet_min_topup : 1000;
+      $('priceCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
+
+      if ($('setVerifFee')) $('setVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
+      if ($('setCleanupDays')) $('setCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
+
+      renderPricingSummary(map);
+      updatePreview();
+    } catch (e) { console.warn('Pricing load failed:', e); }
+  }
+
+  function renderPricingSummary(map) {
+    var box = $('pricingCurrentSummary');
+    if (!box) return;
+    box.innerHTML =
+      '<div class="price-card"><div class="lbl">Verification fee</div><div class="num">' + Number(map.verification_fee || 5000).toLocaleString() + '</div><div class="lbl" style="margin-top:.25rem;">UGX / property</div></div>' +
+      '<div class="price-card" style="background:linear-gradient(135deg,#059669,#047857);"><div class="lbl">HOT lead / unit</div><div class="num">' + Number(map.lead_rate_hot || 5000).toLocaleString() + '</div><div class="lbl" style="margin-top:.25rem;">UGX (per ' + (Number(map.lead_rate_unit || 150000) / 1000) + 'k base)</div></div>' +
+      '<div class="price-card" style="background:linear-gradient(135deg,#d97706,#b45309);"><div class="lbl">Guesthouse lead</div><div class="num">' + (Number(map.guesthouse_lead_percent || 0.04) * 100).toFixed(1) + '%</div><div class="lbl" style="margin-top:.25rem;">of property price</div></div>';
+  }
+
+  function getPricingFromForm() {
+    return {
+      verification_fee: Number($('priceVerifFee').value) || 5000,
+      lead_rate_unit: Number($('priceLeadUnit').value) || 150000,
+      guesthouse_lead_percent: Number($('priceGuestPercent').value) || 0.04,
+      lead_rate_hot: Number($('priceLeadHot').value) || 5000,
+      lead_rate_warm: Number($('priceLeadWarm').value) || 3250,
+      lead_rate_cold: Number($('priceLeadCold').value) || 1750,
+      wallet_min_topup: Number($('priceMinTopup').value) || 1000,
+      lead_cleanup_days: Number($('priceCleanupDays').value) || 30
+    };
+  }
+
+  function updatePreview() {
+    var price = Number($('previewPrice').value) || 0;
+    var type = $('previewType').value;
+    var quality = $('previewQuality').value;
+    var p = getPricingFromForm();
+    var result, formula;
+    if (type === 'guesthouse') {
+      result = Math.round(price * p.guesthouse_lead_percent);
+      formula = 'price × ' + (p.guesthouse_lead_percent * 100).toFixed(1) + '%';
+    } else {
+      var units = Math.max(1, Math.ceil(price / p.lead_rate_unit));
+      var rate = quality === 'hot' ? p.lead_rate_hot : quality === 'warm' ? p.lead_rate_warm : p.lead_rate_cold;
+      result = units * rate;
+      formula = units + ' unit(s) × ' + rate.toLocaleString() + ' UGX';
+    }
+    var box = $('previewResult');
+    if (box) {
+      box.innerHTML =
+        '<div class="font-semibold text-slate-800 mb-1">Lead cost: <span class="text-indigo-600">' + result.toLocaleString() + ' UGX</span></div>' +
+        '<div class="text-xs text-slate-500">' + formula + ' · Property: ' + price.toLocaleString() + ' UGX · ' + type + ' · ' + quality + '</div>';
+    }
+  }
+
+  async function savePricing() {
+    var st = $('pricingStatus');
+    st.className = 'mt-3 text-sm text-indigo-600';
+    st.textContent = 'Saving…';
+    try {
+      var p = getPricingFromForm();
+      var keys = Object.keys(p);
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        var r = await supabase.from('platform_settings').upsert(
+          { key: key, value: p[key], updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        );
+        if (r.error) throw r.error;
+      }
+      st.className = 'mt-3 text-sm text-emerald-600';
+      st.textContent = '✅ Pricing saved. (' + keys.length + ' settings)';
+      if ($('setVerifFee')) $('setVerifFee').value = p.verification_fee;
+      if ($('setCleanupDays')) $('setCleanupDays').value = p.lead_cleanup_days;
+      renderPricingSummary(p);
+    } catch (e) {
+      st.className = 'mt-3 text-sm text-red-600';
+      st.textContent = '❌ ' + e.message;
+    }
+  }
+
+  async function loadPartners() {
+    try {
+      var catsR = await supabase.from('service_categories').select('*').order('sort_order');
+      var provR = await supabase.from('service_providers').select('*').order('sort_order');
+      if (catsR.error) throw catsR.error;
+      var cats = catsR.data || [];
+      var provs = provR.data || [];
+
+      var byCat = {};
+      provs.forEach(function(p) {
+        if (!byCat[p.category_id]) byCat[p.category_id] = [];
+        byCat[p.category_id].push(p);
+      });
+
+      var statsBox = $('partnerStats');
+      if (statsBox) {
+        statsBox.innerHTML =
+          '<div class="detail-card"><div class="label">Categories</div><div class="value">' + cats.length + '</div></div>' +
+          '<div class="detail-card"><div class="label">Active providers</div><div class="value">' + provs.filter(function(p){return p.is_active;}).length + '</div></div>' +
+          '<div class="detail-card"><div class="label">Total providers</div><div class="value">' + provs.length + '</div></div>';
+      }
+
+      var html = '';
+      cats.forEach(function(c) {
+        var items = byCat[c.id] || [];
+        html += '<div class="section-card" style="background:#f8fafc;margin-bottom:1rem;">' +
+          '<div class="flex-between mb-2"><div><strong>' + esc(c.emoji) + ' ' + esc(c.name) + '</strong>' +
+          ' <span class="text-xs text-slate-500">(' + items.length + ' providers · ' + ((c.target_segments||[]).join(', ') || 'none') + ')</span></div>' +
+          '<button class="btn-sm amber toggle-cat" data-id="' + c.id + '" data-active="' + c.is_active + '">' +
+          (c.is_active ? 'Disable' : 'Enable') + '</button></div>' +
+          '<div class="text-xs text-slate-500 mb-2">' + esc(c.description || '') + '</div>';
+        if (items.length) {
+          html += '<table><thead><tr><th>Provider</th><th>URL</th><th>Code</th><th>Model</th><th>Active</th><th></th></tr></thead><tbody>';
+          items.forEach(function(p) {
+            html += '<tr><td>' + esc(p.name) + '<div class="text-xs text-slate-500">' + esc(p.tagline||'') + '</div></td>' +
+              '<td><a href="' + esc(p.url) + '" target="_blank" class="text-xs text-indigo-600 underline">' + esc(p.url.substring(0,40)) + '…</a></td>' +
+              '<td>' + (p.discount_code ? '<code>' + esc(p.discount_code) + '</code>' : '—') + '</td>' +
+              '<td>' + esc(p.commission_type) + '</td>' +
+              '<td>' + (p.is_active ? '✅' : '❌') + '</td>' +
+              '<td><button class="btn-sm red del-prov" data-id="' + p.id + '">×</button></td></tr>';
+          });
+          html += '</tbody></table>';
+        } else {
+          html += '<p class="text-sm text-slate-500">No providers yet.</p>';
+        }
+        html += '</div>';
+      });
+      $('partnerList').innerHTML = html || '<p class="text-slate-500 text-sm">No categories yet.</p>';
+
+      $('partnerList').querySelectorAll('.toggle-cat').forEach(function(el){ el.onclick = async function() {
+        await supabase.from('service_categories').update({ is_active: el.dataset.active !== 'true' }).eq('id', el.dataset.id);
+        loadPartners();
+      };});
+      $('partnerList').querySelectorAll('.del-prov').forEach(function(el){ el.onclick = async function() {
+        if (!confirm('Delete this provider?')) return;
+        await supabase.from('service_providers').delete().eq('id', el.dataset.id);
+        loadPartners();
+      };});
+
+      var logR = await supabase.from('notification_log').select('*').order('created_at', { ascending:false }).limit(50);
+      var logs = logR.data || [];
+      $('notifLog').innerHTML = logs.length
+        ? '<table><thead><tr><th>When</th><th>To</th><th>Template</th><th>Status</th><th>Categories</th></tr></thead><tbody>' +
+          logs.map(function(n){
+            return '<tr><td class="text-xs">' + formatDateTime(n.created_at) + '</td>' +
+              '<td class="text-xs">' + esc(n.recipient_type) + ' · ' + esc(n.recipient_email || '—') + '</td>' +
+              '<td class="text-xs">' + esc(n.template) + '</td>' +
+              '<td><span class="text-xs px-2 py-0.5 rounded-full ' + (n.status==='sent'?'b-approved':'b-rejected') + '">' + esc(n.status) + '</span></td>' +
+              '<td class="text-xs">' + esc((n.categories_shown||[]).join(', ') || '—') + '</td></tr>';
+          }).join('') + '</tbody></table>'
+        : '<p class="text-slate-500 text-sm">No notifications yet.</p>';
+    } catch (e) {
+      $('partnerList').innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function addCategory() {
+    var slug = prompt('Category slug (lowercase, no spaces, e.g. "pest-control"):');
+    if (!slug) return;
+    var name = prompt('Display name (e.g. "Pest Control"):');
+    if (!name) return;
+    var emoji = prompt('Emoji (default 🛠️):') || '🛠️';
+    var segRaw = prompt('Target segments (comma-separated: renter, buyer, guesthouse, student):', 'renter');
+    if (!segRaw) return;
+    var segments = segRaw.split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var r = await supabase.from('service_categories').insert({ slug: slug, name: name, emoji: emoji, target_segments: segments });
+    if (r.error) return alert('❌ ' + r.error.message);
+    loadPartners();
+  }
+
+  async function addProvider() {
+    var cats = await supabase.from('service_categories').select('id, name').eq('is_active', true);
+    if (cats.error || !cats.data || !cats.data.length) return alert('Create a category first.');
+    var catList = cats.data.map(function(c, i){ return (i+1) + '. ' + c.name; }).join('\n');
+    var pick = prompt('Pick category number:\n' + catList);
+    var idx = parseInt(pick, 10) - 1;
+    if (!cats.data[idx]) return alert('Invalid choice.');
+    var catId = cats.data[idx].id;
+
+    var name = prompt('Provider name:'); if (!name) return;
+    var url = prompt('URL (https://…):'); if (!url) return;
+    var tagline = prompt('Short tagline (optional):') || '';
+    var code = prompt('Discount code (optional):') || null;
+
+    var r = await supabase.from('service_providers').insert({
+      category_id: catId, name: name, url: url, tagline: tagline, discount_code: code,
+      commission_type: 'cpc', is_featured: false, is_active: true
+    });
+    if (r.error) return alert('❌ ' + r.error.message);
+    loadPartners();
+  }
+
+  async function loadSettings() {
+    try {
+      var r = await supabase.from('platform_settings').select('key,value');
+      if (r.error) throw r.error;
+      var map = {};
+      (r.data || []).forEach(function(x){ map[x.key] = x.value; });
+      $('setVerifFee').value = map.verification_fee != null ? map.verification_fee : 5000;
+      $('setCleanupDays').value = map.lead_cleanup_days != null ? map.lead_cleanup_days : 30;
+    } catch (e) { console.warn('Settings load failed:', e.message); }
+  }
+
+  async function saveSettings() {
+    var st = $('settingsStatus');
+    st.textContent = 'Saving…'; st.className = 'mt-3 text-sm text-indigo-600';
+    var updates = [
+      { key: 'verification_fee',  value: Number($('setVerifFee').value) || 5000 },
+      { key: 'lead_cleanup_days', value: Number($('setCleanupDays').value) || 30 }
+    ];
+    try {
+      for (var i = 0; i < updates.length; i++) {
+        var u = updates[i];
+        var r = await supabase.from('platform_settings').upsert({ key: u.key, value: u.value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+        if (r.error) throw r.error;
+      }
+      st.textContent = '✅ Settings saved.'; st.className = 'mt-3 text-sm text-emerald-600';
+      loadPricing();
+    } catch (e) { st.textContent = '❌ ' + e.message; st.className = 'mt-3 text-sm text-red-600'; }
+  }
+
+  async function sendTestEmail() {
+    var to = $('testEmailTo').value.trim();
+    var st = $('testEmailStatus');
+    if (!to) {
+      st.className = 'mt-3 text-sm text-red-600';
+      st.textContent = '❌ Enter a recipient email first.';
+      return;
+    }
+    st.className = 'mt-3 text-sm text-indigo-600';
+    st.textContent = '📤 Sending test email…';
+    var result = await sendEmailNotification(
+      to,
+      '✅ Property Hub email test',
+      'This is a test email from Property Hub Admin.\n\nIf you can read this, email notifications are working correctly.\n\nSent at: ' + new Date().toLocaleString('en-UG'),
+      'test'
+    );
+    if (result.success) {
+      st.className = 'mt-3 text-sm text-emerald-600';
+      st.textContent = '✅ Test email sent to ' + to + '. Check inbox (and spam).';
+    } else {
+      st.className = 'mt-3 text-sm text-red-600';
+      st.textContent = '❌ Failed: ' + result.error;
+    }
+  }
+
+  async function init() {
+    authView = $('authView');
+    dashboardView = $('dashboardView');
+    loadingOverlay = $('loadingOverlay');
+
+    await waitForSupabase();
+    if (!window.supabase) { alert('Supabase failed to load.'); hideLoading(); return; }
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    setInterval(async function() {
+      try {
+        var r = await supabase.auth.refreshSession();
+        if (r.error) console.warn('Session refresh failed:', r.error.message);
+      } catch (e) { console.warn('Refresh error:', e.message); }
+    }, 40 * 60 * 1000);
+
+    document.addEventListener('visibilitychange', async function() {
+      if (document.visibilityState === 'visible' && currentUser) {
+        try {
+          var r = await supabase.auth.getSession();
+          if (!r.data || !r.data.session) {
+            await supabase.auth.signOut();
+            currentUser = null;
+            showAuth();
+          } else {
+            await supabase.auth.refreshSession();
+          }
+        } catch (e) { console.warn(e); }
+      }
+    });
+
+    setupTabs();
+
+    var ok = await checkAdmin();
+    if (ok) showDashboard(); else showAuth();
+
+    $('loginForm').addEventListener('submit', handleLogin);
+    $('logoutBtn').addEventListener('click', handleLogout);
+    $('backToBrokerList').addEventListener('click', function() {
+      $('brokerDetailView').classList.add('hidden');
+      $('tab-brokers').classList.remove('hidden');
+      loadBrokers();
+    });
+    $('fixMissingProfilesBtn').addEventListener('click', fixMissingProfiles);
+    $('leadStatusFilter').addEventListener('change', function(e){ leadFilter = e.target.value; loadLeads(); });
+    $('runCleanupBtn').addEventListener('click', runCleanup);
+    $('runCleanupBtn2').addEventListener('click', async function() {
+      var st = $('cleanupStatus');
+      st.textContent = '🧹 Running…'; st.className = 'mt-3 text-sm text-indigo-600';
+      try {
+        var r = await supabase.rpc('cleanup_old_leads', { p_days: 30 });
+        if (r.error) throw r.error;
+        st.textContent = '✅ Deleted ' + (r.data || 0) + ' old lead(s).';
+        st.className = 'mt-3 text-sm text-emerald-600';
+        loadLeads(); loadStats();
+      } catch (e) { st.textContent = '❌ ' + e.message; st.className = 'mt-3 text-sm text-red-600'; }
+    });
+    $('saveSettingsBtn').addEventListener('click', saveSettings);
+    $('refreshStatsBtn').addEventListener('click', loadStats);
+    $('closeDetailModal').addEventListener('click', function(){ $('verificationDetailModal').classList.add('hidden'); });
+    $('verificationDetailModal').addEventListener('click', function(e){
+      if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
+    });
+
+    $('followupFilter').addEventListener('change', loadFollowups);
+    $('refreshFollowupsBtn').addEventListener('click', loadFollowups);
+
+    $('seoFilter').addEventListener('change', loadSeoPages);
+    $('refreshSeoBtn').addEventListener('click', loadSeoPages);
+    $('regenerateSeoBtn').addEventListener('click', regenerateSeoNow);
+
+    $('savePricingBtn').addEventListener('click', savePricing);
+    $('reloadPricingBtn').addEventListener('click', loadPricing);
+    ['priceVerifFee','priceLeadUnit','priceGuestPercent','priceLeadHot','priceLeadWarm','priceLeadCold','priceMinTopup','priceCleanupDays'].forEach(function(id){
+      var el = $(id);
+      if (el) el.addEventListener('input', updatePreview);
+    });
+    ['previewPrice','previewType','previewQuality'].forEach(function(id){
+      var el = $(id);
+      if (el) {
+        el.addEventListener('input', updatePreview);
+        el.addEventListener('change', updatePreview);
+      }
+    });
+
+    $('addCategoryBtn').addEventListener('click', addCategory);
+    $('addProviderBtn').addEventListener('click', addProvider);
+    $('refreshPartnersBtn').addEventListener('click', loadPartners);
+
+    $('testEmailBtn').addEventListener('click', sendTestEmail);
+
+    hideLoading();
+
+    setInterval(function() {
+      if (!authView.classList.contains('hidden')) return;
+      loadStats();
+      var active = document.querySelector('.admin-tab.active');
+      if (!active) return;
+      var t = active.dataset.tab;
+      if (t === 'brokers') loadBrokers();
+      else if (t === 'verifications') loadVerifications();
+      else if (t === 'leads') loadLeads();
+      else if (t === 'followups') loadFollowups();
+      else if (t === 'seo') loadSeoPages();
+      else if (t === 'reports') loadReports();
+      else if (t === 'transactions') loadTransactions();
+    }, 30000);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+})();
+</script>
 </body>
 </html>
