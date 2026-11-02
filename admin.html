@@ -129,7 +129,10 @@
     <!-- BROKERS -->
     <div id="tab-brokers" class="tab-content">
       <div class="section-card">
-        <h3>👥 All Brokers</h3>
+        <div class="flex-between mb-3">
+  <h3>👥 All Brokers</h3>
+  <button id="createBrokerBtn" class="btn-sm green"><i class="fas fa-user-plus"></i> Create broker manually</button>
+        </div>
         <div id="brokerSyncBanner" class="hidden mb-3 text-sm rounded-xl p-3 bg-amber-50 border border-amber-200 text-amber-900 flex items-start justify-between gap-3">
           <div>
             <strong>⚠️ Profile rows missing.</strong>
@@ -1537,7 +1540,8 @@
           html += '<table><thead><tr><th>Provider</th><th>URL</th><th>Code</th><th>Model</th><th>Active</th><th></th></tr></thead><tbody>';
           items.forEach(function(p) {
             html += '<tr><td>' + esc(p.name) + '<div class="text-xs text-slate-500">' + esc(p.tagline||'') + '</div></td>' +
-              '<td><a href="' + esc(p.url) + '" target="_blank" class="text-xs text-indigo-600 underline">' + esc(p.url.substring(0,40)) + '…</a></td>' +
+'<td><a href="' + esc(p.url) + '" target="_blank" class="text-xs text-indigo-600 underline">' + esc(p.url.substring(0,40)) + '…</a>' +
+'<button class="btn-sm amber edit-prov-url ml-1" data-id="' + p.id + '" data-url="' + esc(p.url) + '" data-name="' + esc(p.name) + '" title="Edit URL"><i class="fas fa-edit" style="font-size:9px"></i></button></td>' +
               '<td>' + (p.discount_code ? '<code>' + esc(p.discount_code) + '</code>' : '—') + '</td>' +
               '<td>' + esc(p.commission_type) + '</td>' +
               '<td>' + (p.is_active ? '✅' : '❌') + '</td>' +
@@ -1561,6 +1565,15 @@
         loadPartners();
       };});
 
+      $('partnerList').querySelectorAll('.edit-prov-url').forEach(function(el){ el.onclick = async function() {
+  const current = el.dataset.url;
+  const newUrl = prompt('URL for ' + el.dataset.name + ':', current);
+  if (!newUrl || newUrl === current) return;
+  if (!/^https?:\/\//.test(newUrl)) return alert('URL must start with http:// or https://');
+  const { error } = await supabase.from('service_providers').update({ url: newUrl }).eq('id', el.dataset.id);
+  if (error) return alert('❌ ' + error.message);
+  loadPartners();
+};});
       var logR = await supabase.from('notification_log').select('*').order('created_at', { ascending:false }).limit(50);
       var logs = logR.data || [];
       $('notifLog').innerHTML = logs.length
@@ -1591,6 +1604,39 @@
     if (r.error) return alert('❌ ' + r.error.message);
     loadPartners();
   }
+
+  async function createBrokerManually() {
+  const email = prompt('Broker email:');
+  if (!email) return;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('❌ Invalid email format.');
+  const businessName = prompt('Business name:');
+  if (!businessName) return;
+  const phone = prompt('Phone (e.g. 0771234567):') || '';
+  const password = prompt('Temporary password (min 6 chars):');
+  if (!password || password.length < 6) return alert('❌ Password must be at least 6 characters.');
+
+  const btn = $('createBrokerBtn');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating…';
+
+  try {
+    const { data, error } = await supabase.functions.invoke('admin-create-broker', {
+      body: { email, password, business_name: businessName, phone, account_type: 'broker' }
+    });
+    if (error) throw new Error(error.message || 'Function invocation failed');
+    if (!data || !data.success) throw new Error(data?.error || 'Unknown error');
+
+    alert('✅ Broker created!\n\nEmail: ' + email + '\nPassword: ' + password +
+      '\n\nShare these with the broker. They can change the password after login.');
+    loadBrokers(); loadStats();
+  } catch (e) {
+    alert('❌ Failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
 
   async function addProvider() {
     var cats = await supabase.from('service_categories').select('id, name').eq('is_active', true);
@@ -1703,7 +1749,7 @@
 
     var ok = await checkAdmin();
     if (ok) showDashboard(); else showAuth();
-
+$('createBrokerBtn').addEventListener('click', createBrokerManually);
     $('loginForm').addEventListener('submit', handleLogin);
     $('logoutBtn').addEventListener('click', handleLogout);
     $('backToBrokerList').addEventListener('click', function() {
