@@ -45,7 +45,7 @@
   {"@context":"https://schema.org","@type":"WebSite","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","potentialAction":{"@type":"SearchAction","target":"https://propertyhub.dpdns.org/?search={search_term_string}","query-input":"required name=search_term_string"}}
   </script>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","address":{"@type":"PostalAddress","addressCountry":"UG","addressLocality":"Kampala"},"areaServed":[{"@type":"City","name":"Kampala"},{"@type":"City","name":"Wakiso"},{"@type":"City","name":"Entebbe"},{"@type":"City","name":"Mukono"}],"priceRange":"UGX"}
+  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"Property Hub Uganda","url":"https://propertyhub.dpdns.org/","image":"https://propertyhub.dpdns.org/og-cover.jpg","address":{"@type":"PostalAddress","streetAddress":"Mulago","addressLocality":"Kampala","addressCountry":"UG"},"areaServed":[{"@type":"City","name":"Kampala"},{"@type":"City","name":"Wakiso"},{"@type":"City","name":"Entebbe"},{"@type":"City","name":"Mukono"}],"priceRange":"UGX"}
   </script>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -88,6 +88,8 @@
   <link rel="stylesheet" href="/styles.css" id="compiled-tailwind" />
   <script>
   (function() {
+    // NOTE: CDN fallback only loads if /styles.css (pre-built Tailwind) fails.
+    // For production, always deploy the compiled /styles.css to avoid CDN cost.
     function loadCdn() {
       if (window.__tailwindCdnLoaded) return;
       window.__tailwindCdnLoaded = true;
@@ -197,12 +199,11 @@
     .hero-trust-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
     .hero-trust-chips span { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; backdrop-filter: blur(4px); }
     .hero-trust-chips i { color: #34d399; font-size: 0.75rem; }
-    /* Chatbot */
-       #chatBubble { position: fixed; bottom: 30px; left: 30px; z-index: 1001; background: #4f46e5; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 12px 30px rgba(79,70,229,0.4); cursor: pointer; border: none; transition: transform 0.15s; }
+    #chatBubble { position: fixed; bottom: 30px; left: 30px; z-index: 1001; background: #4f46e5; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 12px 30px rgba(79,70,229,0.4); cursor: pointer; border: none; transition: transform 0.15s; }
     #chatBubble:hover { transform: scale(1.08); }
     #chatBubble .chat-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; font-size: 0.75rem; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(239,68,68,0.5); animation: chatPulse 2s infinite; }
     @keyframes chatPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
-       #chatPanel { position: fixed; bottom: 100px; left: 30px; z-index: 1002; width: min(380px, calc(100vw - 20px)); max-height: min(560px, calc(100vh - 140px)); background: white; border-radius: 1.25rem; box-shadow: 0 20px 60px rgba(0,0,0,0.25); display: none; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; }
+    #chatPanel { position: fixed; bottom: 100px; left: 30px; z-index: 1002; width: min(380px, calc(100vw - 20px)); max-height: min(560px, calc(100vh - 140px)); background: white; border-radius: 1.25rem; box-shadow: 0 20px 60px rgba(0,0,0,0.25); display: none; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; }
     #chatPanel.open { display: flex; }
     #chatHeader { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
     #chatHeader .chat-title { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
@@ -421,7 +422,11 @@
     <main>
       <section id="discoveryView" class="view view-visible">
         <div class="relative bg-slate-900 text-white overflow-hidden">
-          <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
+          <!-- Descriptive ALT hero image (good for SEO + LCP) -->
+          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80&auto=format&fit=crop"
+               alt="Modern apartment building in Kampala, Uganda — Property Hub verified rental and sale listings"
+               class="absolute inset-0 w-full h-full object-cover opacity-30"
+               width="1400" height="933" fetchpriority="high" decoding="async" />
           <div class="absolute inset-0 hero-gradient"></div>
           <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
             <div class="max-w-2xl">
@@ -464,11 +469,14 @@
             <button class="filter-pill px-5 py-2 rounded-full bg-white text-sm" data-filter="property">Properties</button>
             <button class="filter-pill px-5 py-2 rounded-full bg-white text-sm" data-filter="guesthouse">Guesthouses</button>
           </div>
+          <!-- === PRERENDERED LISTINGS (injected by scripts/prerender-guides.mjs) === -->
           <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- PRERENDERED_LISTINGS_START -->
             <div id="crawlerFallback" class="md:col-span-2 lg:col-span-3 pre-render-fallback">
               <h2>Live Ugandan Property Listings — Loading</h2>
               <p>Discover verified rentals, apartments, guesthouses, and land for sale across <strong>Kampala, Wakiso, Kira, Naalya, Ntinda, Kololo, Naguru, Muyenga, Bukoto, Entebbe, Mukono, and Jinja</strong> on Property Hub Uganda.</p>
             </div>
+            <!-- PRERENDERED_LISTINGS_END -->
           </div>
           <div id="emptyState" class="hidden text-center py-20">No properties found.</div>
 
@@ -545,49 +553,31 @@
               <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800">Welcome to Property Hub</h1>
               <p class="text-slate-500 mt-2">Here's how to start getting leads in 5 minutes.</p>
             </div>
-
             <div class="space-y-5">
               <div class="flex gap-4 items-start">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">1</div>
-                <div>
-                  <h3 class="font-bold text-slate-800">Add your first property</h3>
-                  <p class="text-sm text-slate-600 mt-1">Click <strong>Add Property</strong> in your dashboard. Enter the title, price, type, and area. Upload 2–3 clear photos. That's it — your listing is live on the site.</p>
-                </div>
+                <div><h3 class="font-bold text-slate-800">Add your first property</h3><p class="text-sm text-slate-600 mt-1">Click <strong>Add Property</strong> in your dashboard. Enter the title, price, type, and area. Upload 2–3 clear photos. <strong>All listings require verification.</strong></p></div>
               </div>
               <div class="flex gap-4 items-start">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">2</div>
-                <div>
-                  <h3 class="font-bold text-slate-800">Get verified (recommended)</h3>
-                  <p class="text-sm text-slate-600 mt-1">Verified listings rank higher and get more clicks. Cost: 5,000 UGX from your wallet. This protects visitors from scams and builds your reputation.</p>
-                </div>
+                <div><h3 class="font-bold text-slate-800">Verification is compulsory</h3><p class="text-sm text-slate-600 mt-1">Every new listing is verified — this protects visitors from scams and builds your reputation. Cost: 5,000 UGX from your wallet.</p></div>
               </div>
               <div class="flex gap-4 items-start">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">3</div>
-                <div>
-                  <h3 class="font-bold text-slate-800">Receive leads</h3>
-                  <p class="text-sm text-slate-600 mt-1">When a visitor is interested in your property, they fill a short quiz. You'll be notified by <strong>SMS</strong> and <strong>email</strong>. Each lead is scored: <strong>Hot</strong>, <strong>Warm</strong>, or <strong>Cold</strong>.</p>
-                </div>
+                <div><h3 class="font-bold text-slate-800">Receive leads</h3><p class="text-sm text-slate-600 mt-1">When a visitor is interested, they fill a short quiz. You'll be notified by <strong>SMS</strong> and <strong>email</strong>. Each lead is scored: <strong>Hot</strong>, <strong>Warm</strong>, or <strong>Cold</strong>.</p></div>
               </div>
               <div class="flex gap-4 items-start">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center">4</div>
-                <div>
-                  <h3 class="font-bold text-slate-800">Unlock serious leads</h3>
-                  <p class="text-sm text-slate-600 mt-1">You decide which leads to unlock. Hot leads cost more, cold leads cost less. Unlock fee comes from your wallet. Once unlocked, you see the visitor's name, email, and WhatsApp number — and they see your contact too.</p>
-                </div>
+                <div><h3 class="font-bold text-slate-800">Unlock serious leads</h3><p class="text-sm text-slate-600 mt-1">You decide which leads to unlock. Unlock fee comes from your wallet. Once unlocked, you see the visitor's name, email, and WhatsApp number — and they see your contact too.</p></div>
               </div>
               <div class="flex gap-4 items-start">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center">✓</div>
-                <div>
-                  <h3 class="font-bold text-slate-800">Top up your wallet</h3>
-                  <p class="text-sm text-slate-600 mt-1">Click <strong>Top Up</strong> on your dashboard to add funds via MTN MoMo or Airtel Money. Wallet pays for verifications and lead unlocks.</p>
-                </div>
+                <div><h3 class="font-bold text-slate-800">Top up your wallet</h3><p class="text-sm text-slate-600 mt-1">Click <strong>Top Up</strong> on your dashboard to add funds via MTN MoMo or Airtel Money.</p></div>
               </div>
             </div>
-
             <div class="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
               <strong>💡 Pro tip:</strong> Listings with 3+ photos and detailed titles like <em>"2 Bedroom Apartment in Naalya under 800k"</em> get 4× more views than vague titles.
             </div>
-
             <div class="mt-8 flex flex-col sm:flex-row gap-3">
               <button id="onboardingDoneBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold">Got it — take me to my dashboard →</button>
               <button id="onboardingSkipBtn" class="text-sm text-slate-500 px-4 py-3">Skip for now</button>
@@ -635,11 +625,12 @@
               <div><label class="block text-xs font-bold mb-1">Property Type *</label><select id="propType" required class="w-full px-4 py-2 rounded-xl border"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
               <div><label class="block text-xs font-bold mb-1">Address * (area, city)</label><input type="text" id="propAddress" required class="w-full px-4 py-2 rounded-xl border" placeholder="e.g. Naalya, Kampala" /></div>
               <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Images (auto-compressed)</label><input type="file" id="propImage" accept="image/*" multiple class="w-full text-sm" /></div>
-              <div class="md:col-span-2 flex items-center">
-                <input type="checkbox" id="addRequestVerification" />
-                <label for="addRequestVerification" class="ml-2 text-sm">Request Verification <span class="text-amber-700 font-semibold">(5,000 UGX)</span></label>
+              <!-- Verification is compulsory — no checkbox -->
+              <div class="md:col-span-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 flex items-start gap-2">
+                <i class="fas fa-shield-alt mt-0.5"></i>
+                <span><strong>Verification required.</strong> All new listings are verified to protect visitors. A <strong>5,000 UGX</strong> fee is deducted from your wallet. Your listing will show as "Pending" until approved.</span>
               </div>
-              <div class="md:col-span-2"><button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Add</button></div>
+              <div class="md:col-span-2"><button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl">Add &amp; Submit for Verification</button></div>
             </form>
             <div id="uploadStatus" class="mt-3 text-sm"></div>
           </div>
@@ -862,7 +853,9 @@
           "offers": {
             "@type": "Offer",
             "price": property.price_amount,
-            "priceCurrency": "UGX"
+            "priceCurrency": "UGX",
+            "availability": "https://schema.org/InStock",
+            "url": SITE_URL + '/property/' + property.id
           }
         };
         let el = document.getElementById('schema-' + property.id);
@@ -1032,7 +1025,7 @@
 
         article.innerHTML =
           '<div class="relative aspect-[4/3] bg-slate-200 overflow-hidden">' +
-            '<img src="' + imageUrl + '" alt="' + descriptiveAlt + '" class="w-full h-full object-cover" loading="lazy" decoding="async"/>' +
+            '<img src="' + imageUrl + '" alt="' + descriptiveAlt + '" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="450"/>' +
             '<span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full">' + (property.property_type || 'Property') + '</span>' +
             (!showEdit && isVerified ? '<span class="absolute top-3 right-3 bg-emerald-600 text-white text-[8px] font-bold px-2 py-1 rounded-full"><i class="fas fa-check-circle mr-1"></i>VERIFIED</span>' : '') +
           '</div>' +
@@ -1189,8 +1182,11 @@
             const b = (p.broker && p.broker.business_name || '').toLowerCase();
             return a.indexOf(q) !== -1 || t.indexOf(q) !== -1 || b.indexOf(q) !== -1;
           });
-        } else if (parsed.type === 'range') {
-          r = r.filter(function(p) { const price = Number(p.price_amount || 0); return price >= parsed.min && price <= parsed.max; });
+             } else if (parsed.type === 'range') {
+          r = r.filter(function(p) {
+            const price = Number(p.price_amount || 0);
+            return price >= parsed.min && price <= parsed.max;
+          });
         } else if (parsed.type === 'min') {
           r = r.filter(function(p) { return Number(p.price_amount || 0) >= parsed.min; });
         } else if (parsed.type === 'max') {
@@ -1456,7 +1452,17 @@
       function goToDiscovery() { state.currentBrokerId = null; state.currentSeoSlug = null; navigateTo('/'); }
       function navigateToAuth() { navigateTo('/auth'); }
 
-      function openReviewModal(id) { $('#reviewBrokerId').value = id; $('#reviewRating').value = 5; $('#reviewComment').value = ''; $('#reviewClientName').value = ''; $('#reviewClientEmail').value = ''; updateStarUI(5); $('#reviewFormContainer').classList.remove('hidden'); $('#reviewModal').classList.remove('hidden'); loadReviewsForModal(id); }
+      function openReviewModal(id) {
+        $('#reviewBrokerId').value = id;
+        $('#reviewRating').value = 5;
+        $('#reviewComment').value = '';
+        $('#reviewClientName').value = '';
+        $('#reviewClientEmail').value = '';
+        updateStarUI(5);
+        $('#reviewFormContainer').classList.remove('hidden');
+        $('#reviewModal').classList.remove('hidden');
+        loadReviewsForModal(id);
+      }
       function openViewReviewsModal(id) { $('#reviewBrokerId').value = id; $('#reviewFormContainer').classList.add('hidden'); $('#reviewModal').classList.remove('hidden'); loadReviewsForModal(id); }
       async function loadReviewsForModal(id) {
         const list = $('#reviewsList'); if (!list) return;
@@ -1477,10 +1483,32 @@
       function updateStarUI(active) { const s = $('#starSelector'); if (!s) return; s.querySelectorAll('.star').forEach(function(el) { el.classList.toggle('active', parseInt(el.dataset.value) <= active); }); }
       $('#starSelector') && $('#starSelector').querySelectorAll('.star').forEach(function(st) { st.addEventListener('click', function() { const v = parseInt(st.dataset.value); $('#reviewRating').value = v; updateStarUI(v); }); });
 
-      function toggleProfileForm() { $('#profileFormContainer').classList.toggle('visible'); $('#addPropertyContainer').classList.remove('visible'); $('#propertyVerificationContainer').classList.remove('visible'); $('#leadsContainer').classList.remove('visible'); }
-      function toggleAddPropertyForm() { $('#addPropertyContainer').classList.toggle('visible'); $('#profileFormContainer').classList.remove('visible'); $('#propertyVerificationContainer').classList.remove('visible'); $('#leadsContainer').classList.remove('visible'); }
-      function togglePropertyVerificationForm() { $('#propertyVerificationContainer').classList.toggle('visible'); $('#profileFormContainer').classList.remove('visible'); $('#addPropertyContainer').classList.remove('visible'); $('#leadsContainer').classList.remove('visible'); loadPropertyVerificationList(); }
-      function toggleLeadsPanel() { $('#leadsContainer').classList.toggle('visible'); $('#profileFormContainer').classList.remove('visible'); $('#addPropertyContainer').classList.remove('visible'); $('#propertyVerificationContainer').classList.remove('visible'); loadLeads(); }
+      function toggleProfileForm() {
+        $('#profileFormContainer').classList.toggle('visible');
+        $('#addPropertyContainer').classList.remove('visible');
+        $('#propertyVerificationContainer').classList.remove('visible');
+        $('#leadsContainer').classList.remove('visible');
+      }
+      function toggleAddPropertyForm() {
+        $('#addPropertyContainer').classList.toggle('visible');
+        $('#profileFormContainer').classList.remove('visible');
+        $('#propertyVerificationContainer').classList.remove('visible');
+        $('#leadsContainer').classList.remove('visible');
+      }
+      function togglePropertyVerificationForm() {
+        $('#propertyVerificationContainer').classList.toggle('visible');
+        $('#profileFormContainer').classList.remove('visible');
+        $('#addPropertyContainer').classList.remove('visible');
+        $('#leadsContainer').classList.remove('visible');
+        loadPropertyVerificationList();
+      }
+      function toggleLeadsPanel() {
+        $('#leadsContainer').classList.toggle('visible');
+        $('#profileFormContainer').classList.remove('visible');
+        $('#addPropertyContainer').classList.remove('visible');
+        $('#propertyVerificationContainer').classList.remove('visible');
+        loadLeads();
+      }
 
       function openEditModal(pid) {
         const prop = state.myProperties.find(function(p) { return p.id === pid; });
@@ -1509,7 +1537,15 @@
         });
       }
 
-      function openReportModal(id) { $('#reportBrokerId').value = id; $('#reportReason').value = ''; $('#reportDescription').value = ''; $('#reportName').value = ''; $('#reportEmail').value = ''; $('#reportStatus').textContent = ''; $('#reportModal').classList.remove('hidden'); }
+      function openReportModal(id) {
+        $('#reportBrokerId').value = id;
+        $('#reportReason').value = '';
+        $('#reportDescription').value = '';
+        $('#reportName').value = '';
+        $('#reportEmail').value = '';
+        $('#reportStatus').textContent = '';
+        $('#reportModal').classList.remove('hidden');
+      }
 
       async function handleAuthSubmit(e) {
         e.preventDefault();
@@ -1623,84 +1659,24 @@
       //  CHATBOT
       // ══════════════════════════════════════════════════════════════
       const CHAT_KB_VISITOR = [
-        {
-          keywords: ['find', 'search', 'browse', 'looking for', 'how do i look', 'apartment', 'house', 'room'],
-          reply: 'Easy! Type an area or price in the search bar at the top of the page. You can try things like <strong>"Naalya"</strong>, <strong>"under 500k"</strong>, or <strong>"2 bedroom"</strong>. Want me to suggest a popular area?',
-          quick: ['Show me popular areas', 'How do I contact a broker?', 'Is this site safe?']
-        },
-        {
-          keywords: ['contact', 'broker', 'reach', 'talk to', 'connect', 'message'],
-          reply: 'Find a listing you like, then click the blue <strong>Connect</strong> button. Fill a short 4-question quiz about your plans. The broker gets notified and approves you — then you see their WhatsApp number and they see yours.',
-          quick: ['How much does it cost?', 'Is this site safe?', 'Show me how to search']
-        },
-        {
-          keywords: ['safe', 'scam', 'trust', 'verified', 'legit', 'fraud'],
-          reply: 'We protect you three ways:<br>• <strong>Verified badge</strong> = our team reviewed the property<br>• <strong>Trusted badge</strong> = broker has 4★+ from 10+ reviews<br>• <strong>Never pay before viewing</strong> — always meet at the property in person',
-          quick: ['Show me verified listings', 'How do I report a broker?', 'How do I search?']
-        },
-        {
-          keywords: ['price', 'cost', 'fee', 'pay', 'charge', 'free'],
-          reply: 'Browsing is <strong>100% free</strong> for visitors. You never pay us anything. If a broker asks for a "viewing fee" before showing you the property, that\'s a scam — report them.',
-          quick: ['Is this site safe?', 'How do I contact a broker?', 'Show me listings']
-        },
-        {
-          keywords: ['list', 'add', 'post', 'broker portal', 'sign up', 'register', 'i am a broker'],
-          reply: 'Are you a broker or landlord? Click <strong>Broker Portal</strong> in the top right. Register for free, then add your properties. You only pay a small fee when you unlock a serious lead.',
-          quick: ['How does broker pricing work?', 'Is this site safe?', 'Show me listings']
-        },
-        {
-          keywords: ['area', 'location', 'where', 'cover', 'neighborhood'],
-          reply: 'We cover <strong>Kampala, Wakiso, Entebbe, Mukono, Kira, Naalya, Ntinda, Kololo, Naguru, Muyenga, Bukoto, Jinja</strong> and more. Popular right now: Kikoni, Mulago, Katanga, Naalya, Ntinda.',
-          quick: ['Show me listings', 'How do I contact a broker?', 'Is this site safe?']
-        },
-        {
-          keywords: ['report', 'complain', 'problem', 'bad broker'],
-          reply: 'To report a broker: open their profile (click their name on any listing), then click the red <strong>Report</strong> button. Reports are anonymous. We investigate every one.',
-          quick: ['Is this site safe?', 'How do I search?', 'Show me listings']
-        },
-        {
-          keywords: ['hi', 'hello', 'hey', 'help', 'start'],
-          reply: 'Hi! I\'m the Property Hub assistant. I can help you find a place, contact a broker, or explain how the site works. What do you need?',
-          quick: ['How do I search?', 'How do I contact a broker?', 'Is this site safe?']
-        }
+        { keywords: ['find', 'search', 'browse', 'looking for', 'apartment', 'house', 'room'], reply: 'Easy! Type an area or price in the search bar at the top of the page. Try things like <strong>"Naalya"</strong>, <strong>"under 500k"</strong>, or <strong>"2 bedroom"</strong>.', quick: ['Show me popular areas', 'How do I contact a broker?', 'Is this site safe?'] },
+        { keywords: ['contact', 'broker', 'reach', 'talk to', 'connect'], reply: 'Find a listing you like, then click the blue <strong>Connect</strong> button. Fill a short 4-question quiz. The broker gets notified and approves you — then you see their WhatsApp number and they see yours.', quick: ['How much does it cost?', 'Is this site safe?', 'How do I search?'] },
+        { keywords: ['safe', 'scam', 'trust', 'verified', 'legit', 'fraud'], reply: 'We protect you three ways:<br>• <strong>Verified badge</strong> = our team reviewed the property<br>• <strong>Trusted badge</strong> = broker has 4★+ from 10+ reviews<br>• <strong>Never pay before viewing</strong>', quick: ['Show me verified listings', 'How do I report a broker?', 'How do I search?'] },
+        { keywords: ['price', 'cost', 'fee', 'pay', 'free'], reply: 'Browsing is <strong>100% free</strong> for visitors. If a broker asks for a "viewing fee" before showing you the property, that\'s a scam — report them.', quick: ['Is this site safe?', 'How do I contact a broker?', 'Show me listings'] },
+        { keywords: ['list', 'add', 'post', 'broker portal', 'sign up', 'register'], reply: 'Click <strong>Broker Portal</strong> in the top right. Register for free, then add your properties. All new listings require verification (5,000 UGX).', quick: ['How does pricing work?', 'Is this site safe?', 'Show me listings'] },
+        { keywords: ['area', 'location', 'where', 'cover'], reply: 'We cover <strong>Kampala, Wakiso, Entebbe, Mukono, Kira, Naalya, Ntinda, Kololo, Naguru, Muyenga, Bukoto, Jinja</strong>.', quick: ['Show me listings', 'How do I contact a broker?', 'Is this site safe?'] },
+        { keywords: ['report', 'complain', 'problem', 'bad broker'], reply: 'To report: open their profile (click their name), then click the red <strong>Report</strong> button. Reports are anonymous.', quick: ['Is this site safe?', 'How do I search?', 'Show me listings'] },
+        { keywords: ['hi', 'hello', 'hey', 'help', 'start'], reply: 'Hi! I\'m the Property Hub assistant. I can help you find a place, contact a broker, or explain how the site works.', quick: ['How do I search?', 'How do I contact a broker?', 'Is this site safe?'] }
       ];
 
       const CHAT_KB_BROKER = [
-        {
-          keywords: ['add', 'property', 'list', 'new', 'post', 'upload'],
-          reply: 'Click <strong>Add Property</strong> in your dashboard toolbar. Fill in the title, price, type, and area. Upload 2–3 photos. Your listing goes live immediately.',
-          quick: ['How do I get verified?', 'How do leads work?', 'How do I top up?']
-        },
-        {
-          keywords: ['verif', 'verified', 'verify', 'badge', 'trusted'],
-          reply: 'Click <strong>Verification</strong> in your toolbar. Pay 5,000 UGX from your wallet. Submit landlord name, phone, and LC1 contact. Verified listings rank higher and get up to 3× more clicks.',
-          quick: ['How do I add a property?', 'How do leads work?', 'How do I top up?']
-        },
-        {
-          keywords: ['lead', 'unlock', 'approve', 'reject', 'customer', 'visitor'],
-          reply: 'When a visitor is interested, you\'ll get an SMS + email. Open your dashboard → click <strong>Leads</strong>. You\'ll see each lead with a score: <strong>Hot</strong> (best), <strong>Warm</strong>, <strong>Cold</strong>. Click <strong>Unlock</strong> to reveal their contact and share yours.',
-          quick: ['How does pricing work?', 'How do I add a property?', 'How do I top up?']
-        },
-        {
-          keywords: ['price', 'cost', 'fee', 'charge', 'pay', 'wallet', 'money', 'ugx'],
-          reply: 'Two costs only:<br>• <strong>Verification</strong>: 5,000 UGX per property (optional but recommended)<br>• <strong>Lead unlock</strong>: from ~1,750 UGX for cold leads, up to ~5,000+ for hot leads<br><br>All deducted from your wallet. No monthly fees.',
-          quick: ['How do I top up?', 'How do leads work?', 'How do I get verified?']
-        },
-        {
-          keywords: ['top up', 'deposit', 'add money', 'wallet', 'mtn', 'airtel'],
-          reply: 'Click <strong>Top Up</strong> next to your wallet balance. Enter the amount and your MTN MoMo or Airtel Money number. You\'ll get a prompt on your phone — approve it and your wallet updates in seconds.',
-          quick: ['How does pricing work?', 'How do leads work?', 'How do I add a property?']
-        },
-        {
-          keywords: ['more leads', 'boost', 'rank', 'higher', 'visible'],
-          reply: 'Three things boost your ranking:<br>1. Get <strong>Verified</strong> (biggest boost)<br>2. Add <strong>3+ clear photos</strong> and detailed titles<br>3. Collect <strong>positive reviews</strong> from past clients<br><br>You can also click <strong>Boost</strong> on any listing to climb higher.',
-          quick: ['How do I get verified?', 'How do I add a property?', 'How does pricing work?']
-        },
-        {
-          keywords: ['help', 'hi', 'hello', 'stuck', 'how'],
-          reply: 'Hi! I\'m here to help you get leads. Ask me about adding properties, verification, leads, or wallet top-up.',
-          quick: ['How do I add a property?', 'How do leads work?', 'How does pricing work?']
-        }
+        { keywords: ['add', 'property', 'list', 'new', 'post'], reply: 'Click <strong>Add Property</strong> in your dashboard. Fill title, price, type, area. Upload 2–3 photos. Verification is compulsory (5,000 UGX) — your listing shows as "Pending" until approved.', quick: ['How does verification work?', 'How do leads work?', 'How do I top up?'] },
+        { keywords: ['verif', 'verified', 'badge'], reply: 'Every new listing is verified for 5,000 UGX from your wallet. Submit landlord name, phone, and LC1 contact via <strong>Verification</strong> in your toolbar. Verified listings rank highest.', quick: ['How do I add a property?', 'How do leads work?', 'How do I top up?'] },
+        { keywords: ['lead', 'unlock', 'approve', 'customer'], reply: 'When a visitor is interested, you get SMS + email. Open <strong>Leads</strong> in your dashboard. Each lead has a score: Hot, Warm, Cold. Click <strong>Unlock</strong> to reveal their contact and share yours.', quick: ['How does pricing work?', 'How do I add a property?', 'How do I top up?'] },
+        { keywords: ['price', 'cost', 'fee', 'wallet', 'money'], reply: 'Two costs only:<br>• <strong>Verification</strong>: 5,000 UGX per property (compulsory)<br>• <strong>Lead unlock</strong>: ~1,750 UGX (cold) to ~5,000+ (hot)<br><br>No monthly fees.', quick: ['How do I top up?', 'How do leads work?', 'How does verification work?'] },
+        { keywords: ['top up', 'deposit', 'mtn', 'airtel'], reply: 'Click <strong>Top Up</strong> next to your wallet. Enter amount + MTN/Airtel number. Approve the prompt — wallet updates in seconds.', quick: ['How does pricing work?', 'How do leads work?', 'How do I add a property?'] },
+        { keywords: ['boost', 'rank', 'higher'], reply: 'Rank higher by: 1) Getting Verified, 2) Adding 3+ clear photos, 3) Collecting positive reviews, 4) Clicking <strong>Boost</strong> on any listing.', quick: ['How does verification work?', 'How do I add a property?', 'How does pricing work?'] },
+        { keywords: ['help', 'hi', 'hello'], reply: 'Hi! Ask me about adding properties, verification, leads, or wallet top-up.', quick: ['How do I add a property?', 'How do leads work?', 'How does pricing work?'] }
       ];
 
       function updateChatContext() {
@@ -1708,9 +1684,7 @@
         const onboardingVisible = $('#onboardingView') && $('#onboardingView').classList.contains('view-visible');
         state.chatContext = (dashboardVisible || onboardingVisible) ? 'broker' : 'visitor';
         const subEl = $('#chatContext');
-        if (subEl) subEl.textContent = state.chatContext === 'broker'
-          ? 'Here to help you get leads'
-          : 'Here to help you find a place';
+        if (subEl) subEl.textContent = state.chatContext === 'broker' ? 'Here to help you get leads' : 'Here to help you find a place';
       }
 
       function chatOpen() {
@@ -1718,10 +1692,7 @@
         $('#chatBubble').style.display = 'none';
         const badge = $('#chatBadge');
         if (badge) badge.style.display = 'none';
-        if (!$('#chatMessages').dataset.initialized) {
-          chatReset();
-          $('#chatMessages').dataset.initialized = '1';
-        }
+        if (!$('#chatMessages').dataset.initialized) { chatReset(); $('#chatMessages').dataset.initialized = '1'; }
       }
 
       function chatClose() {
@@ -1774,8 +1745,8 @@
         if (best) return best;
         return {
           reply: state.chatContext === 'broker'
-            ? 'I\'m not sure about that one. Try asking about <strong>adding a property</strong>, <strong>verification</strong>, <strong>leads</strong>, or <strong>pricing</strong>. For anything else, email support@propertyhub.dpdns.org.'
-            : 'I\'m not sure about that one. Try asking about <strong>searching</strong>, <strong>contacting a broker</strong>, or <strong>safety</strong>. For anything else, email support@propertyhub.dpdns.org.',
+            ? 'I\'m not sure about that. Try asking about <strong>adding a property</strong>, <strong>verification</strong>, <strong>leads</strong>, or <strong>pricing</strong>. For anything else: support@propertyhub.dpdns.org.'
+            : 'I\'m not sure about that. Try asking about <strong>searching</strong>, <strong>contacting a broker</strong>, or <strong>safety</strong>. For anything else: support@propertyhub.dpdns.org.',
           quick: state.chatContext === 'broker'
             ? ['How do I add a property?', 'How do leads work?', 'How does pricing work?']
             : ['How do I search?', 'How do I contact a broker?', 'Is this site safe?']
@@ -1889,7 +1860,6 @@
         $('#refreshWalletBtn') && $('#refreshWalletBtn').addEventListener('click', loadWallet);
         $('#refreshLeadsBtn') && $('#refreshLeadsBtn').addEventListener('click', loadLeads);
 
-        // Chatbot wiring
         $('#chatBubble') && $('#chatBubble').addEventListener('click', chatOpen);
         $('#chatClose') && $('#chatClose').addEventListener('click', chatClose);
         $('#chatSend') && $('#chatSend').addEventListener('click', function() {
@@ -1920,6 +1890,9 @@
           } catch (e) { $('#profileStatus').textContent = '❌ ' + e.message; }
         });
 
+        // ══════════════════════════════════════════════════════════
+        // ADD PROPERTY — verification is now COMPULSORY
+        // ══════════════════════════════════════════════════════════
         $('#addPropertyForm') && $('#addPropertyForm').addEventListener('submit', async function(e) {
           e.preventDefault();
           if (!state.currentUser) { alert('Sign in first.'); return; }
@@ -1928,9 +1901,15 @@
           const type = $('#propType').value;
           const addr = $('#propAddress').value.trim();
           const files = $('#propImage').files;
-          const reqV = $('#addRequestVerification').checked;
           if (!title || !price || !addr) { alert('Fill required fields.'); return; }
-          if (reqV) { if (!confirm('⚠️ Property Verification\n\nCosts ' + formatPrice(VERIFICATION_FEE) + '. Do you approve?')) return; }
+
+          // ⚠️ COMPULSORY VERIFICATION
+          if (state.walletBalance < VERIFICATION_FEE) {
+            alert('⚠️ Verification is required for all new listings.\n\nYou need ' + formatPrice(VERIFICATION_FEE) + ' in your wallet to submit this property.\n\nPlease top up first.');
+            return;
+          }
+          if (!confirm('⚠️ Verification Required\n\nAll new listings must be verified. A ' + formatPrice(VERIFICATION_FEE) + ' fee will be deducted from your wallet.\n\nDo you approve?')) return;
+
           const urls = [];
           if (files && files.length > 0) {
             $('#uploadStatus').className = 'mt-3 text-sm text-indigo-600';
@@ -1963,19 +1942,30 @@
             const insR = await supabase.from('properties').insert({
               title, price_amount: price, property_type: dbType, address: addr,
               media_urls: urls, is_verified: false,
-              verification_status: reqV ? 'pending' : 'unverified',
+              verification_status: 'pending',
               owner_id: state.currentUser.id, is_paused: false
             }).select().single();
             if (insR.error) throw insR.error;
             const inserted = insR.data;
-            if (reqV && inserted && inserted.id) {
-              const wR = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE, p_type: 'verification_fee', p_reference: inserted.id, p_description: 'Property verification fee' });
-              if (!wR.error) {
-                await supabase.from('property_verification_requests').insert({ property_id: inserted.id, broker_id: state.currentUser.id, submitted_data: {}, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
-                await loadWallet();
-              }
+            const wR = await supabase.rpc('deduct_wallet', {
+              p_user_id: state.currentUser.id,
+              p_amount: VERIFICATION_FEE,
+              p_type: 'verification_fee',
+              p_reference: inserted.id,
+              p_description: 'Compulsory property verification fee'
+            });
+            if (!wR.error) {
+              await supabase.from('property_verification_requests').insert({
+                property_id: inserted.id,
+                broker_id: state.currentUser.id,
+                submitted_data: {},
+                fee_amount: VERIFICATION_FEE,
+                fee_paid: true,
+                status: 'pending'
+              });
+              await loadWallet();
             }
-            alert('✅ Property added!');
+            alert('✅ Property submitted for verification!\n\nYour listing will go live once approved (usually within 24h).');
             $('#addPropertyForm').reset();
             $('#uploadStatus').textContent = '';
             await loadMyProperties();
@@ -2067,7 +2057,8 @@
           try {
             const r = await supabase.from('reports').insert({ reporter_id: state.currentUser ? state.currentUser.id : null, reporter_name: rn, reporter_email: re, broker_id: bid, reason, description: desc, status: 'pending' });
             if (r.error) throw r.error;
-            $('#reportStatus').textContent = '✅ Report submitted.'; $('#reportStatus').className = 'mt-3 text-sm text-emerald-600';
+            $('#reportStatus').textContent = '✅ Report submitted.';
+            $('#reportStatus').className = 'mt-3 text-sm text-emerald-600';
             setTimeout(function() { $('#reportModal').classList.add('hidden'); }, 2500);
           } catch (e) { $('#reportStatus').textContent = '❌ ' + e.message; $('#reportStatus').className = 'mt-3 text-sm text-red-600'; }
         });
