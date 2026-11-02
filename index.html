@@ -1767,6 +1767,22 @@
         if (!window.supabase) { console.error('Supabase SDK failed to load.'); return; }
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Load live pricing from admin-configured platform_settings
+try {
+  var psRes = await supabase.from('platform_settings').select('key,value');
+  if (psRes.data) {
+    var ps = {};
+    psRes.data.forEach(function(x){ ps[x.key] = x.value; });
+    if (ps.verification_fee != null) VERIFICATION_FEE_OVERRIDE = Number(ps.verification_fee);
+    if (ps.lead_rate_unit != null) LEAD_RATE_UNIT_OVERRIDE = Number(ps.lead_rate_unit);
+    if (ps.lead_rate_hot != null)  LEAD_RATE_HOT_OVERRIDE  = Number(ps.lead_rate_hot);
+    if (ps.lead_rate_warm != null) LEAD_RATE_WARM_OVERRIDE = Number(ps.lead_rate_warm);
+    if (ps.lead_rate_cold != null) LEAD_RATE_COLD_OVERRIDE = Number(ps.lead_rate_cold);
+    if (ps.guesthouse_lead_percent != null) GUEST_PCT_OVERRIDE = Number(ps.guesthouse_lead_percent);
+    if (ps.wallet_min_topup != null) MIN_TOPUP_OVERRIDE = Number(ps.wallet_min_topup);
+  }
+} catch (_) { /* keep constants */ }
+    
         setTimeout(function() {
           const lo = $('#loadingOverlay');
           if (lo) lo.classList.add('hidden');
