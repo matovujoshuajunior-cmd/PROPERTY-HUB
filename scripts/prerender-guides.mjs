@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // scripts/prerender-guides.mjs
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
@@ -5,7 +6,6 @@ import path from 'path';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
-
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('❌ Missing SUPABASE_URL or SUPABASE_ANON_KEY');
   process.exit(1);
@@ -13,8 +13,6 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Map each guide slug to the keywords that should appear in a listing’s
-// title or address to be included on that page.
 const GUIDE_KEYWORDS = {
   'single-rooms-near-makerere': ['kikoni', 'katanga', 'wandegeya', 'mulago', 'makerere'],
   'hostels-near-mulago':        ['mulago'],
@@ -28,105 +26,96 @@ const GUIDE_KEYWORDS = {
   'guesthouses-entebbe-airport':['entebbe']
 };
 
-function formatPrice(amount) {
-  return Number(amount || 0).toLocaleString('en-UG') + ' UGX';
-}
+const formatPrice = a => Number(a || 0).toLocaleString('en-UG') + ' UGX';
 
-function buildListingCard(listing) {
-  const locality = (listing.address || 'Uganda').split(',')[0].trim();
-  const typeLabel = listing.property_type === 'rental'
-    ? 'for Rent'
-    : listing.property_type === 'guesthouse'
-      ? 'Guesthouse'
-      : 'for Sale';
-  const altText = `${listing.title || 'Property'} ${typeLabel} in ${locality}, Uganda — ${formatPrice(listing.price_amount)} on Property Hub`;
-
-  const imageUrl = (listing.media_urls && listing.media_urls[0])
-    ? listing.media_urls[0]
-    : 'https://propertyhub.dpdns.org/og-cover.jpg';
-
-  return `
-    <article class="listing-card">
-      <img src="${imageUrl}" alt="${altText.replace(/"/g, '&quot;')}" loading="lazy" />
+function buildListingCard(l) {
+  const locality = (l.address || 'Uganda').split(',')[0].trim();
+  const typeLabel = l.property_type === 'rental' ? 'for Rent'
+                  : l.property_type === 'guesthouse' ? 'Guesthouse'
+                  : 'for Sale';
+  const alt = `${l.title || 'Property'} ${typeLabel} in ${locality}, Uganda — ${formatPrice(l.price_amount)} on Property Hub`;
+  const img = (l.media_urls && l.media_urls[0]) || 'https://propertyhub.dpdns.org/og-cover.jpg';
+  return `<article class="listing-card">
+      <img src="${img}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy" width="400" height="160" />
       <div class="listing-body">
-        <h3>${listing.title || 'Property'}</h3>
-        <p class="price">${formatPrice(listing.price_amount)}</p>
-        <p class="location">${listing.address || 'Location not specified'}</p>
-        <a href="https://propertyhub.dpdns.org/property/${listing.id}" class="btn">View details →</a>
+        <h3>${l.title || 'Property'}</h3>
+        <p class="price">${formatPrice(l.price_amount)}</p>
+        <p class="location">${l.address || 'Location not specified'}</p>
+        <a href="https://propertyhub.dpdns.org/property/${l.id}" class="btn">View details →</a>
       </div>
-    </article>
-  `;
+    </article>`;
 }
 
-function buildOfferSchema(listing) {
+function buildOfferSchema(l) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: listing.title || 'Property',
-    description: listing.title || '',
-    image: listing.media_urls?.[0] || '',
+    name: l.title || 'Property',
+    description: l.title || '',
+    image: l.media_urls?.[0] || '',
     offers: {
       '@type': 'Offer',
-      price: listing.price_amount || 0,
+      price: l.price_amount || 0,
       priceCurrency: 'UGX',
       availability: 'https://schema.org/InStock',
-      url: `https://propertyhub.dpdns.org/property/${listing.id}`
+      url: `https://propertyhub.dpdns.org/property/${l.id}`
     },
-    areaServed: {
-      '@type': 'Place',
-      name: (listing.address || 'Uganda').split(',')[0].trim()
-    }
+    areaServed: { '@type': 'Place', name: (l.address || 'Uganda').split(',')[0].trim() }
   };
 }
 
 async function main() {
   console.log('🚀 Fetching listings from Supabase…');
   const { data: listings, error } = await supabase
-    .from('properties')
-    .select('*')
-    .eq('is_paused', false)
+    .from('properties').select('*').eq('is_paused', false)
     .order('created_at', { ascending: false });
-
   if (error) throw error;
-  if (!listings.length) {
-    console.warn('⚠️  No listings found — guide pages will contain a helpful empty-state message.');
-  }
+  console.log(`   ${listings.length} active listings`);
 
+  // ─── Guides ───
   for (const [slug, keywords] of Object.entries(GUIDE_KEYWORDS)) {
     const matching = listings.filter(l => {
-      const text = `${l.title} ${l.address}`.toLowerCase();
+      const text = `${l.title || ''} ${l.address || ''}`.toLowerCase();
       return keywords.some(k => text.includes(k));
     });
-
     console.log(`📄 ${slug}: ${matching.length} listings`);
 
     const cardsHtml = matching.length
-      ? matching.map(buildListingCard).join('')
+      ? matching.map(buildListingCard).join('\n')
       : `<p class="empty-state">No listings yet in this area. <a href="https://propertyhub.dpdns.org/">Browse all properties →</a></p>`;
 
-    const schemaBlocks = matching.map(l => `
-      <script type="application/ld+json">${JSON.stringify(buildOfferSchema(l))}</script>
-    `).join('');
+    const offerSchema = matching.map(l =>
+      `<script type="application/ld+json">${JSON.stringify(buildOfferSchema(l))}</script>`
+    ).join('\n');
 
     const templatePath = path.join(process.cwd(), 'guides', slug, 'template.html');
     if (!fs.existsSync(templatePath)) {
-      console.warn(`⚠️  Skipping ${slug}: template.html not found at ${templatePath}`);
+      console.warn(`⚠️  Skipping ${slug}: template.html not found`);
       continue;
     }
-
     let html = fs.readFileSync(templatePath, 'utf8');
     html = html.replace('<!-- LISTING_CARDS -->', cardsHtml);
-    html = html.replace('<!-- OFFER_SCHEMA -->', schemaBlocks);
-
-    const outputDir = path.join(process.cwd(), 'guides', slug);
-    fs.writeFileSync(path.join(outputDir, 'index.html'), html);
-    console.log(`✅ Wrote ${slug}/index.html`);
+    html = html.replace('<!-- OFFER_SCHEMA -->', offerSchema);
+    fs.writeFileSync(path.join(process.cwd(), 'guides', slug, 'index.html'), html);
+    console.log(`   ✅ guides/${slug}/index.html`);
   }
 
+  // ─── Homepage top 6 ───
+  const top = listings.slice(0, 6);
+  if (top.length) {
+    const topCards = top.map(buildListingCard).join('\n');
+    const indexPath = path.join(process.cwd(), 'index.html');
+    if (fs.existsSync(indexPath)) {
+      let html = fs.readFileSync(indexPath, 'utf8');
+      html = html.replace(
+        /<!-- PRERENDERED_LISTINGS_START -->[\s\S]*?<!-- PRERENDERED_LISTINGS_END -->/,
+        `<!-- PRERENDERED_LISTINGS_START -->\n${topCards}\n            <!-- PRERENDERED_LISTINGS_END -->`
+      );
+      fs.writeFileSync(indexPath, html);
+      console.log(`✅ Injected ${top.length} listings into index.html`);
+    }
+  }
   console.log('🎉 Done.');
 }
 
-main().catch(err => {
-  console.error('❌ Prerender failed:', err);
-  process.exit(1);
-});
+main().catch(err => { console.error('❌', err); process.exit(1); });
