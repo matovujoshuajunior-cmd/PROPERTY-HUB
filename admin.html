@@ -124,12 +124,24 @@
       </div>
 
       <div id="tab-brokers" class="tab-content">
-        <div class="section-card">
-          <h3>👥 All Brokers</h3>
-          <div id="brokerList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
-          <div id="noBrokers" class="hidden text-slate-500 text-sm py-4">No brokers found.</div>
-        </div>
+  <div class="section-card">
+    <h3>👥 All Brokers</h3>
+
+    <div id="brokerSyncBanner" class="hidden mb-3 text-sm rounded-xl p-3 bg-amber-50 border border-amber-200 text-amber-900 flex items-start justify-between gap-3">
+      <div>
+        <strong>⚠️ Profile rows missing.</strong>
+        <span id="brokerSyncText"></span>
       </div>
+      <button id="fixMissingProfilesBtn" class="btn-sm amber whitespace-nowrap">
+        <i class="fas fa-wrench"></i> Fix now
+      </button>
+    </div>
+
+    <div id="brokerCountSummary" class="mb-2 text-xs text-slate-500"></div>
+    <div id="brokerList" class="table-wrap"><p class="text-slate-500 text-sm">Loading...</p></div>
+    <div id="noBrokers" class="hidden text-slate-500 text-sm py-4">No brokers found.</div>
+  </div>
+</div>
 
       <div id="brokerDetailView" class="hidden">
         <div class="section-card">
@@ -577,36 +589,91 @@
     //  BROKERS
     // ══════════════════════════════════════════════════════════════
     async function loadBrokers() {
-      var box = $('brokerList'), no = $('noBrokers');
-      try {
-        var r = await supabase.from('profiles').select('*').order('created_at', { ascending:false });
-        if (r.error) throw r.error;
-        var data = r.data || [];
-        if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
-        no.classList.add('hidden');
-        var html = '<table><thead><tr><th>Business</th><th>Email</th><th>Phone</th><th>Verified</th><th>Blocked</th><th>Actions</th></tr></thead><tbody>';
-        data.forEach(function(b) {
-          html += '<tr>' +
-            '<td class="font-medium">' + esc(b.business_name || 'Unnamed') + '</td>' +
-            '<td>' + esc(b.email || '—') + '</td>' +
-            '<td>' + esc(b.phone || '—') + '</td>' +
-            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span></td>' +
-            '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span></td>' +
-            '<td>' +
-              '<button class="btn-sm blue view-broker" data-id="' + b.id + '">View</button>' +
-              (b.is_verified ? '<button class="btn-sm amber unverify-broker" data-id="' + b.id + '">Unverify</button>' : '<button class="btn-sm green verify-broker" data-id="' + b.id + '">Verify</button>') +
-              (b.is_blocked ? '<button class="btn-sm green unblock-broker" data-id="' + b.id + '">Unblock</button>' : '<button class="btn-sm red block-broker" data-id="' + b.id + '">Block</button>') +
-            '</td></tr>';
-        });
-        html += '</tbody></table>';
-        box.innerHTML = html;
-        box.querySelectorAll('.view-broker').forEach(function(x){ x.onclick = function(){ showBrokerDetail(x.dataset.id); }; });
-        box.querySelectorAll('.verify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'verify'); }; });
-        box.querySelectorAll('.unverify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unverify'); }; });
-        box.querySelectorAll('.block-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'block'); }; });
-        box.querySelectorAll('.unblock-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unblock'); }; });
-      } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading brokers.</p>'; }
+  var box = $('brokerList'), no = $('noBrokers');
+  var banner = $('brokerSyncBanner');
+  var summary = $('brokerCountSummary');
+  try {
+    // 1. Load profiles
+    var r = await supabase.from('profiles').select('*').order('created_at', { ascending:false });
+    if (r.error) throw r.error;
+    var data = r.data || [];
+
+    // 2. Diagnostic — how many auth users exist vs how many profile rows
+    var authCount = null;
+    try {
+      var cnt = await supabase.rpc('count_auth_users');
+      if (!cnt.error && typeof cnt.data === 'number') authCount = cnt.data;
+    } catch (_) { /* RPC may not be installed — skip */ }
+
+    if (summary) {
+      summary.textContent = authCount != null
+        ? data.length + ' profile row(s) · ' + authCount + ' auth user(s) in the database'
+        : data.length + ' profile row(s)';
     }
+
+    // 3. Show warning banner if there is a mismatch
+    if (banner) {
+      if (authCount != null && data.length < authCount) {
+        var missing = authCount - data.length;
+        var txt = $('brokerSyncText');
+        if (txt) txt.textContent = missing + ' auth user(s) have no profile row — they will not appear below until backfilled.';
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    if (!data.length) { box.innerHTML = ''; no.classList.remove('hidden'); return; }
+    no.classList.add('hidden');
+
+    var html = '<table><thead><tr><th>Business</th><th>Email</th><th>Phone</th><th>Verified</th><th>Blocked</th><th>Actions</th></tr></thead><tbody>';
+    data.forEach(function(b) {
+      html += '<tr>' +
+        '<td class="font-medium">' + esc(b.business_name || 'Unnamed') + '</td>' +
+        '<td>' + esc(b.email || '—') + '</td>' +
+        '<td>' + esc(b.phone || '—') + '</td>' +
+        '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_verified?'verified':'unverified') + '">' + (b.is_verified?'verified':'unverified') + '</span></td>' +
+        '<td><span class="text-xs px-2 py-0.5 rounded-full ' + badge(b.is_blocked?'blocked':'active') + '">' + (b.is_blocked?'blocked':'active') + '</span></td>' +
+        '<td>' +
+          '<button class="btn-sm blue view-broker" data-id="' + b.id + '">View</button>' +
+          (b.is_verified ? '<button class="btn-sm amber unverify-broker" data-id="' + b.id + '">Unverify</button>' : '<button class="btn-sm green verify-broker" data-id="' + b.id + '">Verify</button>') +
+          (b.is_blocked ? '<button class="btn-sm green unblock-broker" data-id="' + b.id + '">Unblock</button>' : '<button class="btn-sm red block-broker" data-id="' + b.id + '">Block</button>') +
+        '</td></tr>';
+    });
+    html += '</tbody></table>';
+    box.innerHTML = html;
+
+    box.querySelectorAll('.view-broker').forEach(function(x){ x.onclick = function(){ showBrokerDetail(x.dataset.id); }; });
+    box.querySelectorAll('.verify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'verify'); }; });
+    box.querySelectorAll('.unverify-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unverify'); }; });
+    box.querySelectorAll('.block-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'block'); }; });
+    box.querySelectorAll('.unblock-broker').forEach(function(x){ x.onclick = function(){ handleBrokerAction(x.dataset.id,'unblock'); }; });
+  } catch (e) {
+    box.innerHTML = '<p class="text-red-500 text-sm">Error loading brokers: ' + esc(e.message) + '</p>';
+  }
+}
+
+// Backfill missing profiles — one click from the dashboard
+async function fixMissingProfiles() {
+  var btn = $('fixMissingProfilesBtn');
+  if (!btn) return;
+  if (!confirm('Create profile rows for any auth users that are missing one?\n\nThis will NOT overwrite existing profiles.')) return;
+  var original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing…';
+  try {
+    var r = await supabase.rpc('backfill_missing_profiles');
+    if (r.error) throw r.error;
+    var n = r.data || 0;
+    alert('✅ Created ' + n + ' missing profile row(s).');
+    await loadBrokers();
+    await loadStats();
+  } catch (e) {
+    alert('❌ ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
 
     async function handleBrokerAction(id, action) {
       if (!confirm('Are you sure you want to ' + action + ' this broker?')) return;
@@ -1493,6 +1560,7 @@
         loadBrokers();
       });
       $('leadStatusFilter').addEventListener('change', function(e){ leadFilter = e.target.value; loadLeads(); });
+      $('fixMissingProfilesBtn').addEventListener('click', fixMissingProfiles);
       $('runCleanupBtn').addEventListener('click', runCleanup);
       $('runCleanupBtn2').addEventListener('click', async function() {
         var st = $('cleanupStatus');
