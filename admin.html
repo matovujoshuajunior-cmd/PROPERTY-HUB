@@ -1690,7 +1690,7 @@ async function loadFollowups() {
         else if (t === 'reports') loadReports();
         else if (t === 'transactions') loadTransactions();
       }, 30000);
-    
+    }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
