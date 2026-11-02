@@ -1390,10 +1390,24 @@ function buildWaLink(phone) {
           }).select().single();
           if (leadR.error) throw leadR.error;
           const bdR = await supabase.from('profiles').select('email, phone, business_name').eq('id', pd.owner_id).single();
-          if (bdR.data) {
-            if (bdR.data.email) {
-              await sendNotificationEmail(bdR.data.email, bdR.data.business_name || 'Broker', '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title, buildBrokerLeadEmail(pd.title, pd.address, lt, cost));
-            }
+          if (bdR.data.email) {
+  const leadForEmail = {
+    lead_type: lt,
+    total_score: total,
+    cost: cost,
+    visitor_name: name,
+    visitor_email: email,
+    visitor_whatsapp: wa,
+    quiz_answers: answers
+  };
+  const brokerFull = { business_name: bdR.data.business_name, phone: bdR.data.phone, email: bdR.data.email };
+  await sendNotificationEmail(
+    bdR.data.email,
+    bdR.data.business_name || 'Broker',
+    '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title,
+    buildBrokerLeadEmail(pd, brokerFull, leadForEmail)
+  );
+}
             if (bdR.data.phone) {
               const shortTitle = String(pd.title || 'Property').substring(0, 30);
               const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/dashboard';
@@ -1454,7 +1468,12 @@ function buildWaLink(phone) {
               const u = uR.data;
               const pdR = await supabase.from('properties').select('title').eq('id', u.property_id).single();
               const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
-              if (u.visitor_email) await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', buildVisitorApprovedEmail(u.visitor_name, (pdR.data && pdR.data.title) || 'the property', bpR.data && bpR.data.business_name, (bpR.data && bpR.data.phone) || u.visitor_whatsapp, (bpR.data && bpR.data.email) || state.currentUser.email));
+              if (u.visitor_email) {
+  const propFull = pdR.data || {};
+  const brokerFull = bpR.data || { email: state.currentUser.email };
+  const body = await buildVisitorApprovedEmail(u, propFull, brokerFull);
+  await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', body);
+}
               if (u.visitor_whatsapp) {
                 const brokerPhone = (bpR.data && bpR.data.phone) || '';
                 const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
@@ -1479,8 +1498,12 @@ function buildWaLink(phone) {
               const uR = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', id).select('visitor_name, visitor_email, property_id').single();
               if (uR.error) throw uR.error;
               const u = uR.data;
-              const pdR = await supabase.from('properties').select('title').eq('id', u.property_id).single();
-              if (u.visitor_email) await sendNotificationEmail(u.visitor_email, u.visitor_name, 'Your Request Was Not Approved', buildVisitorRejectedEmail(u.visitor_name, (pdR.data && pdR.data.title) || 'the property'));
+const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
+             if (u.visitor_email) {
+  const propFull = pdR.data || {};
+  const body = buildVisitorRejectedEmail(u, propFull);
+  await sendNotificationEmail(u.visitor_email, u.visitor_name, 'Your Request Was Not Approved', body);
+}
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           }); });
