@@ -688,6 +688,7 @@
       const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
       const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
+     
       const VERIFICATION_FEE = 5000;
       const SITE_URL = 'https://propertyhub.dpdns.org';
 
@@ -934,15 +935,127 @@
         } catch (err) { console.error('Email failed:', err); return false; }
       }
 
-      function buildBrokerLeadEmail(t, a, lt, c) {
-        return 'Hello Broker,\n\n🔔 NEW ' + lt.toUpperCase() + ' LEAD\n━━━━━━━━━━━━━━━━━━━━━━━\n\n🏠 ' + (t || 'Untitled') + '\n📍 ' + (a || 'Location not specified') + '\n\n🔥 Lead Type: ' + lt.toUpperCase() + '\n💰 Cost to unlock: ' + c.toLocaleString() + ' UGX\n\nLog in to your dashboard to unlock this lead.\n\n👉 ' + SITE_URL + '/dashboard\n\n— Property Hub Uganda';
-      }
-      function buildVisitorApprovedEmail(n, t, bn, bp, be) {
-        return 'Hello ' + n + ',\n\n🎉 Your request has been APPROVED.\n\nProperty: ' + t + '\nBroker: ' + (bn || 'the broker') + '\n\n📱 WhatsApp: ' + (bp || '—') + '\n📧 Email: ' + (be || '—') + '\n\n⚠️ Safety: Never pay before viewing in person.\n\n' + SITE_URL;
-      }
-      function buildVisitorRejectedEmail(n, t) {
-        return 'Hello ' + n + ',\n\nUnfortunately the broker was unavailable for "' + t + '".\n\nTry again: ' + SITE_URL;
-      }
+    function buildBrokerLeadEmail(prop, broker, lead) {
+  var lt = lead.lead_type || 'warm';
+  var ltEmoji = lt === 'hot' ? '🔥' : lt === 'warm' ? '🌤️' : '❄️';
+  var ltLabel = lt.toUpperCase();
+  var answers = lead.quiz_answers || {};
+  var scoreLines = [
+    '  • Timeline: '        + pickAnswer(answers.q1, ['6+ months', '1–6 months', 'ASAP (<1 month)']),
+    '  • Budget fit: '       + pickAnswer(answers.q2, ['Below asking', 'Matches asking']),
+    '  • Viewing readiness: ' + pickAnswer(answers.q3, ['Not ready', 'Wants more info', 'Ready within 7 days']),
+    '  • Seriousness: '      + pickAnswer(answers.q4, ['Just browsing', 'Comparing', 'Top choice'])
+  ].join('\n');
+
+  return (
+    'Hello ' + (broker.business_name || 'Broker') + ',\n\n' +
+    ltEmoji + ' NEW ' + ltLabel + ' LEAD — ' + prop.title + '\n' +
+    '────────────────────────────────────────\n\n' +
+    '🏠 Property:  ' + prop.title + '\n' +
+    '📍 Area:      ' + (prop.address || '—') + '\n' +
+    '💰 Price:     ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n' +
+    '🔥 Lead type: ' + ltLabel + '  (score ' + (lead.total_score || 0) + '/12)\n' +
+    '💵 Unlock at: ' + Number(lead.cost || 0).toLocaleString() + ' UGX\n\n' +
+    '👤 Visitor:   ' + lead.visitor_name + '\n' +
+    '📧 Email:     ' + lead.visitor_email + '\n' +
+    '📱 WhatsApp:  ' + lead.visitor_whatsapp + '\n\n' +
+    '📝 WHY THEY SCORED ' + ltLabel + '\n' + scoreLines + '\n\n' +
+    '👉 Unlock now: https://propertyhub.dpdns.org/dashboard\n' +
+    '   Lead expires in 24h — after that it is released.\n\n' +
+    '— Property Hub'
+  );
+}
+
+function pickAnswer(val, labels) {
+  var idx = (parseInt(val, 10) || 1) - 1;
+  return labels[idx] || '—';
+}
+     async function buildVisitorApprovedEmail(lead, prop, broker) {
+  var seg = prop.property_type === 'guesthouse' ? 'guesthouse'
+          : prop.property_type === 'property'    ? 'buyer'
+          : 'renter';
+
+  // Load partner categories for this segment
+  var partners = [];
+  try {
+    var r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
+    if (!r.error && r.data) partners = r.data;
+  } catch (_) {}
+
+  // Group partner rows by category, cap at 3 categories × 2 providers
+  var byCat = {};
+  partners.forEach(function(p) {
+    if (!byCat[p.category_name]) byCat[p.category_name] = { emoji: p.category_emoji, items: [] };
+    if (byCat[p.category_name].items.length < 2) byCat[p.category_name].items.push(p);
+  });
+  var catNames = Object.keys(byCat).slice(0, 3);
+  var servicesBlock = '';
+  if (catNames.length) {
+    servicesBlock = '\n────────────────────────────────────────\n' +
+      '🎁 WHILE YOU SETTLE IN — verified partners\n' +
+      '────────────────────────────────────────\n\n';
+    catNames.forEach(function(name) {
+      var c = byCat[name];
+      servicesBlock += c.emoji + ' ' + name + '\n';
+      c.items.forEach(function(p) {
+        servicesBlock += '   • ' + p.provider_name + ' — ' + (p.tagline || '') + '\n' +
+                        '     ' + p.url + (p.discount_code ? '  (code: ' + p.discount_code + ')' : '') + '\n';
+      });
+      servicesBlock += '\n';
+    });
+    servicesBlock += 'More services: https://propertyhub.dpdns.org/services/\n';
+  }
+
+  return (
+    'Hello ' + lead.visitor_name + ',\n\n' +
+    '🎉 GOOD NEWS — your request was APPROVED\n' +
+    '────────────────────────────────────────\n\n' +
+    '🏠 ' + prop.title + '\n' +
+    '📍 ' + (prop.address || '—') + '\n' +
+    '💰 ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n\n' +
+    '👤 Your broker:  ' + (broker.business_name || 'the broker') + '\n' +
+    '📱 WhatsApp:     ' + (broker.phone || '—') + '\n' +
+    '📧 Email:        ' + (broker.email || '—') + '\n\n' +
+    '🔗 Chat on WhatsApp: ' + buildWaLink(broker.phone) + '\n\n' +
+    '────────────────────────────────────────\n' +
+    '✅ YOUR NEXT STEPS\n' +
+    '────────────────────────────────────────\n\n' +
+    '1. WhatsApp the broker NOW — say "I was approved on Property Hub about ' + prop.title + '".\n' +
+    '2. Agree a viewing time. Do NOT pay anything before you see the property in person.\n' +
+    '3. Take a friend with you to the viewing.\n' +
+    '4. Check the meter and water pressure yourself.\n' +
+    '5. Only pay after you sign a written agreement.\n\n' +
+    '⚠️ If the broker asks for money before viewing, stop — that is a scam.\n' +
+    'Report it here: https://propertyhub.dpdns.org/?report=1\n' +
+    servicesBlock + '\n' +
+    'We will check in with you in 3 days to see how it went.\n\n' +
+    '— Property Hub'
+  );
+}
+
+function buildWaLink(phone) {
+  if (!phone) return '';
+  var p = String(phone).replace(/\D/g, '');
+  if (p.startsWith('0')) p = '256' + p.slice(1);
+  if (!p.startsWith('256')) p = '256' + p;
+  return 'https://wa.me/' + p;
+}
+      function buildVisitorRejectedEmail(lead, prop) {
+  return (
+    'Hello ' + lead.visitor_name + ',\n\n' +
+    'We are sorry — the broker was not able to take your request for:\n\n' +
+    '🏠 ' + (prop.title || 'the property') + '\n\n' +
+    'This usually means it has just been rented or the broker is unreachable.\n\n' +
+    '────────────────────────────────────────\n' +
+    '🔎 SIMILAR PROPERTIES\n' +
+    '────────────────────────────────────────\n\n' +
+    'Browse alternatives in the same area:\n' +
+    'https://propertyhub.dpdns.org/?search=' + encodeURIComponent((prop.address || '').split(',')[0].trim()) + '\n\n' +
+    'Or see everything available now:\n' +
+    'https://propertyhub.dpdns.org/\n\n' +
+    '— Property Hub'
+  );
+}
 
       async function loadWallet() {
         if (!state.currentUser) return;
