@@ -21,12 +21,13 @@ a:hover{text-decoration:underline}
 .back-btn:hover{background:#4338ca;text-decoration:none}
 .container{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem}
 h1{font-size:2rem;font-weight:800;color:#0f172a;margin-bottom:.5rem}
+h2.section{font-size:1.15rem;font-weight:700;color:#1e293b;margin:2rem 0 .75rem}
 p.intro{font-size:1.05rem;color:#475569;margin-bottom:2rem}
 .grid{display:grid;grid-template-columns:1fr;gap:1rem}
 @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
 .card{display:block;padding:1.25rem;background:#fff;border:1px solid #e2e8f0;border-radius:1rem;transition:all .2s}
 .card:hover{border-color:#4f46e5;transform:translateY(-2px);text-decoration:none;box-shadow:0 10px 20px -10px rgba(79,70,229,0.2)}
-.card h2{font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:.4rem}
+.card h3{font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:.4rem}
 .card p{font-size:.85rem;color:#64748b;margin:0}
 .footer{background:#0f172a;color:#cbd5e1;padding:2.5rem 1.5rem;margin-top:3rem;text-align:center;font-size:.85rem}
 .footer a{color:#a5b4fc}
@@ -43,28 +44,61 @@ p.intro{font-size:1.05rem;color:#475569;margin-bottom:2rem}
 
 <main class="container">
   <h1>Property Guides for Kampala</h1>
-  <p class="intro">In-depth guides to finding rentals, hostels, and rooms in Kampala's most searched neighborhoods. Each guide covers current 2026 prices, safety tips, and how to avoid rental scams.</p>
+  <p class="intro">In-depth guides to finding rentals, hostels, apartments, and land in Kampala's most searched neighborhoods. Each guide covers current 2026 prices, safety tips, and how to avoid rental scams.</p>
 
+  <h2 class="section">Student &amp; Budget Rentals</h2>
   <div class="grid">
     <a href="/guides/single-rooms-near-makerere/" class="card">
-      <h2>Single Rooms Near Makerere University</h2>
+      <h3>Single Rooms Near Makerere University</h3>
       <p>Prices from 100,000 UGX/month in Kikoni, Katanga, Wandegeya, and Mulago.</p>
     </a>
     <a href="/guides/hostels-near-mulago/" class="card">
-      <h2>Hostels Near Mulago Hospital</h2>
+      <h3>Hostels Near Mulago Hospital</h3>
       <p>For medical students, nurses, and patient families. From 200,000 UGX/month.</p>
     </a>
     <a href="/guides/cheap-rooms-kikoni/" class="card">
-      <h2>Cheap Rooms for Rent in Kikoni</h2>
+      <h3>Cheap Rooms for Rent in Kikoni</h3>
       <p>Kampala's cheapest student neighborhood. Rooms from 100,000 UGX/month.</p>
     </a>
     <a href="/guides/rooms-wandegeya/" class="card">
-      <h2>Rooms for Rent in Wandegeya</h2>
+      <h3>Rooms for Rent in Wandegeya</h3>
       <p>Modern rooms with reliable utilities. From 250,000 UGX/month.</p>
     </a>
     <a href="/guides/student-hostels-katanga/" class="card">
-      <h2>Student Hostels in Katanga</h2>
+      <h3>Student Hostels in Katanga</h3>
       <p>Older but cheaper. Rooms from 120,000 UGX/month near Makerere.</p>
+    </a>
+  </div>
+
+  <h2 class="section">Apartments &amp; Houses</h2>
+  <div class="grid">
+    <a href="/guides/apartments-naalya/" class="card">
+      <h3>2 Bedroom Apartments in Naalya</h3>
+      <p>Modern, secure, family-friendly. From 800,000 UGX/month.</p>
+    </a>
+    <a href="/guides/apartments-ntinda/" class="card">
+      <h3>Apartments for Rent in Ntinda</h3>
+      <p>Studios to 3-bedrooms in Kampala's walkable northeast. From 700,000 UGX/month.</p>
+    </a>
+    <a href="/guides/rentals-bukoto/" class="card">
+      <h3>Houses &amp; Apartments in Bukoto</h3>
+      <p>Upscale, expat-friendly, walled compounds. From 1M UGX/month.</p>
+    </a>
+  </div>
+
+  <h2 class="section">Buying Property</h2>
+  <div class="grid">
+    <a href="/guides/bungalows-kisaasi/" class="card">
+      <h3>Bungalows for Sale in Kisaasi</h3>
+      <p>Newer builds with titled land. From 60M UGX (land) / 180M UGX (bungalow).</p>
+    </a>
+  </div>
+
+  <h2 class="section">Short Stays</h2>
+  <div class="grid">
+    <a href="/guides/guesthouses-entebbe-airport/" class="card">
+      <h3>Guesthouses Near Entebbe Airport</h3>
+      <p>Cheap overnight stays 10–15 min from the terminal. From 80,000 UGX/night.</p>
     </a>
   </div>
 </main>
