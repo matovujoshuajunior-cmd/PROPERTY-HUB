@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verified Property Services in Uganda | Property Hub</title>
+<meta name="description" content="Furniture, cleaning, legal, mortgage, airport transfers — vetted partners to help you settle in. Curated by Property Hub Uganda." />
+<link rel="canonical" href="https://propertyhub.dpdns.org/services/" />
+<meta name="robots" content="index, follow" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
+<link rel="stylesheet" href="../guides/styles.css" />
+<style>
+  .service-cat { margin-bottom: 2.5rem; }
+  .service-cat h2 { font-size: 1.35rem; font-weight: 700; color: #1e293b; margin-bottom: .5rem; }
+  .service-cat p.desc { font-size: .9rem; color: #64748b; margin-bottom: 1rem; }
+  .provider-grid { display: grid; grid-template-columns: 1fr; gap: .85rem; }
+  @media (min-width: 640px) { .provider-grid { grid-template-columns: 1fr 1fr; } }
+  .provider-card { background: #fff; border: 1px solid #e2e8f0; border-radius: .85rem; padding: 1rem 1.25rem; transition: all .15s; }
+  .provider-card:hover { border-color: #4f46e5; transform: translateY(-2px); box-shadow: 0 8px 20px -10px rgba(79,70,229,.2); }
+  .provider-card h3 { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: .25rem; }
+  .provider-card p { font-size: .85rem; color: #64748b; margin-bottom: .65rem; }
+  .provider-card .btn { font-size: .8rem; }
+  .provider-card .code { display: inline-block; background: #fef3c7; color: #92400e; font-size: .7rem; font-weight: 700; padding: .15rem .55rem; border-radius: 9999px; margin-left: .5rem; }
+  .loading { color: #64748b; font-size: .9rem; padding: 2rem 0; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo">🏠 Property<span>Hub</span></a>
+    <a href="/" class="back-btn">Browse Listings →</a>
+  </div>
+</header>
+
+<main class="container">
+  <nav class="breadcrumb"><a href="/">Home</a> › <span>Verified Services</span></nav>
+
+  <h1>Verified Property Services in Uganda</h1>
+  <p class="updated">Last updated: November 2026</p>
+  <p class="intro">Moving in, buying land, or just landed in Uganda? These are vetted partners we trust — verified by Property Hub for quality and reliability. Using them keeps this site free for visitors like you.</p>
+
+  <div id="serviceList"><p class="loading">Loading services…</p></div>
+</main>
+
+<footer class="footer">
+  <p>© 2026 <a href="/">Property Hub Uganda</a> — Verified rentals, land, and guesthouses across Uganda.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script>
+(async function() {
+  const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+
+  if (!window.supabase) { document.getElementById('serviceList').innerHTML = '<p class="loading">Could not connect. Refresh the page.</p>'; return; }
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  try {
+    const [catRes, provRes] = await Promise.all([
+      supabase.from('service_categories').select('*').eq('is_active', true).order('sort_order'),
+      supabase.from('service_providers').select('*').eq('is_active', true).order('is_featured', { ascending: false }).order('sort_order')
+    ]);
+    if (catRes.error) throw catRes.error;
+    const cats = catRes.data || [];
+    const provs = provRes.data || [];
+
+    const byCat = {};
+    provs.forEach(p => {
+      if (!byCat[p.category_id]) byCat[p.category_id] = [];
+      byCat[p.category_id].push(p);
+    });
+
+    if (!cats.length) {
+      document.getElementById('serviceList').innerHTML = '<p class="loading">No services listed yet — check back soon.</p>';
+      return;
+    }
+
+    let html = '';
+    cats.forEach(c => {
+      const items = byCat[c.id] || [];
+      if (!items.length) return;
+      html += '<section class="service-cat">' +
+        '<h2>' + esc(c.emoji) + ' ' + esc(c.name) + '</h2>' +
+        (c.description ? '<p class="desc">' + esc(c.description) + '</p>' : '') +
+        '<div class="provider-grid">';
+      items.forEach(p => {
+        html += '<article class="provider-card">' +
+          '<h3>' + esc(p.name) + '</h3>' +
+          (p.tagline ? '<p>' + esc(p.tagline) + '</p>' : '') +
+          '<a href="' + esc(p.url) + '" target="_blank" rel="noopener nofollow sponsored" class="btn">Visit ' + esc(p.name) + ' →</a>' +
+          (p.discount_code ? '<span class="code">Use code: ' + esc(p.discount_code) + '</span>' : '') +
+          '</article>';
+      });
+      html += '</div></section>';
+    });
+
+    document.getElementById('serviceList').innerHTML = html || '<p class="loading">No services available yet.</p>';
+  } catch (e) {
+    document.getElementById('serviceList').innerHTML = '<p class="loading" style="color:#ef4444">Error loading services: ' + esc(e.message) + '</p>';
+  }
+})();
+</script>
+</body>
+</html>
