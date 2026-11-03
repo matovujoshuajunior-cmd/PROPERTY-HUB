@@ -1495,7 +1495,7 @@ async function handleQuizSubmit() {
 
     $('#quizModal').classList.add('hidden');
     alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".');
-  } catch (e) {
+  {
     console.error(e);
     alert('Error: ' + e.message);
   }
