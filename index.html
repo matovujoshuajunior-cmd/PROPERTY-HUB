@@ -980,12 +980,12 @@ async function loadPlatformSettings() {
         } catch (err) { console.error('Email failed:', err); return false; }
       }
 
-    function buildBrokerLeadEmail(prop, broker, lead) {
-  var lt = lead.lead_type || 'warm';
-  var ltEmoji = lt === 'hot' ? '🔥' : lt === 'warm' ? '🌤️' : '❄️';
-  var ltLabel = lt.toUpperCase();
-  var answers = lead.quiz_answers || {};
-  var scoreLines = [
+   function buildBrokerLeadEmail(prop, broker, lead) {
+  const lt = lead.lead_type || 'warm';
+  const ltEmoji = lt === 'hot' ? '🔥' : lt === 'warm' ? '🌤️' : '❄️';
+  const answers = lead.quiz_answers || {};
+  const firstName = (lead.visitor_name || 'Someone').split(' ')[0] || 'Someone';
+  const scoreLines = [
     '  • Timeline: '        + pickAnswer(answers.q1, ['6+ months', '1–6 months', 'ASAP (<1 month)']),
     '  • Budget fit: '       + pickAnswer(answers.q2, ['Below asking', 'Matches asking']),
     '  • Viewing readiness: ' + pickAnswer(answers.q3, ['Not ready', 'Wants more info', 'Ready within 7 days']),
@@ -994,23 +994,29 @@ async function loadPlatformSettings() {
 
   return (
     'Hello ' + (broker.business_name || 'Broker') + ',\n\n' +
-    ltEmoji + ' NEW ' + ltLabel + ' LEAD — ' + prop.title + '\n' +
+    ltEmoji + ' NEW ' + lt.toUpperCase() + ' LEAD — ' + (prop.title || 'Property') + '\n' +
     '────────────────────────────────────────\n\n' +
-    '🏠 Property:  ' + prop.title + '\n' +
+    '🏠 Property:  ' + (prop.title || '—') + '\n' +
     '📍 Area:      ' + (prop.address || '—') + '\n' +
     '💰 Price:     ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n' +
-    '🔥 Lead type: ' + ltLabel + '  (score ' + (lead.total_score || 0) + '/12)\n' +
+    '🔥 Lead type: ' + lt.toUpperCase() + '  (score ' + (lead.total_score || 0) + '/12)\n' +
     '💵 Unlock at: ' + Number(lead.cost || 0).toLocaleString() + ' UGX\n\n' +
-    '👤 Visitor:   ' + lead.visitor_name + '\n' +
-    '📧 Email:     ' + lead.visitor_email + '\n' +
-    '📱 WhatsApp:  ' + lead.visitor_whatsapp + '\n\n' +
-    '📝 WHY THEY SCORED ' + ltLabel + '\n' + scoreLines + '\n\n' +
-    '👉 Unlock now: https://propertyhub.dpdns.org/dashboard\n' +
-    '   Lead expires in 24h — after that it is released.\n\n' +
+    '👤 Visitor:   ' + firstName + ' ***\n' +
+    '🔒 Contact details hidden until unlocked\n\n' +
+    '📝 WHY THEY SCORED ' + lt.toUpperCase() + '\n' + scoreLines + '\n\n' +
+    '────────────────────────────────────────\n' +
+    '💰 WHY UNLOCK?\n' +
+    '────────────────────────────────────────\n\n' +
+    'Unlocking reveals:\n' +
+    '  • Full name\n' +
+    '  • WhatsApp number\n' +
+    '  • Email address\n\n' +
+    'Only one broker can unlock — first to pay wins.\n' +
+    'Lead auto-expires in 24 hours.\n\n' +
+    '👉 Unlock now: ' + SITE_URL + '/dashboard\n\n' +
     '— Property Hub'
   );
 }
-
 function pickAnswer(val, labels) {
   var idx = (parseInt(val, 10) || 1) - 1;
   return labels[idx] || '—';
@@ -1490,53 +1496,75 @@ async function handleQuizSubmit() {
 
     $('#quizModal').classList.add('hidden');
     alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".');
-   catch (e) {
+   catch (e) 
     console.error(e);
     alert('Error: ' + e.message);
   }
 }
 
-      async function loadLeads() {
+    async function loadLeads() {
   if (!state.currentUser) return;
   try {
-    const r = await supabase.from('lead_requests').select('*').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
+    const r = await supabase.rpc('get_my_broker_leads', { p_status: leadFilter || null });
     if (r.error) throw r.error;
+    const leads = r.data || [];
+
     const propIds = [];
-    (r.data || []).forEach(function(l) { if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id); });
+    leads.forEach(function(l) {
+      if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id);
+    });
     let propMap = {};
     if (propIds.length) {
-      const pr = await supabase.from('properties').select('id, title, price_amount, property_type, address').in('id', propIds);
+      const pr = await supabase.from('properties')
+        .select('id, title, price_amount, property_type, address')
+        .in('id', propIds);
       (pr.data || []).forEach(function(p) { propMap[p.id] = p; });
     }
+
     const list = $('#leadsList'), noMsg = $('#noLeads');
     if (!list || !noMsg) return;
-    const vis = (r.data || []).filter(function(l) { return l.status !== 'rejected'; });
+
+    const vis = leads.filter(function(l) { return l.status !== 'rejected'; });
     if (vis.length === 0) { list.innerHTML = ''; noMsg.classList.remove('hidden'); return; }
     noMsg.classList.add('hidden');
-    const now = Date.now(); let html = '';
+
+    const now = Date.now();
+    let html = '';
+
     vis.forEach(function(l) {
       const prop = propMap[l.property_id] || {};
-      const isP = l.status === 'pending', isA = l.status === 'approved';
+      const isP = l.status === 'pending';
+      const isA = l.status === 'approved';
       const sc = isA ? 'approved' : isP ? 'pending' : 'expired';
       const sl = isA ? '✅ Unlocked' : isP ? '⏳ Pending' : '⏰ Expired';
       const lc = l.cost || calculateLeadCost(prop.price_amount || 0, l.lead_type, prop.property_type);
+
       let followUpBadge = '';
       if (isA && l.approved_at) {
-        if (l.follow_up_sent) followUpBadge = '<span class="badge-followup"><i class="fas fa-check"></i> Follow-up sent</span>';
-        else {
+        if (l.follow_up_sent) {
+          followUpBadge = '<span class="badge-followup"><i class="fas fa-check"></i> Follow-up sent</span>';
+        } else {
           const daysLeft = Math.max(0, 3 - Math.floor((now - new Date(l.approved_at).getTime()) / 86400000));
           followUpBadge = '<span class="badge-followup"><i class="fas fa-clock"></i> Follow-up in ' + daysLeft + 'd</span>';
         }
       }
-      html += '<div class="verification-property-item"><div class="property-title">' + (prop.title || 'Unknown') + ' ' + (l.lead_type === 'hot' ? '<span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : '') + ' <span class="text-xs text-slate-400">(' + l.lead_type + ')</span> ' + followUpBadge + '</div>' +
+
+      html += '<div class="verification-property-item">' +
+        '<div class="property-title">' + (prop.title || 'Unknown') +
+          (l.lead_type === 'hot' ? ' <span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : '') +
+          ' <span class="text-xs text-slate-400">(' + l.lead_type + ')</span> ' + followUpBadge + '</div>' +
         '<div><span class="property-status ' + sc + '">' + sl + '</span></div>' +
         '<div class="flex items-center gap-2 flex-wrap">' +
-          (isP ? '<button class="unlock-lead-btn unlock-btn" data-lead-id="' + l.id + '"><i class="fas fa-unlock"></i> Unlock · ' + lc.toLocaleString() + ' UGX</button><button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full" data-lead-id="' + l.id + '">Reject</button>' : '') +
-          (isA ? '<button class="view-lead-details text-xs text-blue-600" data-lead-id="' + l.id + '">View Contact</button><button class="remove-lead-btn text-xs text-red-500 font-medium" data-lead-id="' + l.id + '"><i class="fas fa-trash"></i></button>' : '') +
+          (isP ? '<button class="unlock-lead-btn unlock-btn" data-lead-id="' + l.id + '"><i class="fas fa-unlock"></i> Unlock · ' + lc.toLocaleString() + ' UGX</button>' +
+                 '<button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full" data-lead-id="' + l.id + '">Reject</button>' : '') +
+          (isA ? '<button class="view-lead-details text-xs text-blue-600" data-lead-id="' + l.id + '">View Contact</button>' +
+                 '<button class="remove-lead-btn text-xs text-red-500 font-medium" data-lead-id="' + l.id + '"><i class="fas fa-trash"></i></button>' : '') +
         '</div></div>';
     });
+
     list.innerHTML = html;
 
+    // Unlock handler
     list.querySelectorAll('.unlock-lead-btn').forEach(function(b) {
       b.addEventListener('click', async function() {
         const id = b.dataset.leadId;
@@ -1551,8 +1579,12 @@ async function handleQuizSubmit() {
           if (uR.error) throw uR.error;
           const u = uR.data;
 
-          const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
-          const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
+          const pdR = await supabase.from('properties')
+            .select('title, address, price_amount, property_type')
+            .eq('id', u.property_id).single();
+          const bpR = await supabase.from('profiles')
+            .select('business_name, phone, email')
+            .eq('id', state.currentUser.id).single();
 
           if (u.visitor_email) {
             const propFull = pdR.data || {};
@@ -1583,15 +1615,23 @@ async function handleQuizSubmit() {
       });
     });
 
+    // Reject handler
     list.querySelectorAll('.reject-lead-btn').forEach(function(b) {
       b.addEventListener('click', async function() {
         const id = b.dataset.leadId;
         if (!confirm('Reject this lead?')) return;
         try {
-          const uR = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', id).select('visitor_name, visitor_email, property_id').single();
+          const uR = await supabase.from('lead_requests')
+            .update({ status: 'rejected' })
+            .eq('id', id)
+            .select('visitor_name, visitor_email, property_id').single();
           if (uR.error) throw uR.error;
           const u = uR.data;
-          const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
+
+          const pdR = await supabase.from('properties')
+            .select('title, address, price_amount, property_type')
+            .eq('id', u.property_id).single();
+
           if (u.visitor_email) {
             const propFull = pdR.data || {};
             const body = buildVisitorRejectedEmail(u, propFull);
@@ -1604,15 +1644,22 @@ async function handleQuizSubmit() {
       });
     });
 
+    // View details handler
     list.querySelectorAll('.view-lead-details').forEach(function(b) {
       b.addEventListener('click', async function() {
-        const r2 = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', b.dataset.leadId).single();
+        const r2 = await supabase.from('lead_requests')
+          .select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at')
+          .eq('id', b.dataset.leadId).single();
         if (r2.error) { alert('Error'); return; }
         const l = r2.data;
-        alert('Contact:\nName: ' + l.visitor_name + '\nEmail: ' + l.visitor_email + '\nWhatsApp: ' + l.visitor_whatsapp + '\nUnlocked: ' + new Date(l.unlocked_at).toLocaleString());
+        alert('Contact:\nName: ' + l.visitor_name +
+              '\nEmail: ' + l.visitor_email +
+              '\nWhatsApp: ' + l.visitor_whatsapp +
+              '\nUnlocked: ' + new Date(l.unlocked_at).toLocaleString());
       });
     });
 
+    // Remove handler
     list.querySelectorAll('.remove-lead-btn').forEach(function(b) {
       b.addEventListener('click', async function() {
         if (!confirm('Remove this lead?')) return;
