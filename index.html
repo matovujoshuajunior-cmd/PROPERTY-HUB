@@ -1378,13 +1378,13 @@ function buildWaLink(phone) {
         if (e.target && e.target.id === 'quizForm') { e.preventDefault(); handleQuizSubmit(); }
       });
 
-     async function handleQuizSubmit() {
+
+async function handleQuizSubmit() {
   const pid = $('#quizPropertyId').value;
   const name = $('#quizName').value.trim();
   const email = $('#quizEmail').value.trim();
   const wa = $('#quizWhatsapp').value.trim();
 
-  // Validate WhatsApp number
   const cleanWa = wa.replace(/\D/g, '');
   if (cleanWa.length < 9 || cleanWa.length > 13) {
     alert('Please enter a valid phone number (e.g. 0771234567)');
@@ -1395,10 +1395,7 @@ function buildWaLink(phone) {
   let total = 0;
   for (let i = 1; i <= 4; i++) {
     const s = document.querySelector('input[name="q' + i + '"]:checked');
-    if (!s) {
-      alert('Please answer question ' + i + '.');
-      return;
-    }
+    if (!s) { alert('Please answer question ' + i + '.'); return; }
     answers['q' + i] = parseInt(s.value, 10);
     total += parseInt(s.value, 10);
   }
@@ -1417,7 +1414,6 @@ function buildWaLink(phone) {
     const pd = pdR.data;
     if (!pd || !pd.owner_id) throw new Error('Property has no owner.');
 
-    // Rate limit — one submission per (property, email) per hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     const dupCheck = await supabase
       .from('lead_requests')
@@ -1488,7 +1484,7 @@ function buildWaLink(phone) {
         const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/dashboard';
         await sendSMS(bdR.data.phone, smsText);
       }
-    }
+    
 
     if (window.plausible) plausible('Lead Submitted', { props: { property_type: pd.property_type, lead_type: lt } });
 
@@ -1501,133 +1497,134 @@ function buildWaLink(phone) {
 }
 
       async function loadLeads() {
-        if (!state.currentUser) return;
-        try {
-          const r = await supabase.from('lead_requests').select('*').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
-          if (r.error) throw r.error;
-          const propIds = [];
-          (r.data || []).forEach(function(l) { if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id); });
-          let propMap = {};
-          if (propIds.length) {
-            const pr = await supabase.from('properties').select('id, title, price_amount, property_type').in('id', propIds);
-            (pr.data || []).forEach(function(p) { propMap[p.id] = p; });
-          }
-          const list = $('#leadsList'), noMsg = $('#noLeads');
-          if (!list || !noMsg) return;
-          const vis = (r.data || []).filter(function(l) { return l.status !== 'rejected'; });
-          if (vis.length === 0) { list.innerHTML = ''; noMsg.classList.remove('hidden'); return; }
-          noMsg.classList.add('hidden');
-          const now = Date.now(); let html = '';
-          vis.forEach(function(l) {
-            const prop = propMap[l.property_id] || {};
-            const isP = l.status === 'pending', isA = l.status === 'approved';
-            const sc = isA ? 'approved' : isP ? 'pending' : 'expired';
-            const sl = isA ? '✅ Unlocked' : isP ? '⏳ Pending' : '⏰ Expired';
-            const lc = l.cost || calculateLeadCost(prop.price_amount || 0, l.lead_type, prop.property_type);
-            let followUpBadge = '';
-            if (isA && l.approved_at) {
-              if (l.follow_up_sent) followUpBadge = '<span class="badge-followup"><i class="fas fa-check"></i> Follow-up sent</span>';
-              else {
-                const daysLeft = Math.max(0, 3 - Math.floor((now - new Date(l.approved_at).getTime()) / 86400000));
-                followUpBadge = '<span class="badge-followup"><i class="fas fa-clock"></i> Follow-up in ' + daysLeft + 'd</span>';
-              }
-            }
-            html += '<div class="verification-property-item"><div class="property-title">' + (prop.title || 'Unknown') + ' ' + (l.lead_type === 'hot' ? '<span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : '') + ' <span class="text-xs text-slate-400">(' + l.lead_type + ')</span> ' + followUpBadge + '</div>' +
-              '<div><span class="property-status ' + sc + '">' + sl + '</span></div>' +
-              '<div class="flex items-center gap-2 flex-wrap">' +
-                (isP ? '<button class="unlock-lead-btn unlock-btn" data-lead-id="' + l.id + '"><i class="fas fa-unlock"></i> Unlock · ' + lc.toLocaleString() + ' UGX</button><button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full" data-lead-id="' + l.id + '">Reject</button>' : '') +
-                (isA ? '<button class="view-lead-details text-xs text-blue-600" data-lead-id="' + l.id + '">View Contact</button><button class="remove-lead-btn text-xs text-red-500 font-medium" data-lead-id="' + l.id + '"><i class="fas fa-trash"></i></button>' : '') +
-              '</div></div>';
-          });
-          list.innerHTML = html;
-          list.querySelectorAll('.unlock-lead-btn').forEach(function(b) { b.addEventListener('click', async function() {
-            const id = b.dataset.leadId;
-            if (!confirm('Unlock this lead?')) return;
-            try {
-              const uR = await supabase.from('lead_requests').update({ status: 'approved', unlocked_at: new Date().toISOString(), approved_at: new Date().toISOString(), follow_up_sent: false }).eq('id', id).select('visitor_name, visitor_email, visitor_whatsapp, property_id').single();
-              if (uR.error) throw uR.error;
-              const u = uR.data;
-              const pdR = await supabase.from('properties').select('title').eq('id', u.property_id).single();
-              const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
-              if (u.visitor_email) {
-  const propFull = pdR.data || {};
-  const brokerFull = bpR.data || { email: state.currentUser.email };
-  const body = await buildVisitorApprovedEmail(u, propFull, brokerFull);
-  await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', body);
-}
-              if (u.visitor_whatsapp) {
-                const brokerPhone = (bpR.data && bpR.data.phone) || '';
-                const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
-                let waLink = '';
-                if (brokerPhone) {
-                  let cleanPhone = String(brokerPhone).replace(/\D/g, '');
-                  if (cleanPhone.startsWith('0')) cleanPhone = '256' + cleanPhone.slice(1);
-                  if (!cleanPhone.startsWith('256')) cleanPhone = '256' + cleanPhone;
-                  waLink = 'https://wa.me/' + cleanPhone;
-                }
-                const smsText = 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : '');
-                await sendSMS(u.visitor_whatsapp, smsText);
-              }
-              alert('✅ Lead unlocked!\n\nVisitor: ' + u.visitor_name);
-              loadLeads();
-            } catch (e) { alert('Error: ' + e.message); }
-          }); });
-          list.querySelectorAll('.reject-lead-btn').forEach(function(b) { b.addEventListener('click', async function() {
-            const id = b.dataset.leadId;
-            if (!confirm('Reject this lead?')) return;
-            try {
-              const uR = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', id).select('visitor_name, visitor_email, property_id').single();
-              if (uR.error) throw uR.error;
-              const u = uR.data;
-const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
-             if (u.visitor_email) {
-  const propFull = pdR.data || {};
-  const body = buildVisitorRejectedEmail(u, propFull);
-  await sendNotificationEmail(u.visitor_email, u.visitor_name, 'Your Request Was Not Approved', body);
-}
-              loadLeads();
-            } catch (e) { alert('Error: ' + e.message); }
-          }); });
-          list.querySelectorAll('.view-lead-details').forEach(function(b) { b.addEventListener('click', async function() {
-            const r2 = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', b.dataset.leadId).single();
-            if (r2.error) { alert('Error'); return; }
-            const l = r2.data;
-            alert('Contact:\nName: ' + l.visitor_name + '\nEmail: ' + l.visitor_email + '\nWhatsApp: ' + l.visitor_whatsapp + '\nUnlocked: ' + new Date(l.unlocked_at).toLocaleString());
-          }); });
-          list.querySelectorAll('.remove-lead-btn').forEach(function(b) { b.addEventListener('click', async function() {
-            if (!confirm('Remove this lead?')) return;
-            const r2 = await supabase.from('lead_requests').delete().eq('id', b.dataset.leadId);
-            if (r2.error) return alert('Error: ' + r2.error.message);
-            loadLeads();
-          }); });
-        } catch (e) { console.error(e); }
+  if (!state.currentUser) return;
+  try {
+    const r = await supabase.from('lead_requests').select('*').eq('broker_id', state.currentUser.id).order('created_at', { ascending: false });
+    if (r.error) throw r.error;
+    const propIds = [];
+    (r.data || []).forEach(function(l) { if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id); });
+    let propMap = {};
+    if (propIds.length) {
+      const pr = await supabase.from('properties').select('id, title, price_amount, property_type, address').in('id', propIds);
+      (pr.data || []).forEach(function(p) { propMap[p.id] = p; });
+    }
+    const list = $('#leadsList'), noMsg = $('#noLeads');
+    if (!list || !noMsg) return;
+    const vis = (r.data || []).filter(function(l) { return l.status !== 'rejected'; });
+    if (vis.length === 0) { list.innerHTML = ''; noMsg.classList.remove('hidden'); return; }
+    noMsg.classList.add('hidden');
+    const now = Date.now(); let html = '';
+    vis.forEach(function(l) {
+      const prop = propMap[l.property_id] || {};
+      const isP = l.status === 'pending', isA = l.status === 'approved';
+      const sc = isA ? 'approved' : isP ? 'pending' : 'expired';
+      const sl = isA ? '✅ Unlocked' : isP ? '⏳ Pending' : '⏰ Expired';
+      const lc = l.cost || calculateLeadCost(prop.price_amount || 0, l.lead_type, prop.property_type);
+      let followUpBadge = '';
+      if (isA && l.approved_at) {
+        if (l.follow_up_sent) followUpBadge = '<span class="badge-followup"><i class="fas fa-check"></i> Follow-up sent</span>';
+        else {
+          const daysLeft = Math.max(0, 3 - Math.floor((now - new Date(l.approved_at).getTime()) / 86400000));
+          followUpBadge = '<span class="badge-followup"><i class="fas fa-clock"></i> Follow-up in ' + daysLeft + 'd</span>';
+        }
       }
+      html += '<div class="verification-property-item"><div class="property-title">' + (prop.title || 'Unknown') + ' ' + (l.lead_type === 'hot' ? '<span class="text-red-500 text-xs ml-2">🔥 Hot</span>' : '') + ' <span class="text-xs text-slate-400">(' + l.lead_type + ')</span> ' + followUpBadge + '</div>' +
+        '<div><span class="property-status ' + sc + '">' + sl + '</span></div>' +
+        '<div class="flex items-center gap-2 flex-wrap">' +
+          (isP ? '<button class="unlock-lead-btn unlock-btn" data-lead-id="' + l.id + '"><i class="fas fa-unlock"></i> Unlock · ' + lc.toLocaleString() + ' UGX</button><button class="reject-lead-btn text-xs bg-red-500 text-white px-3 py-1.5 rounded-full" data-lead-id="' + l.id + '">Reject</button>' : '') +
+          (isA ? '<button class="view-lead-details text-xs text-blue-600" data-lead-id="' + l.id + '">View Contact</button><button class="remove-lead-btn text-xs text-red-500 font-medium" data-lead-id="' + l.id + '"><i class="fas fa-trash"></i></button>' : '') +
+        '</div></div>';
+    });
+    list.innerHTML = html;
 
-      const VERIF_FIELDS = {
-        property: [
-          { id: 'landTitle', label: 'Land Title / Certificate Number', required: true },
-          { id: 'ownerName', label: 'Registered Owner Name', required: true },
-          { id: 'lc1Name', label: 'LC1 Chairperson Name & Contact', required: true },
-          { id: 'surveyNumber', label: 'Survey / Plot Number', required: false },
-          { id: 'titleDocUrl', label: 'Title Document Link', required: true },
-          { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
-        ],
-        rental: [
-          { id: 'landlordName', label: 'Landlord / Owner Name', required: true },
-          { id: 'landlordPhone', label: 'Landlord Phone', required: true },
-          { id: 'units', label: 'Number of Units', required: false },
-          { id: 'proofUrl', label: 'Proof of Ownership Link', required: true },
-          { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
-        ],
-        guesthouse: [
-          { id: 'managerName', label: 'Manager / Operator Name', required: true },
-          { id: 'managerPhone', label: 'Manager Phone', required: true },
-          { id: 'licenseNumber', label: 'Tourism License Number', required: false },
-          { id: 'rooms', label: 'Number of Rooms', required: false },
-          { id: 'proofUrl', label: 'Proof Link', required: true },
-          { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
-        ]
-      };
+    list.querySelectorAll('.unlock-lead-btn').forEach(function(b) {
+      b.addEventListener('click', async function() {
+        const id = b.dataset.leadId;
+        if (!confirm('Unlock this lead?')) return;
+        try {
+          const uR = await supabase.from('lead_requests').update({
+            status: 'approved',
+            unlocked_at: new Date().toISOString(),
+            approved_at: new Date().toISOString(),
+            follow_up_sent: false
+          }).eq('id', id).select('visitor_name, visitor_email, visitor_whatsapp, property_id').single();
+          if (uR.error) throw uR.error;
+          const u = uR.data;
+
+          const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
+          const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
+
+          if (u.visitor_email) {
+            const propFull = pdR.data || {};
+            const brokerFull = bpR.data || { email: state.currentUser.email };
+            const body = await buildVisitorApprovedEmail(u, propFull, brokerFull);
+            await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', body);
+          }
+
+          if (u.visitor_whatsapp) {
+            const brokerPhone = (bpR.data && bpR.data.phone) || '';
+            const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
+            let waLink = '';
+            if (brokerPhone) {
+              let cleanPhone = String(brokerPhone).replace(/\D/g, '');
+              if (cleanPhone.startsWith('0')) cleanPhone = '256' + cleanPhone.slice(1);
+              if (!cleanPhone.startsWith('256')) cleanPhone = '256' + cleanPhone;
+              waLink = 'https://wa.me/' + cleanPhone;
+            }
+            const smsText = 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : '');
+            await sendSMS(u.visitor_whatsapp, smsText);
+          }
+
+          alert('✅ Lead unlocked!\n\nVisitor: ' + u.visitor_name);
+          loadLeads();
+        } catch (e) {
+          alert('Error: ' + e.message);
+        }
+      });
+    });
+
+    list.querySelectorAll('.reject-lead-btn').forEach(function(b) {
+      b.addEventListener('click', async function() {
+        const id = b.dataset.leadId;
+        if (!confirm('Reject this lead?')) return;
+        try {
+          const uR = await supabase.from('lead_requests').update({ status: 'rejected' }).eq('id', id).select('visitor_name, visitor_email, property_id').single();
+          if (uR.error) throw uR.error;
+          const u = uR.data;
+          const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
+          if (u.visitor_email) {
+            const propFull = pdR.data || {};
+            const body = buildVisitorRejectedEmail(u, propFull);
+            await sendNotificationEmail(u.visitor_email, u.visitor_name, 'Your Request Was Not Approved', body);
+          }
+          loadLeads();
+        } catch (e) {
+          alert('Error: ' + e.message);
+        }
+      });
+    });
+
+    list.querySelectorAll('.view-lead-details').forEach(function(b) {
+      b.addEventListener('click', async function() {
+        const r2 = await supabase.from('lead_requests').select('visitor_name, visitor_email, visitor_whatsapp, unlocked_at').eq('id', b.dataset.leadId).single();
+        if (r2.error) { alert('Error'); return; }
+        const l = r2.data;
+        alert('Contact:\nName: ' + l.visitor_name + '\nEmail: ' + l.visitor_email + '\nWhatsApp: ' + l.visitor_whatsapp + '\nUnlocked: ' + new Date(l.unlocked_at).toLocaleString());
+      });
+    });
+
+    list.querySelectorAll('.remove-lead-btn').forEach(function(b) {
+      b.addEventListener('click', async function() {
+        if (!confirm('Remove this lead?')) return;
+        const r2 = await supabase.from('lead_requests').delete().eq('id', b.dataset.leadId);
+        if (r2.error) return alert('Error: ' + r2.error.message);
+        loadLeads();
+      });
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
 
       function buildVerifFields(type) {
         const c = $('#verifDynamicFields');
