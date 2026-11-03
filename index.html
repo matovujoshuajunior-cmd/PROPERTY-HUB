@@ -742,7 +742,7 @@ async function loadPlatformSettings() {
   } catch (e) {
     console.warn('Pricing load failed — using defaults:', e.message);
   }
-}  
+}
 
       let supabase = null;
       const state = {
@@ -1015,34 +1015,35 @@ function pickAnswer(val, labels) {
   var idx = (parseInt(val, 10) || 1) - 1;
   return labels[idx] || '—';
 }
-     async function buildVisitorApprovedEmail(lead, prop, broker) {
-  var seg = prop.property_type === 'guesthouse' ? 'guesthouse'
-          : prop.property_type === 'property'    ? 'buyer'
-          : 'renter';
+async function buildVisitorApprovedEmail(lead, prop, broker) {
+  const seg = prop.property_type === 'guesthouse' ? 'guesthouse'
+            : prop.property_type === 'property'    ? 'buyer'
+            : 'renter';
 
-  // Load partner categories for this segment
-  var partners = [];
+  let partners = [];
   try {
-    var r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
+    const r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
     if (!r.error && r.data) partners = r.data;
-  } catch (_) {}
+  } catch (_) {
+    // Silent — email still goes out without partner block
+  }
 
-  // Group partner rows by category, cap at 3 categories × 2 providers
-  var byCat = {};
-  partners.forEach(function(p) {
+  const byCat = {};
+  partners.forEach(p => {
     if (!byCat[p.category_name]) byCat[p.category_name] = { emoji: p.category_emoji, items: [] };
     if (byCat[p.category_name].items.length < 2) byCat[p.category_name].items.push(p);
   });
-  var catNames = Object.keys(byCat).slice(0, 3);
-  var servicesBlock = '';
+  const catNames = Object.keys(byCat).slice(0, 3);
+
+  let servicesBlock = '';
   if (catNames.length) {
     servicesBlock = '\n────────────────────────────────────────\n' +
       '🎁 WHILE YOU SETTLE IN — verified partners\n' +
       '────────────────────────────────────────\n\n';
-    catNames.forEach(function(name) {
-      var c = byCat[name];
+    catNames.forEach(name => {
+      const c = byCat[name];
       servicesBlock += c.emoji + ' ' + name + '\n';
-      c.items.forEach(function(p) {
+      c.items.forEach(p => {
         servicesBlock += '   • ' + p.provider_name + ' — ' + (p.tagline || '') + '\n' +
                         '     ' + p.url + (p.discount_code ? '  (code: ' + p.discount_code + ')' : '') + '\n';
       });
@@ -1051,21 +1052,30 @@ function pickAnswer(val, labels) {
     servicesBlock += 'More services: https://propertyhub.dpdns.org/services/\n';
   }
 
+  const brokerPhone = broker.phone || '';
+  let waLink = '';
+  if (brokerPhone) {
+    let p = String(brokerPhone).replace(/\D/g, '');
+    if (p.startsWith('0')) p = '256' + p.slice(1);
+    if (!p.startsWith('256')) p = '256' + p;
+    waLink = 'https://wa.me/' + p;
+  }
+
   return (
-    'Hello ' + lead.visitor_name + ',\n\n' +
+    'Hello ' + (lead.visitor_name || 'there') + ',\n\n' +
     '🎉 GOOD NEWS — your request was APPROVED\n' +
     '────────────────────────────────────────\n\n' +
-    '🏠 ' + prop.title + '\n' +
+    '🏠 ' + (prop.title || 'the property') + '\n' +
     '📍 ' + (prop.address || '—') + '\n' +
     '💰 ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n\n' +
     '👤 Your broker:  ' + (broker.business_name || 'the broker') + '\n' +
-    '📱 WhatsApp:     ' + (broker.phone || '—') + '\n' +
+    '📱 WhatsApp:     ' + (brokerPhone || '—') + '\n' +
     '📧 Email:        ' + (broker.email || '—') + '\n\n' +
-    '🔗 Chat on WhatsApp: ' + buildWaLink(broker.phone) + '\n\n' +
+    (waLink ? '🔗 Chat on WhatsApp: ' + waLink + '\n\n' : '') +
     '────────────────────────────────────────\n' +
     '✅ YOUR NEXT STEPS\n' +
     '────────────────────────────────────────\n\n' +
-    '1. WhatsApp the broker NOW — say "I was approved on Property Hub about ' + prop.title + '".\n' +
+    '1. WhatsApp the broker NOW — say "I was approved on Property Hub about ' + (prop.title || 'the property') + '".\n' +
     '2. Agree a viewing time. Do NOT pay anything before you see the property in person.\n' +
     '3. Take a friend with you to the viewing.\n' +
     '4. Check the meter and water pressure yourself.\n' +
@@ -1368,63 +1378,127 @@ function buildWaLink(phone) {
         if (e.target && e.target.id === 'quizForm') { e.preventDefault(); handleQuizSubmit(); }
       });
 
-      async function handleQuizSubmit() {
-        const pid = $('#quizPropertyId').value;
-        const name = $('#quizName').value.trim();
-        const email = $('#quizEmail').value.trim();
-        const wa = $('#quizWhatsapp').value.trim();
-        const answers = {}; let total = 0;
-        for (let i = 1; i <= 4; i++) {
-          const s = document.querySelector('input[name="q' + i + '"]:checked');
-          if (!s) { alert('Please answer question ' + i + '.'); return; }
-          answers['q' + i] = parseInt(s.value);
-          total += parseInt(s.value);
-        }
-        let lt = 'cold';
-        if (total >= 9) lt = 'hot'; else if (total >= 6) lt = 'warm';
-        try {
-          const pdR = await supabase.from('properties').select('owner_id, title, address, price_amount, property_type').eq('id', pid).single();
-          if (pdR.error) throw pdR.error;
-          const pd = pdR.data;
-          if (!pd || !pd.owner_id) throw new Error('Property has no owner.');
-          const cost = calculateLeadCost(pd.price_amount || 0, lt, pd.property_type);
-          const leadR = await supabase.from('lead_requests').insert({
-            property_id: pid, broker_id: pd.owner_id,
-            visitor_name: name, visitor_email: email, visitor_whatsapp: wa,
-            quiz_answers: answers, total_score: total, lead_type: lt,
-            status: 'pending', cost: cost,
-            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-          }).select().single();
-          if (leadR.error) throw leadR.error;
-          const bdR = await supabase.from('profiles').select('email, phone, business_name').eq('id', pd.owner_id).single();
-          if (bdR.data.email) {
-  const leadForEmail = {
-    lead_type: lt,
-    total_score: total,
-    cost: cost,
-    visitor_name: name,
-    visitor_email: email,
-    visitor_whatsapp: wa,
-    quiz_answers: answers
-  };
-  const brokerFull = { business_name: bdR.data.business_name, phone: bdR.data.phone, email: bdR.data.email };
-  await sendNotificationEmail(
-    bdR.data.email,
-    bdR.data.business_name || 'Broker',
-    '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title,
-    buildBrokerLeadEmail(pd, brokerFull, leadForEmail)
-  );
-}
-            if (bdR.data.phone) {
-              const shortTitle = String(pd.title || 'Property').substring(0, 30);
-              const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/dashboard';
-              await sendSMS(bdR.data.phone, smsText);
-            }
-          }
-          $('#quizModal').classList.add('hidden');
-          alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".');
-        } catch (e) { console.error(e); alert('Error: ' + e.message); }
+     async function handleQuizSubmit() {
+  const pid = $('#quizPropertyId').value;
+  const name = $('#quizName').value.trim();
+  const email = $('#quizEmail').value.trim();
+  const wa = $('#quizWhatsapp').value.trim();
+
+  // Validate WhatsApp number
+  const cleanWa = wa.replace(/\D/g, '');
+  if (cleanWa.length < 9 || cleanWa.length > 13) {
+    alert('Please enter a valid phone number (e.g. 0771234567)');
+    return;
+  }
+
+  const answers = {};
+  let total = 0;
+  for (let i = 1; i <= 4; i++) {
+    const s = document.querySelector('input[name="q' + i + '"]:checked');
+    if (!s) {
+      alert('Please answer question ' + i + '.');
+      return;
+    }
+    answers['q' + i] = parseInt(s.value, 10);
+    total += parseInt(s.value, 10);
+  }
+
+  let lt = 'cold';
+  if (total >= 9) lt = 'hot';
+  else if (total >= 6) lt = 'warm';
+
+  try {
+    const pdR = await supabase
+      .from('properties')
+      .select('owner_id, title, address, price_amount, property_type')
+      .eq('id', pid)
+      .single();
+    if (pdR.error) throw pdR.error;
+    const pd = pdR.data;
+    if (!pd || !pd.owner_id) throw new Error('Property has no owner.');
+
+    // Rate limit — one submission per (property, email) per hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const dupCheck = await supabase
+      .from('lead_requests')
+      .select('id')
+      .eq('property_id', pid)
+      .eq('visitor_email', email)
+      .gte('created_at', oneHourAgo)
+      .limit(1);
+
+    if (dupCheck.data && dupCheck.data.length > 0) {
+      alert('⏳ You already requested this property less than an hour ago.\n\nThe broker has been notified — please wait for their response.');
+      $('#quizModal').classList.add('hidden');
+      return;
+    }
+
+    const cost = calculateLeadCost(pd.price_amount || 0, lt, pd.property_type);
+
+    const leadR = await supabase
+      .from('lead_requests')
+      .insert({
+        property_id: pid,
+        broker_id: pd.owner_id,
+        visitor_name: name,
+        visitor_email: email,
+        visitor_whatsapp: wa,
+        quiz_answers: answers,
+        total_score: total,
+        lead_type: lt,
+        status: 'pending',
+        cost: cost,
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      })
+      .select()
+      .single();
+    if (leadR.error) throw leadR.error;
+
+    const bdR = await supabase
+      .from('profiles')
+      .select('email, phone, business_name')
+      .eq('id', pd.owner_id)
+      .single();
+
+    if (bdR.data) {
+      if (bdR.data.email) {
+        const leadForEmail = {
+          lead_type: lt,
+          total_score: total,
+          cost: cost,
+          visitor_name: name,
+          visitor_email: email,
+          visitor_whatsapp: wa,
+          quiz_answers: answers
+        };
+        const brokerFull = {
+          business_name: bdR.data.business_name,
+          phone: bdR.data.phone,
+          email: bdR.data.email
+        };
+        await sendNotificationEmail(
+          bdR.data.email,
+          bdR.data.business_name || 'Broker',
+          '🔔 New ' + lt.toUpperCase() + ' Lead – ' + pd.title,
+          buildBrokerLeadEmail(pd, brokerFull, leadForEmail)
+        );
       }
+      if (bdR.data.phone) {
+        const shortTitle = String(pd.title || 'Property').substring(0, 30);
+        const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/dashboard';
+        await sendSMS(bdR.data.phone, smsText);
+      }
+    }
+
+    if (window.plausible) plausible('Lead Submitted', { props: { property_type: pd.property_type, lead_type: lt } });
+
+    $('#quizModal').classList.add('hidden');
+    alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".');
+  } catch (e) {
+    console.error(e);
+    alert('Error: ' + e.message);
+  }
+}
 
       async function loadLeads() {
         if (!state.currentUser) return;
