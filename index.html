@@ -1503,7 +1503,7 @@ async function handleQuizSubmit() {
     async function loadLeads() {
   if (!state.currentUser) return;
   try {
-    const r = await supabase.rpc('get_my_broker_leads', { p_status: leadFilter || null });
+    const r = await supabase.rpc('get_my_broker_leads', {});
     if (r.error) throw r.error;
     const leads = r.data || [];
 
