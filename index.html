@@ -1031,7 +1031,7 @@ async function buildVisitorApprovedEmail(lead, prop, broker) {
     const r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
     if (!r.error && r.data) partners = r.data;
   } catch (_) {
-    // Silent — email still goes out without partner block
+    /* silent — email still goes out without partner block */
   }
 
   const byCat = {};
@@ -1093,7 +1093,6 @@ async function buildVisitorApprovedEmail(lead, prop, broker) {
     '— Property Hub'
   );
 }
-
 function buildWaLink(phone) {
   if (!phone) return '';
   var p = String(phone).replace(/\D/g, '');
@@ -1490,18 +1489,17 @@ async function handleQuizSubmit() {
         const smsText = 'New ' + lt.toUpperCase() + ' lead for "' + shortTitle + '". Approve: ' + SITE_URL + '/dashboard';
         await sendSMS(bdR.data.phone, smsText);
       }
-    
+    }
 
     if (window.plausible) plausible('Lead Submitted', { props: { property_type: pd.property_type, lead_type: lt } });
 
     $('#quizModal').classList.add('hidden');
     alert('✅ Notification Sent!\n\nWe\'ve notified the broker about your interest in "' + pd.title + '".');
-   catch (e) 
+  } catch (e) {
     console.error(e);
     alert('Error: ' + e.message);
   }
 }
-
     async function loadLeads() {
   if (!state.currentUser) return;
   try {
@@ -2032,34 +2030,93 @@ async function handleQuizSubmit() {
         });
       }
 
-      function chatFindReply(text) {
-        const t = text.toLowerCase();
-        const kb = state.chatContext === 'broker' ? CHAT_KB_BROKER : CHAT_KB_VISITOR;
-        let best = null, bestScore = 0;
-        kb.forEach(function(item) {
-          let score = 0;
-          item.keywords.forEach(function(k) { if (t.indexOf(k) !== -1) score += k.length; });
-          if (score > bestScore) { bestScore = score; best = item; }
+    async function chatFindReply(text) {
+  const t = text.toLowerCase();
+  const matchedLoc = CHAT_LOCATIONS.find(loc => t.includes(loc));
+  const priceHint = chatParsePrice(t);
+
+  if (matchedLoc || priceHint) {
+    try {
+      let q = supabase.from('properties')
+        .select('id, title, address, price_amount, property_type, is_verified, verification_status')
+        .eq('is_paused', false)
+        .limit(3);
+
+      if (matchedLoc) q = q.ilike('address', '%' + matchedLoc + '%');
+      if (priceHint && priceHint.type === 'max') q = q.lte('price_amount', priceHint.value);
+
+      const r = await q;
+      const rows = r.data || [];
+
+      if (rows.length > 0) {
+        let html = '🔎 I found ' + rows.length + ' propert' + (rows.length === 1 ? 'y' : 'ies') +
+          (matchedLoc ? ' in <strong>' + matchedLoc.charAt(0).toUpperCase() + matchedLoc.slice(1) + '</strong>' : '') +
+          (priceHint ? ' under ' + priceHint.value.toLocaleString() + ' UGX' : '') + ':<br><br>';
+
+        rows.forEach(p => {
+          const locality = (p.address || '').split(',')[0].trim();
+          const verified = p.verification_status === 'approved' ? ' ✅' : '';
+          html += '• <a href="/property/' + p.id + '"><strong>' + (p.title || 'Property') + '</strong></a>' + verified + '<br>' +
+                  '&nbsp;&nbsp;' + Number(p.price_amount || 0).toLocaleString() + ' UGX · ' + locality + '<br><br>';
         });
-        if (best) return best;
+        html += '<a href="/?search=' + encodeURIComponent(matchedLoc || '') + '">See all results →</a>';
+
         return {
-          reply: state.chatContext === 'broker'
-            ? 'I\'m not sure about that. Try asking about <strong>adding a property</strong>, <strong>verification</strong>, <strong>leads</strong>, or <strong>pricing</strong>. For anything else: support@propertyhub.dpdns.org.'
-            : 'I\'m not sure about that. Try asking about <strong>searching</strong>, <strong>contacting a broker</strong>, or <strong>safety</strong>. For anything else: support@propertyhub.dpdns.org.',
-          quick: state.chatContext === 'broker'
-            ? ['How do I add a property?', 'How do leads work?', 'How does pricing work?']
-            : ['How do I search?', 'How do I contact a broker?', 'Is this site safe?']
+          reply: html,
+          quick: ['Show me cheaper options', 'How do I contact a broker?', 'Is this site safe?']
         };
       }
 
-      function chatAsk(text) {
-        chatAddMessage('user', text);
-        const r = chatFindReply(text);
-        setTimeout(function() {
-          chatAddMessage('bot', r.reply);
-          chatShowQuickReplies(r.quick || []);
-        }, 250);
-      }
+      return {
+        reply: 'I searched but did not find any listings' +
+          (matchedLoc ? ' in <strong>' + matchedLoc + '</strong>' : '') +
+          (priceHint ? ' under ' + priceHint.value.toLocaleString() + ' UGX' : '') + ' right now.<br><br>' +
+          'Try:<br>• A nearby area (e.g. Ntinda, Bukoto)<br>• A higher budget<br>• <a href="/">Browse all listings</a>',
+        quick: ['Show me popular areas', 'How do I contact a broker?', 'Is this site safe?']
+      };
+    } catch (e) {
+      console.error('Chat search failed:', e);
+    }
+  }
+
+  const kb = state.chatContext === 'broker' ? CHAT_KB_BROKER : CHAT_KB_VISITOR;
+  let best = null, bestScore = 0;
+  kb.forEach(function(item) {
+    let score = 0;
+    item.keywords.forEach(function(k) { if (t.indexOf(k) !== -1) score += k.length; });
+    if (score > bestScore) { bestScore = score; best = item; }
+  });
+  if (best) return best;
+
+  return {
+    reply: state.chatContext === 'broker'
+      ? 'I\'m not sure about that. Try asking about <strong>adding a property</strong>, <strong>verification</strong>, <strong>leads</strong>, or <strong>pricing</strong>.'
+      : 'I\'m not sure about that. Try typing an area like <strong>Ntinda</strong> or <strong>Kikoni</strong> and I\'ll search live listings.',
+    quick: state.chatContext === 'broker'
+      ? ['How do I add a property?', 'How do leads work?', 'How does pricing work?']
+      : ['Show me listings in Ntinda', 'How do I contact a broker?', 'Is this site safe?']
+  };
+}
+
+async function chatAsk(text) {
+  chatAddMessage('user', text);
+  const msgs = $('#chatMessages');
+  const typing = document.createElement('div');
+  typing.className = 'chat-msg bot';
+  typing.innerHTML = '<em style="color:#94a3b8">Searching…</em>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const r = await chatFindReply(text);
+    typing.remove();
+    chatAddMessage('bot', r.reply);
+    chatShowQuickReplies(r.quick || []);
+  } catch (e) {
+    typing.remove();
+    chatAddMessage('bot', 'Something went wrong. Please try again.');
+  }
+}
 
       async function init() {
         console.log('🚀 Initializing…');
