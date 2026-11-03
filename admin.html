@@ -367,6 +367,11 @@
             <button id="refreshPartnersBtn" class="btn-sm blue"><i class="fas fa-sync-alt"></i></button>
           </div>
         </div>
+        <div class="section-card">
+  <h3>📈 Follow-Up Funnel</h3>
+  <div id="funnelStats" class="grid-3 mb-4"></div>
+  <div id="funnelResponses"></div>
+</div>
         <div id="partnerStats" class="grid-3 mb-4"></div>
         <div id="partnerList"><p class="text-slate-500 text-sm">Loading…</p></div>
       </div>
@@ -958,6 +963,62 @@
     } catch (e) { alert('Error: ' + e.message); }
   }
 
+  async function loadFunnelStats() {
+  try {
+    // Get all approved leads + clicks in last 30 days
+    const since = new Date(Date.now() - 30 * 86400000).toISOString();
+    const [leadsR, clicksR] = await Promise.all([
+      supabase.from('lead_requests')
+        .select('id, followup_token, followup_visited_at, followup_completed_at, followup_response, followup_view_count, partner_clicked')
+        .eq('status', 'approved')
+        .gte('approved_at', since),
+      supabase.from('partner_clicks')
+        .select('lead_id, category_slug')
+        .gte('clicked_at', since)
+    ]);
+
+    const leads = leadsR.data || [];
+    const clicks = clicksR.data || [];
+
+    const sent   = leads.filter(l => l.followup_token).length;
+    const opened = leads.filter(l => l.followup_visited_at).length;
+    const done   = leads.filter(l => l.followup_completed_at).length;
+    const clicked = new Set(clicks.map(c => c.lead_id)).size;
+
+    const openRate = sent ? Math.round((opened / sent) * 100) : 0;
+    const compRate = opened ? Math.round((done / opened) * 100) : 0;
+    const clkRate  = done ? Math.round((clicked / done) * 100) : 0;
+
+    $('funnelStats').innerHTML =
+      '<div class="detail-card"><div class="label">Sent (30d)</div><div class="value">' + sent + '</div></div>' +
+      '<div class="detail-card"><div class="label">Opened</div><div class="value">' + opened + ' <span class="text-xs text-slate-500">(' + openRate + '%)</span></div></div>' +
+      '<div class="detail-card"><div class="label">Completed quiz</div><div class="value">' + done + ' <span class="text-xs text-slate-500">(' + compRate + '%)</span></div></div>';
+
+    const responses = { got_it: 0, still_looking: 0, not_yet: 0, different: 0 };
+    leads.forEach(l => { if (l.followup_response && responses[l.followup_response] !== undefined) responses[l.followup_response]++; });
+
+    const byCat = {};
+    clicks.forEach(c => { byCat[c.category_slug] = (byCat[c.category_slug] || 0) + 1; });
+    const topCats = Object.entries(byCat).sort((a,b) => b[1]-a[1]).slice(0, 5);
+
+    $('funnelResponses').innerHTML =
+      '<h4 class="font-semibold mb-2">Responses</h4>' +
+      '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;font-size:.85rem;margin-bottom:1rem;">' +
+        '<div>✅ Got it: <strong>' + responses.got_it + '</strong></div>' +
+        '<div>🤔 Still looking: <strong>' + responses.still_looking + '</strong></div>' +
+        '<div>❌ Didn\'t work: <strong>' + responses.not_yet + '</strong></div>' +
+        '<div>🏠 Different place: <strong>' + responses.different + '</strong></div>' +
+      '</div>' +
+      '<h4 class="font-semibold mb-2">Partner click rate: ' + clkRate + '%</h4>' +
+      (topCats.length ?
+        '<ul style="font-size:.85rem;margin-left:1rem;">' + topCats.map(([c,n]) => '<li>' + esc(c) + ': <strong>' + n + '</strong> clicks</li>').join('') + '</ul>' :
+        '<p class="text-xs text-slate-500">No partner clicks yet.</p>');
+
+  } catch (e) {
+    $('funnelStats').innerHTML = '<p class="text-red-500 text-sm">Error: ' + esc(e.message) + '</p>';
+  }
+}
+
   async function loadLeads() {
     var box = $('leadsList'), no = $('noLeads');
     try {
@@ -1012,64 +1073,49 @@
     } catch (e) { box.innerHTML = '<p class="text-red-500 text-sm">Error loading leads.</p>'; }
   }
 
-  async function buildFollowupEmail(lead, prop, broker) {
-    var seg = prop.property_type === 'guesthouse' ? 'guesthouse'
-            : prop.property_type === 'property'    ? 'buyer'
-            : 'renter';
-
-    var partners = [];
+async function buildFollowupEmail(lead, prop, broker) {
+  // Ensure the lead has a token
+  if (!lead.followup_token) {
     try {
-      var r = await supabase.rpc('get_partners_for_segment', { p_segment: seg });
-      if (!r.error && r.data) partners = r.data;
+      const { data } = await supabase.rpc('ensure_followup_token', { p_lead_id: lead.id });
+      if (data) lead.followup_token = data;
     } catch (_) {}
-
-    var byCat = {};
-    partners.forEach(function(p) {
-      if (!byCat[p.category_name]) byCat[p.category_name] = { emoji: p.category_emoji, items: [] };
-      if (byCat[p.category_name].items.length < 2) byCat[p.category_name].items.push(p);
-    });
-    var catNames = Object.keys(byCat);
-
-    var servicesBlock = '';
-    if (catNames.length) {
-      catNames.forEach(function(name) {
-        var c = byCat[name];
-        servicesBlock += '\n' + c.emoji + ' ' + name + '\n';
-        c.items.forEach(function(p) {
-          servicesBlock += '   • ' + p.provider_name + (p.tagline ? ' — ' + p.tagline : '') + '\n' +
-                          '     ' + p.url + '\n' +
-                          (p.discount_code ? '     💰 Code: ' + p.discount_code + '\n' : '');
-        });
-      });
-    } else {
-      servicesBlock = '\nBrowse verified partners: https://propertyhub.dpdns.org/services/\n';
-    }
-
-    var subject = 'Did you find what you needed in ' + (prop.address || 'Kampala').split(',')[0].trim() + '?';
-    var body =
-      'Hello ' + lead.visitor_name + ',\n\n' +
-      '3 days ago you connected with ' + (broker.business_name || 'a broker') + ' about:\n\n' +
-      '🏠 ' + (prop.title || 'the property') + '\n\n' +
-      '────────────────────────────────────────\n' +
-      '📝 QUICK CHECK-IN — 1 minute\n' +
-      '────────────────────────────────────────\n\n' +
-      'Did you get the place?\n\n' +
-      '  ✅ YES — please rate the broker so other renters benefit:\n' +
-      '     https://propertyhub.dpdns.org/broker/' + lead.broker_id + '\n\n' +
-      '  🤔 STILL LOOKING — see similar properties:\n' +
-      '     https://propertyhub.dpdns.org/?search=' + encodeURIComponent((prop.address || '').split(',')[0].trim()) + '\n\n' +
-      '  ❌ NO — browse new listings:\n' +
-      '     https://propertyhub.dpdns.org/\n\n' +
-      '────────────────────────────────────────\n' +
-      '🎁 SERVICES YOU MIGHT NEED\n' +
-      '────────────────────────────────────────\n' +
-      servicesBlock + '\n' +
-      '────────────────────────────────────────\n\n' +
-      'These are vetted partners we trust. Using them keeps Property Hub free for you.\n\n' +
-      '— The Property Hub Team';
-
-    return { subject: subject, body: body, categories: catNames.slice() };
   }
+
+  const token = lead.followup_token || '';
+  const link = 'https://propertyhub.dpdns.org/followup/?t=' + encodeURIComponent(token);
+  const first = (lead.visitor_name || '').split(' ')[0] || 'there';
+  const propTitle = prop.title || 'the property';
+  const locality = (prop.address || 'Kampala').split(',')[0].trim();
+  const brokerName = broker.business_name || 'your broker';
+
+  const subject = 'Quick question about ' + propTitle + ' 👋';
+
+  const body =
+    'Hey ' + first + ',\n\n' +
+    '3 days ago you connected with ' + brokerName + ' about "' + propTitle + '" in ' + locality + '.\n\n' +
+    'Quick question — did it work out?\n\n' +
+    'We ask everyone this, because your answer helps us:\n\n' +
+    '  ✅ Spot scam brokers before they hurt someone else\n' +
+    '  ⭐ Rank honest brokers higher\n' +
+    '  🏠 Send better matches to other renters\n\n' +
+    'It takes 60 seconds. No account needed. And when you finish, ' +
+    'we\'ll show you:\n\n' +
+    '  • Similar properties if you\'re still looking\n' +
+    '  • Vetted services (furniture, cleaning, moving, legal)\n' +
+    '    with discount codes for Property Hub users\n\n' +
+    '👉 Take 60 seconds here:\n' +
+    link + '\n\n' +
+    '────────────────────────────────────────\n\n' +
+    'P.S. If you did get the place — huge congratulations! ' +
+    'Your quick rating helps the next person find a good broker, ' +
+    'and it helps ' + brokerName + ' get more clients.\n\n' +
+    'Don\'t want these check-ins? Just reply "STOP" and we\'ll leave you alone.\n\n' +
+    '— The Property Hub Team\n' +
+    'https://propertyhub.dpdns.org';
+
+  return { subject: subject, body: body, categories: [], link: link };
+}
 
   async function loadFollowups() {
     var box = $('followupList');
@@ -1519,6 +1565,7 @@
         byCat[p.category_id].push(p);
       });
 
+      loadFunnelStats();
       var statsBox = $('partnerStats');
       if (statsBox) {
         statsBox.innerHTML =
