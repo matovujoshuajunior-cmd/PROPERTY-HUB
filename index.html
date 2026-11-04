@@ -1266,8 +1266,9 @@
         const grid = $('#listingsGrid');
         if (grid) grid.innerHTML = '<div class="md:col-span-2 lg:col-span-3 pre-render-fallback"><h2>Loading live Ugandan property listings…</h2></div>';
         try {
-          let r = await supabase.from('properties').select('*').eq('is_paused', false).order('created_at', { ascending: false });
-          if (r.error) r = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+
+          const r = await supabase.from('properties').select('*').eq('is_paused', false).order('created_at', { ascending: false });
+if (r.error) throw r.error;
           const raw = r.data || [];
           const ownerIds = [];
           raw.forEach(function(p) { if (p.owner_id && ownerIds.indexOf(p.owner_id) === -1) ownerIds.push(p.owner_id); });
