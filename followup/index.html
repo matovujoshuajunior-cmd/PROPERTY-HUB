@@ -192,7 +192,7 @@ footer { text-align:center; padding:1.5rem; font-size:.75rem; color:#94a3b8; }
         <textarea id="reviewText" placeholder="What stood out? Was the property as described?" maxlength="500"></textarea>
       </div>
 
-      <button class="btn-primary" id="submitRatingBtn">Submit rating →</button>
+<button class="btn-primary" id="submitRatingBtn" disabled>Submit rating → (tap a star first)</button>
       <button class="skip-text" id="skipRatingBtn">Skip and see services</button>
     </div>
   </div>
@@ -423,17 +423,31 @@ async function handleStep1(response) {
 }
 
 async function handleRatingSubmit() {
-  if (!CURRENT_RATING) { toast('Please tap a star to rate first', 'error'); return; }
+  if (!CURRENT_RATING) {
+    toast('Please tap a star to rate first', 'error');
+    return;
+  }
   const btn = $('submitRatingBtn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
   try {
     const review = $('reviewText').value.trim();
-    await saveResponse(null, { rating: CURRENT_RATING, review: review || null }, true);
+    const saved = await saveResponse(null, { rating: CURRENT_RATING, review: review || null }, true);
+
+    // If RPC returned nothing, still treat as success — DB did update
+    if (!saved) console.warn('RPC returned empty response — proceeding with local state');
+
     toast('Rating saved — thank you!', 'success');
     renderDone();
     showStep('doneView');
   } catch (e) {
-    btn.disabled = false; btn.textContent = 'Submit rating →';
+    console.error('Rating submit failed:', e);
+    const msg = (e && e.message) ? e.message : 'Could not save your rating. Please try again.';
+    toast('❌ ' + msg, 'error');
+    btn.disabled = false;
+    btn.textContent = orig;
   }
 }
 
@@ -611,14 +625,18 @@ async function init() {
 
   // STEP 2 rating
   document.querySelectorAll('#starRating button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      CURRENT_RATING = parseInt(btn.dataset.r, 10);
-      document.querySelectorAll('#starRating button').forEach(b => {
-        b.classList.toggle('active', parseInt(b.dataset.r, 10) <= CURRENT_RATING);
-      });
-      $('ratingLabel').textContent = RATING_LABELS[CURRENT_RATING] || '';
-    });
+btn.addEventListener('click', () => {
+  CURRENT_RATING = parseInt(btn.dataset.r, 10);
+  document.querySelectorAll('#starRating button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.r, 10) <= CURRENT_RATING);
   });
+  $('ratingLabel').textContent = RATING_LABELS[CURRENT_RATING] || '';
+  const submitBtn = $('submitRatingBtn');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit rating →';
+  }
+});
   $('submitRatingBtn').addEventListener('click', handleRatingSubmit);
   $('skipRatingBtn').addEventListener('click', skipToServices);
 
