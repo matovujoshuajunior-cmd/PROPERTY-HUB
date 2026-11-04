@@ -740,8 +740,24 @@
         return { type: 'text', q: q.toLowerCase() };
       }
 
-      async function loadPlatformSettings() {
-        try {
+    async function loadPlatformSettings() {
+  try {
+    const cached = sessionStorage.getItem('ph_pricing');
+    if (cached) {
+      const m = JSON.parse(cached);
+      if (Date.now() - m._ts < 5 * 60 * 1000) {
+        applyPricingFromMap(m);
+        return;
+      }
+    }
+    const r = await supabase.from('platform_settings').select('key,value');
+    if (r.error || !r.data) return;
+    const m = { _ts: Date.now() };
+    r.data.forEach(x => { m[x.key] = x.value; });
+    sessionStorage.setItem('ph_pricing', JSON.stringify(m));
+    applyPricingFromMap(m);
+  } catch (e) { console.warn('Pricing load failed:', e.message); }
+}
           const r = await supabase.from('platform_settings').select('key,value');
           if (r.error || !r.data) return;
           const m = {};
@@ -1719,7 +1735,10 @@
         list.innerHTML = '<p class="text-slate-500 text-sm">Loading...</p>';
         $('#noReviewsMessage').classList.add('hidden');
         try {
-          const r = await supabase.from('reviews').select('*').eq('broker_id', id).order('created_at', { ascending: false });
+          const r = await supabase.rpc('submit_review', {
+  p_broker_id: bid, p_name: name, p_email: email || null,
+  p_rating: rating, p_comment: comment || null, p_followup_token: null
+});
           if (!r.data || r.data.length === 0) { list.innerHTML = ''; $('#noReviewsMessage').classList.remove('hidden'); return; }
           let h = '';
           r.data.forEach(function(rv) {
@@ -2145,7 +2164,12 @@
         $('#hideTrustBanner') && $('#hideTrustBanner').addEventListener('click', function() { tb.style.display = 'none'; tm.classList.add('visible'); localStorage.setItem(hk, '1'); });
         $('#showTrustBanner') && $('#showTrustBanner').addEventListener('click', function() { tb.style.display = 'block'; tm.classList.remove('visible'); localStorage.setItem(hk, '0'); });
 
-        $('#searchInput') && $('#searchInput').addEventListener('input', function(e) { state.searchQuery = e.target.value; applyFiltersAndSearch(); });
+       let _searchDebounce;
+$('#searchInput') && $('#searchInput').addEventListener('input', function(e) {
+  state.searchQuery = e.target.value;
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(applyFiltersAndSearch, 250);
+});
         $('#clearSearchBtn') && $('#clearSearchBtn').addEventListener('click', function() {
           $('#searchInput').value = ''; state.searchQuery = ''; applyFiltersAndSearch(); $('#searchInput').focus();
         });
