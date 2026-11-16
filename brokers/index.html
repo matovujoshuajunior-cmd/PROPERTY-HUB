@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grow Your Broker Business — Property Hub Uganda</title>
+  <meta name="description" content="Get verified, stand out from scammers, and receive serious buyer leads. Free to join — list 2 properties to activate your account." />
+  <link rel="canonical" href="https://propertyhub.dpdns.org/brokers/" />
+  <meta name="robots" content="index, follow" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Grow Your Broker Business — Property Hub Uganda" />
+  <meta property="og:description" content="Get verified, stand out from scammers, receive serious buyer leads. Free to join." />
+  <meta property="og:image" content="https://propertyhub.dpdns.org/og-cover.jpg" />
+  <link rel="preconnect" href="https://ubkgovgoifgpazkapaxi.supabase.co" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #334155;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 1.25rem; }
+
+    /* Header */
+    .header { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 1rem 0; position: sticky; top: 0; z-index: 50; }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 1.35rem; font-weight: 800; color: #1e293b; text-decoration: none; }
+    .logo span { color: #4f46e5; }
+    .signin-link { font-size: .875rem; color: #4f46e5; font-weight: 500; text-decoration: none; }
+    .signin-link:hover { text-decoration: underline; }
+
+    /* Hero */
+    .hero { padding: 3rem 0 2rem; text-align: center; }
+    .hero-badge { display: inline-block; background: #ecfdf5; color: #065f46; padding: .35rem .85rem; border-radius: 9999px; font-size: .75rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .hero h1 { font-size: 2rem; font-weight: 800; color: #0f172a; line-height: 1.15; margin-bottom: 1rem; }
+    @media (min-width: 640px) { .hero h1 { font-size: 2.5rem; } }
+    .hero p { font-size: 1.05rem; color: #475569; max-width: 560px; margin: 0 auto 1.5rem; }
+    .hero-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
+    .hero-stats .stat { text-align: center; }
+    .hero-stats .num { font-size: 1.5rem; font-weight: 800; color: #4f46e5; }
+    .hero-stats .lbl { font-size: .75rem; color: #64748b; text-transform: uppercase; letter-spacing: .03em; }
+
+    /* Value props */
+    .value-grid { display: grid; grid-template-columns: 1fr; gap: .75rem; margin-bottom: 2rem; }
+    @media (min-width: 640px) { .value-grid { grid-template-columns: 1fr 1fr; } }
+    .value-card { background: #fff; border: 1px solid #e2e8f0; border-radius: .85rem; padding: 1rem; display: flex; gap: .75rem; align-items: flex-start; }
+    .value-card .icon { flex-shrink: 0; width: 2.25rem; height: 2.25rem; border-radius: .5rem; background: #eef2ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: .95rem; }
+    .value-card h3 { font-size: .9rem; font-weight: 700; color: #1e293b; margin-bottom: .2rem; }
+    .value-card p { font-size: .8rem; color: #64748b; line-height: 1.5; }
+
+    /* Quiz */
+    .quiz-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 1.25rem; padding: 1.75rem; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 2rem; }
+    .quiz-progress { display: flex; gap: .35rem; margin-bottom: 1.25rem; }
+    .quiz-progress span { flex: 1; height: 4px; border-radius: 2px; background: #e2e8f0; transition: .3s; }
+    .quiz-progress span.active { background: #4f46e5; }
+    .quiz-step { display: none; }
+    .quiz-step.active { display: block; }
+    .quiz-step h2 { font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-bottom: .4rem; }
+    .quiz-step .quiz-desc { font-size: .85rem; color: #64748b; margin-bottom: 1.25rem; }
+    .choice { display: block; width: 100%; text-align: left; padding: .85rem 1rem; margin-bottom: .5rem; background: #fff; border: 2px solid #e2e8f0; border-radius: .65rem; font-size: .9rem; font-weight: 500; color: #1e293b; cursor: pointer; transition: .15s; font-family: inherit; }
+    .choice:hover { border-color: #a5b4fc; background: #f5f3ff; }
+    .choice.selected { border-color: #4f46e5; background: #eef2ff; color: #4338ca; font-weight: 600; }
+
+    /* Result */
+    .result-wrap { display: none; }
+    .result-wrap.active { display: block; }
+    .score-display { text-align: center; padding: 1.5rem 0 1.25rem; }
+    .score-circle { width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; margin: 0 auto 1rem; box-shadow: 0 10px 30px rgba(79,70,229,.35); }
+    .score-label { font-size: .85rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .5rem; }
+    .score-title { font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: .5rem; }
+    .score-message { font-size: .95rem; color: #475569; max-width: 480px; margin: 0 auto; }
+    .plan-preview { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: .85rem; padding: 1rem 1.25rem; margin: 1.5rem 0; text-align: left; position: relative; overflow: hidden; }
+    .plan-preview::after { content: '🔒 Unlock with free account'; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(248,250,252,0) 0%, rgba(248,250,252,0.95) 60%); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 1rem; font-size: .85rem; font-weight: 700; color: #4f46e5; }
+    .plan-preview h4 { font-size: .8rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: .5rem; }
+    .plan-preview ul { list-style: none; margin: 0; }
+    .plan-preview li { font-size: .85rem; color: #475569; padding: .35rem 0; display: flex; gap: .5rem; align-items: flex-start; }
+    .plan-preview li i { color: #10b981; margin-top: .15rem; }
+
+    /* CTA */
+    .cta-btn { display: block; width: 100%; padding: 1rem 1.5rem; background: #4f46e5; color: #fff; border: none; border-radius: .85rem; font-size: 1rem; font-weight: 700; cursor: pointer; transition: .15s; text-decoration: none; text-align: center; font-family: inherit; }
+    .cta-btn:hover { background: #4338ca; }
+    .cta-btn.secondary { background: #fff; color: #4f46e5; border: 2px solid #4f46e5; }
+    .cta-btn.secondary:hover { background: #eef2ff; }
+    .cta-note { font-size: .75rem; color: #94a3b8; text-align: center; margin-top: .75rem; }
+
+    /* Signup form */
+    .signup-wrap { display: none; }
+    .signup-wrap.active { display: block; }
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-size: .75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .03em; margin-bottom: .3rem; }
+    .field input { width: 100%; padding: .75rem 1rem; border: 1px solid #e2e8f0; border-radius: .65rem; font-size: .95rem; font-family: inherit; }
+    .field input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+    .field .hint { font-size: .75rem; color: #94a3b8; margin-top: .25rem; }
+    .error-box { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: .75rem 1rem; border-radius: .65rem; font-size: .85rem; margin-bottom: 1rem; display: none; }
+    .error-box.active { display: block; }
+    .back-link { background: none; border: none; color: #64748b; font-size: .85rem; cursor: pointer; padding: .5rem 0; text-decoration: underline; font-family: inherit; }
+    .back-link:hover { color: #4f46e5; }
+
+    /* Trust */
+    .trust-section { text-align: center; padding: 2rem 0; }
+    .trust-section h3 { font-size: .85rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 1rem; }
+    .trust-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+    .trust-badge { display: inline-flex; align-items: center; gap: .35rem; font-size: .8rem; color: #475569; }
+    .trust-badge i { color: #10b981; }
+
+    /* FAQ */
+    .faq-section { padding: 2rem 0; }
+    .faq-section h2 { font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 1rem; text-align: center; }
+    .faq-item { background: #fff; border: 1px solid #e2e8f0; border-radius: .65rem; margin-bottom: .5rem; overflow: hidden; }
+    .faq-item summary { padding: .85rem 1rem; font-size: .9rem; font-weight: 600; color: #1e293b; cursor: pointer; list-style: none; position: relative; padding-right: 2.5rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); font-size: 1.25rem; color: #94a3b8; }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item p { padding: 0 1rem 1rem; font-size: .85rem; color: #64748b; line-height: 1.6; }
+
+    /* Footer */
+    .footer { background: #0f172a; color: #cbd5e1; padding: 2rem 1.25rem; margin-top: 2rem; text-align: center; font-size: .8rem; }
+    .footer a { color: #a5b4fc; text-decoration: none; }
+
+    /* Success screen */
+    .success-wrap { display: none; text-align: center; padding: 2rem 0; }
+    .success-wrap.active { display: block; }
+    .success-wrap .emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+    .success-wrap h2 { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: .5rem; }
+    .success-wrap p { color: #64748b; margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container header-inner">
+    <a href="/" class="logo">🏠 Property<span>Hub</span></a>
+    <a href="/auth" class="signin-link">Already a broker? Sign in →</a>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- HERO -->
+  <section class="hero" id="heroSection">
+    <div class="hero-badge"><i class="fas fa-bolt"></i> FREE TO JOIN · 60-SECOND QUIZ</div>
+    <h1>Are you losing serious buyers to scammy brokers?</h1>
+    <p>Find out your Broker Readiness Score in 60 seconds. Get a personalized growth plan. List 2 properties to activate your free account.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="num">0%</div><div class="lbl">Listing fee</div></div>
+      <div class="stat"><div class="num">100%</div><div class="lbl">Verified leads</div></div>
+      <div class="stat"><div class="num">2 mins</div><div class="lbl">Setup time</div></div>
+    </div>
+  </section>
+
+  <!-- VALUE PROPS -->
+  <section class="value-grid">
+    <div class="value-card">
+      <div class="icon"><i class="fas fa-shield-alt"></i></div>
+      <div><h3>Verified badge</h3><p>Stand out with a green tick that says "reviewed by our team."</p></div>
+    </div>
+    <div class="value-card">
+      <div class="icon"><i class="fas fa-star"></i></div>
+      <div><h3>Trusted ranking</h3><p>Good reviews push your listings to the top of search.</p></div>
+    </div>
+    <div class="value-card">
+      <div class="icon"><i class="fas fa-users"></i></div>
+      <div><h3>Serious leads only</h3><p>Visitors fill a quiz before contacting you — no time-wasters.</p></div>
+    </div>
+    <div class="value-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <div><h3>Your data protected</h3><p>Contact info stays hidden until you approve the lead.</p></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="quiz-wrap" id="quizSection">
+    <div class="quiz-progress"><span class="active" id="p1"></span><span id="p2"></span><span id="p3"></span></div>
+
+    <!-- Q1 -->
+    <div class="quiz-step active" id="q1">
+      <h2>1. How many properties do you currently have available?</h2>
+      <p class="quiz-desc">Rentals, sales, guesthouses — count them all.</p>
+      <button class="choice" data-q="q1" data-val="0">None yet (I'm just getting started)</button>
+      <button class="choice" data-q="q1" data-val="1">1 property</button>
+      <button class="choice" data-q="q1" data-val="3">2–5 properties</button>
+      <button class="choice" data-q="q1" data-val="4">6 or more properties</button>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-step" id="q2">
+      <h2>2. Where do you currently advertise?</h2>
+      <p class="quiz-desc">Be honest — this helps us personalize your plan.</p>
+      <button class="choice" data-q="q2" data-val="0">Nowhere specific right now</button>
+      <button class="choice" data-q="q2" data-val="1">WhatsApp status & groups only</button>
+      <button class="choice" data-q="q2" data-val="2">Facebook / Instagram</button>
+      <button class="choice" data-q="q2" data-val="3">Other property portals + social</button>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-step" id="q3">
+      <h2>3. What's your biggest challenge right now?</h2>
+      <p class="quiz-desc">This shapes the recommendations we'll send you.</p>
+      <button class="choice" data-q="q3" data-val="1">I'm not getting enough serious leads</button>
+      <button class="choice" data-q="q3" data-val="2">Too many time-wasters</button>
+      <button class="choice" data-q="q3" data-val="2">I can't stand out from scammers</button>
+      <button class="choice" data-q="q3" data-val="3">I just need more visibility</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="result-wrap" id="resultSection">
+    <div class="score-display">
+      <div class="score-circle" id="scoreCircle">0</div>
+      <div class="score-label">Broker Readiness Score</div>
+      <h2 class="score-title" id="scoreTitle">Calculating…</h2>
+      <p class="score-message" id="scoreMessage"></p>
+    </div>
+
+    <div class="plan-preview">
+      <h4><i class="fas fa-lightbulb"></i> Your Personalized Growth Plan</h4>
+      <ul id="planItems">
+        <li><i class="fas fa-check-circle"></i> Get verified within 24 hours</li>
+        <li><i class="fas fa-check-circle"></i> List your 2 best properties first</li>
+        <li><i class="fas fa-check-circle"></i> Collect 10 reviews to earn Trusted badge</li>
+        <li><i class="fas fa-check-circle"></i> Rank above unverified brokers in search</li>
+        <li><i class="fas fa-check-circle"></i> Receive your first serious lead within 7 days</li>
+      </ul>
+    </div>
+
+    <button class="cta-btn" id="startSignupBtn">Create Free Account to Activate →</button>
+    <p class="cta-note">No credit card. No listing fee. List 2 properties to activate.</p>
+    <div style="text-align:center;margin-top:1rem;">
+      <button class="back-link" id="retakeBtn">← Retake quiz</button>
+    </div>
+  </section>
+
+  <!-- SIGNUP FORM -->
+  <section class="signup-wrap quiz-wrap" id="signupSection">
+    <h2 style="font-size:1.35rem;font-weight:800;color:#0f172a;margin-bottom:.5rem;">Create your free broker account</h2>
+    <p style="font-size:.9rem;color:#64748b;margin-bottom:1.5rem;">You're 2 minutes away from your first verified listing.</p>
+
+    <div class="error-box" id="signupError"></div>
+
+    <form id="signupForm">
+      <div class="field">
+        <label>Business Name *</label>
+        <input type="text" id="bizName" required placeholder="e.g. Sarah's Property Services" autocomplete="organization" />
+        <div class="hint">This appears on your broker profile and reviews.</div>
+      </div>
+      <div class="field">
+        <label>Email Address *</label>
+        <input type="email" id="email" required placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label>WhatsApp Phone *</label>
+        <input type="tel" id="phone" required placeholder="0771234567" autocomplete="tel" />
+        <div class="hint">Buyers will reach you here after you approve their lead.</div>
+      </div>
+      <div class="field">
+        <label>Password *</label>
+        <input type="password" id="password" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password" />
+      </div>
+
+      <button type="submit" class="cta-btn" id="createAccountBtn">Create Account →</button>
+      <p class="cta-note">By creating an account you agree to our <a href="/terms.html" style="color:#4f46e5;">Terms</a> and <a href="/privacy.html" style="color:#4f46e5;">Privacy Policy</a>.</p>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <button type="button" class="back-link" id="backToResultBtn">← Back to your score</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- SUCCESS -->
+  <section class="success-wrap quiz-wrap" id="successSection">
+    <div class="emoji">🎉</div>
+    <h2>Welcome aboard!</h2>
+    <p>Redirecting you to your dashboard to list your first 2 properties…</p>
+    <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:.85rem;padding:1rem;text-align:left;font-size:.9rem;color:#065f46;max-width:400px;margin:0 auto;">
+      <p style="font-weight:700;margin-bottom:.5rem;">✅ Your account has been created</p>
+      <p>📧 Check your email to confirm your account (check spam too).</p>
+      <p style="margin-top:.5rem;">Once confirmed, sign in and list 2 properties to activate your account.</p>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trust-section">
+    <h3>Trusted by brokers across Kampala</h3>
+    <div class="trust-badges">
+      <span class="trust-badge"><i class="fas fa-check-circle"></i> Verified listings only</span>
+      <span class="trust-badge"><i class="fas fa-shield-alt"></i> Fraud-protected</span>
+      <span class="trust-badge"><i class="fas fa-bolt"></i> Instant lead alerts</span>
+      <span class="trust-badge"><i class="fas fa-star"></i> Transparent reviews</span>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <h2>Common questions</h2>
+
+    <details class="faq-item">
+      <summary>Is it really free?</summary>
+      <p>Yes — creating an account and listing properties is 100% free. You only pay small fees when you choose to verify a listing (5,000 UGX) or unlock a lead (1,750–5,000+ UGX, deducted from your wallet).</p>
+    </details>
+
+    <details class="faq-item">
+      <summary>Why do I need to list 2 properties?</summary>
+      <p>A broker with 2+ listings is 4× more likely to receive serious buyer interest. It's our way of ensuring the platform has real, active inventory — which benefits everyone, especially you. Listing 2 properties takes about 10 minutes.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary>How do leads work?</summary>
+      <p>When a visitor wants to view a property, they fill a short quiz. You get an SMS + email with their first name only. If you want their full contact, click "Unlock" in your dashboard and pay the small lead fee. Contact details stay hidden until you pay — so you never see a lead you can't act on.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary>What if I don't want to be verified?</summary>
+      <p>Verification is compulsory for all new listings — it's how we protect visitors from scams and keep the platform trustworthy. The 5,000 UGX fee protects your reputation too: buyers trust verified brokers, and verified brokers rank higher in search.</p>
+    </details>
+
+    <details class="faq-item">
+      <summary>Can I cancel anytime?</summary>
+      <p>Yes. You can pause or delete any listing from your dashboard. There are no subscriptions or monthly fees — you only pay when you actively use the platform (verification or lead unlock).</p>
+    </details>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>© 2026 Property Hub Uganda · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+
+  const state = { q1: null, q2: null, q3: null, score: 0 };
+
+  function $(id) { return document.getElementById(id); }
+  function show(id) { document.querySelectorAll('.quiz-step, .result-wrap, .signup-wrap, .success-wrap').forEach(el => el.classList.remove('active')); $(id).classList.add('active'); }
+
+  function updateProgress(n) {
+    ['p1','p2','p3'].forEach((p, i) => $(p).classList.toggle('active', i < n));
+  }
+
+  function bindChoice(stepId, onAnswered) {
+    document.querySelectorAll(`#${stepId} .choice`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        state[btn.dataset.q] = parseInt(btn.dataset.val, 10);
+        document.querySelectorAll(`#${stepId} .choice`).forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        setTimeout(() => onAnswered(), 200);
+      });
+    });
+  }
+
+  bindChoice('q1', () => { updateProgress(2); show('q2'); });
+  bindChoice('q2', () => { updateProgress(3); show('q3'); });
+  bindChoice('q3', () => { updateProgress(3); computeAndShowResult(); });
+
+  function computeAndShowResult() {
+    const score = (state.q1 || 0) + (state.q2 || 0) + (state.q3 || 0);
+    state.score = score;
+
+    $('scoreCircle').textContent = score + '/10';
+
+    let title, message;
+    if (score <= 3) {
+      title = 'You\'re starting out';
+      message = 'You have the drive but not the visibility. Property Hub gives you a free, trusted platform to build from day one — no reputation needed.';
+    } else if (score <= 6) {
+      title = 'You have properties — but you\'re invisible';
+      message = 'The market can\'t find you. Serious buyers choose brokers they can verify. Property Hub puts you in front of them with a green tick.';
+    } else if (score <= 8) {
+      title = 'You\'re losing winnable leads';
+      message = 'Serious buyers are choosing other brokers — not because your properties are worse, but because those brokers look more trustworthy. Let\'s fix that.';
+    } else {
+      title = 'You\'re ready to scale';
+      message = 'You have the listings, the experience, and the drive. You just need a platform that markets you as trustworthy — not one that hides you behind scam ads.';
+    }
+
+    $('scoreTitle').textContent = title;
+    $('scoreMessage').textContent = message;
+
+    show('resultSection');
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+  }
+
+  $('startSignupBtn').addEventListener('click', () => { show('signupSection'); window.scrollTo({ top: 200, behavior: 'smooth' }); });
+  $('backToResultBtn').addEventListener('click', () => { show('resultSection'); });
+  $('retakeBtn').addEventListener('click', () => {
+    state.q1 = state.q2 = state.q3 = null;
+    document.querySelectorAll('.choice').forEach(b => b.classList.remove('selected'));
+    updateProgress(1);
+    show('q1');
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+  });
+
+  $('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const bizName = $('bizName').value.trim();
+    const email = $('email').value.trim();
+    const phone = $('phone').value.trim();
+    const password = $('password').value;
+    const err = $('signupError');
+    err.classList.remove('active');
+
+    if (!bizName || !email || !phone || !password) { err.textContent = 'Please fill all fields.'; err.classList.add('active'); return; }
+    if (password.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.classList.add('active'); return; }
+
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length < 9 || cleanPhone.length > 13) { err.textContent = 'Please enter a valid phone number.'; err.classList.add('active'); return; }
+
+    const btn = $('createAccountBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating account…';
+
+    try {
+      if (!window.supabase) throw new Error('Supabase not loaded. Refresh the page.');
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { business_name: bizName, phone, account_type: 'broker', source: 'brokers_landing', quiz_score: state.score },
+          emailRedirectTo: 'https://propertyhub.dpdns.org/auth'
+        }
+      });
+      if (error) throw error;
+
+      // Try to sign in immediately (works if email confirmation is disabled)
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (signInError) {
+        // Email confirmation required — show success and instruct
+        show('successSection');
+        btn.disabled = false;
+        btn.textContent = 'Create Account →';
+        return;
+      }
+
+      if (signInData.session && signInData.session.user) {
+        // Set activation flag for the dashboard
+        try {
+          localStorage.setItem('ph_broker_activation_' + signInData.session.user.id, '1');
+        } catch (_) {}
+
+        show('successSection');
+        setTimeout(() => { window.location.href = '/dashboard?ob=brokers'; }, 1800);
+      }
+    } catch (e) {
+      err.textContent = e.message || 'Signup failed. Please try again.';
+      err.classList.add('active');
+      btn.disabled = false;
+      btn.textContent = 'Create Account →';
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
