@@ -88,6 +88,8 @@
     body { background:#f8fafc; font-family:'Inter',system-ui,-apple-system,sans-serif; color:#334155; line-height:1.6; }
     a { color:#4f46e5; text-decoration:none; }
     a:hover { text-decoration:underline; }
+    /* Critical: .hidden works without Tailwind */
+    .hidden { display: none !important; }
     .property-card { transition:transform .2s,box-shadow .25s; }
     .property-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px -12px rgba(0,0,0,.18); }
     .hero-gradient { background:linear-gradient(135deg,rgba(15,23,42,.6) 0%,rgba(30,58,95,.35) 100%); }
@@ -191,6 +193,40 @@
       #chatBubble { bottom:20px; left:20px; width:56px; height:56px; }
       #chatPanel { left:10px; bottom:90px; }
     }
+    /* Guides responsive grid */
+    .guides-grid {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:1.25rem;
+    }
+    @media (min-width:640px) { .guides-grid { grid-template-columns:1fr 1fr; } }
+    @media (min-width:1024px) { .guides-grid { grid-template-columns:repeat(3, 1fr); } }
+    .guide-col h3 {
+      font-size:.8rem;
+      font-weight:700;
+      color:#64748b;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:.6rem;
+      padding-bottom:.4rem;
+      border-bottom:1px solid #e2e8f0;
+    }
+    .guide-col ul {
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:.35rem;
+      font-size:.85rem;
+    }
+    .guide-col ul a {
+      display:block;
+      padding:.25rem 0;
+      color:#4f46e5;
+      line-height:1.4;
+    }
+    .guide-col ul a:hover {
+      text-decoration:underline;
+    }
   </style>
 </head>
 <body>
@@ -229,104 +265,9 @@
   </div>
 </div>
 
-<div id="reviewModal" class="modal-backdrop hidden">
-  <div class="modal-content">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;color:#1e293b;">⭐ Reviews</h2><button id="closeReviewModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;"><span style="font-size:.875rem;color:#64748b;">What others say</span><button id="toggleWriteReview" class="write-review-toggle"><i class="fas fa-pen"></i> Write a Review</button></div>
-    <div id="reviewFormContainer" class="hidden" style="margin-bottom:1rem;padding:1rem;background:#f8fafc;border-radius:.75rem;border:1px solid #e2e8f0;">
-      <form id="reviewForm">
-        <input type="hidden" id="reviewBrokerId" />
-        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Name *</label><input type="text" id="reviewClientName" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
-        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Email *</label><input type="email" id="reviewClientEmail" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
-        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Rating</label><div id="starSelector" class="star-rating" style="display:flex;gap:.25rem;"><span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span></div><input type="hidden" id="reviewRating" value="5" /></div>
-        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Review</label><textarea id="reviewComment" rows="3" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;"></textarea></div>
-        <button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Review</button>
-      </form>
-    </div>
-    <div id="reviewsList" style="max-height:16rem;overflow-y:auto;"></div>
-    <div id="noReviewsMessage" class="hidden" style="color:#64748b;font-size:.875rem;text-align:center;padding:1rem;">No reviews yet. Be the first to review!</div>
-  </div>
-</div>
-
-<div id="quizModal" class="modal-backdrop hidden">
-  <div class="modal-content">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">📞 Connect with Broker</h2><button id="closeQuizModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
-    <form id="quizForm">
-      <input type="hidden" id="quizPropertyId" />
-      <div id="quizStep1">
-        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Your Full Name *</label><input type="text" id="quizName" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
-        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Email Address *</label><input type="email" id="quizEmail" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
-        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">WhatsApp Number *</label><input type="text" id="quizWhatsapp" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
-        <button type="button" id="quizNextBtn" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Next: Quiz Questions →</button>
-      </div>
-      <div id="quizStep2" class="hidden">
-        <div class="quiz-question"><p class="q-title">1. When do you plan to move in or buy?</p>
-          <label class="quiz-option"><input type="radio" name="q1" value="1" required /> 6+ months</label>
-          <label class="quiz-option"><input type="radio" name="q1" value="2" /> 1–6 months</label>
-          <label class="quiz-option"><input type="radio" name="q1" value="3" /> ASAP</label>
-        </div>
-        <div class="quiz-question"><p class="q-title">2. How does your budget compare?</p>
-          <label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below asking</label>
-          <label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches asking</label>
-        </div>
-        <div class="quiz-question"><p class="q-title">3. Ready to view within 7 days?</p>
-          <label class="quiz-option"><input type="radio" name="q3" value="1" required /> Not yet</label>
-          <label class="quiz-option"><input type="radio" name="q3" value="2" /> Maybe</label>
-          <label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes</label>
-        </div>
-        <div class="quiz-question"><p class="q-title">4. How serious?</p>
-          <label class="quiz-option"><input type="radio" name="q4" value="1" required /> Browsing</label>
-          <label class="quiz-option"><input type="radio" name="q4" value="2" /> Comparing</label>
-          <label class="quiz-option"><input type="radio" name="q4" value="3" /> Top choice</label>
-        </div>
-        <button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;margin-top:1rem;">Submit Request</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div id="topupModal" class="modal-backdrop hidden">
-  <div class="modal-content" style="max-width:400px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">💰 Top Up Wallet</h2><button id="closeTopupModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
-    <form id="topupForm">
-      <input type="number" id="topupAmount" required min="1000" placeholder="Amount (e.g. 20000)" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" />
-      <input type="text" id="topupPhone" placeholder="Mobile money number" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;margin-top:.5rem;" />
-      <select id="topupProvider" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;margin-top:.5rem;">
-        <option value="iotec">MTN MoMo</option>
-        <option value="relworx">Airtel Money</option>
-      </select>
-      <button type="submit" style="width:100%;background:#10b981;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;margin-top:.75rem;">Deposit</button>
-    </form>
-    <div id="topupStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
-  </div>
-</div>
-
-<div id="reportModal" class="modal-backdrop hidden">
-  <div class="modal-content" style="max-width:480px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">🚨 Report Broker</h2><button id="closeReportModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
-    <p style="color:#64748b;font-size:.875rem;margin-bottom:.75rem;">Your report is anonymous to the broker.</p>
-    <form id="reportForm">
-      <input type="hidden" id="reportBrokerId" />
-      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Name (optional)</label><input type="text" id="reportName" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
-      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Email (optional)</label><input type="email" id="reportEmail" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
-      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Reason *</label>
-        <select id="reportReason" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" required>
-          <option value="">Select a reason</option>
-          <option value="fraud">Fraud / Scam</option>
-          <option value="fake_listing">Fake Listing</option>
-          <option value="harassment">Harassment</option>
-          <option value="spam">Spam</option>
-          <option value="misleading">Misleading Information</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Description *</label><textarea id="reportDescription" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" rows="4"></textarea></div>
-      <button type="submit" style="width:100%;background:#ef4444;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Report</button>
-    </form>
-    <div id="reportStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
-  </div>
-</div>
-
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- MAIN APP (crawlable content first)                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="app" style="min-height:100vh;">
   <header style="background:rgba(255,255,255,.9);border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:50;">
     <div style="max-width:80rem;margin:0 auto;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;">
@@ -340,6 +281,7 @@
 
   <main>
     <section id="discoveryView" class="view view-visible">
+      <!-- HERO -->
       <div style="position:relative;background:#0f172a;color:#fff;overflow:hidden;min-height:400px;">
         <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1e1b4b 0%,#4f46e5 40%,#f97316 100%);opacity:.9;"></div>
         <div class="hero-gradient" style="position:absolute;inset:0;"></div>
@@ -391,35 +333,68 @@
           </div>
           <!-- PRERENDERED_LISTINGS_END -->
         </div>
-        <div id="emptyState" class="hidden" style="text-align:center;padding:5rem 0;">No properties found.</div>
 
-        <section style="margin-top:3rem;margin-bottom:1rem;">
-          <h2 style="font-size:1.25rem;font-weight:700;color:#1e293b;margin-bottom:.25rem;">Popular Property Guides in Uganda</h2>
-          <p style="color:#64748b;font-size:.875rem;margin-bottom:1rem;">In-depth guides to help you find a place in Uganda's most searched neighborhoods.</p>
-          <ul style="display:grid;grid-template-columns:1fr;gap:.5rem;font-size:.875rem;list-style:none;">
-            <li><a href="/guides/single-rooms-near-makerere/">Single rooms near Makerere University</a></li>
-            <li><a href="/guides/hostels-near-mulago/">Hostels near Mulago Hospital</a></li>
-            <li><a href="/guides/cheap-rooms-kikoni/">Cheap rooms for rent in Kikoni</a></li>
-            <li><a href="/guides/rooms-wandegeya/">Rooms for rent in Wandegeya</a></li>
-            <li><a href="/guides/student-hostels-katanga/">Student hostels in Katanga</a></li>
-            <li><a href="/guides/apartments-naalya/">2 bedroom apartments in Naalya</a></li>
-            <li><a href="/guides/apartments-ntinda/">Apartments for rent in Ntinda</a></li>
-            <li><a href="/guides/rentals-bukoto/">Houses &amp; apartments in Bukoto</a></li>
-            <li><a href="/guides/bungalows-kisaasi/">Bungalows for sale in Kisaasi</a></li>
-            <li><a href="/guides/guesthouses-entebbe-airport/">Guesthouses near Entebbe Airport</a></li>
-            <li><a href="/guides/kamwokya/">Houses for rent in Kamwokya</a></li>
-            <li><a href="/guides/kyebando/">Houses for rent in Kyebando</a></li>
-            <li><a href="/guides/kalerwe/">Cheap rooms in Kalerwe</a></li>
-            <li><a href="/guides/kanyanya/">Houses for rent in Kanyanya</a></li>
-            <li><a href="/guides/bwaise/">Cheap rooms in Bwaise</a></li>
-            <li><a href="/guides/kololo/">Luxury houses in Kololo</a></li>
-            <li><a href="/guides/nakasero/">Apartments in Nakasero</a></li>
-          </ul>
+        <!-- ALL 17 GUIDES IN COLUMNS -->
+        <section style="margin-top:3rem;margin-bottom:2rem;">
+          <h2 style="font-size:1.5rem;font-weight:800;color:#1e293b;margin-bottom:.4rem;">Property Guides for Kampala</h2>
+          <p style="color:#64748b;font-size:.9rem;margin-bottom:1.5rem;">In-depth guides to help you find a place in Uganda's most searched neighborhoods.</p>
+
+          <div class="guides-grid">
+            <!-- Column 1: Student & Budget -->
+            <div class="guide-col">
+              <h3>🎓 Student &amp; Budget Rentals</h3>
+              <ul>
+                <li><a href="/guides/single-rooms-near-makerere/">Single Rooms Near Makerere University</a></li>
+                <li><a href="/guides/hostels-near-mulago/">Hostels Near Mulago Hospital</a></li>
+                <li><a href="/guides/cheap-rooms-kikoni/">Cheap Rooms in Kikoni</a></li>
+                <li><a href="/guides/rooms-wandegeya/">Rooms in Wandegeya</a></li>
+                <li><a href="/guides/student-hostels-katanga/">Student Hostels in Katanga</a></li>
+                <li><a href="/guides/kalerwe/">Cheap Rooms in Kalerwe</a></li>
+                <li><a href="/guides/bwaise/">Cheap Rooms in Bwaise</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 2: Apartments & Houses -->
+            <div class="guide-col">
+              <h3>🏢 Apartments &amp; Houses</h3>
+              <ul>
+                <li><a href="/guides/apartments-naalya/">2 Bedroom Apartments in Naalya</a></li>
+                <li><a href="/guides/apartments-ntinda/">Apartments in Ntinda</a></li>
+                <li><a href="/guides/rentals-bukoto/">Houses &amp; Apartments in Bukoto</a></li>
+                <li><a href="/guides/kamwokya/">Houses in Kamwokya</a></li>
+                <li><a href="/guides/kyebando/">Houses in Kyebando</a></li>
+                <li><a href="/guides/kanyanya/">Houses in Kanyanya</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 3: Luxury, Buying & Short Stays -->
+            <div class="guide-col">
+              <h3>💎 Luxury, Buying &amp; Short Stays</h3>
+              <ul>
+                <li><a href="/guides/kololo/">Luxury Houses in Kololo</a></li>
+                <li><a href="/guides/nakasero/">Apartments in Nakasero</a></li>
+                <li><a href="/guides/bungalows-kisaasi/">Bungalows for Sale in Kisaasi</a></li>
+                <li><a href="/guides/guesthouses-entebbe-airport/">Guesthouses Near Entebbe Airport</a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- BROKER CTA -->
+        <section style="background:linear-gradient(135deg,#4f46e5,#4338ca);border-radius:1.25rem;padding:1.75rem;margin-bottom:2rem;color:#fff;">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
+            <div>
+              <h3 style="font-size:1.25rem;font-weight:800;margin-bottom:.25rem;">Are you a broker?</h3>
+              <p style="color:#c7d2fe;font-size:.9rem;">List your properties free. Get verified leads in your area.</p>
+            </div>
+            <a href="/brokers/" style="background:#fff;color:#4f46e5;padding:.75rem 1.5rem;border-radius:.75rem;font-size:.9rem;font-weight:700;text-decoration:none;white-space:nowrap;">List Property →</a>
+          </div>
         </section>
       </section>
     </section>
 
-    <section id="brokerView" class="view view-hidden">
+    <!-- Other views: hidden, marked non-snippet -->
+    <section id="brokerView" class="view view-hidden" data-nosnippet aria-hidden="true">
       <div style="max-width:80rem;margin:0 auto;padding:2rem 1rem;">
         <button id="backToDiscovery" style="font-size:.875rem;margin-bottom:1.5rem;background:none;border:none;cursor:pointer;"><i class="fas fa-arrow-left"></i> Back</button>
         <div id="brokerHeader" class="broker-header" style="border-radius:1rem;padding:1.5rem;margin-bottom:2rem;">
@@ -440,7 +415,7 @@
       </div>
     </section>
 
-    <section id="authView" class="view view-hidden" style="max-width:28rem;margin:3rem auto;padding:0 1rem;">
+    <section id="authView" class="view view-hidden" style="max-width:28rem;margin:3rem auto;padding:0 1rem;" data-nosnippet aria-hidden="true">
       <div class="auth-card" style="padding:2rem;">
         <div style="display:flex;border-radius:.75rem;background:#f1f5f9;padding:.25rem;margin-bottom:2rem;">
           <button id="toggleSignIn" class="auth-toggle-btn active" style="width:50%;padding:.625rem;border-radius:.5rem;font-size:.875rem;font-weight:600;border:none;cursor:pointer;">Sign In</button>
@@ -465,7 +440,7 @@
       </div>
     </section>
 
-    <section id="onboardingView" class="view view-hidden">
+    <section id="onboardingView" class="view view-hidden" data-nosnippet aria-hidden="true">
       <div style="max-width:48rem;margin:0 auto;padding:2.5rem 1rem;">
         <div style="background:#fff;border-radius:1.5rem;border:1px solid #e2e8f0;padding:2rem;">
           <div style="text-align:center;margin-bottom:2rem;">
@@ -490,7 +465,7 @@
       </div>
     </section>
 
-    <section id="dashboardView" class="view view-hidden">
+    <section id="dashboardView" class="view view-hidden" data-nosnippet aria-hidden="true">
       <div style="max-width:64rem;margin:0 auto;padding:2rem 1rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
           <h2 style="font-size:1.25rem;font-weight:700;">📋 My Properties</h2>
@@ -565,16 +540,17 @@
         <p style="color:#94a3b8;">Connecting property seekers with verified brokers across Uganda.</p>
       </div>
       <div>
-        <h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Popular Guides</h4>
+        <h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Featured Guides</h4>
         <ul style="display:flex;flex-direction:column;gap:.25rem;list-style:none;">
           <li><a href="/guides/single-rooms-near-makerere/" style="color:#94a3b8;">Single rooms near Makerere</a></li>
           <li><a href="/guides/apartments-naalya/" style="color:#94a3b8;">Apartments in Naalya</a></li>
           <li><a href="/guides/kololo/" style="color:#94a3b8;">Houses in Kololo</a></li>
+          <li><a href="/guides/nakasero/" style="color:#94a3b8;">Apartments in Nakasero</a></li>
           <li><a href="/guides/" style="color:#94a3b8;">All guides →</a></li>
         </ul>
       </div>
       <div>
-        <h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Areas</h4>
+        <h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Areas We Cover</h4>
         <p style="color:#94a3b8;">Kampala · Wakiso · Entebbe · Mukono · Kira · Naalya · Ntinda · Bukoto · Jinja</p>
       </div>
     </div>
@@ -588,6 +564,136 @@
       <a href="/services/" style="color:#94a3b8;">Services</a>
     </div>
   </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- MODALS (after footer, hidden from crawlers)                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div id="reviewModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;color:#1e293b;">⭐ Reviews</h2><button id="closeReviewModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;"><span style="font-size:.875rem;color:#64748b;">What others say</span><button id="toggleWriteReview" class="write-review-toggle"><i class="fas fa-pen"></i> Write a Review</button></div>
+    <div id="reviewFormContainer" class="hidden" style="margin-bottom:1rem;padding:1rem;background:#f8fafc;border-radius:.75rem;border:1px solid #e2e8f0;">
+      <form id="reviewForm">
+        <input type="hidden" id="reviewBrokerId" />
+        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Name *</label><input type="text" id="reviewClientName" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
+        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Email *</label><input type="email" id="reviewClientEmail" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
+        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Rating</label><div id="starSelector" class="star-rating" style="display:flex;gap:.25rem;"><span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span></div><input type="hidden" id="reviewRating" value="5" /></div>
+        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Review</label><textarea id="reviewComment" rows="3" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;"></textarea></div>
+        <button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Review</button>
+      </form>
+    </div>
+    <div id="reviewsList" style="max-height:16rem;overflow-y:auto;"></div>
+    <div id="noReviewsMessage" class="hidden" style="color:#64748b;font-size:.875rem;text-align:center;padding:1rem;">No reviews yet. Be the first to review!</div>
+  </div>
+</div>
+
+<div id="editModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">✏️ Edit Property</h2><button id="closeEditModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
+    <form id="editPropertyForm" style="display:flex;flex-direction:column;gap:1rem;">
+      <input type="hidden" id="editPropertyId" />
+      <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Title *</label><input type="text" id="editTitle" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
+      <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Price (UGX) *</label><input type="number" id="editPrice" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
+      <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Property Type *</label><select id="editType" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
+      <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Address *</label><input type="text" id="editAddress" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
+      <button type="submit" style="background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Update Property</button>
+    </form>
+  </div>
+</div>
+
+<div id="propertyVerificationModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">📋 Property Verification</h2><button id="closeVerificationModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:.75rem;padding:.75rem;margin-bottom:1rem;font-size:.875rem;color:#92400e;"><i class="fas fa-info-circle" style="margin-right:.25rem;"></i>Verification fee: <strong id="verifFeeDisplay">5,000 UGX</strong></div>
+    <form id="propertyVerificationForm" style="display:flex;flex-direction:column;gap:1rem;">
+      <input type="hidden" id="verifPropertyId" />
+      <input type="hidden" id="verifPropertyType" />
+      <div id="verifDynamicFields"></div>
+      <button type="submit" style="background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Verification Request</button>
+    </form>
+    <div id="verifStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
+  </div>
+</div>
+
+<div id="quizModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true">
+  <div class="modal-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">📞 Connect with Broker</h2><button id="closeQuizModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
+    <form id="quizForm">
+      <input type="hidden" id="quizPropertyId" />
+      <div id="quizStep1">
+        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Your Full Name *</label><input type="text" id="quizName" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
+        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Email Address *</label><input type="email" id="quizEmail" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
+        <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">WhatsApp Number *</label><input type="text" id="quizWhatsapp" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
+        <button type="button" id="quizNextBtn" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Next: Quiz Questions →</button>
+      </div>
+      <div id="quizStep2" class="hidden">
+        <div class="quiz-question"><p class="q-title">1. When do you plan to move in or buy?</p>
+          <label class="quiz-option"><input type="radio" name="q1" value="1" required /> 6+ months</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="2" /> 1–6 months</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="3" /> ASAP</label>
+        </div>
+        <div class="quiz-question"><p class="q-title">2. How does your budget compare?</p>
+          <label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below asking</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches asking</label>
+        </div>
+        <div class="quiz-question"><p class="q-title">3. Ready to view within 7 days?</p>
+          <label class="quiz-option"><input type="radio" name="q3" value="1" required /> Not yet</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="2" /> Maybe</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes</label>
+        </div>
+        <div class="quiz-question"><p class="q-title">4. How serious?</p>
+          <label class="quiz-option"><input type="radio" name="q4" value="1" required /> Browsing</label>
+          <label class="quiz-option"><input type="radio" name="q4" value="2" /> Comparing</label>
+          <label class="quiz-option"><input type="radio" name="q4" value="3" /> Top choice</label>
+        </div>
+        <button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;margin-top:1rem;">Submit Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="topupModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true">
+  <div class="modal-content" style="max-width:400px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">💰 Top Up Wallet</h2><button id="closeTopupModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
+    <form id="topupForm">
+      <input type="number" id="topupAmount" required min="1000" placeholder="Amount (e.g. 20000)" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" />
+      <input type="text" id="topupPhone" placeholder="Mobile money number" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;margin-top:.5rem;" />
+      <select id="topupProvider" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;margin-top:.5rem;">
+        <option value="iotec">MTN MoMo</option>
+        <option value="relworx">Airtel Money</option>
+      </select>
+      <button type="submit" style="width:100%;background:#10b981;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;margin-top:.75rem;">Deposit</button>
+    </form>
+    <div id="topupStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
+  </div>
+</div>
+
+<div id="reportModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true">
+  <div class="modal-content" style="max-width:480px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">🚨 Report Broker</h2><button id="closeReportModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
+    <p style="color:#64748b;font-size:.875rem;margin-bottom:.75rem;">Your report is anonymous to the broker.</p>
+    <form id="reportForm">
+      <input type="hidden" id="reportBrokerId" />
+      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Name (optional)</label><input type="text" id="reportName" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
+      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Email (optional)</label><input type="email" id="reportEmail" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>
+      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Reason *</label>
+        <select id="reportReason" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" required>
+          <option value="">Select a reason</option>
+          <option value="fraud">Fraud / Scam</option>
+          <option value="fake_listing">Fake Listing</option>
+          <option value="harassment">Harassment</option>
+          <option value="spam">Spam</option>
+          <option value="misleading">Misleading Information</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Description *</label><textarea id="reportDescription" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" rows="4"></textarea></div>
+      <button type="submit" style="width:100%;background:#ef4444;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Report</button>
+    </form>
+    <div id="reportStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
@@ -632,21 +738,36 @@
     function $$(s) { return document.querySelectorAll(s); }
     function formatPrice(a) { return Number(a || 0).toLocaleString('en-UG') + ' UGX'; }
 
-    // ══════════════════════════════════════════════════════════════
-    // FIXED: Robust media_urls parser (handles arrays, JSON strings, single URL)
-    // ══════════════════════════════════════════════════════════════
+    // ── TITLE CASE ──
+    function titleCase(str) {
+      if (!str) return '';
+      const small = new Set(['a','an','and','as','at','but','by','for','in','of','on','or','the','to','v','via','vs','with','from','into','under','over']);
+      return String(str).replace(/\b[a-zA-Z]+\b/g, function(word, offset) {
+        if (/^[A-Z]{2,}$/.test(word)) return word;
+        const lower = word.toLowerCase();
+        if (offset > 0 && small.has(lower)) return lower;
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+      });
+    }
+
+    // ── TYPE LABEL ──
+    function formatPropertyType(type) {
+      if (type === 'rental') return 'For Rent';
+      if (type === 'property') return 'For Sale';
+      if (type === 'guesthouse') return 'Guesthouse';
+      return 'Property';
+    }
+
+    // ── ROBUST media_urls parser ──
     function getImageArray(p) {
       if (!p.media_urls) return [];
       let arr = p.media_urls;
-      // Handle JSON string
       if (typeof arr === 'string') {
         try {
           const parsed = JSON.parse(arr);
           if (Array.isArray(parsed)) return parsed;
           if (typeof parsed === 'string') return [parsed];
-        } catch (_) {
-          return [arr];
-        }
+        } catch (_) { return [arr]; }
         return [arr];
       }
       if (Array.isArray(arr)) return arr;
@@ -658,6 +779,19 @@
       const first = arr[0];
       if (!first || typeof first !== 'string') return '/og-cover.jpg';
       return first;
+    }
+
+    // ── SMART ALT TEXT (no duplication) ──
+    function buildAltText(property) {
+      const title = titleCase(property.title || 'Property');
+      const locality = (property.address || 'Uganda').split(',')[0].trim();
+      const price = Number(property.price_amount || 0).toLocaleString();
+      const localityLower = locality.toLowerCase();
+      const titleLower = title.toLowerCase();
+      if (locality && titleLower.indexOf(localityLower) !== -1) {
+        return title + ' — ' + price + ' UGX on Property Hub Uganda';
+      }
+      return title + ' in ' + (locality || 'Uganda') + ', Uganda — ' + price + ' UGX on Property Hub';
     }
 
     function renderStars(r) { let h = ''; for (let i = 0; i < 5; i++) h += i < r ? '★' : '☆'; return h; }
@@ -744,9 +878,17 @@
     function showView(view) {
       ['discoveryView', 'brokerView', 'authView', 'dashboardView', 'onboardingView'].forEach(function(id) {
         const el = document.getElementById(id);
-        if (el) { el.classList.remove('view-visible'); el.classList.add('view-hidden'); }
+        if (el) {
+          el.classList.remove('view-visible');
+          el.classList.add('view-hidden');
+          el.setAttribute('aria-hidden', 'true');
+        }
       });
-      if (view) { view.classList.remove('view-hidden'); view.classList.add('view-visible'); }
+      if (view) {
+        view.classList.remove('view-hidden');
+        view.classList.add('view-visible');
+        view.removeAttribute('aria-hidden');
+      }
     }
 
     function setAuthMode(signUpMode) {
@@ -784,7 +926,7 @@
       const streetAddress = property.address || 'Uganda';
       const locality = streetAddress.split(',')[0].trim() || 'Uganda';
       const schema = {
-        "@context": "https://schema.org", "@type": "RealEstateListing", "name": property.title,
+        "@context": "https://schema.org", "@type": "RealEstateListing", "name": titleCase(property.title || 'Property'),
         "url": SITE_URL + '/property/' + property.id, "image": getImageArray(property).slice(0, 3),
         "address": { "@type": "PostalAddress", "streetAddress": streetAddress, "addressLocality": locality, "addressCountry": "UG" },
         "offers": { "@type": "Offer", "price": property.price_amount, "priceCurrency": "UGX" }
@@ -975,19 +1117,21 @@
       let connectHtml = '';
       if (!showEdit) connectHtml = '<button class="connect-btn" data-property-id="' + property.id + '" style="background:#4f46e5;color:#fff;font-size:.65rem;font-weight:600;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-handshake"></i> Connect</button>';
 
-      const locality = (property.address || 'Uganda').split(',')[0].trim();
-      const typeLabel = property.property_type === 'rental' ? 'for Rent' : property.property_type === 'guesthouse' ? 'Guesthouse' : 'for Sale';
-      const descriptiveAlt = `${property.title || 'Property'} ${typeLabel} in ${locality}, Uganda — ${formatPrice(property.price_amount)}`;
+      // BROKER FALLBACK: "Property Hub" if no broker data
+      const brokerName = (broker && broker.business_name) || 'Property Hub';
+      const displayTitle = titleCase(property.title || 'Property');
+      const typeLabel = formatPropertyType(property.property_type);
+      const altText = buildAltText(property);
 
       article.innerHTML =
         '<div style="position:relative;aspect-ratio:4/3;background:#e2e8f0;overflow:hidden;">' +
-          '<img src="' + imageUrl + '" alt="' + descriptiveAlt + '" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.onerror=null;this.src=\'/og-cover.jpg\';"/>' +
-          '<span style="position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px;">' + (property.property_type || 'Property') + '</span>' +
+          '<img src="' + imageUrl + '" alt="' + altText.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.onerror=null;this.src=\'/og-cover.jpg\';"/>' +
+          '<span style="position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px;">' + typeLabel + '</span>' +
           (!showEdit && isVerified ? '<span style="position:absolute;top:.75rem;right:.75rem;background:#10b981;color:#fff;font-size:.5rem;font-weight:700;padding:.25rem .5rem;border-radius:9999px;">✓ VERIFIED</span>' : '') +
         '</div>' +
         '<div style="padding:1rem;display:flex;flex-direction:column;flex:1;">' +
           '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.25rem;">' +
-            '<h3 style="font-weight:600;color:#1e293b;font-size:1rem;">' + (property.title || 'Untitled') + '</h3>' +
+            '<h3 style="font-weight:600;color:#1e293b;font-size:1rem;">' + displayTitle + '</h3>' +
             '<div style="display:flex;align-items:center;gap:.25rem;">' + (!showEdit ? badgeHtml : '') + ' ' + (!showEdit && isTrusted ? trustedHtml : '') + '</div>' +
           '</div>' +
           '<p style="color:#4338ca;font-weight:700;font-size:.875rem;margin-top:.125rem;">' + formatPrice(property.price_amount) + '</p>' +
@@ -999,8 +1143,8 @@
           '</div>' +
           '<div style="margin-top:.75rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border-top:1px solid #e2e8f0;padding-top:.75rem;flex-wrap:wrap;">' +
             (showBrokerLink
-              ? '<button class="broker-name-link" data-broker-id="' + ((broker && broker.id) || '') + '" style="font-size:.75rem;font-weight:500;color:#4f46e5;display:flex;align-items:center;gap:.25rem;background:none;border:none;cursor:pointer;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ' + ((broker && broker.business_name) || 'Unknown Broker') + '</button>'
-              : '<span style="font-size:.75rem;color:#64748b;display:flex;align-items:center;gap:.25rem;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ' + ((broker && broker.business_name) || 'Broker') + '</span>') +
+              ? '<button class="broker-name-link" data-broker-id="' + ((broker && broker.id) || '') + '" style="font-size:.75rem;font-weight:500;color:#4f46e5;display:flex;align-items:center;gap:.25rem;background:none;border:none;cursor:pointer;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ' + brokerName + '</button>'
+              : '<span style="font-size:.75rem;color:#64748b;display:flex;align-items:center;gap:.25rem;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ' + brokerName + '</span>') +
             '<div style="display:flex;gap:.5rem;">' + actionsHtml + boostHtml + pauseHtml + rateHtml + connectHtml + '</div>' +
           '</div>' +
         '</div>';
@@ -1013,7 +1157,7 @@
         catch (err) { alert('Error: ' + err.message); }
       });
       const rateBtn = article.querySelector('.rate-btn'); if (rateBtn) rateBtn.addEventListener('click', function(e) { e.stopPropagation(); openReviewModal(broker.id); });
-      const nameLink = article.querySelector('.broker-name-link'); if (nameLink) nameLink.addEventListener('click', function(e) { e.stopPropagation(); navigateToBroker(broker.id); });
+      const nameLink = article.querySelector('.broker-name-link'); if (nameLink && broker && broker.id) nameLink.addEventListener('click', function(e) { e.stopPropagation(); navigateToBroker(broker.id); });
       const connectBtn = article.querySelector('.connect-btn'); if (connectBtn) connectBtn.addEventListener('click', function(e) { e.stopPropagation(); openQuizModal(property.id); });
       const pauseBtn = article.querySelector('.pause-btn'); if (pauseBtn) pauseBtn.addEventListener('click', function(e) { e.stopPropagation(); togglePropertyPause(property.id, property.is_paused); });
       return article;
@@ -1037,8 +1181,11 @@
 
     function renderListings(list) {
       const grid = $('#listingsGrid');
+      const emptyState = $('#emptyState');
       if (!grid) return;
       grid.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'none';
+
       if (!list || list.length === 0) {
         grid.innerHTML = '<div style="grid-column:1/-1;color:#64748b;font-size:.9rem;padding:2rem 0;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">No properties match your search</h2><p>Try searching for <strong>cheap houses for rent in Kampala</strong>, <strong>apartments in Naalya</strong>, or <strong>land for sale in Wakiso</strong>.</p></div>';
         const pc = $('#propertyCount'); if (pc) pc.textContent = '0 listings';
@@ -1047,7 +1194,7 @@
       const pc = $('#propertyCount'); if (pc) pc.textContent = list.length + ' listing' + (list.length > 1 ? 's' : '');
       grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
       list.forEach(function(p) {
-        const broker = p.broker || state.profilesMap[p.owner_id] || null;
+        const broker = p.broker || (p.owner_id && state.profilesMap[p.owner_id]) || null;
         grid.appendChild(createPropertyCard(p, broker, true, false));
       });
     }
@@ -1125,39 +1272,69 @@
     }
 
     // ══════════════════════════════════════════════════════════════
-    // FIXED: fetchAllData — no is_paused filter in SQL, filter in JS
+    // FIXED: fetchAllData with join query + fallback
     // ══════════════════════════════════════════════════════════════
     async function fetchAllData() {
       const grid = $('#listingsGrid');
       if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;color:#64748b;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">Loading listings…</h2></div>';
       try {
-        // NO .eq('is_paused', false) — filter in JS to handle null values
-        const r = await supabase.from('properties').select('*').order('created_at', { ascending: false });
-        if (r.error) {
-          console.error('❌ Properties query failed:', r.error);
-          throw r.error;
+        // Primary: join query with broker data inline
+        let allRows = [];
+        let joinSucceeded = false;
+        try {
+          const jr = await supabase.from('properties').select(`
+            id, title, price_amount, property_type, address, media_urls, is_paused, verification_status, is_verified, created_at, owner_id,
+            broker:profiles!owner_id(id, business_name, average_rating, review_count, lead_score, is_verified, is_blocked, phone)
+          `).order('created_at', { ascending: false });
+          if (!jr.error && jr.data) {
+            allRows = jr.data;
+            joinSucceeded = true;
+            // Populate profilesMap from joined data
+            state.profilesMap = {};
+            allRows.forEach(p => { if (p.broker && p.broker.id) state.profilesMap[p.broker.id] = p.broker; });
+          }
+        } catch (joinErr) {
+          console.warn('⚠️ Join query failed, using fallback:', joinErr);
         }
-        const allRows = r.data || [];
-        console.log('✅ Loaded ' + allRows.length + ' properties from database');
-        // Filter out paused properties (only excludes explicit true)
-        const raw = allRows.filter(p => p.is_paused !== true);
-        console.log('✅ ' + raw.length + ' active properties after filtering paused');
 
-        const ownerIds = [];
-        raw.forEach(function(p) { if (p.owner_id && ownerIds.indexOf(p.owner_id) === -1) ownerIds.push(p.owner_id); });
-        if (ownerIds.length) {
-          const pr = await supabase.from('profiles').select('*').in('id', ownerIds);
-          state.profilesMap = {};
-          (pr.data || []).forEach(function(p) { state.profilesMap[p.id] = p; });
+        // Fallback: separate queries
+        if (!joinSucceeded) {
+          const r = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+          if (r.error) throw r.error;
+          allRows = r.data || [];
+          const ownerIds = [];
+          allRows.forEach(p => { if (p.owner_id && ownerIds.indexOf(p.owner_id) === -1) ownerIds.push(p.owner_id); });
+          if (ownerIds.length) {
+            const pr = await supabase.from('profiles').select('id, business_name, average_rating, review_count, lead_score, is_verified, is_blocked, phone').in('id', ownerIds);
+            state.profilesMap = {};
+            (pr.data || []).forEach(p => { state.profilesMap[p.id] = p; });
+            console.log('📊 Profiles loaded:', Object.keys(state.profilesMap).length, 'of', ownerIds.length, 'owners');
+          }
         }
-        const repR = await supabase.from('reports').select('broker_id, status').eq('status', 'pending');
-        if (repR.data) {
-          const counts = {};
-          repR.data.forEach(function(x) { counts[x.broker_id] = (counts[x.broker_id] || 0) + 1; });
-          Object.keys(state.profilesMap).forEach(function(id) { state.profilesMap[id].report_count = counts[id] || 0; });
-        }
+
+        // Filter paused (handles null = active)
+        const raw = allRows.filter(p => p.is_paused !== true);
+        console.log('✅ Loaded ' + allRows.length + ' properties, ' + raw.length + ' active');
+
+        // Attach broker to each property from profilesMap if join didn't
+        raw.forEach(p => {
+          if (!p.broker && p.owner_id && state.profilesMap[p.owner_id]) {
+            p.broker = state.profilesMap[p.owner_id];
+          }
+        });
+
+        // Check for reports
+        try {
+          const repR = await supabase.from('reports').select('broker_id, status').eq('status', 'pending');
+          if (repR.data) {
+            const counts = {};
+            repR.data.forEach(x => { counts[x.broker_id] = (counts[x.broker_id] || 0) + 1; });
+            Object.keys(state.profilesMap).forEach(id => { state.profilesMap[id].report_count = counts[id] || 0; });
+          }
+        } catch (_) {}
+
         const enriched = raw.map(function(prop) {
-          const broker = state.profilesMap[prop.owner_id] || null;
+          const broker = prop.broker || state.profilesMap[prop.owner_id] || null;
           const rc = (broker && broker.report_count) || 0;
           return Object.assign({}, prop, { broker: broker, rankScore: calculateRankScore(prop, broker, rc) });
         });
@@ -1170,7 +1347,7 @@
         applyFiltersAndSearch();
       } catch (e) {
         console.error('❌ Fetch error:', e);
-        if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#ef4444;margin-bottom:.5rem;">Could not load listings</h2><p style="color:#64748b;">Please refresh the page. If this persists, contact support.</p></div>';
+        if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#ef4444;margin-bottom:.5rem;">Could not load listings</h2><p style="color:#64748b;">Please refresh the page.</p></div>';
       }
     }
 
@@ -1211,7 +1388,8 @@
     }
 
     function openQuizModal(pid) {
-      $('#quizPropertyId').value = pid;
+      const el = $('#quizPropertyId'); if (!el) return;
+      el.value = pid;
       $('#quizStep1').classList.remove('hidden');
       $('#quizStep2').classList.add('hidden');
       $('#quizForm').reset();
@@ -1467,11 +1645,11 @@
         $('#reportBrokerBtn').onclick = function() { if (state.currentUser && state.currentUser.id === id) { alert('You cannot report yourself.'); return; } openReportModal(id); };
         const prR = await supabase.from('properties').select('*').eq('owner_id', id).order('created_at', { ascending: false });
         grid.innerHTML = '';
-        if (!prR.data || prR.data.length === 0) { $('#brokerEmptyState').classList.remove('hidden'); return; }
+        const active = (prR.data || []).filter(p => p.is_paused !== true);
+        if (active.length === 0) { $('#brokerEmptyState').classList.remove('hidden'); return; }
         $('#brokerEmptyState').classList.add('hidden');
         grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
-        const active = prR.data.filter(p => p.is_paused !== true);
-        const sorted = active.map(function(p) { return Object.assign({}, p, { rankScore: calculateRankScore(p, b) }); }).sort(function(a, c) { return c.rankScore - a.rankScore; });
+        const sorted = active.map(function(p) { return Object.assign({}, p, { broker: b, rankScore: calculateRankScore(p, b) }); }).sort(function(a, c) { return c.rankScore - a.rankScore; });
         sorted.forEach(function(p) { grid.appendChild(createPropertyCard(p, b, false, false)); });
       } catch (e) { grid.innerHTML = '<div style="text-align:center;padding:3rem 0;color:#ef4444;">Error loading profile.</div>'; }
     }
@@ -1536,19 +1714,35 @@
       loadLeads();
     }
 
+    // ── DEFENSIVE openEditModal ──
     function openEditModal(pid) {
-      const prop = state.myProperties.find(function(p) { return p.id === pid; });
-      if (!prop) return;
-      $('#editPropertyId').value = pid;
-      $('#editTitle').value = prop.title || '';
-      $('#editPrice').value = prop.price_amount || '';
-      const dbType = prop.property_type || '';
-      let ft = 'Rentals';
-      if (dbType === 'property') ft = 'Properties';
-      else if (dbType === 'guesthouse') ft = 'Guesthouses';
-      $('#editType').value = ft;
-      $('#editAddress').value = prop.address || '';
-      $('#editModal').classList.remove('hidden');
+      try {
+        const prop = state.myProperties.find(function(p) { return p.id === pid; });
+        if (!prop) { console.warn('Property not found:', pid); return; }
+        const idInput = $('#editPropertyId');
+        const titleInput = $('#editTitle');
+        const priceInput = $('#editPrice');
+        const typeInput = $('#editType');
+        const addrInput = $('#editAddress');
+        if (!idInput || !titleInput || !priceInput || !typeInput || !addrInput) {
+          console.error('Edit modal elements not found in DOM');
+          alert('Edit form unavailable. Please refresh the page.');
+          return;
+        }
+        idInput.value = pid;
+        titleInput.value = prop.title || '';
+        priceInput.value = prop.price_amount || '';
+        const dbType = prop.property_type || '';
+        let ft = 'Rentals';
+        if (dbType === 'property') ft = 'Properties';
+        else if (dbType === 'guesthouse') ft = 'Guesthouses';
+        typeInput.value = ft;
+        addrInput.value = prop.address || '';
+        $('#editModal').classList.remove('hidden');
+      } catch (e) {
+        console.error('openEditModal error:', e);
+        alert('Could not open editor: ' + e.message);
+      }
     }
 
     function openReportModal(id) {
@@ -1806,6 +2000,28 @@
         } catch (e) { alert('Failed: ' + e.message); }
       });
 
+      $('#editPropertyForm') && $('#editPropertyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = $('#editPropertyId').value;
+        if (!id) return;
+        const title = $('#editTitle').value.trim();
+        const price = parseFloat($('#editPrice').value);
+        const type = $('#editType').value;
+        const addr = $('#editAddress').value.trim();
+        if (!title || !price || !addr) { alert('Fill fields.'); return; }
+        const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
+        try {
+          const r = await supabase.from('properties').update({ title, price_amount: price, property_type: dbType, address: addr }).eq('id', id);
+          if (r.error) throw r.error;
+          alert('✅ Updated!');
+          $('#editModal').classList.add('hidden');
+          await loadMyProperties();
+          await fetchAllData();
+        } catch (e) { alert('Failed: ' + e.message); }
+      });
+      $('#closeEditModal') && $('#closeEditModal').addEventListener('click', function() { $('#editModal').classList.add('hidden'); });
+
+      $('#closeVerificationModal') && $('#closeVerificationModal').addEventListener('click', function() { $('#propertyVerificationModal').classList.add('hidden'); });
       $('#propertyVerificationForm') && $('#propertyVerificationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const pid = $('#verifPropertyId').value;
