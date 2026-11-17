@@ -3,34 +3,52 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Property Guides for Kampala Renters & Buyers | Property Hub Uganda</title>
+<title>Property Guides for Kampala Renters & Buyers 2026 | Property Hub Uganda</title>
 <meta name="description" content="In-depth guides to finding rentals, hostels, apartments, and land in Kampala's most searched neighborhoods. Prices, safety tips, and verified listings." />
 <link rel="canonical" href="https://propertyhub.dpdns.org/guides/" />
-<meta name="robots" content="index, follow" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
+<link rel="stylesheet" href="/guides/styles.css" />
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"Home","item":"https://propertyhub.dpdns.org/"},
+{"@type":"ListItem","position":2,"name":"Guides","item":"https://propertyhub.dpdns.org/guides/"}
+]}
+</script>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#334155;line-height:1.7;font-size:16px}
-a{color:#4f46e5;text-decoration:none}
-a:hover{text-decoration:underline}
-.header{background:#fff;border-bottom:1px solid #e2e8f0;padding:1rem 1.5rem}
-.header-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:1.35rem;font-weight:800;color:#1e293b}
-.logo span{color:#4f46e5}
-.back-btn{background:#4f46e5;color:#fff;padding:.5rem 1.1rem;border-radius:.65rem;font-size:.85rem;font-weight:600}
-.back-btn:hover{background:#4338ca;text-decoration:none}
-.container{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem}
-h1{font-size:2rem;font-weight:800;color:#0f172a;margin-bottom:.5rem}
-h2.section{font-size:1.15rem;font-weight:700;color:#1e293b;margin:2rem 0 .75rem}
-p.intro{font-size:1.05rem;color:#475569;margin-bottom:2rem}
-.grid{display:grid;grid-template-columns:1fr;gap:1rem}
-@media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
-.card{display:block;padding:1.25rem;background:#fff;border:1px solid #e2e8f0;border-radius:1rem;transition:all .2s}
-.card:hover{border-color:#4f46e5;transform:translateY(-2px);text-decoration:none;box-shadow:0 10px 20px -10px rgba(79,70,229,0.2)}
-.card h3{font-size:1.05rem;font-weight:700;color:#1e293b;margin-bottom:.4rem}
-.card p{font-size:.85rem;color:#64748b;margin:0}
-.footer{background:#0f172a;color:#cbd5e1;padding:2.5rem 1.5rem;margin-top:3rem;text-align:center;font-size:.85rem}
-.footer a{color:#a5b4fc}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#334155;line-height:1.7;font-size:16px}
+  a{color:#4f46e5;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .header{background:#fff;border-bottom:1px solid #e2e8f0;padding:1rem 1.5rem;position:sticky;top:0;z-index:10}
+  .header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+  .logo{font-size:1.35rem;font-weight:800;color:#1e293b}
+  .logo span{color:#4f46e5}
+  .back-btn{background:#4f46e5;color:#fff;padding:.5rem 1.1rem;border-radius:.65rem;font-size:.85rem;font-weight:600}
+  .back-btn:hover{background:#4338ca;text-decoration:none}
+  .container{max-width:900px;margin:0 auto;padding:2rem 1.5rem 4rem}
+  h1{font-size:2rem;font-weight:800;color:#0f172a;margin-bottom:.5rem}
+  .updated{font-size:.8rem;color:#64748b;margin-bottom:1.5rem}
+  .intro{font-size:1.05rem;color:#475569;margin-bottom:2rem}
+  .section{margin-bottom:2.5rem}
+  .section h2{font-size:1.25rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+  .section p.section-desc{font-size:.9rem;color:#64748b;margin-bottom:1rem}
+  .grid{display:grid;grid-template-columns:1fr;gap:.85rem}
+  @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+  .card{display:block;padding:1.1rem 1.25rem;background:#fff;border:1px solid #e2e8f0;border-radius:.85rem;transition:all .2s}
+  .card:hover{border-color:#4f46e5;transform:translateY(-2px);text-decoration:none;box-shadow:0 10px 20px -10px rgba(79,70,229,0.2)}
+  .card h3{font-size:.95rem;font-weight:700;color:#1e293b;margin-bottom:.25rem}
+  .card p{font-size:.8rem;color:#64748b;margin:0}
+  .broker-cta{background:linear-gradient(135deg,#4f46e5,#4338ca);color:#fff;border-radius:1rem;padding:1.5rem;margin-bottom:2rem;display:flex;flex-direction:column;gap:.75rem;align-items:flex-start}
+  @media(min-width:640px){.broker-cta{flex-direction:row;align-items:center;justify-content:space-between}}
+  .broker-cta h3{font-size:1.1rem;font-weight:800;margin-bottom:.25rem}
+  .broker-cta p{font-size:.85rem;color:#c7d2fe}
+  .broker-cta a{background:#fff;color:#4f46e5;padding:.6rem 1.2rem;border-radius:.65rem;font-size:.85rem;font-weight:700;white-space:nowrap}
+  .broker-cta a:hover{background:#eef2ff;text-decoration:none}
+  .footer{background:#0f172a;color:#cbd5e1;padding:2.5rem 1.5rem;margin-top:3rem;text-align:center;font-size:.85rem}
+  .footer a{color:#a5b4fc}
 </style>
 </head>
 <body>
@@ -43,64 +61,127 @@ p.intro{font-size:1.05rem;color:#475569;margin-bottom:2rem}
 </header>
 
 <main class="container">
+
   <h1>Property Guides for Kampala</h1>
+  <p class="updated">Last updated: November 2026</p>
   <p class="intro">In-depth guides to finding rentals, hostels, apartments, and land in Kampala's most searched neighborhoods. Each guide covers current 2026 prices, safety tips, and how to avoid rental scams.</p>
 
-  <h2 class="section">Student &amp; Budget Rentals</h2>
-  <div class="grid">
-    <a href="/guides/single-rooms-near-makerere/" class="card">
-      <h3>Single Rooms Near Makerere University</h3>
-      <p>Prices from 100,000 UGX/month in Kikoni, Katanga, Wandegeya, and Mulago.</p>
-    </a>
-    <a href="/guides/hostels-near-mulago/" class="card">
-      <h3>Hostels Near Mulago Hospital</h3>
-      <p>For medical students, nurses, and patient families. From 200,000 UGX/month.</p>
-    </a>
-    <a href="/guides/cheap-rooms-kikoni/" class="card">
-      <h3>Cheap Rooms for Rent in Kikoni</h3>
-      <p>Kampala's cheapest student neighborhood. Rooms from 100,000 UGX/month.</p>
-    </a>
-    <a href="/guides/rooms-wandegeya/" class="card">
-      <h3>Rooms for Rent in Wandegeya</h3>
-      <p>Modern rooms with reliable utilities. From 250,000 UGX/month.</p>
-    </a>
-    <a href="/guides/student-hostels-katanga/" class="card">
-      <h3>Student Hostels in Katanga</h3>
-      <p>Older but cheaper. Rooms from 120,000 UGX/month near Makerere.</p>
-    </a>
+  <div class="broker-cta">
+    <div>
+      <h3>Are you a broker?</h3>
+      <p>List your properties free on Property Hub. Get verified leads in your area.</p>
+    </div>
+    <a href="/brokers/">Take the Broker Quiz →</a>
   </div>
 
-  <h2 class="section">Apartments &amp; Houses</h2>
-  <div class="grid">
-    <a href="/guides/apartments-naalya/" class="card">
-      <h3>2 Bedroom Apartments in Naalya</h3>
-      <p>Modern, secure, family-friendly. From 800,000 UGX/month.</p>
-    </a>
-    <a href="/guides/apartments-ntinda/" class="card">
-      <h3>Apartments for Rent in Ntinda</h3>
-      <p>Studios to 3-bedrooms in Kampala's walkable northeast. From 700,000 UGX/month.</p>
-    </a>
-    <a href="/guides/rentals-bukoto/" class="card">
-      <h3>Houses &amp; Apartments in Bukoto</h3>
-      <p>Upscale, expat-friendly, walled compounds. From 1M UGX/month.</p>
-    </a>
-  </div>
+  <!-- STUDENT & BUDGET RENTALS -->
+  <section class="section">
+    <h2>🎓 Student &amp; Budget Rentals</h2>
+    <p class="section-desc">Affordable rooms near Makerere, Mulago, and surrounding areas</p>
+    <div class="grid">
+      <a href="/guides/single-rooms-near-makerere/" class="card">
+        <h3>Single Rooms Near Makerere University</h3>
+        <p>From 100,000 UGX/month in Kikoni, Katanga, Wandegeya, and Mulago.</p>
+      </a>
+      <a href="/guides/hostels-near-mulago/" class="card">
+        <h3>Hostels Near Mulago Hospital</h3>
+        <p>For medical students, nurses, and patient families. From 200,000 UGX.</p>
+      </a>
+      <a href="/guides/cheap-rooms-kikoni/" class="card">
+        <h3>Cheap Rooms in Kikoni</h3>
+        <p>Kampala's cheapest student neighborhood. From 100,000 UGX/month.</p>
+      </a>
+      <a href="/guides/rooms-wandegeya/" class="card">
+        <h3>Rooms in Wandegeya</h3>
+        <p>Modern rooms near Makerere. From 250,000 UGX/month.</p>
+      </a>
+      <a href="/guides/student-hostels-katanga/" class="card">
+        <h3>Student Hostels in Katanga</h3>
+        <p>Older, cheaper, social. Rooms from 120,000 UGX/month.</p>
+      </a>
+      <a href="/guides/kalerwe/" class="card">
+        <h3>Cheap Rooms in Kalerwe</h3>
+        <p>Cheapest rooms in Kampala. From 80,000 UGX/month near Mulago.</p>
+      </a>
+      <a href="/guides/bwaise/" class="card">
+        <h3>Cheap Rooms in Bwaise</h3>
+        <p>Affordable rooms near Makerere. From 100,000 UGX/month.</p>
+      </a>
+    </div>
+  </section>
 
-  <h2 class="section">Buying Property</h2>
-  <div class="grid">
-    <a href="/guides/bungalows-kisaasi/" class="card">
-      <h3>Bungalows for Sale in Kisaasi</h3>
-      <p>Newer builds with titled land. From 60M UGX (land) / 180M UGX (bungalow).</p>
-    </a>
-  </div>
+  <!-- APARTMENTS & HOUSES -->
+  <section class="section">
+    <h2>🏢 Apartments &amp; Houses</h2>
+    <p class="section-desc">Mid-range rentals in Kampala's residential neighborhoods</p>
+    <div class="grid">
+      <a href="/guides/apartments-naalya/" class="card">
+        <h3>2 Bedroom Apartments in Naalya</h3>
+        <p>Modern, secure, family-friendly. From 800,000 UGX/month.</p>
+      </a>
+      <a href="/guides/apartments-ntinda/" class="card">
+        <h3>Apartments in Ntinda</h3>
+        <p>Studios to 3-bedrooms. From 700,000 UGX/month.</p>
+      </a>
+      <a href="/guides/rentals-bukoto/" class="card">
+        <h3>Houses &amp; Apartments in Bukoto</h3>
+        <p>Upscale, expat-friendly. From 1M UGX/month.</p>
+      </a>
+      <a href="/guides/kamwokya/" class="card">
+        <h3>Houses in Kamwokya</h3>
+        <p>Near Acacia Mall. Rooms from 150,000 UGX/month.</p>
+      </a>
+      <a href="/guides/kyebando/" class="card">
+        <h3>Houses in Kyebando</h3>
+        <p>Quiet, residential. From 120,000 UGX/month.</p>
+      </a>
+      <a href="/guides/kanyanya/" class="card">
+        <h3>Houses in Kanyanya</h3>
+        <p>Family-friendly near Bahai Temple. From 150,000 UGX/month.</p>
+      </a>
+    </div>
+  </section>
 
-  <h2 class="section">Short Stays</h2>
-  <div class="grid">
-    <a href="/guides/guesthouses-entebbe-airport/" class="card">
-      <h3>Guesthouses Near Entebbe Airport</h3>
-      <p>Cheap overnight stays 10–15 min from the terminal. From 80,000 UGX/night.</p>
-    </a>
-  </div>
+  <!-- LUXURY & UPSCALE -->
+  <section class="section">
+    <h2>💎 Luxury &amp; Upscale Rentals</h2>
+    <p class="section-desc">Premium properties in Kampala's most prestigious neighborhoods</p>
+    <div class="grid">
+      <a href="/guides/kololo/" class="card">
+        <h3>Houses for Rent in Kololo</h3>
+        <p>Expat and diplomatic hub. From 2M UGX/month.</p>
+      </a>
+      <a href="/guides/nakasero/" class="card">
+        <h3>Apartments in Nakasero</h3>
+        <p>City-centre luxury near embassies. From 1.5M UGX/month.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- BUYING & INVESTING -->
+  <section class="section">
+    <h2>🔑 Buying &amp; Investing</h2>
+    <p class="section-desc">Guides for buying property in Uganda</p>
+    <div class="grid">
+      <a href="/guides/bungalows-kisaasi/" class="card">
+        <h3>Bungalows for Sale in Kisaasi</h3>
+        <p>Newer builds with titled land. From 180M UGX.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- SHORT STAYS -->
+  <section class="section">
+    <h2>🏨 Short Stays</h2>
+    <p class="section-desc">Guesthouses and short-term rentals</p>
+    <div class="grid">
+      <a href="/guides/guesthouses-entebbe-airport/" class="card">
+        <h3>Guesthouses Near Entebbe Airport</h3>
+        <p>Cheap overnight stays near the terminal. From 80,000 UGX/night.</p>
+      </a>
+    </div>
+  </section>
+
 </main>
 
 <footer class="footer">
