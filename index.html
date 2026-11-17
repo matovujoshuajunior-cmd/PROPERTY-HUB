@@ -394,7 +394,7 @@
     </section>
 
     <!-- Other views: hidden, marked non-snippet -->
-    <section id="brokerView" class="view view-hidden" data-nosnippet aria-hidden="true">
+    <section id="brokerView" class="view view-hidden" data-nosnippet>
       <div style="max-width:80rem;margin:0 auto;padding:2rem 1rem;">
         <button id="backToDiscovery" style="font-size:.875rem;margin-bottom:1.5rem;background:none;border:none;cursor:pointer;"><i class="fas fa-arrow-left"></i> Back</button>
         <div id="brokerHeader" class="broker-header" style="border-radius:1rem;padding:1.5rem;margin-bottom:2rem;">
@@ -415,7 +415,7 @@
       </div>
     </section>
 
-    <section id="authView" class="view view-hidden" style="max-width:28rem;margin:3rem auto;padding:0 1rem;" data-nosnippet aria-hidden="true">
+<section id="authView" class="view view-hidden" style="max-width:28rem;margin:3rem auto;padding:0 1rem;" data-nosnippet>
       <div class="auth-card" style="padding:2rem;">
         <div style="display:flex;border-radius:.75rem;background:#f1f5f9;padding:.25rem;margin-bottom:2rem;">
           <button id="toggleSignIn" class="auth-toggle-btn active" style="width:50%;padding:.625rem;border-radius:.5rem;font-size:.875rem;font-weight:600;border:none;cursor:pointer;">Sign In</button>
@@ -440,7 +440,7 @@
       </div>
     </section>
 
-    <section id="onboardingView" class="view view-hidden" data-nosnippet aria-hidden="true">
+<section id="onboardingView" class="view view-hidden" data-nosnippet>
       <div style="max-width:48rem;margin:0 auto;padding:2.5rem 1rem;">
         <div style="background:#fff;border-radius:1.5rem;border:1px solid #e2e8f0;padding:2rem;">
           <div style="text-align:center;margin-bottom:2rem;">
@@ -465,7 +465,7 @@
       </div>
     </section>
 
-    <section id="dashboardView" class="view view-hidden" data-nosnippet aria-hidden="true">
+<section id="dashboardView" class="view view-hidden" data-nosnippet>
       <div style="max-width:64rem;margin:0 auto;padding:2rem 1rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
           <h2 style="font-size:1.25rem;font-weight:700;">📋 My Properties</h2>
@@ -605,14 +605,31 @@
 
 <div id="propertyVerificationModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true">
   <div class="modal-content">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">📋 Property Verification</h2><button id="closeVerificationModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
-    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:.75rem;padding:.75rem;margin-bottom:1rem;font-size:.875rem;color:#92400e;"><i class="fas fa-info-circle" style="margin-right:.25rem;"></i>Verification fee: <strong id="verifFeeDisplay">5,000 UGX</strong></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">📋 Verify Your Property</h2><button id="closeVerificationModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div>
+
+    <div id="paymentInstructions" style="background:#fef3c7;border:1px solid #fbbf24;border-radius:.75rem;padding:1rem;margin-bottom:1rem;font-size:.85rem;color:#92400e;">
+      <p style="font-weight:700;margin-bottom:.5rem;">📱 Step 1: Send <strong id="verifFeeDisplay">5,000 UGX</strong> via Mobile Money</p>
+      <p style="margin-bottom:.4rem;"><strong>MTN MoMo:</strong> <code style="background:#fff;padding:.15rem .4rem;border-radius:.25rem;" id="mtnNumber">0700123456</code> — <span id="mtnName">Property Hub Uganda</span></p>
+      <p style="margin-bottom:.5rem;"><strong>Airtel Money:</strong> <code style="background:#fff;padding:.15rem .4rem;border-radius:.25rem;" id="airtelNumber">0750123456</code> — <span id="airtelName">Property Hub Uganda</span></p>
+      <p style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #fbbf24;">After sending, you'll get an SMS with a <strong>transaction reference</strong> (e.g. "MP12345678"). Enter it below.</p>
+    </div>
+
     <form id="propertyVerificationForm" style="display:flex;flex-direction:column;gap:1rem;">
       <input type="hidden" id="verifPropertyId" />
       <input type="hidden" id="verifPropertyType" />
+
+      <div style="padding:.75rem;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:.75rem;">
+        <label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;color:#065f46;">💳 Payment Reference *</label>
+        <input type="text" data-verif-field="paymentReference" required placeholder="e.g. MP12345678" style="width:100%;padding:.5rem 1rem;border:1px solid #a7f3d0;border-radius:.75rem;font-size:.875rem;" />
+        <p style="font-size:.7rem;color:#065f46;margin-top:.25rem;">From your MoMo/Airtel SMS</p>
+      </div>
+
+      <p style="font-weight:700;color:#1e293b;font-size:.9rem;">📋 Step 2: Property details</p>
       <div id="verifDynamicFields"></div>
-      <button type="submit" style="background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Verification Request</button>
+
+      <button type="submit" style="background:#4f46e5;color:#fff;padding:.75rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit for Approval</button>
     </form>
+
     <div id="verifStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
   </div>
 </div>
@@ -705,7 +722,17 @@
     const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
     const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
-    const SITE_URL = 'https://propertyhub.dpdns.org';
+        const SITE_URL = 'https://propertyhub.dpdns.org';
+
+    // ── MANUAL PAYMENT CONFIG ──
+    // ⚠️ REPLACE THESE WITH YOUR REAL MOBILE MONEY NUMBERS
+    const PAYMENT_CONFIG = {
+      mtn_name:      'Property Hub Uganda',
+      mtn_number:    '0706289135',   // ← REPLACE
+      airtel_name:   'Property Hub Uganda',
+      airtel_number: '0766966202',   // ← REPLACE
+      amount:        5000
+    };
 
     let VERIFICATION_FEE = 5000;
     let LEAD_RATE_PER_150K = { hot: 5000, warm: 3250, cold: 1750 };
@@ -875,19 +902,24 @@
       return { view: 'home' };
     }
 
-    function showView(view) {
+
+  
+        function showView(view) {
+      // Blur focused element first to prevent aria-hidden warnings
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        try { document.activeElement.blur(); } catch (_) {}
+      }
       ['discoveryView', 'brokerView', 'authView', 'dashboardView', 'onboardingView'].forEach(function(id) {
         const el = document.getElementById(id);
         if (el) {
           el.classList.remove('view-visible');
           el.classList.add('view-hidden');
-          el.setAttribute('aria-hidden', 'true');
+          // No aria-hidden — CSS display:none is sufficient
         }
       });
       if (view) {
         view.classList.remove('view-hidden');
         view.classList.add('view-visible');
-        view.removeAttribute('aria-hidden');
       }
     }
 
@@ -1057,8 +1089,20 @@
       } catch (e) { console.error(e); }
     }
 
-    function isTrustedBroker(b) { return b && b.average_rating >= 4 && b.review_count >= 10 && b.lead_score >= 20 && (b.report_count || 0) < 3; }
+       function isTrustedBroker(b) { return b && b.average_rating >= 4 && b.review_count >= 10 && b.lead_score >= 20 && (b.report_count || 0) < 3; }
 
+    // Check if broker is eligible for their first free lead
+    async function isFirstLeadFree() {
+      if (!state.currentUser) return false;
+      try {
+        const r = await supabase.from('lead_requests')
+          .select('id')
+          .eq('broker_id', state.currentUser.id)
+          .eq('status', 'approved')
+          .limit(1);
+        return !r.data || r.data.length === 0;
+      } catch (_) { return false; }
+    }
     function calculateRankScore(property, broker, reportCount) {
       reportCount = reportCount || 0;
       let score = 0;
@@ -1453,12 +1497,15 @@
       } catch (e) { console.error(e); alert('Error: ' + e.message); }
     }
 
-    async function loadLeads() {
+        async function loadLeads() {
       if (!state.currentUser) return;
       try {
         const r = await supabase.rpc('get_my_broker_leads', {});
         if (r.error) throw r.error;
         const leads = r.data || [];
+
+        // Check first-lead-free status
+        const firstFree = await isFirstLeadFree();
         const propIds = [];
         leads.forEach(function(l) { if (l.property_id && propIds.indexOf(l.property_id) === -1) propIds.push(l.property_id); });
         let propMap = {};
@@ -1489,7 +1536,7 @@
             '<div class="property-title">' + (prop.title || 'Unknown') + (l.lead_type === 'hot' ? ' 🔥' : '') + ' <span style="font-size:.75rem;color:#94a3b8;">(' + l.lead_type + ')</span> ' + followUpBadge + '</div>' +
             '<div><span class="property-status ' + sc + '">' + sl + '</span></div>' +
             '<div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">' +
-              (isP ? '<button class="unlock-lead-btn" data-lead-id="' + l.id + '" style="background:#10b981;color:#fff;font-size:.75rem;font-weight:600;padding:.375rem .85rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-unlock"></i> Unlock · ' + lc.toLocaleString() + ' UGX</button>' +
+                           (isP ? '<button class="unlock-lead-btn" data-lead-id="' + l.id + '" style="background:' + (firstFree ? '#f59e0b' : '#10b981') + ';color:#fff;font-size:.75rem;font-weight:600;padding:.375rem .85rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-' + (firstFree ? 'gift' : 'unlock') + '"></i> ' + (firstFree ? '🎁 First Lead FREE' : 'Unlock · ' + lc.toLocaleString() + ' UGX') + '</button>' +
                      '<button class="reject-lead-btn" data-lead-id="' + l.id + '" style="font-size:.75rem;background:#ef4444;color:#fff;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;">Reject</button>' : '') +
               (isA ? '<button class="view-lead-details" data-lead-id="' + l.id + '" style="font-size:.75rem;color:#3b82f6;background:none;border:none;cursor:pointer;">View Contact</button>' +
                      '<button class="remove-lead-btn" data-lead-id="' + l.id + '" style="font-size:.75rem;color:#ef4444;background:none;border:none;cursor:pointer;"><i class="fas fa-trash"></i></button>' : '') +
@@ -1505,11 +1552,27 @@
                 status: 'approved', unlocked_at: new Date().toISOString(), approved_at: new Date().toISOString(), follow_up_sent: false
               }).eq('id', b.dataset.leadId).select('visitor_name, visitor_email, visitor_whatsapp, property_id, cost').single();
               if (uR.error) throw uR.error;
-              const u = uR.data;
-              if (u.cost) {
+                            const u = uR.data;
+
+              // First lead free — check if this is the broker's first unlocked lead
+              const priorApproved = await supabase.from('lead_requests')
+                .select('id')
+                .eq('broker_id', state.currentUser.id)
+                .eq('status', 'approved')
+                .neq('id', b.dataset.leadId)
+                .limit(1);
+              const isFirst = !priorApproved.data || priorApproved.data.length === 0;
+
+              if (u.cost && !isFirst) {
+                // Not first lead — deduct wallet
                 const wR = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: u.cost, p_type: 'lead_unlock', p_reference: b.dataset.leadId, p_description: 'Lead unlock' });
-                if (wR.error) { await supabase.from('lead_requests').update({ status: 'pending', approved_at: null, unlocked_at: null }).eq('id', b.dataset.leadId); throw new Error(wR.error.message); }
+                if (wR.error) {
+                  await supabase.from('lead_requests').update({ status: 'pending', approved_at: null, unlocked_at: null }).eq('id', b.dataset.leadId);
+                  throw new Error(wR.error.message);
+                }
                 await loadWallet();
+              } else if (isFirst) {
+                console.log('🎁 First lead unlocked FREE');
               }
               const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
               const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
@@ -1524,7 +1587,7 @@
                 if (brokerPhone) { let cp = String(brokerPhone).replace(/\D/g, ''); if (cp.startsWith('0')) cp = '256' + cp.slice(1); if (!cp.startsWith('256')) cp = '256' + cp; waLink = 'https://wa.me/' + cp; }
                 await sendSMS(u.visitor_whatsapp, 'Approved! Broker: ' + brokerName + '. ' + (waLink ? 'Chat: ' + waLink : ''));
               }
-              alert('✅ Lead unlocked! Visitor: ' + u.visitor_name);
+                            alert((isFirst ? '🎁 FIRST LEAD FREE!\n\n' : '✅ Lead unlocked!\n\n') + 'Visitor: ' + u.visitor_name);
               loadLeads();
             } catch (e) { alert('Error: ' + e.message); }
           });
@@ -1592,13 +1655,15 @@
       }).join('');
     }
 
-    function openVerificationModal(pid, ptype) {
-      if (state.walletBalance < VERIFICATION_FEE) { alert('⚠️ Insufficient wallet. Need ' + formatPrice(VERIFICATION_FEE) + '.'); return; }
-      if (!confirm('⚠️ Verification costs ' + formatPrice(VERIFICATION_FEE) + '. Continue?')) return;
+       function openVerificationModal(pid, ptype) {
       $('#verifPropertyId').value = pid;
       $('#verifPropertyType').value = ptype || 'rental';
       $('#verifStatus').textContent = '';
-      const f = $('#verifFeeDisplay'); if (f) f.textContent = formatPrice(VERIFICATION_FEE);
+      const f = $('#verifFeeDisplay'); if (f) f.textContent = formatPrice(PAYMENT_CONFIG.amount);
+      const mtnEl = $('#mtnNumber'); if (mtnEl) mtnEl.textContent = PAYMENT_CONFIG.mtn_number;
+      const airtelEl = $('#airtelNumber'); if (airtelEl) airtelEl.textContent = PAYMENT_CONFIG.airtel_number;
+      const mtnNameEl = $('#mtnName'); if (mtnNameEl) mtnNameEl.textContent = PAYMENT_CONFIG.mtn_name;
+      const airtelNameEl = $('#airtelName'); if (airtelNameEl) airtelNameEl.textContent = PAYMENT_CONFIG.airtel_name;
       buildVerifFields(ptype || 'rental');
       $('#propertyVerificationModal').classList.remove('hidden');
     }
@@ -1618,7 +1683,8 @@
           const can = s === 'unverified' || s === 'rejected';
           const row = document.createElement('div');
           row.className = 'verification-property-item';
-          row.innerHTML = '<div class="property-title">' + (p.title || 'Untitled') + '</div><div><span class="property-status ' + sc + '">' + sl + '</span></div><div>' + (can ? '<button class="request-verif-btn" data-id="' + p.id + '" data-type="' + (p.property_type || 'rental') + '" style="background:#10b981;color:#fff;font-size:.75rem;font-weight:600;padding:.375rem .85rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-shield-alt"></i> Request · ' + formatPrice(VERIFICATION_FEE) + '</button>' : '') + '</div>';
+          const btnLabel = s === 'unverified' ? '<i class="fas fa-shield-alt"></i> Verify now' : '<i class="fas fa-redo"></i> Resubmit';
+          row.innerHTML = '<div class="property-title">' + (p.title || 'Untitled') + '</div><div><span class="property-status ' + sc + '">' + sl + '</span></div><div>' + (can ? '<button class="request-verif-btn" data-id="' + p.id + '" data-type="' + (p.property_type || 'rental') + '" style="background:#10b981;color:#fff;font-size:.75rem;font-weight:600;padding:.375rem .85rem;border-radius:9999px;border:none;cursor:pointer;">' + btnLabel + '</button>' : '') + '</div>';
           list.appendChild(row);
         });
         list.querySelectorAll('.request-verif-btn').forEach(function(b) { b.addEventListener('click', function() { openVerificationModal(b.dataset.id, b.dataset.type); }); });
@@ -1860,6 +1926,122 @@
       const subEl = $('#chatContext'); if (subEl) subEl.textContent = state.chatContext === 'broker' ? 'Here to help you get leads' : 'Here to help you find a place';
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // CHATBOT
+    // ══════════════════════════════════════════════════════════════
+    const CHAT_KB_VISITOR = [
+      { keywords: ['find','search','browse','looking','apartment','house','room'], reply: 'Type an area or price in the search bar. Try <strong>"Naalya"</strong>, <strong>"under 500k"</strong>, or <strong>"2 bedroom"</strong>.', quick: ['Show me listings in Ntinda','How do I contact a broker?','Is this site safe?'] },
+      { keywords: ['contact','broker','reach','connect'], reply: 'Find a listing you like, then click <strong>Connect</strong>. Fill a short quiz. The broker approves you — then you get their WhatsApp.', quick: ['How much does it cost?','Is this site safe?'] },
+      { keywords: ['safe','scam','trust','verified','legit'], reply: 'Three safety layers:<br>• <strong>Verified</strong> badge = reviewed by our team<br>• <strong>Trusted</strong> badge = 4★+ from 10+ reviews<br>• <strong>Never pay before viewing</strong>', quick: ['Is this site safe?','How do I contact a broker?'] },
+      { keywords: ['price','cost','fee','pay','free'], reply: 'Browsing is <strong>100% free</strong>. If a broker asks for a viewing fee, that\'s a scam — report them.', quick: ['Is this site safe?'] },
+      { keywords: ['hi','hello','hey','help'], reply: 'Hi! I can help you find a place, contact a broker, or explain how the site works.', quick: ['Show me listings in Ntinda','Is this site safe?'] }
+    ];
+    const CHAT_KB_BROKER = [
+      { keywords: ['add','property','list','new'], reply: 'Click <strong>Add Property</strong> in your dashboard. After adding, verify via Mobile Money.', quick: ['How do I verify?','First lead free?'] },
+      { keywords: ['verif','verified','pay','payment'], reply: 'Verification: send <strong>5,000 UGX</strong> to our Mobile Money. Then in the Verification panel, click "Verify now" and enter the transaction reference.', quick: ['How do leads work?','First lead free?'] },
+      { keywords: ['lead','unlock','approve','free'], reply: 'When a visitor is interested, you get masked info by SMS + email. Unlock to see contact. 🎁 <strong>First lead is FREE!</strong>', quick: ['How do I verify?','How does pricing work?'] },
+      { keywords: ['price','cost','fee','wallet'], reply: 'Verification: 5,000 UGX one-time. Lead unlocks: 1,750–5,000+ UGX. <strong>First lead FREE!</strong>', quick: ['How do I verify?'] },
+      { keywords: ['help','hi','hello'], reply: 'Ask me about adding properties, verification, or leads.', quick: ['How do I verify?','First lead free?'] }
+    ];
+    const CHAT_LOCATIONS = ['kikoni','katanga','wandegeya','mulago','makerere','naalya','ntinda','bukoto','kisaasi','naguru','kololo','muyenga','kira','entebbe','mukono','jinja','kampala','wakiso','gayaza','kyanja'];
+
+    function chatParsePrice(t) {
+      const m = t.match(/(?:under|below|less than|<)\s*(\d+(?:\.\d+)?)\s*([kKmM]?)/i);
+      if (m) { let n = parseFloat(m[1]); if (m[2].toLowerCase() === 'k') n *= 1000; if (m[2].toLowerCase() === 'm') n *= 1000000; return { type: 'max', value: n }; }
+      return null;
+    }
+
+    function updateChatContext() {
+      const dashboardVisible = $('#dashboardView') && $('#dashboardView').classList.contains('view-visible');
+      state.chatContext = dashboardVisible ? 'broker' : 'visitor';
+      const subEl = $('#chatContext'); if (subEl) subEl.textContent = state.chatContext === 'broker' ? 'Here to help you get leads' : 'Here to help you find a place';
+    }
+
+    function chatOpen() {
+      $('#chatPanel').classList.add('open');
+      $('#chatBubble').style.display = 'none';
+      const badge = $('#chatBadge'); if (badge) badge.style.display = 'none';
+      if (!$('#chatMessages').dataset.initialized) { chatReset(); $('#chatMessages').dataset.initialized = '1'; }
+    }
+    function chatClose() { $('#chatPanel').classList.remove('open'); $('#chatBubble').style.display = 'flex'; }
+
+    function chatReset() {
+      const msgs = $('#chatMessages'); msgs.innerHTML = '';
+      chatAddMessage('bot', state.chatContext === 'broker' ? 'Welcome! I can help with adding properties, verification, or leads.' : 'Hi! I can help you find a place, contact a broker, or explain how the site works.');
+      chatShowQuickReplies(state.chatContext === 'broker' ? ['How do I verify?','How do leads work?','First lead free?'] : ['Show me listings in Ntinda','Rooms in Kikoni','Is this site safe?']);
+    }
+    function chatAddMessage(who, html) {
+      const msgs = $('#chatMessages');
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + who;
+      div.innerHTML = html;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+    function chatShowQuickReplies(list) {
+      const box = $('#chatQuickReplies'); box.innerHTML = '';
+      (list || []).forEach(function(q) {
+        const b = document.createElement('button');
+        b.className = 'chat-quick-btn';
+        b.textContent = q;
+        b.addEventListener('click', function() { chatAsk(q); });
+        box.appendChild(b);
+      });
+    }
+
+    async function chatFindReply(text) {
+      const t = text.toLowerCase();
+      const matchedLoc = CHAT_LOCATIONS.find(loc => t.includes(loc));
+      const priceHint = chatParsePrice(t);
+      if (matchedLoc || priceHint) {
+        try {
+          let q = supabase.from('properties').select('id, title, address, price_amount, verification_status').limit(3);
+          if (matchedLoc) q = q.ilike('address', '%' + matchedLoc + '%');
+          if (priceHint) q = q.lte('price_amount', priceHint.value);
+          const r = await q;
+          const rows = (r.data || []).filter(p => p.is_paused !== true);
+          if (rows.length > 0) {
+            let html = '🔎 I found ' + rows.length + ' propert' + (rows.length === 1 ? 'y' : 'ies') + ':<br><br>';
+            rows.forEach(p => {
+              const locality = (p.address || '').split(',')[0].trim();
+              const verified = p.verification_status === 'approved' ? ' ✅' : '';
+              html += '• <a href="/property/' + p.id + '"><strong>' + (p.title || 'Property') + '</strong></a>' + verified + '<br>&nbsp;&nbsp;' + Number(p.price_amount || 0).toLocaleString() + ' UGX · ' + locality + '<br><br>';
+            });
+            return { reply: html, quick: ['How do I contact a broker?','Is this site safe?'] };
+          }
+          return { reply: 'No listings matched. Try a nearby area or higher budget.', quick: ['How do I contact a broker?'] };
+        } catch (_) {}
+      }
+      const kb = state.chatContext === 'broker' ? CHAT_KB_BROKER : CHAT_KB_VISITOR;
+      let best = null, bestScore = 0;
+      kb.forEach(function(item) {
+        let score = 0;
+        item.keywords.forEach(function(k) { if (t.indexOf(k) !== -1) score += k.length; });
+        if (score > bestScore) { bestScore = score; best = item; }
+      });
+      if (best) return best;
+      return { reply: 'Try typing an area like <strong>Ntinda</strong> or <strong>Kikoni</strong>, or ask about safety.', quick: ['Show me listings in Ntinda','Is this site safe?'] };
+    }
+
+    async function chatAsk(text) {
+      chatAddMessage('user', text);
+      const msgs = $('#chatMessages');
+      const typing = document.createElement('div');
+      typing.className = 'chat-msg bot';
+      typing.innerHTML = '<em style="color:#94a3b8">Searching…</em>';
+      msgs.appendChild(typing);
+      msgs.scrollTop = msgs.scrollHeight;
+      try {
+        const r = await chatFindReply(text);
+        typing.remove();
+        chatAddMessage('bot', r.reply);
+        chatShowQuickReplies(r.quick || []);
+      } catch (_) {
+        typing.remove();
+        chatAddMessage('bot', 'Something went wrong. Please try again.');
+      }
+    }
+    
     async function init() {
       if (!window.supabase) {
         console.error('❌ Supabase SDK failed to load');
@@ -1950,8 +2132,7 @@
         const addr = $('#propAddress').value.trim();
         const files = $('#propImage').files;
         if (!title || !price || !addr) { alert('Fill required fields.'); return; }
-        if (state.walletBalance < VERIFICATION_FEE) { alert('⚠️ Verification required. You need ' + formatPrice(VERIFICATION_FEE) + ' in your wallet.'); return; }
-        if (!confirm('⚠️ ' + formatPrice(VERIFICATION_FEE) + ' will be deducted. Continue?')) return;
+        
         const urls = [];
         if (files && files.length > 0) {
           $('#uploadStatus').textContent = 'Compressing images…';
@@ -1978,27 +2159,32 @@
           }
         }
         const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
-        try {
-          const insR = await supabase.from('properties').insert({ title, price_amount: price, property_type: dbType, address: addr, media_urls: urls, is_verified: false, verification_status: 'pending', owner_id: state.currentUser.id, is_paused: false }).select().single();
+                try {
+          const insR = await supabase.from('properties').insert({
+            title, price_amount: price, property_type: dbType, address: addr,
+            media_urls: urls, is_verified: false,
+            verification_status: 'unverified',   // <── unverified until manual payment
+            owner_id: state.currentUser.id, is_paused: false
+          }).select().single();
           if (insR.error) throw insR.error;
-          const wR = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE, p_type: 'verification_fee', p_reference: insR.data.id, p_description: 'Verification fee' });
-          if (!wR.error) {
-            await supabase.from('property_verification_requests').insert({ property_id: insR.data.id, broker_id: state.currentUser.id, submitted_data: {}, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
-            await loadWallet();
-          }
-          alert('✅ Submitted for verification!');
+
+          alert('✅ Property added!\n\n⚠️ NEXT STEP — Verify it to go live:\n\n1. Open the Verification panel\n2. Click "Verify now" on your property\n3. Follow the Mobile Money payment steps');
+
           $('#addPropertyForm').reset();
           $('#uploadStatus').textContent = '';
           await loadMyProperties();
           await fetchAllData();
           $('#addPropertyContainer').classList.remove('visible');
+
           if (state.currentUser && state.myProperties.length >= 2 && state.activationMode) {
             try { localStorage.removeItem('ph_broker_activation_' + state.currentUser.id); } catch (_) {}
             state.activationMode = false;
           }
           renderMyProperties();
+
+          // Auto-open Verification panel so broker knows what to do next
+          setTimeout(function() { togglePropertyVerificationForm(); }, 300);
         } catch (e) { alert('Failed: ' + e.message); }
-      });
 
       $('#editPropertyForm') && $('#editPropertyForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -2022,25 +2208,51 @@
       $('#closeEditModal') && $('#closeEditModal').addEventListener('click', function() { $('#editModal').classList.add('hidden'); });
 
       $('#closeVerificationModal') && $('#closeVerificationModal').addEventListener('click', function() { $('#propertyVerificationModal').classList.add('hidden'); });
-      $('#propertyVerificationForm') && $('#propertyVerificationForm').addEventListener('submit', async function(e) {
+            $('#propertyVerificationForm') && $('#propertyVerificationForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const pid = $('#verifPropertyId').value;
         if (!pid) return;
-        if (state.walletBalance < VERIFICATION_FEE) { $('#verifStatus').textContent = '❌ Insufficient balance.'; $('#verifStatus').style.color = '#ef4444'; return; }
+
         const data = {};
-        document.querySelectorAll('[data-verif-field]').forEach(function(el) { data[el.dataset.verifField] = el.value.trim(); });
-        $('#verifStatus').textContent = 'Processing…';
+        document.querySelectorAll('[data-verif-field]').forEach(function(el) {
+          if (el.dataset.verifField) data[el.dataset.verifField] = el.value.trim();
+        });
+
+        if (!data.paymentReference) {
+          $('#verifStatus').textContent = '❌ Please enter the payment reference from your MoMo SMS.';
+          $('#verifStatus').style.color = '#ef4444';
+          return;
+        }
+
+        $('#verifStatus').textContent = 'Submitting…';
         $('#verifStatus').style.color = '#4f46e5';
+
         try {
-          const wR = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: VERIFICATION_FEE, p_type: 'verification_fee', p_reference: pid, p_description: 'Verification' });
-          if (wR.error) throw new Error(wR.error.message);
-          await supabase.from('property_verification_requests').insert({ property_id: pid, broker_id: state.currentUser.id, submitted_data: data, fee_amount: VERIFICATION_FEE, fee_paid: true, status: 'pending' });
+          // Insert verification request — admin approves manually
+          const reqR = await supabase.from('property_verification_requests').insert({
+            property_id: pid,
+            broker_id: state.currentUser.id,
+            submitted_data: data,
+            fee_amount: PAYMENT_CONFIG.amount,
+            fee_paid: false,
+            status: 'pending'
+          }).select().single();
+
+          if (reqR.error) throw reqR.error;
+
+          // Mark property as pending
           await supabase.from('properties').update({ verification_status: 'pending' }).eq('id', pid);
-          await loadWallet(); await loadPropertyVerificationList(); await loadMyProperties();
-          $('#verifStatus').textContent = '✅ Submitted!';
+
+          await loadPropertyVerificationList();
+          await loadMyProperties();
+
+          $('#verifStatus').textContent = '✅ Submitted! Admin will review and verify within 24 hours.';
           $('#verifStatus').style.color = '#10b981';
-          setTimeout(function() { $('#propertyVerificationModal').classList.add('hidden'); }, 2500);
-        } catch (e) { $('#verifStatus').textContent = '❌ ' + e.message; $('#verifStatus').style.color = '#ef4444'; }
+          setTimeout(function() { $('#propertyVerificationModal').classList.add('hidden'); }, 3500);
+        } catch (e) {
+          $('#verifStatus').textContent = '❌ ' + e.message;
+          $('#verifStatus').style.color = '#ef4444';
+        }
       });
 
       $('#reviewForm') && $('#reviewForm').addEventListener('submit', async function(e) {
