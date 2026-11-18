@@ -166,7 +166,7 @@
     .area-input-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 18px;
+      margin-bottom: 10px;
     }
 
     .area-input {
@@ -185,19 +185,26 @@
     }
 
     .verify-btn {
-      background: #1e293b;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 0 16px;
+      background: var(--accent);
+      color: #090d16;
+      border: none;
+      padding: 0 18px;
       border-radius: 10px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 14px;
       cursor: pointer;
       white-space: nowrap;
+      transition: background 0.2s ease;
     }
 
     .verify-btn:hover {
-      background: rgba(245, 158, 11, 0.15);
+      background: var(--accent-hover);
+    }
+
+    .input-error {
+      color: #f87171;
+      font-size: 13px;
+      margin-bottom: 14px;
     }
 
     .proof-box {
@@ -205,6 +212,7 @@
       border: 1px solid #1f2937;
       border-radius: 10px;
       padding: 16px;
+      margin-top: 14px;
       margin-bottom: 22px;
     }
 
@@ -373,21 +381,23 @@
     <!-- ========================================== -->
     <div id="stage-3" class="hidden">
       <h2>Verify what we say.</h2>
-      <p>What is your current place of operation? Enter your area below (e.g. <strong>Kikoni</strong>) to see the live search terms buyers use every day:</p>
+      <p>What is your current place of operation? Enter your area below (e.g. <strong>Kikoni</strong>) to unlock the live buyer search keywords for your location:</p>
 
       <div class="area-input-row">
         <input
           type="text"
           id="area-input"
           class="area-input"
-          placeholder="Enter your place (e.g. Kikoni)..."
-          oninput="updateProofKeywords()"
+          placeholder="Type your place (e.g. Kikoni)..."
+          autocomplete="off"
         />
-        <button class="verify-btn" onclick="updateProofKeywords()">Verify</button>
+        <button type="button" id="verify-btn" class="verify-btn">Verify</button>
       </div>
+      <div id="input-error" class="input-error hidden">Please enter your place or neighborhood first.</div>
 
-           <div class="proof-box">
-        <div class="proof-label">Search Keywords for <span id="active-area-label">Kikoni</span> (Tap to verify on Google)</div>
+      <!-- Hidden until the user inserts their place and clicks Verify -->
+      <div id="proof-box" class="proof-box hidden">
+        <div class="proof-label">Search Keywords for <span id="active-area-label"></span> (Tap to verify on Bing)</div>
         <div id="keyword-chips" class="keyword-chips"></div>
         <p class="proof-note">
           That is how our site marketing and online domination capture ready clients for your properties—starting with <strong>your first verified lead 100% FREE</strong>.
@@ -409,7 +419,6 @@
   </div>
 
   <script>
-    // Your exact words typed character-by-character
     const bluffScript =
       "You are a broker who has appeared to have revenue returning properties, " +
       "but you link everywhere, inconspicuous, and you accept bad deals due to limited options. " +
@@ -473,36 +482,70 @@
       stage3.classList.remove("hidden");
       stage3.classList.add("fade-in");
 
-      updateProofKeywords();
+      // Focus input so mobile/desktop user is prompted to type their place
+      setTimeout(() => {
+        document.getElementById("area-input").focus();
+      }, 300);
     }
 
-    function updateProofKeywords() {
-      const rawInput = document.getElementById("area-input").value.trim();
-      const area = rawInput.length > 0 ? rawInput : "Kikoni";
+    function generateProofKeywords() {
+      const inputEl = document.getElementById("area-input");
+      const errorEl = document.getElementById("input-error");
+      const proofBox = document.getElementById("proof-box");
+      const rawValue = inputEl.value.trim();
 
-      document.getElementById("active-area-label").textContent = area;
+      // Require the user to insert a place first
+      if (!rawValue) {
+        errorEl.classList.remove("hidden");
+        proofBox.classList.add("hidden");
+        inputEl.focus();
+        return;
+      }
 
-      const phrases = [
-        `rentals in ${area}`,
-        `apartments in ${area}`,
-        `rooms in ${area}`,
-        `houses for rent in ${area}`
+      errorEl.classList.add("hidden");
+
+      // Capitalize first letter of each word (e.g., "kikoni" -> "Kikoni")
+      const formattedPlace = rawValue
+        .split(/\s+/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ");
+
+      document.getElementById("active-area-label").textContent = formattedPlace;
+
+      const keywords = [
+        `rentals in ${formattedPlace}`,
+        `apartments in ${formattedPlace}`,
+        `rooms in ${formattedPlace}`,
+        `houses for rent in ${formattedPlace}`
       ];
 
       const container = document.getElementById("keyword-chips");
       container.innerHTML = "";
 
-      phrases.forEach((phrase) => {
-        const googleUrl = `https://google.com{encodeURIComponent(phrase)}`;
+      keywords.forEach((phrase) => {
+        const bingUrl = `https://bing.com{encodeURIComponent(phrase)}`;
         const link = document.createElement("a");
-        link.href = googleUrl;
+        link.href = bingUrl;
         link.target = "_blank";
-        link.rel = "noopener";
+        link.rel = "noopener noreferrer";
         link.className = "keyword-link";
-        link.innerHTML = `"${phrase}" <span>Verify on Google ↗</span>`;
+        link.innerHTML = `"${phrase}" <span>Verify on Bing ↗</span>`;
         container.appendChild(link);
       });
+
+      // Reveal the proof box now that the place has been inserted
+      proofBox.classList.remove("hidden");
+      proofBox.classList.add("fade-in");
     }
+
+    // Bind Verify button click & Enter key press
+    document.getElementById("verify-btn").addEventListener("click", generateProofKeywords);
+    document.getElementById("area-input").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        generateProofKeywords();
+      }
+    });
   </script>
 
 </body>
