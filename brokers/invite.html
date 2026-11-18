@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Private Table | Property Hub Uganda</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #111827;
+      --border-subtle: #1f2937;
+      --border-hover: #f59e0b;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-soft: #d1d5db;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(circle at top center, #1e293b 0%, #090d16 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 16px;
+      line-height: 1.6;
+    }
+
+    .brand-header {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .brand-header span {
+      color: var(--accent);
+    }
+
+    .room-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      padding: 32px 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #1f2937;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 33.33%;
+      background: var(--accent);
+      transition: width 0.5s ease;
+    }
+
+    .step-badge {
+      display: inline-block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+
+    h1, h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      line-height: 1.3;
+    }
+
+    p {
+      color: var(--text-soft);
+      font-size: 15.5px;
+      margin-bottom: 22px;
+    }
+
+    .context-reply {
+      font-size: 13.5px;
+      color: var(--accent);
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 2px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+    }
+
+    /* Typewriter Container */
+    .typewriter-box {
+      min-height: 165px;
+      font-size: 16px;
+      line-height: 1.75;
+      color: #f3f4f6;
+      margin-bottom: 24px;
+      letter-spacing: 0.1px;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 18px;
+      background-color: var(--accent);
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: blink 0.75s infinite;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* Choice Buttons */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .choice-btn {
+      width: 100%;
+      text-align: left;
+      background: #182032;
+      color: var(--text-main);
+      border: 1px solid #2d3748;
+      padding: 15px 18px;
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .choice-btn:hover, .choice-btn:active {
+      border-color: var(--border-hover);
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    .choice-btn span.arrow {
+      color: var(--accent);
+      font-weight: 700;
+      margin-left: 10px;
+    }
+
+    /* Primary Truce CTA */
+    .cta-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--accent);
+      color: #090d16;
+      font-weight: 700;
+      font-size: 15.5px;
+      padding: 16px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.2s ease;
+      margin-bottom: 16px;
+    }
+
+    .cta-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .truce-perks {
+      list-style: none;
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: #0d1320;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+    }
+
+    .truce-perks li {
+      font-size: 14px;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .truce-perks li:last-child {
+      margin-bottom: 0;
+    }
+
+    .truce-perks li::before {
+      content: "✓";
+      color: var(--accent);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    /* Direct Line Fallback */
+    .direct-negotiation {
+      text-align: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    .direct-links {
+      margin-top: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .direct-links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .direct-links a:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.45s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="brand-header">Property Hub <span>Uganda</span></div>
+
+  <div class="room-card">
+    <div class="progress-track">
+      <div id="progress-fill" class="progress-fill"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- STAGE 1: THE BASKET OF BREAD               -->
+    <!-- ========================================== -->
+    <div id="stage-1" class="fade-in">
+      <div class="step-badge">1 of 3 · Break-Bread Room</div>
+      <h1>Welcome to the table.</h1>
+      <p>Before we put our proposal down, tell us honestly—what did you make of <strong>propertyhub.dpdns.org</strong>?</p>
+
+      <div class="options-group">
+        <button class="choice-btn" onclick="enterStage2('unchecked')">
+          <span>I didn’t check it yet — tell me straight</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="choice-btn" onclick="enterStage2('cards')">
+          <span>I saw property cards & locations, but what’s the catch?</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="choice-btn" onclick="enterStage2('purpose')">
+          <span>I looked around — what is its real purpose for me?</span>
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- STAGE 2: EXPOSING THE BLUFF (TYPEWRITER)   -->
+    <!-- ========================================== -->
+    <div id="stage-2" class="hidden">
+      <div class="step-badge">2 of 3 · Cards on the Table</div>
+      <div id="context-reply" class="context-reply"></div>
+
+      <div class="typewriter-box">
+        <span id="typewriter-output"></span><span id="typewriter-cursor" class="cursor"></span>
+      </div>
+
+      <div id="stage-2-options" class="options-group hidden">
+        <button class="choice-btn" onclick="enterStage3()">
+          <span>Yes — I need serious, ready leads</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="choice-btn" onclick="enterStage3()">
+          <span>Fair point — show me what I can do now</span>
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- STAGE 3: THE TRUCE                         -->
+    <!-- ========================================== -->
+    <div id="stage-3" class="hidden">
+      <div class="step-badge">3 of 3 · The Truce</div>
+      <h2>Then let’s shake on it.</h2>
+      <p>You control the properties. We control the online buyer traffic across Kampala, Wakiso, and Entebbe.</p>
+
+      <ul class="truce-perks">
+        <li>List your starting properties in under 5 minutes</li>
+        <li>Buyers are pre-vetted on budget & move-in timeline</li>
+        <li><strong>Your first verified lead is 100% FREE</strong></li>
+      </ul>
+
+      <!-- Update href if you want to trigger a specific modal hash or query -->
+      <a href="https://dpdns.org" class="cta-btn">
+        Create Broker Account & Add Property →
+      </a>
+
+      <div class="direct-negotiation">
+        Prefer to negotiate terms directly first?
+        <div class="direct-links">
+          <!-- REPLACE 0700000000 AND 256700000000 WITH YOUR REAL NUMBER -->
+          <a href="tel:+256700000000">📞 Call Desk</a>
+          <a href="https://wa.me." target="_blank" rel="noopener">💬 WhatsApp Direct</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configure your exact phone number here (international format without + for WhatsApp)
+    const PHONE_DISPLAY = "0700000000";
+    const PHONE_INTL = "256700000000";
+
+    // The exact psychological bluff script typed word-by-word
+    const bluffScript =
+      "Let’s put the cards on the table. " +
+      "You are a broker or owner holding solid, revenue-returning properties—yet you operate quietly offline, scatter your links, and sometimes accept weak deals simply because your buyer pool is limited. " +
+      "You don’t have a property problem. You have a visibility problem. " +
+      "We generate the serious, ready leads you are missing through targeted search and online domination.";
+
+    let isTyping = false;
+
+    function enterStage2(selection) {
+      if (isTyping) return;
+
+      // Update progress bar
+      document.getElementById("progress-fill").style.width = "66.66%";
+
+      // Switch screens
+      document.getElementById("stage-1").classList.add("hidden");
+      const stage2 = document.getElementById("stage-2");
+      stage2.classList.remove("hidden");
+      stage2.classList.add("fade-in");
+
+      // Tailor the opening line based on what they clicked in Stage 1
+      const replyBox = document.getElementById("context-reply");
+      if (selection === "unchecked") {
+        replyBox.textContent = "Fair enough. Read every word of why we reached out to you:";
+      } else if (selection === "cards") {
+        replyBox.textContent = "No catch. Those cards are how paying clients find properties before calling anyone:";
+      } else {
+        replyBox.textContent = "Good question. Here is the exact reason we invited you to this table:";
+      }
+
+      // Start the live typewriter
+      isTyping = true;
+      typeText(bluffScript, 0);
+    }
+
+    function typeText(text, index) {
+      const output = document.getElementById("typewriter-output");
+
+      if (index < text.length) {
+        const currentChar = text.charAt(index);
+        output.textContent += currentChar;
+
+        // Natural human typing speed + dramatic pauses on punctuation
+        let speed = 30;
+        if (currentChar === "." || currentChar === "—") {
+          speed = 420; // Forces them to absorb the sentence
+        } else if (currentChar === ",") {
+          speed = 210;
+        }
+
+        setTimeout(() => typeText(text, index + 1), speed);
+      } else {
+        // Typing finished: hide cursor and reveal the trap buttons
+        isTyping = false;
+        document.getElementById("typewriter-cursor").style.display = "none";
+        const options = document.getElementById("stage-2-options");
+        options.classList.remove("hidden");
+        options.classList.add("fade-in");
+      }
+    }
+
+    function enterStage3() {
+      document.getElementById("progress-fill").style.width = "100%";
+      document.getElementById("stage-2").classList.add("hidden");
+      const stage3 = document.getElementById("stage-3");
+      stage3.classList.remove("hidden");
+      stage3.classList.add("fade-in");
+    }
+  </script>
+
+</body>
+</html>
