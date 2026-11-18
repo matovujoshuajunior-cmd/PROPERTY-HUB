@@ -516,17 +516,17 @@
 </div>
 
   
-  <!-- ========== CLEAN VERSION – NO MORE CONFLICTS ========== -->
+  <!-- ========== RESTORED + CLEAN VERSION ========== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <script>
-(function() {
-  // Everything is inside this function → no global pollution
+(function () {
+  // ========== CONFIG ==========
   const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
   const SUPABASE_ANON_KEY =  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
-    const SITE_URL = 'https://propertyhub.dpdns.org';
+  const SITE_URL = 'https://propertyhub.dpdns.org';
 
-  // Use a different name so it never conflicts
+  // Use unique name to avoid any conflict
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const state = {
@@ -537,11 +537,13 @@
     profilesMap: {},
     currentFilter: 'all',
     searchQuery: '',
-    isSignUpMode: false
+    isSignUpMode: false,
+    activationMode: false
   };
 
-  const $ = s => document.querySelector(s);
-  const $$ = s => Array.from(document.querySelectorAll(s));
+  // ========== HELPERS ==========
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
 
   function titleCase(str) {
     return (str || '').replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase());
@@ -557,11 +559,14 @@
   }
   function renderStars(r) {
     let h = '';
-    for (let i = 0; i < 5; i++) h += i < Math.floor(r||0) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+    const full = Math.floor(r || 0);
+    for (let i = 0; i < 5; i++) {
+      h += i < full ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+    }
     return h;
   }
   function isTrusted(b) {
-    return b && (b.average_rating||0) >= 4 && (b.review_count||0) >= 10;
+    return b && (b.average_rating || 0) >= 4 && (b.review_count || 0) >= 10;
   }
 
   function showView(el) {
@@ -592,91 +597,167 @@
     return { view: 'home' };
   }
 
-  // ---------- Card ----------
-  function createPropertyCard(p, broker, showLink = true, showEdit = false) {
-    const art = document.createElement('article');
-    art.className = 'property-card';
-    art.style.cssText = 'background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid #e2e8f0;display:flex;flex-direction:column;';
+  // ========== PROPERTY CARD (full features restored) ==========
+  function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
+    const article = document.createElement('article');
+    article.className = 'property-card';
+    article.style.cssText = 'background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid #e2e8f0;display:flex;flex-direction:column;';
+    article.id = 'property-' + property.id;
 
-    const img = getImageUrl(p);
-    const rating = broker?.average_rating || 0;
-    const reviews = broker?.review_count || 0;
-    const lead = broker?.lead_score || 0;
-    const verified = p.verification_status === 'approved';
-    const trusted = isTrusted(broker);
-    const name = broker?.business_name || 'Property Hub';
-    const title = titleCase(p.title || 'Property');
-    const type = formatPropertyType(p.property_type);
+    const imageUrl = getImageUrl(property);
+    const rating = (broker && broker.average_rating) || 0;
+    const reviewCount = (broker && broker.review_count) || 0;
+    const leadScore = (broker && broker.lead_score) || 0;
+    const isVerified = property.verification_status === 'approved';
+    const isTrusted = broker ? isTrusted(broker) : false;
+    const brokerName = (broker && broker.business_name) || 'Property Hub';
+    const displayTitle = titleCase(property.title || 'Property');
+    const typeLabel = formatPropertyType(property.property_type);
 
-    let badge = '';
-    if (verified) badge = '<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>';
-    else if (p.verification_status === 'pending') badge = '<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>';
+    // Badges
+    let badgeHtml = '';
+    if (isVerified) badgeHtml = '<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>';
+    else if (property.verification_status === 'pending') badgeHtml = '<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>';
+    else if (property.verification_status === 'rejected') badgeHtml = '<span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>';
 
-    const trustedBadge = trusted ? '<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>' : '';
+    const trustedHtml = isTrusted ? '<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>' : '';
 
-    let actions = '';
+    // Action buttons
+    let actionsHtml = '';
     if (showEdit) {
-      actions = `<button class="edit-btn" style="font-size:.75rem;color:#4f46e5;background:none;border:none;cursor:pointer;"><i class="fas fa-edit"></i> Edit</button>`;
+      actionsHtml += `
+        <button class="edit-btn" data-id="${property.id}" style="font-size:.75rem;color:#4f46e5;font-weight:500;background:none;border:none;cursor:pointer;">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="pause-btn" data-id="${property.id}" data-paused="${property.is_paused || false}" style="font-size:.75rem;color:#3b82f6;font-weight:500;background:none;border:none;cursor:pointer;margin-left:.5rem;">
+          <i class="fas ${property.is_paused ? 'fa-play' : 'fa-pause'}"></i> ${property.is_paused ? 'Resume' : 'Pause'}
+        </button>
+        <button class="delete-btn" data-id="${property.id}" style="font-size:.75rem;color:#ef4444;font-weight:500;background:none;border:none;cursor:pointer;margin-left:.5rem;">
+          <i class="fas fa-trash"></i> Delete
+        </button>`;
     } else {
-      actions = `<button class="connect-btn" style="background:#4f46e5;color:#fff;font-size:.65rem;font-weight:600;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-handshake"></i> Connect</button>`;
+      actionsHtml = `
+        <button class="connect-btn" data-id="${property.id}" style="background:#4f46e5;color:#fff;font-size:.65rem;font-weight:600;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;">
+          <i class="fas fa-handshake"></i> Connect
+        </button>`;
     }
 
-    art.innerHTML = `
+    article.innerHTML = `
       <div style="position:relative;aspect-ratio:4/3;background:#e2e8f0;overflow:hidden;">
-        <img src="${img}" alt="${title}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.src='/og-cover.jpg'">
-        <span style="position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px;">${type}</span>
-        ${verified && !showEdit ? '<span style="position:absolute;top:.75rem;right:.75rem;background:#10b981;color:#fff;font-size:.5rem;font-weight:700;padding:.25rem .5rem;border-radius:9999px;">✓ VERIFIED</span>' : ''}
+        <img src="${imageUrl}" alt="${displayTitle}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy"
+             onerror="this.onerror=null;this.src='/og-cover.jpg'">
+        <span style="position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px;">${typeLabel}</span>
+        ${isVerified && !showEdit ? '<span style="position:absolute;top:.75rem;right:.75rem;background:#10b981;color:#fff;font-size:.5rem;font-weight:700;padding:.25rem .5rem;border-radius:9999px;">✓ VERIFIED</span>' : ''}
       </div>
-      <div style="padding:1rem;flex:1;display:flex;flex-direction:column;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:.25rem;flex-wrap:wrap;">
-          <h3 style="font-weight:600;color:#1e293b;font-size:1rem;">${title}</h3>
-          <div>${!showEdit ? badge + ' ' + trustedBadge : ''}</div>
+      <div style="padding:1rem;display:flex;flex-direction:column;flex:1;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.25rem;">
+          <h3 style="font-weight:600;color:#1e293b;font-size:1rem;">${displayTitle}</h3>
+          <div style="display:flex;align-items:center;gap:.25rem;">
+            ${!showEdit ? badgeHtml : ''} ${!showEdit && isTrusted ? trustedHtml : ''}
+          </div>
         </div>
-        <p style="color:#4338ca;font-weight:700;font-size:.875rem;margin-top:.125rem;">${formatPrice(p.price_amount)}</p>
-        <p style="color:#64748b;font-size:.75rem;margin-top:.125rem;"><i class="fas fa-map-pin" style="color:#94a3b8;"></i> ${p.address || 'Location not specified'}</p>
+        <p style="color:#4338ca;font-weight:700;font-size:.875rem;margin-top:.125rem;">${formatPrice(property.price_amount)}</p>
+        <p style="color:#64748b;font-size:.75rem;display:flex;align-items:center;gap:.25rem;margin-top:.125rem;">
+          <i class="fas fa-map-pin" style="color:#94a3b8;"></i> ${property.address || 'Location not specified'}
+        </p>
         <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;font-size:.75rem;">
           <span class="stars">${renderStars(rating)}</span>
-          <span style="color:#64748b;">(${reviews})</span>
-          <span class="badge-lead">⚡ ${lead}</span>
+          <span style="color:#64748b;">(${reviewCount})</span>
+          <span class="badge-lead">⚡ ${leadScore}</span>
         </div>
-        <div style="margin-top:.75rem;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e2e8f0;padding-top:.75rem;">
-          ${showLink
-            ? `<button class="broker-link" data-id="${broker?.id||''}" style="font-size:.75rem;color:#4f46e5;background:none;border:none;cursor:pointer;"><i class="fas fa-user-circle"></i> ${name}</button>`
-            : `<span style="font-size:.75rem;color:#64748b;"><i class="fas fa-user-circle"></i> ${name}</span>`}
-          <div>${actions}</div>
+        <div style="margin-top:.75rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border-top:1px solid #e2e8f0;padding-top:.75rem;flex-wrap:wrap;">
+          ${showBrokerLink
+            ? `<button class="broker-name-link" data-id="${broker?.id || ''}" style="font-size:.75rem;font-weight:500;color:#4f46e5;display:flex;align-items:center;gap:.25rem;background:none;border:none;cursor:pointer;">
+                 <i class="fas fa-user-circle" style="color:#94a3b8;"></i> ${brokerName}
+               </button>`
+            : `<span style="font-size:.75rem;color:#64748b;display:flex;align-items:center;gap:.25rem;">
+                 <i class="fas fa-user-circle" style="color:#94a3b8;"></i> ${brokerName}
+               </span>`}
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">${actionsHtml}</div>
         </div>
       </div>`;
 
-    art.querySelector('.connect-btn')?.addEventListener('click', e => {
+    // ========== EVENT LISTENERS (restored) ==========
+    // Edit
+    article.querySelector('.edit-btn')?.addEventListener('click', (e) => {
       e.stopPropagation();
-      alert('Connect feature will open here');
+      openEditModal(property.id);
     });
-    art.querySelector('.broker-link')?.addEventListener('click', e => {
+
+    // Pause / Resume
+    article.querySelector('.pause-btn')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      const pid = btn.dataset.id;
+      const currentlyPaused = btn.dataset.paused === 'true';
+      try {
+        const { error } = await client.from('properties')
+          .update({ is_paused: !currentlyPaused })
+          .eq('id', pid);
+        if (error) throw error;
+        alert(currentlyPaused ? 'Property resumed' : 'Property paused');
+        await loadMyProperties();
+        await fetchAllData();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
+
+    // Delete
+    article.querySelector('.delete-btn')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm('Are you sure you want to delete this property?')) return;
+      try {
+        const { error } = await client.from('properties').delete().eq('id', property.id);
+        if (error) throw error;
+        state.myProperties = state.myProperties.filter(p => p.id !== property.id);
+        renderMyProperties();
+        await fetchAllData();
+        alert('Property deleted');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
+
+    // Connect
+    article.querySelector('.connect-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openQuizModal(property.id);
+    });
+
+    // Broker name click
+    article.querySelector('.broker-name-link')?.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = e.currentTarget.dataset.id;
-      if (id) navigateTo('/broker/' + id);
+      if (id) navigateTo('/broker/' + encodeURIComponent(id));
     });
 
-    return art;
+    return article;
   }
 
-  // ---------- Render ----------
+  // ========== RENDERING ==========
   function renderListings(list) {
     const grid = $('#listingsGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    if (!list.length) {
-      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#64748b;">
-        <h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;">No properties match your search</h2>
-        <p>Try searching for cheap houses in Kampala or apartments in Naalya</p>
-      </div>`;
-      $('#propertyCount').textContent = '0 listings';
+
+    if (!list || list.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1;color:#64748b;font-size:.9rem;padding:2rem 0;text-align:center;">
+          <h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">No properties match your search</h2>
+          <p>Try searching for <strong>cheap houses for rent in Kampala</strong>, <strong>apartments in Naalya</strong>, or <strong>land for sale in Wakiso</strong>.</p>
+        </div>`;
+      const pc = $('#propertyCount');
+      if (pc) pc.textContent = '0 listings';
       return;
     }
-    $('#propertyCount').textContent = list.length + (list.length === 1 ? ' listing' : ' listings');
+
+    const pc = $('#propertyCount');
+    if (pc) pc.textContent = list.length + (list.length === 1 ? ' listing' : ' listings');
     grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+
     list.forEach(p => {
-      const broker = p.broker || state.profilesMap[p.owner_id] || null;
+      const broker = p.broker || (p.owner_id && state.profilesMap[p.owner_id]) || null;
       grid.appendChild(createPropertyCard(p, broker, true, false));
     });
   }
@@ -685,89 +766,136 @@
     const list = $('#myPropertiesList');
     if (!list) return;
     list.innerHTML = '';
-    if (!state.myProperties.length) {
+
+    // Simple activation banner
+    const existing = document.getElementById('activationBanner');
+    if (existing) existing.remove();
+
+    if (state.myProperties.length === 0) {
       $('#myPropertiesEmpty')?.classList.remove('hidden');
       return;
     }
     $('#myPropertiesEmpty')?.classList.add('hidden');
+
     list.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
-    state.myProperties.forEach(p => list.appendChild(createPropertyCard(p, state.currentUser, false, true)));
+    state.myProperties.forEach(prop => {
+      list.appendChild(createPropertyCard(prop, state.currentUser, false, true));
+    });
   }
 
-  // ---------- Data ----------
+  // ========== DATA ==========
   async function fetchAllData() {
     const grid = $('#listingsGrid');
-    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#64748b;">Loading listings…</div>';
+    if (grid) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;color:#64748b;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;">Loading listings…</h2></div>';
+    }
 
     try {
-      let rows = [];
+      let allRows = [];
+      let joinSucceeded = false;
+
+      // Try join query
       try {
         const { data, error } = await client.from('properties').select(`
-          id, title, price_amount, property_type, address, media_urls, is_paused, verification_status, created_at, owner_id,
-          broker:profiles!owner_id(id, business_name, average_rating, review_count, lead_score)
+          id, title, price_amount, property_type, address, media_urls, is_paused,
+          verification_status, is_verified, created_at, owner_id,
+          broker:profiles!owner_id(id, business_name, average_rating, review_count, lead_score, is_verified, phone)
         `).order('created_at', { ascending: false });
+
         if (!error && data) {
-          rows = data;
+          allRows = data;
+          joinSucceeded = true;
           state.profilesMap = {};
-          data.forEach(p => { if (p.broker?.id) state.profilesMap[p.broker.id] = p.broker; });
+          data.forEach(p => {
+            if (p.broker && p.broker.id) state.profilesMap[p.broker.id] = p.broker;
+          });
         }
       } catch (e) {
-        const { data } = await client.from('properties').select('*').order('created_at', { ascending: false });
-        rows = data || [];
-        const ids = [...new Set(rows.map(p => p.owner_id).filter(Boolean))];
-        if (ids.length) {
-          const { data: profiles } = await client.from('profiles').select('id, business_name, average_rating, review_count, lead_score').in('id', ids);
+        console.warn('Join failed, using fallback');
+      }
+
+      // Fallback
+      if (!joinSucceeded) {
+        const { data, error } = await client.from('properties').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        allRows = data || [];
+
+        const ownerIds = [...new Set(allRows.map(p => p.owner_id).filter(Boolean))];
+        if (ownerIds.length) {
+          const { data: profiles } = await client.from('profiles')
+            .select('id, business_name, average_rating, review_count, lead_score, is_verified, phone')
+            .in('id', ownerIds);
           state.profilesMap = {};
           (profiles || []).forEach(p => state.profilesMap[p.id] = p);
         }
       }
 
-      const active = rows.filter(p => p.is_paused !== true);
-      active.forEach(p => {
-        if (!p.broker && p.owner_id) p.broker = state.profilesMap[p.owner_id] || null;
+      // Attach broker + filter paused
+      const raw = allRows.filter(p => p.is_paused !== true);
+      raw.forEach(p => {
+        if (!p.broker && p.owner_id && state.profilesMap[p.owner_id]) {
+          p.broker = state.profilesMap[p.owner_id];
+        }
       });
 
-      state.allProperties = active;
-      state.filteredProperties = active.slice();
+      state.allProperties = raw;
+      state.filteredProperties = raw.slice();
       applyFiltersAndSearch();
     } catch (err) {
-      console.error(err);
-      if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#ef4444;">Could not load listings</div>';
+      console.error('Fetch error:', err);
+      if (grid) {
+        grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#ef4444;">Could not load listings</h2><p style="color:#64748b;">Please refresh the page.</p></div>';
+      }
     }
   }
 
   async function loadMyProperties() {
     if (!state.currentUser) return;
-    const { data } = await client.from('properties').select('*').eq('owner_id', state.currentUser.id).order('created_at', { ascending: false });
-    state.myProperties = data || [];
-    renderMyProperties();
+    try {
+      const { data, error } = await client.from('properties')
+        .select('*')
+        .eq('owner_id', state.currentUser.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      state.myProperties = data || [];
+      renderMyProperties();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   function applyFiltersAndSearch() {
     let list = state.allProperties.slice();
+
     if (state.currentFilter !== 'all') {
       list = list.filter(p => (p.property_type || '').toLowerCase() === state.currentFilter);
     }
+
     if (state.searchQuery.trim()) {
       const q = state.searchQuery.toLowerCase();
-      list = list.filter(p =>
-        (p.title || '').toLowerCase().includes(q) ||
-        (p.address || '').toLowerCase().includes(q) ||
-        (p.broker?.business_name || '').toLowerCase().includes(q)
-      );
+      list = list.filter(p => {
+        const title = (p.title || '').toLowerCase();
+        const addr = (p.address || '').toLowerCase();
+        const brokerName = (p.broker && p.broker.business_name || '').toLowerCase();
+        return title.includes(q) || addr.includes(q) || brokerName.includes(q);
+      });
     }
+
     state.filteredProperties = list;
     renderListings(list);
+
+    const clearBtn = $('#clearSearchBtn');
+    if (clearBtn) clearBtn.classList.toggle('hidden', !state.searchQuery.trim());
   }
 
-  // ---------- Auth ----------
-  function setAuthMode(signUp) {
-    state.isSignUpMode = signUp;
-    $('#signUpFields')?.classList.toggle('hidden', !signUp);
-    $('#formTitle').textContent = signUp ? 'Create Account' : 'Welcome Back';
-    $('#submitAuthBtn').textContent = signUp ? 'Create Account' : 'Access Dashboard';
-    $('#toggleSignIn')?.classList.toggle('active', !signUp);
-    $('#toggleSignUp')?.classList.toggle('active', signUp);
+  // ========== AUTH ==========
+  function setAuthMode(isSignUp) {
+    state.isSignUpMode = isSignUp;
+    $('#signUpFields')?.classList.toggle('hidden', !isSignUp);
+    $('#formTitle').textContent = isSignUp ? 'Create Account' : 'Welcome Back';
+    $('#submitAuthBtn').textContent = isSignUp ? 'Create Account' : 'Access Dashboard';
+    $('#toggleSignIn')?.classList.toggle('active', !isSignUp);
+    $('#toggleSignUp')?.classList.toggle('active', isSignUp);
   }
 
   async function handleAuthSubmit(e) {
@@ -778,62 +906,189 @@
     if (state.isSignUpMode) {
       const business_name = $('#bizNameInput').value.trim();
       const phone = $('#phoneInput').value.trim();
+      const account_type = $('#accTypeSelect')?.value || 'broker';
       if (!business_name) return alert('Enter Business Name');
+
       const { error } = await client.auth.signUp({
-        email, password,
-        options: { data: { business_name, phone } }
+        email,
+        password,
+        options: {
+          data: { business_name, phone, account_type },
+          emailRedirectTo: SITE_URL + '/auth'
+        }
       });
-      if (error) return alert(error.message);
-      alert('Account created! Check your email.');
+      if (error) return alert('Signup failed: ' + error.message);
+      alert('✅ Account created! Check your email to confirm.');
       setAuthMode(false);
+      $('#authForm')?.reset();
     } else {
       const { data, error } = await client.auth.signInWithPassword({ email, password });
-      if (error) return alert(error.message);
+      if (error) return alert('Sign in failed: ' + error.message);
+
       state.currentUser = data.user;
       $('#portalBtnLabel').textContent = 'Dashboard';
       await loadMyProperties();
+      await fetchAllData();
       navigateTo('/dashboard');
     }
   }
 
-  // ---------- Routing ----------
+  // ========== ROUTING ==========
   async function handleRoute() {
     const route = parseRoute();
-    if (route.view === 'auth') {
-      showView($('#authView'));
-      setAuthMode(false);
-    } else if (route.view === 'dashboard') {
-      if (!state.currentUser) return navigateTo('/auth');
-      showView($('#dashboardView'));
-      await loadMyProperties();
-    } else if (route.view === 'broker' && route.id) {
-      showView($('#brokerView'));
-      const { data } = await client.from('profiles').select('*').eq('id', route.id).single();
-      if (data) {
-        $('#brokerBusinessName').textContent = data.business_name || 'Broker';
-        $('#brokerStars').innerHTML = renderStars(data.average_rating || 0);
-        $('#brokerReviewCount').textContent = `(${data.review_count || 0} reviews)`;
-        $('#brokerLeadScore').textContent = '⚡ ' + (data.lead_score || 0);
-      }
-      const { data: props } = await client.from('properties').select('*').eq('owner_id', route.id);
-      const grid = $('#brokerListingsGrid');
-      grid.innerHTML = '';
-      (props || []).filter(p => !p.is_paused).forEach(p => {
-        grid.appendChild(createPropertyCard(p, data, false, false));
-      });
-    } else if (route.view === 'onboarding') {
-      showView($('#onboardingView'));
-    } else {
-      showView($('#discoveryView'));
-      applyFiltersAndSearch();
+
+    switch (route.view) {
+      case 'auth':
+        showView($('#authView'));
+        setAuthMode(false);
+        break;
+      case 'dashboard':
+        if (!state.currentUser) return navigateTo('/auth', true);
+        showView($('#dashboardView'));
+        await loadMyProperties();
+        break;
+      case 'onboarding':
+        if (state.currentUser) showView($('#onboardingView'));
+        else navigateTo('/auth', true);
+        break;
+      case 'broker':
+        if (route.id) await loadBrokerProfile(route.id);
+        else navigateTo('/');
+        break;
+      default:
+        showView($('#discoveryView'));
+        applyFiltersAndSearch();
     }
   }
 
-  // ---------- Start ----------
-  async function init() {
-    setTimeout(() => $('#loadingOverlay')?.classList.add('hidden'), 400);
+  async function loadBrokerProfile(id) {
+    const grid = $('#brokerListingsGrid');
+    if (!grid) return;
+    showView($('#brokerView'));
+    grid.innerHTML = '<div style="text-align:center;padding:3rem 0;">Loading...</div>';
 
-    // Auth
+    try {
+      const { data: broker, error } = await client.from('profiles').select('*').eq('id', id).single();
+      if (error) throw error;
+
+      $('#brokerBusinessName').textContent = broker.business_name || 'Broker';
+      $('#brokerTrustedBadge')?.classList.toggle('hidden', !isTrusted(broker));
+      $('#brokerStars').innerHTML = renderStars(broker.average_rating || 0);
+      $('#brokerReviewCount').textContent = `(${broker.review_count || 0} reviews)`;
+      $('#brokerLeadScore').textContent = '⚡ ' + (broker.lead_score || 0);
+
+      const { data: props } = await client.from('properties')
+        .select('*')
+        .eq('owner_id', id)
+        .order('created_at', { ascending: false });
+
+      grid.innerHTML = '';
+      const active = (props || []).filter(p => p.is_paused !== true);
+
+      if (active.length === 0) {
+        $('#brokerEmptyState')?.classList.remove('hidden');
+        return;
+      }
+      $('#brokerEmptyState')?.classList.add('hidden');
+      grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+      active.forEach(p => {
+        grid.appendChild(createPropertyCard(p, broker, false, false));
+      });
+    } catch (e) {
+      grid.innerHTML = '<div style="text-align:center;padding:3rem 0;color:#ef4444;">Error loading profile</div>';
+    }
+  }
+
+  // ========== STUBS / SIMPLE MODALS ==========
+  function openQuizModal(pid) {
+    alert('Connect / Lead quiz for property ' + pid + '\n(Full quiz modal can be restored later)');
+  }
+  function openEditModal(pid) {
+    alert('Edit property ' + pid + '\n(Full edit modal can be restored later)');
+  }
+
+  // ========== DASHBOARD TOGGLES ==========
+  function toggleAddPropertyForm() {
+    $('#addPropertyContainer')?.classList.toggle('visible');
+    $('#profileFormContainer')?.classList.remove('visible');
+    $('#propertyVerificationContainer')?.classList.remove('visible');
+    $('#leadsContainer')?.classList.remove('visible');
+  }
+  function toggleProfileForm() {
+    $('#profileFormContainer')?.classList.toggle('visible');
+    $('#addPropertyContainer')?.classList.remove('visible');
+    $('#propertyVerificationContainer')?.classList.remove('visible');
+    $('#leadsContainer')?.classList.remove('visible');
+  }
+  function togglePropertyVerificationForm() {
+    $('#propertyVerificationContainer')?.classList.toggle('visible');
+    $('#profileFormContainer')?.classList.remove('visible');
+    $('#addPropertyContainer')?.classList.remove('visible');
+    $('#leadsContainer')?.classList.remove('visible');
+    loadPropertyVerificationList();
+  }
+  function toggleLeadsPanel() {
+    $('#leadsContainer')?.classList.toggle('visible');
+    $('#profileFormContainer')?.classList.remove('visible');
+    $('#addPropertyContainer')?.classList.remove('visible');
+    $('#propertyVerificationContainer')?.classList.remove('visible');
+  }
+
+  async function loadPropertyVerificationList() {
+    const list = $('#propertyVerificationList');
+    if (!list || !state.currentUser) return;
+
+    list.innerHTML = '<p style="color:#64748b;">Loading...</p>';
+    try {
+      const { data } = await client.from('properties')
+        .select('id, title, property_type, verification_status')
+        .eq('owner_id', state.currentUser.id);
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p style="color:#64748b;">You have no properties yet.</p>';
+        return;
+      }
+
+      list.innerHTML = '';
+      data.forEach(p => {
+        const status = p.verification_status || 'unverified';
+        const label = status === 'approved' ? '✅ Approved' :
+                      status === 'pending'  ? '⏳ Pending' :
+                      status === 'rejected' ? '❌ Rejected' : '⚪ Not requested';
+        const canRequest = status === 'unverified' || status === 'rejected';
+
+        const row = document.createElement('div');
+        row.className = 'verification-property-item';
+        row.innerHTML = `
+          <div class="property-title">${p.title || 'Untitled'}</div>
+          <div><span class="property-status ${status}">${label}</span></div>
+          <div>
+            ${canRequest ? `<button class="request-verif-btn" data-id="${p.id}" style="background:#10b981;color:#fff;font-size:.75rem;font-weight:600;padding:.375rem .85rem;border-radius:9999px;border:none;cursor:pointer;">
+              <i class="fas fa-shield-alt"></i> Verify now
+            </button>` : ''}
+          </div>`;
+        list.appendChild(row);
+      });
+
+      // Simple click handler
+      list.querySelectorAll('.request-verif-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          alert('Verification request for property ' + btn.dataset.id + '\n(Full payment + form modal can be restored)');
+        });
+      });
+    } catch (e) {
+      list.innerHTML = '<p style="color:#ef4444;">Error loading verification list</p>';
+    }
+  }
+
+  // ========== INIT ==========
+  async function init() {
+    // Hide loading overlay
+    setTimeout(() => {
+      $('#loadingOverlay')?.classList.add('hidden');
+    }, 400);
+
+    // Auth listeners
     $('#authForm')?.addEventListener('submit', handleAuthSubmit);
     $('#toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
     $('#toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
@@ -845,18 +1100,26 @@
     });
     $('#backToSearchBtn')?.addEventListener('click', () => navigateTo('/'));
     $('#backToDiscovery')?.addEventListener('click', () => navigateTo('/'));
+    $('#forgotPasswordBtn')?.addEventListener('click', async () => {
+      const email = $('#emailInput').value.trim();
+      if (!email) return alert('Enter your email first');
+      const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL + '/auth' });
+      if (error) alert(error.message);
+      else alert('Password reset email sent');
+    });
 
     // Search
-    let t;
-    $('#searchInput')?.addEventListener('input', e => {
+    let searchTimer;
+    $('#searchInput')?.addEventListener('input', (e) => {
       state.searchQuery = e.target.value;
-      clearTimeout(t);
-      t = setTimeout(applyFiltersAndSearch, 250);
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applyFiltersAndSearch, 250);
     });
     $('#clearSearchBtn')?.addEventListener('click', () => {
       $('#searchInput').value = '';
       state.searchQuery = '';
       applyFiltersAndSearch();
+      $('#searchInput').focus();
     });
 
     // Filters
@@ -869,64 +1132,130 @@
       });
     });
 
-    // Portal
+    // Portal button
     $('#brokerPortalBtn')?.addEventListener('click', () => {
-      state.currentUser ? navigateTo('/dashboard') : navigateTo('/auth');
+      if (state.currentUser) navigateTo('/dashboard');
+      else navigateTo('/auth');
     });
 
-    // Dashboard
-    $('#dashboardAddPropertyBtn')?.addEventListener('click', () => {
-      $('#addPropertyContainer')?.classList.toggle('visible');
-    });
-    $('#dashboardEditProfileBtn')?.addEventListener('click', () => {
-      $('#profileFormContainer')?.classList.toggle('visible');
+    // Dashboard buttons
+    $('#dashboardAddPropertyBtn')?.addEventListener('click', toggleAddPropertyForm);
+    $('#dashboardEditProfileBtn')?.addEventListener('click', toggleProfileForm);
+    $('#dashboardPropertyVerificationBtn')?.addEventListener('click', togglePropertyVerificationForm);
+    $('#dashboardLeadsBtn')?.addEventListener('click', toggleLeadsPanel);
+    $('#dashboardHelpBtn')?.addEventListener('click', () => navigateTo('/onboarding'));
+    $('#onboardingDoneBtn')?.addEventListener('click', () => navigateTo('/dashboard'));
+    $('#onboardingSkipBtn')?.addEventListener('click', () => navigateTo('/dashboard'));
+    $('#cancelProfileEditBtn')?.addEventListener('click', () => {
+      $('#profileFormContainer')?.classList.remove('visible');
     });
 
-    // Add property
-    $('#addPropertyForm')?.addEventListener('submit', async e => {
+    // Profile save
+    $('#profileSettingsForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!state.currentUser) return alert('Sign in first');
+      if (!state.currentUser) return;
+      const business_name = $('#settingsBusinessName').value.trim();
+      const phone = $('#settingsPhone').value.trim();
+      try {
+        const { error } = await client.from('profiles')
+          .update({ business_name, phone })
+          .eq('id', state.currentUser.id);
+        if (error) throw error;
+        $('#profileStatus').textContent = '✅ Profile updated!';
+      } catch (err) {
+        $('#profileStatus').textContent = '❌ ' + err.message;
+      }
+    });
+
+    // Add Property
+    $('#addPropertyForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!state.currentUser) return alert('Please sign in first');
+
       const title = $('#propTitle').value.trim();
       const price = parseFloat($('#propPrice').value);
       const type = $('#propType').value;
       const address = $('#propAddress').value.trim();
-      if (!title || !price || !address) return alert('Fill required fields');
+
+      if (!title || !price || !address) return alert('Please fill all required fields');
 
       const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || 'rental';
-      const { error } = await client.from('properties').insert({
-        title, price_amount: price, property_type: dbType, address,
-        owner_id: state.currentUser.id,
-        verification_status: 'unverified',
-        is_paused: false
-      });
-      if (error) return alert(error.message);
-      alert('Property added!');
-      $('#addPropertyForm').reset();
-      $('#addPropertyContainer')?.classList.remove('visible');
-      await loadMyProperties();
-      await fetchAllData();
+
+      try {
+        const { error } = await client.from('properties').insert({
+          title,
+          price_amount: price,
+          property_type: dbType,
+          address,
+          media_urls: [],
+          is_verified: false,
+          verification_status: 'unverified',
+          owner_id: state.currentUser.id,
+          is_paused: false
+        });
+        if (error) throw error;
+
+        alert('✅ Property added!\n\nNext step: Go to Verification panel and verify it.');
+        $('#addPropertyForm').reset();
+        $('#addPropertyContainer')?.classList.remove('visible');
+        await loadMyProperties();
+        await fetchAllData();
+        // Auto open verification
+        setTimeout(togglePropertyVerificationForm, 300);
+      } catch (err) {
+        alert('Failed: ' + err.message);
+      }
     });
 
-    // Session
-    const { data: { session } } = await client.auth.getSession();
-    if (session?.user) {
-      state.currentUser = session.user;
-      $('#portalBtnLabel').textContent = 'Dashboard';
+    // Trust banner
+    $('#hideTrustBanner')?.addEventListener('click', () => {
+      const tb = $('#trustBanner');
+      if (tb) tb.style.display = 'none';
+      try { localStorage.setItem('ph_trust_hidden', '1'); } catch (_) {}
+    });
+    try {
+      if (localStorage.getItem('ph_trust_hidden') === '1') {
+        const tb = $('#trustBanner');
+        if (tb) tb.style.display = 'none';
+      }
+    } catch (_) {}
+
+    // Scroll top
+    const scrollBtn = $('#scrollTopBtn');
+    if (scrollBtn) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) scrollBtn.classList.add('show');
+        else scrollBtn.classList.remove('show');
+      });
+      scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+
+    // Session restore
+    try {
+      const { data: { session } } = await client.auth.getSession();
+      if (session?.user) {
+        state.currentUser = session.user;
+        $('#portalBtnLabel').textContent = 'Dashboard';
+      }
+    } catch (e) {
+      console.warn('Session error', e);
     }
 
     await fetchAllData();
     handleRoute();
+
     window.addEventListener('popstate', handleRoute);
 
-    console.log('%c✅ Property Hub ready – no more conflicts', 'color:green;font-weight:bold');
+    console.log('%c✅ Property Hub fully restored and clean', 'color: #10b981; font-weight: bold; font-size: 14px');
   }
 
+  // Start
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 })();
-</script>
+</script> 
 </body>
 </html>
