@@ -2303,31 +2303,50 @@
 
       window.addEventListener('popstate', function() { handleRoute(); });
 
-      try {
-        const s = await supabase.auth.getSession();
-        if (s.data && s.data.session && s.data.session.user) {
-          state.currentUser = s.data.session.user;
-          $('#portalBtnLabel').textContent = 'Dashboard';
-          await loadProfileSettings();
-          await loadWallet();
-        }
-      } catch (_) {}
+        try {
+    const { data, error } = await supabase.auth.getSession();
 
-      const qp = new URLSearchParams(window.location.search);
-      const sp = qp.get('search');
-      if (sp) { const si = $('#searchInput'); if (si) si.value = sp; state.searchQuery = sp; history.replaceState(null, '', '/'); }
+    if (error) {
+      console.error('Session error:', error.message);
+    } else if (data?.session?.user) {
+      state.currentUser = data.session.user;
 
-      await handleRoute();
-      await fetchAllData();
-      await handleRoute();
+      const portalLabel = $('#portalBtnLabel');
+      if (portalLabel) {
+        portalLabel.textContent = 'Dashboard';
+      }
 
-      console.log('✅ Property Hub ready');
-    
+      await Promise.all([
+        loadProfileSettings(),
+        loadWallet()
+      ]);
+    }
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
+    const qp = new URLSearchParams(window.location.search);
+    const sp = qp.get('search');
+    if (sp) {
+      const si = $('#searchInput');
+      if (si) si.value = sp;
+      state.searchQuery = sp;
+      history.replaceState(null, '', '/');
+    }
 
-  })();
+    await fetchAllData();
+    await handleRoute();
+
+    console.log('✅ Property Hub ready');
+  } catch (err) {
+    console.error('❌ Property Hub initialization failed:', err);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+})();
 </script>
+
 </body>
 </html>
