@@ -2302,8 +2302,7 @@
       $('#closeTopupModal') && $('#closeTopupModal').addEventListener('click', function() { $('#topupModal').classList.add('hidden'); });
 
       window.addEventListener('popstate', function() { handleRoute(); });
-
-        try {
+  try {
     const { data, error } = await supabase.auth.getSession();
 
     if (error) {
@@ -2345,7 +2344,6 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
-})();
 </script>
 
 </body>
