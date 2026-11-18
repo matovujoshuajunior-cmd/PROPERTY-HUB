@@ -77,121 +77,130 @@
   </script>
 
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#f8fafc; font-family:'Inter',system-ui,-apple-system,sans-serif; color:#334155; line-height:1.6; }
-    a { color:#4f46e5; text-decoration:none; }
-    a:hover { text-decoration:underline; }
-    .hidden { display: none !important; }
-    .property-card { transition:transform .2s,box-shadow .25s; }
-    .property-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px -12px rgba(0,0,0,.18); }
-    .hero-gradient { background:linear-gradient(135deg,rgba(15,23,42,.6) 0%,rgba(30,58,95,.35) 100%); }
-    .filter-pill { transition:all .15s; cursor:pointer; user-select:none; padding:.5rem 1.25rem; border-radius:9999px; font-size:.875rem; border:none; background:#fff; }
-    .filter-pill.active { background:#1e293b !important; color:#fff !important; }
-    .filter-pill:hover { background:#e2e8f0; }
-    .broker-header { background:linear-gradient(145deg,#fff,#f1f5f9); border-bottom:1px solid #e2e8f0; }
-    .view-hidden { display:none !important; }
-    .view-visible { display:block !important; }
-    .auth-card { background:#fff; border-radius:2rem; box-shadow:0 25px 50px -12px rgba(0,0,0,.25); }
-    .auth-toggle-btn { transition:all .2s; cursor:pointer; }
-    .auth-toggle-btn.active { background:#1e293b; color:#fff; border-color:#1e293b; }
-    #loadingOverlay { position:fixed; inset:0; background:#fff; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1rem; transition:opacity .35s; }
-    #loadingOverlay.hidden { opacity:0; pointer-events:none; }
-    .loader { border:4px solid #f3f4f6; border-top:4px solid #4f46e5; border-radius:50%; width:48px; height:48px; animation:spin 1s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; display:flex; align-items:center; justify-content:center; padding:1rem; backdrop-filter:blur(4px); }
-    .modal-backdrop.hidden { display:none; }
-    .modal-content { background:#fff; border-radius:2rem; max-width:600px; width:100%; max-height:90vh; overflow-y:auto; padding:2rem; }
-    .stars { color:#f59e0b; letter-spacing:2px; }
-    .badge-lead { background:#10b981; color:#fff; padding:.1rem .5rem; border-radius:9999px; font-size:.6rem; font-weight:bold; }
-    .star-rating .star { cursor:pointer; font-size:2rem; color:#d1d5db; }
-    .star-rating .star.active { color:#f59e0b; }
-    .badge-verified { background:#10b981; color:#fff; font-size:.6rem; padding:.1rem .5rem; border-radius:9999px; display:inline-flex; align-items:center; gap:.25rem; font-weight:600; }
-    .badge-pending { background:#f59e0b; color:#fff; font-size:.6rem; padding:.1rem .5rem; border-radius:9999px; display:inline-flex; align-items:center; gap:.25rem; font-weight:600; }
-    .badge-rejected { background:#ef4444; color:#fff; font-size:.6rem; padding:.1rem .5rem; border-radius:9999px; display:inline-flex; align-items:center; gap:.25rem; font-weight:600; }
-    .badge-trusted { background:#f59e0b; color:#1e293b; font-size:.6rem; padding:.1rem .5rem; border-radius:9999px; display:inline-flex; align-items:center; gap:.25rem; font-weight:700; border:1px solid #d97706; }
-    .badge-followup { background:#8b5cf6; color:#fff; font-size:.6rem; padding:.15rem .55rem; border-radius:9999px; display:inline-flex; align-items:center; gap:.25rem; font-weight:600; }
-    .dashboard-toolbar { position:sticky; top:68px; z-index:30; display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; justify-content:space-between; background:#fff; padding:1rem 1.25rem; border-radius:1.5rem; box-shadow:0 8px 30px rgba(0,0,0,.05); margin-bottom:1.5rem; }
-    .toolbar-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; justify-content:flex-end; flex:1; }
-    .wallet-pill { background:#1e293b; color:#fff; padding:.4rem 1rem; border-radius:9999px; font-size:.875rem; font-weight:600; display:inline-flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
-    .wallet-pill .balance { color:#34d399; }
-    .wallet-pill .wallet-label { color:#94a3b8; font-weight:400; font-size:.6rem; text-transform:uppercase; }
-    .dashboard-toolbar .toolbar-btn { padding:.5rem 1rem; border-radius:9999px; font-size:.875rem; font-weight:500; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; background:#f1f5f9; color:#1e293b; white-space:nowrap; min-width:42px; min-height:42px; }
-    .dashboard-toolbar .toolbar-btn:hover { background:#e2e8f0; }
-    .dashboard-toolbar .toolbar-btn.primary { background:#4f46e5; color:#fff; }
-    .dashboard-toolbar .toolbar-btn.green { background:#10b981; color:#fff; }
-    .dashboard-toolbar .toolbar-btn.amber { background:#f59e0b; color:#fff; }
-    .dashboard-toolbar .toolbar-btn-dark { background:#334155; color:#fff; }
-    @media (max-width:1023px) { .dashboard-toolbar .btn-label { display:none; } .dashboard-toolbar .toolbar-btn { padding:.6rem; } }
-    @media (max-width:640px) {
-      .dashboard-toolbar { top:60px; padding:.6rem .75rem; gap:.5rem; border-radius:1rem; flex-direction:column; align-items:stretch; }
-      .dashboard-toolbar .wallet-pill { justify-content:center; width:100%; font-size:.8rem; padding:.35rem .75rem; }
-      .dashboard-toolbar .wallet-currency { display:none; }
-      .dashboard-toolbar .wallet-label { display:none; }
-      .toolbar-actions { justify-content:space-between; width:100%; gap:.4rem; flex-wrap:nowrap; }
-      .dashboard-toolbar .toolbar-btn { flex:1; padding:.65rem .25rem; min-width:0; min-height:44px; }
-      .dashboard-toolbar .toolbar-btn i { font-size:1.1rem; }
-      .verification-property-item { flex-direction:column; align-items:stretch; gap:.5rem; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#f8fafc;font-family:'Inter',system-ui,-apple-system,sans-serif;color:#334155;line-height:1.6}
+    a{color:#4f46e5;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .hidden{display:none!important}
+    .property-card{background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid #e2e8f0;display:flex;flex-direction:column;transition:transform .2s,box-shadow .25s}
+    .property-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px -12px rgba(0,0,0,.18)}
+    .property-card__image{position:relative;aspect-ratio:4/3;background:#e2e8f0;overflow:hidden}
+    .property-card__image img{width:100%;height:100%;object-fit:cover;display:block}
+    .property-card__type{position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px}
+    .property-card__body{padding:1rem;display:flex;flex-direction:column;flex:1}
+    .property-card__title{font-weight:600;color:#1e293b;font-size:1rem;line-height:1.3}
+    .property-card__title a{color:inherit;text-decoration:none}
+    .property-card__title a:hover{color:#4f46e5}
+    .property-card__price{color:#4338ca;font-weight:700;font-size:.875rem;margin-top:.125rem}
+    .property-card__location{color:#64748b;font-size:.75rem;margin-top:.125rem}
+    .property-card__desc{color:#64748b;font-size:.8rem;margin-top:.5rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .property-card__footer{margin-top:.75rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border-top:1px solid #e2e8f0;padding-top:.75rem;flex-wrap:wrap}
+    .property-card__broker{font-size:.75rem;font-weight:500;color:#4f46e5;display:flex;align-items:center;gap:.25rem;background:none;border:none;cursor:pointer;padding:0}
+    .property-card__cta{background:#4f46e5;color:#fff;font-size:.65rem;font-weight:600;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer}
+    .hero-gradient{background:linear-gradient(135deg,rgba(15,23,42,.6) 0%,rgba(30,58,95,.35) 100%)}
+    .filter-pill{transition:all .15s;cursor:pointer;user-select:none;padding:.5rem 1.25rem;border-radius:9999px;font-size:.875rem;border:none;background:#fff}
+    .filter-pill.active{background:#1e293b!important;color:#fff!important}
+    .filter-pill:hover{background:#e2e8f0}
+    .broker-header{background:linear-gradient(145deg,#fff,#f1f5f9);border-bottom:1px solid #e2e8f0}
+    .view-hidden{display:none!important}
+    .view-visible{display:block!important}
+    .auth-card{background:#fff;border-radius:2rem;box-shadow:0 25px 50px -12px rgba(0,0,0,.25)}
+    .auth-toggle-btn{transition:all .2s;cursor:pointer}
+    .auth-toggle-btn.active{background:#1e293b;color:#fff;border-color:#1e293b}
+    #loadingOverlay{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;transition:opacity .35s}
+    #loadingOverlay.hidden{opacity:0;pointer-events:none}
+    .loader{border:4px solid #f3f4f6;border-top:4px solid #4f46e5;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+    .modal-backdrop.hidden{display:none}
+    .modal-content{background:#fff;border-radius:2rem;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:2rem}
+    .stars{color:#f59e0b;letter-spacing:2px}
+    .badge-lead{background:#10b981;color:#fff;padding:.1rem .5rem;border-radius:9999px;font-size:.6rem;font-weight:bold}
+    .star-rating .star{cursor:pointer;font-size:2rem;color:#d1d5db}
+    .star-rating .star.active{color:#f59e0b}
+    .badge-verified{background:#10b981;color:#fff;font-size:.6rem;padding:.1rem .5rem;border-radius:9999px;display:inline-flex;align-items:center;gap:.25rem;font-weight:600}
+    .badge-pending{background:#f59e0b;color:#fff;font-size:.6rem;padding:.1rem .5rem;border-radius:9999px;display:inline-flex;align-items:center;gap:.25rem;font-weight:600}
+    .badge-rejected{background:#ef4444;color:#fff;font-size:.6rem;padding:.1rem .5rem;border-radius:9999px;display:inline-flex;align-items:center;gap:.25rem;font-weight:600}
+    .badge-trusted{background:#f59e0b;color:#1e293b;font-size:.6rem;padding:.1rem .5rem;border-radius:9999px;display:inline-flex;align-items:center;gap:.25rem;font-weight:700;border:1px solid #d97706}
+    .badge-followup{background:#8b5cf6;color:#fff;font-size:.6rem;padding:.15rem .55rem;border-radius:9999px;display:inline-flex;align-items:center;gap:.25rem;font-weight:600}
+    .dashboard-toolbar{position:sticky;top:68px;z-index:30;display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:space-between;background:#fff;padding:1rem 1.25rem;border-radius:1.5rem;box-shadow:0 8px 30px rgba(0,0,0,.05);margin-bottom:1.5rem}
+    .toolbar-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end;flex:1}
+    .wallet-pill{background:#1e293b;color:#fff;padding:.4rem 1rem;border-radius:9999px;font-size:.875rem;font-weight:600;display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+    .wallet-pill .balance{color:#34d399}
+    .wallet-pill .wallet-label{color:#94a3b8;font-weight:400;font-size:.6rem;text-transform:uppercase}
+    .dashboard-toolbar .toolbar-btn{padding:.5rem 1rem;border-radius:9999px;font-size:.875rem;font-weight:500;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;background:#f1f5f9;color:#1e293b;white-space:nowrap;min-width:42px;min-height:42px}
+    .dashboard-toolbar .toolbar-btn:hover{background:#e2e8f0}
+    .dashboard-toolbar .toolbar-btn.primary{background:#4f46e5;color:#fff}
+    .dashboard-toolbar .toolbar-btn.green{background:#10b981;color:#fff}
+    .dashboard-toolbar .toolbar-btn.amber{background:#f59e0b;color:#fff}
+    .dashboard-toolbar .toolbar-btn-dark{background:#334155;color:#fff}
+    @media(max-width:1023px){.dashboard-toolbar .btn-label{display:none}.dashboard-toolbar .toolbar-btn{padding:.6rem}}
+    @media(max-width:640px){
+      .dashboard-toolbar{top:60px;padding:.6rem .75rem;gap:.5rem;border-radius:1rem;flex-direction:column;align-items:stretch}
+      .dashboard-toolbar .wallet-pill{justify-content:center;width:100%;font-size:.8rem;padding:.35rem .75rem}
+      .dashboard-toolbar .wallet-currency{display:none}
+      .dashboard-toolbar .wallet-label{display:none}
+      .toolbar-actions{justify-content:space-between;width:100%;gap:.4rem;flex-wrap:nowrap}
+      .dashboard-toolbar .toolbar-btn{flex:1;padding:.65rem .25rem;min-width:0;min-height:44px}
+      .dashboard-toolbar .toolbar-btn i{font-size:1.1rem}
+      .verification-property-item{flex-direction:column;align-items:stretch;gap:.5rem}
     }
-    .profile-form-container, .add-property-container, .verification-form-container { background:#fff; border-radius:1.5rem; padding:1.25rem; margin-bottom:1.5rem; box-shadow:0 8px 30px rgba(0,0,0,.05); display:none; }
-    .profile-form-container.visible, .add-property-container.visible, .verification-form-container.visible { display:block; }
-    .security-notification { position:fixed; bottom:20px; right:20px; max-width:380px; background:#1e293b; color:#fff; padding:1rem 1.25rem; border-radius:1rem; box-shadow:0 20px 60px rgba(0,0,0,.3); z-index:999; display:none; }
-    .review-item { background:#f8fafc; border-radius:.75rem; padding:.75rem 1rem; border:1px solid #e2e8f0; }
-    .write-review-toggle { cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; color:#4f46e5; font-weight:500; }
-    .verification-property-item { background:#f8fafc; border:1px solid #e2e8f0; border-radius:.75rem; padding:.75rem 1rem; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.5rem; }
-    .verification-property-item .property-title { font-weight:600; color:#1e293b; flex:1; }
-    .verification-property-item .property-status { font-size:.75rem; font-weight:600; padding:.1rem .6rem; border-radius:9999px; }
-    .property-status.approved { background:#d1fae5; color:#065f46; }
-    .property-status.pending { background:#fef3c7; color:#92400e; }
-    .property-status.rejected { background:#fee2e2; color:#991b1b; }
-    .property-status.expired { background:#e2e8f0; color:#475569; }
-    #scrollTopBtn { position:fixed; bottom:30px; right:30px; z-index:1000; background:#4f46e5; color:#fff; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 10px 25px rgba(0,0,0,.2); cursor:pointer; opacity:0; visibility:hidden; transition:all .3s; border:none; }
-    #scrollTopBtn.show { opacity:1; visibility:visible; }
-    .trust-banner { position:relative; background:linear-gradient(135deg,#ecfdf5 0%,#f0f9ff 100%); border:1px solid #a7f3d0; border-radius:1rem; padding:1.25rem 2.5rem 1.25rem 1.25rem; margin-top:1rem; margin-bottom:1.5rem; }
-    .trust-banner h3 { font-weight:700; color:#065f46; font-size:1rem; margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem; }
-    .trust-banner ul { display:grid; grid-template-columns:1fr; gap:.5rem; list-style:none; }
-    @media (min-width:768px) { .trust-banner ul { grid-template-columns:1fr 1fr; } }
-    .trust-banner li { font-size:.8rem; color:#334155; line-height:1.4; display:flex; align-items:flex-start; gap:.5rem; }
-    .trust-banner li i { color:#10b981; margin-top:.15rem; flex-shrink:0; }
-    .close-banner-btn { position:absolute; top:.75rem; right:.75rem; background:rgba(6,95,70,.1); border:none; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#065f46; font-size:.9rem; }
-    .quiz-question { background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;padding:.75rem 1rem;margin-bottom:.75rem; }
-    .quiz-question p.q-title { font-weight:600;color:#1e293b;font-size:.875rem;margin-bottom:.5rem; }
-    .quiz-option { display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;background:#fff;padding:.3rem .75rem;border-radius:9999px;border:1px solid #e2e8f0;margin:.2rem;cursor:pointer; }
-    .seo-breadcrumb { font-size:.75rem; color:#64748b; margin-bottom:.75rem; }
-    .pre-render-fallback { color:#64748b; font-size:.9rem; padding:1rem 0; }
-    .pre-render-fallback h2 { font-size:1.1rem; font-weight:700; color:#1e293b; margin-bottom:.5rem; }
-    .hero-trust-chips { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
-    .hero-trust-chips span { display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); color:#e2e8f0; padding:.35rem .85rem; border-radius:9999px; font-size:.75rem; font-weight:500; backdrop-filter:blur(4px); }
-    .hero-trust-chips i { color:#34d399; font-size:.75rem; }
-    #chatBubble { position:fixed; bottom:30px; left:30px; z-index:1001; background:#4f46e5; color:#fff; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; box-shadow:0 12px 30px rgba(79,70,229,.4); cursor:pointer; border:none; }
-    #chatBubble:hover { transform:scale(1.08); }
-    #chatBubble .chat-badge { position:absolute; top:-6px; right:-6px; background:#ef4444; color:#fff; font-size:.75rem; font-weight:bold; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid #fff; }
-    #chatPanel { position:fixed; bottom:100px; left:30px; z-index:1002; width:min(380px,calc(100vw - 20px)); max-height:min(560px,calc(100vh - 140px)); background:#fff; border-radius:1.25rem; box-shadow:0 20px 60px rgba(0,0,0,.25); display:none; flex-direction:column; overflow:hidden; border:1px solid #e2e8f0; }
-    #chatPanel.open { display:flex; }
-    #chatHeader { background:linear-gradient(135deg,#4f46e5 0%,#4338ca 100%); color:#fff; padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; }
-    #chatHeader .chat-title { font-weight:700; font-size:.95rem; display:flex; align-items:center; gap:.5rem; }
-    #chatHeader .chat-subtitle { font-size:.7rem; color:#c7d2fe; margin-top:.1rem; }
-    #chatClose { background:rgba(255,255,255,.15); border:none; color:#fff; width:30px; height:30px; border-radius:50%; cursor:pointer; }
-    #chatMessages { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:.65rem; background:#f8fafc; }
-    .chat-msg { max-width:85%; padding:.65rem .9rem; border-radius:1rem; font-size:.85rem; line-height:1.5; word-wrap:break-word; }
-    .chat-msg.bot { background:#fff; color:#1e293b; align-self:flex-start; border:1px solid #e2e8f0; }
-    .chat-msg.user { background:#4f46e5; color:#fff; align-self:flex-end; }
-    .chat-msg a { color:#4f46e5; text-decoration:underline; }
-    #chatQuickReplies { padding:.5rem 1rem; display:flex; flex-wrap:wrap; gap:.4rem; background:#fff; border-top:1px solid #f1f5f9; max-height:110px; overflow-y:auto; }
-    .chat-quick-btn { background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; padding:.35rem .75rem; border-radius:9999px; font-size:.75rem; cursor:pointer; white-space:nowrap; }
-    #chatInputRow { display:flex; gap:.5rem; padding:.75rem; border-top:1px solid #e2e8f0; background:#fff; }
-    #chatInput { flex:1; border:1px solid #e2e8f0; border-radius:9999px; padding:.55rem 1rem; font-size:.85rem; outline:none; }
-    #chatSend { background:#4f46e5; color:#fff; border:none; width:40px; height:40px; border-radius:50%; cursor:pointer; }
-    @media (max-width:640px) {
-      #chatBubble { bottom:20px; left:20px; width:56px; height:56px; }
-      #chatPanel { left:10px; bottom:90px; }
-    }
-    .guides-grid { display:grid; grid-template-columns:1fr; gap:1.25rem; }
-    @media (min-width:640px) { .guides-grid { grid-template-columns:1fr 1fr; } }
-    @media (min-width:1024px) { .guides-grid { grid-template-columns:repeat(3, 1fr); } }
-    .guide-col h3 { font-size:.8rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.04em; margin-bottom:.6rem; padding-bottom:.4rem; border-bottom:1px solid #e2e8f0; }
-    .guide-col ul { list-style:none; display:flex; flex-direction:column; gap:.35rem; font-size:.85rem; }
-    .guide-col ul a { display:block; padding:.25rem 0; color:#4f46e5; line-height:1.4; }
-    .guide-col ul a:hover { text-decoration:underline; }
+    .profile-form-container,.add-property-container,.verification-form-container{background:#fff;border-radius:1.5rem;padding:1.25rem;margin-bottom:1.5rem;box-shadow:0 8px 30px rgba(0,0,0,.05);display:none}
+    .profile-form-container.visible,.add-property-container.visible,.verification-form-container.visible{display:block}
+    .security-notification{position:fixed;bottom:20px;right:20px;max-width:380px;background:#1e293b;color:#fff;padding:1rem 1.25rem;border-radius:1rem;box-shadow:0 20px 60px rgba(0,0,0,.3);z-index:999;display:none}
+    .review-item{background:#f8fafc;border-radius:.75rem;padding:.75rem 1rem;border:1px solid #e2e8f0}
+    .write-review-toggle{cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;color:#4f46e5;font-weight:500}
+    .verification-property-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;padding:.75rem 1rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.5rem}
+    .verification-property-item .property-title{font-weight:600;color:#1e293b;flex:1}
+    .verification-property-item .property-status{font-size:.75rem;font-weight:600;padding:.1rem .6rem;border-radius:9999px}
+    .property-status.approved{background:#d1fae5;color:#065f46}
+    .property-status.pending{background:#fef3c7;color:#92400e}
+    .property-status.rejected{background:#fee2e2;color:#991b1b}
+    .property-status.expired{background:#e2e8f0;color:#475569}
+    #scrollTopBtn{position:fixed;bottom:30px;right:30px;z-index:1000;background:#4f46e5;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 10px 25px rgba(0,0,0,.2);cursor:pointer;opacity:0;visibility:hidden;transition:all .3s;border:none}
+    #scrollTopBtn.show{opacity:1;visibility:visible}
+    .trust-banner{position:relative;background:linear-gradient(135deg,#ecfdf5 0%,#f0f9ff 100%);border:1px solid #a7f3d0;border-radius:1rem;padding:1.25rem 2.5rem 1.25rem 1.25rem;margin-top:1rem;margin-bottom:1.5rem}
+    .trust-banner h3{font-weight:700;color:#065f46;font-size:1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+    .trust-banner ul{display:grid;grid-template-columns:1fr;gap:.5rem;list-style:none}
+    @media(min-width:768px){.trust-banner ul{grid-template-columns:1fr 1fr}}
+    .trust-banner li{font-size:.8rem;color:#334155;line-height:1.4;display:flex;align-items:flex-start;gap:.5rem}
+    .trust-banner li i{color:#10b981;margin-top:.15rem;flex-shrink:0}
+    .close-banner-btn{position:absolute;top:.75rem;right:.75rem;background:rgba(6,95,70,.1);border:none;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#065f46;font-size:.9rem}
+    .quiz-question{background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;padding:.75rem 1rem;margin-bottom:.75rem}
+    .quiz-question p.q-title{font-weight:600;color:#1e293b;font-size:.875rem;margin-bottom:.5rem}
+    .quiz-option{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;background:#fff;padding:.3rem .75rem;border-radius:9999px;border:1px solid #e2e8f0;margin:.2rem;cursor:pointer}
+    .seo-breadcrumb{font-size:.75rem;color:#64748b;margin-bottom:.75rem}
+    .pre-render-fallback{color:#64748b;font-size:.9rem;padding:1rem 0}
+    .pre-render-fallback h2{font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem}
+    .hero-trust-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+    .hero-trust-chips span{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:.35rem .85rem;border-radius:9999px;font-size:.75rem;font-weight:500;backdrop-filter:blur(4px)}
+    .hero-trust-chips i{color:#34d399;font-size:.75rem}
+    #chatBubble{position:fixed;bottom:30px;left:30px;z-index:1001;background:#4f46e5;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 12px 30px rgba(79,70,229,.4);cursor:pointer;border:none}
+    #chatBubble:hover{transform:scale(1.08)}
+    #chatBubble .chat-badge{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;font-size:.75rem;font-weight:bold;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid #fff}
+    #chatPanel{position:fixed;bottom:100px;left:30px;z-index:1002;width:min(380px,calc(100vw - 20px));max-height:min(560px,calc(100vh - 140px));background:#fff;border-radius:1.25rem;box-shadow:0 20px 60px rgba(0,0,0,.25);display:none;flex-direction:column;overflow:hidden;border:1px solid #e2e8f0}
+    #chatPanel.open{display:flex}
+    #chatHeader{background:linear-gradient(135deg,#4f46e5 0%,#4338ca 100%);color:#fff;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+    #chatHeader .chat-title{font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:.5rem}
+    #chatHeader .chat-subtitle{font-size:.7rem;color:#c7d2fe;margin-top:.1rem}
+    #chatClose{background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer}
+    #chatMessages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.65rem;background:#f8fafc}
+    .chat-msg{max-width:85%;padding:.65rem .9rem;border-radius:1rem;font-size:.85rem;line-height:1.5;word-wrap:break-word}
+    .chat-msg.bot{background:#fff;color:#1e293b;align-self:flex-start;border:1px solid #e2e8f0}
+    .chat-msg.user{background:#4f46e5;color:#fff;align-self:flex-end}
+    .chat-msg a{color:#4f46e5;text-decoration:underline}
+    #chatQuickReplies{padding:.5rem 1rem;display:flex;flex-wrap:wrap;gap:.4rem;background:#fff;border-top:1px solid #f1f5f9;max-height:110px;overflow-y:auto}
+    .chat-quick-btn{background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;padding:.35rem .75rem;border-radius:9999px;font-size:.75rem;cursor:pointer;white-space:nowrap}
+    #chatInputRow{display:flex;gap:.5rem;padding:.75rem;border-top:1px solid #e2e8f0;background:#fff}
+    #chatInput{flex:1;border:1px solid #e2e8f0;border-radius:9999px;padding:.55rem 1rem;font-size:.85rem;outline:none}
+    #chatSend{background:#4f46e5;color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer}
+    @media(max-width:640px){#chatBubble{bottom:20px;left:20px;width:56px;height:56px}#chatPanel{left:10px;bottom:90px}}
+    .guides-grid{display:grid;grid-template-columns:1fr;gap:1.25rem}
+    @media(min-width:640px){.guides-grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1024px){.guides-grid{grid-template-columns:repeat(3,1fr)}}
+    .guide-col h3{font-size:.8rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid #e2e8f0}
+    .guide-col ul{list-style:none;display:flex;flex-direction:column;gap:.35rem;font-size:.85rem}
+    .guide-col ul a{display:block;padding:.25rem 0;color:#4f46e5;line-height:1.4}
   </style>
 </head>
 <body>
@@ -199,33 +208,18 @@
 <div id="loadingOverlay"><div class="loader"></div><p style="color:#475569;font-size:.875rem;margin-top:.5rem;">Loading Property Hub…</p></div>
 <button id="scrollTopBtn" title="Back to top"><i class="fas fa-arrow-up"></i></button>
 
-<button id="chatBubble" title="Chat with us" aria-label="Open chat">
-  <i class="fas fa-comments"></i>
-  <span class="chat-badge" id="chatBadge">1</span>
-</button>
+<button id="chatBubble" title="Chat with us" aria-label="Open chat"><i class="fas fa-comments"></i><span class="chat-badge" id="chatBadge">1</span></button>
 <div id="chatPanel" role="dialog" aria-label="Chat assistant">
-  <div id="chatHeader">
-    <div>
-      <div class="chat-title"><i class="fas fa-headset"></i> Property Hub Assistant</div>
-      <div class="chat-subtitle" id="chatContext">Here to help you find a place</div>
-    </div>
-    <button id="chatClose" aria-label="Close chat">&times;</button>
-  </div>
+  <div id="chatHeader"><div><div class="chat-title"><i class="fas fa-headset"></i> Property Hub Assistant</div><div class="chat-subtitle" id="chatContext">Here to help you find a place</div></div><button id="chatClose" aria-label="Close chat">&times;</button></div>
   <div id="chatMessages"></div>
   <div id="chatQuickReplies"></div>
-  <div id="chatInputRow">
-    <input id="chatInput" type="text" placeholder="Type a question…" autocomplete="off" />
-    <button id="chatSend" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
-  </div>
+  <div id="chatInputRow"><input id="chatInput" type="text" placeholder="Type a question…" autocomplete="off" /><button id="chatSend" aria-label="Send"><i class="fas fa-paper-plane"></i></button></div>
 </div>
 
 <div id="securityNotification" class="security-notification">
   <div style="display:flex;align-items:flex-start;gap:.75rem;">
     <i class="fas fa-shield-alt" style="color:#34d399;font-size:1.2rem;margin-top:.15rem;"></i>
-    <div style="flex:1;font-size:.875rem;">
-      <p style="font-weight:600;">🔒 Your Safety Comes First</p>
-      <p style="color:#cbd5e1;font-size:.75rem;">Check the broker's reviews and prefer <strong style="color:#34d399;">Verified</strong> listings.</p>
-    </div>
+    <div style="flex:1;font-size:.875rem;"><p style="font-weight:600;">🔒 Your Safety Comes First</p><p style="color:#cbd5e1;font-size:.75rem;">Check the broker's reviews and prefer <strong style="color:#34d399;">Verified</strong> listings.</p></div>
     <button id="closeSecurityNotification" style="background:none;border:none;color:#fff;cursor:pointer;"><i class="fas fa-times"></i></button>
   </div>
 </div>
@@ -242,7 +236,6 @@
   </header>
 
   <main>
-    <!-- DISCOVERY VIEW -->
     <section id="discoveryView" class="view view-visible">
       <div style="position:relative;background:#0f172a;color:#fff;overflow:hidden;min-height:400px;">
         <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1e1b4b 0%,#4f46e5 40%,#f97316 100%);opacity:.9;"></div>
@@ -256,11 +249,7 @@
               <input id="searchInput" type="text" placeholder="Search by area, price, or broker…" style="width:100%;padding:.75rem 3rem;border-radius:.75rem;color:#1e293b;border:none;" />
               <button id="clearSearchBtn" class="hidden" title="Clear" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;background:none;border:none;cursor:pointer;width:2rem;height:2rem;"><i class="fas fa-times"></i></button>
             </div>
-            <div class="hero-trust-chips">
-              <span><i class="fas fa-check-circle"></i> Verified brokers</span>
-              <span><i class="fas fa-bolt"></i> Direct contact</span>
-              <span><i class="fas fa-shield-alt"></i> No scams</span>
-            </div>
+            <div class="hero-trust-chips"><span><i class="fas fa-check-circle"></i> Verified brokers</span><span><i class="fas fa-bolt"></i> Direct contact</span><span><i class="fas fa-shield-alt"></i> No scams</span></div>
           </div>
         </div>
       </div>
@@ -287,12 +276,28 @@
           <button class="filter-pill" data-filter="property">Properties</button>
           <button class="filter-pill" data-filter="guesthouse">Guesthouses</button>
         </div>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PRERENDERED LISTINGS - injected by scripts/prerender-homepage.mjs -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <div id="listingsGrid" style="display:grid;grid-template-columns:1fr;gap:2rem;">
+          <!-- PRERENDERED_LISTINGS_START -->
           <div id="crawlerFallback" class="pre-render-fallback" style="grid-column:1/-1;">
             <h2>Live Ugandan Property Listings — Loading</h2>
             <p>Discover verified rentals, apartments, guesthouses, and land for sale across <strong>Kampala, Wakiso, Kira, Naalya, Ntinda, Kololo, Naguru, Muyenga, Bukoto, Entebbe, Mukono, and Jinja</strong>.</p>
           </div>
+          <!-- PRERENDERED_LISTINGS_END -->
         </div>
+
+        <!-- Noscript fallback for bots that block JS entirely -->
+        <noscript>
+          <div style="margin-top:2rem;padding:1rem;background:#fff;border-radius:1rem;border:1px solid #e2e8f0;">
+            <h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">Browse Property Listings</h2>
+            <p style="color:#64748b;font-size:.875rem;margin-bottom:1rem;">JavaScript is required for the full experience. Here are the listings in plain text:</p>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:.5rem;">
+              <li>Loading listings... refresh to see them in the main grid above.</li>
+            </ul>
+          </div>
+        </noscript>
 
         <section style="margin-top:3rem;margin-bottom:2rem;">
           <h2 style="font-size:1.5rem;font-weight:800;color:#1e293b;margin-bottom:.4rem;">Property Guides for Kampala</h2>
@@ -335,17 +340,13 @@
 
         <section style="background:linear-gradient(135deg,#4f46e5,#4338ca);border-radius:1.25rem;padding:1.75rem;margin-bottom:2rem;color:#fff;">
           <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
-            <div>
-              <h3 style="font-size:1.25rem;font-weight:800;margin-bottom:.25rem;">Are you a broker?</h3>
-              <p style="color:#c7d2fe;font-size:.9rem;">List your properties free. Get verified leads in your area.</p>
-            </div>
+            <div><h3 style="font-size:1.25rem;font-weight:800;margin-bottom:.25rem;">Are you a broker?</h3><p style="color:#c7d2fe;font-size:.9rem;">List your properties free. Get verified leads in your area.</p></div>
             <a href="/brokers/" style="background:#fff;color:#4f46e5;padding:.75rem 1.5rem;border-radius:.75rem;font-size:.9rem;font-weight:700;text-decoration:none;white-space:nowrap;">List Property →</a>
           </div>
         </section>
       </section>
     </section>
 
-    <!-- BROKER VIEW -->
     <section id="brokerView" class="view view-hidden" data-nosnippet>
       <div style="max-width:80rem;margin:0 auto;padding:2rem 1rem;">
         <button id="backToDiscovery" style="font-size:.875rem;margin-bottom:1.5rem;background:none;border:none;cursor:pointer;"><i class="fas fa-arrow-left"></i> Back</button>
@@ -367,7 +368,6 @@
       </div>
     </section>
 
-    <!-- AUTH VIEW -->
     <section id="authView" class="view view-hidden" style="max-width:28rem;margin:3rem auto;padding:0 1rem;" data-nosnippet>
       <div class="auth-card" style="padding:2rem;">
         <div style="display:flex;border-radius:.75rem;background:#f1f5f9;padding:.25rem;margin-bottom:2rem;">
@@ -393,23 +393,15 @@
       </div>
     </section>
 
-    <!-- ONBOARDING VIEW -->
     <section id="onboardingView" class="view view-hidden" data-nosnippet>
       <div style="max-width:48rem;margin:0 auto;padding:2.5rem 1rem;">
         <div style="background:#fff;border-radius:1.5rem;border:1px solid #e2e8f0;padding:2rem;">
-          <div style="text-align:center;margin-bottom:2rem;">
-            <div style="font-size:3rem;margin-bottom:.75rem;">🎉</div>
-            <h1 style="font-size:1.75rem;font-weight:800;color:#1e293b;">Welcome to Property Hub</h1>
-            <p style="color:#64748b;margin-top:.5rem;">Here's how to start getting leads in 5 minutes.</p>
-          </div>
+          <div style="text-align:center;margin-bottom:2rem;"><div style="font-size:3rem;margin-bottom:.75rem;">🎉</div><h1 style="font-size:1.75rem;font-weight:800;color:#1e293b;">Welcome to Property Hub</h1><p style="color:#64748b;margin-top:.5rem;">Here's how to start getting leads in 5 minutes.</p></div>
           <div style="display:flex;flex-direction:column;gap:1.25rem;">
-            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">1</div><div><h3 style="font-weight:700;color:#1e293b;">Add your first property</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">Click <strong>Add Property</strong>. Verification is compulsory (5,000 UGX).</p></div></div>
-            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">2</div><div><h3 style="font-weight:700;color:#1e293b;">Get verified</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">Verified listings rank higher and get more clicks.</p></div></div>
-            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">3</div><div><h3 style="font-weight:700;color:#1e293b;">Receive leads</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">You'll be notified by SMS and email. Contact details hidden until you unlock.</p></div></div>
-            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">4</div><div><h3 style="font-weight:700;color:#1e293b;">Unlock serious leads</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">You decide which leads to unlock. First to pay wins.</p></div></div>
-          </div>
-          <div style="margin-top:2rem;background:#fffbeb;border:1px solid #fde68a;border-radius:.75rem;padding:1rem;font-size:.875rem;color:#92400e;">
-            <strong>💡 Pro tip:</strong> Listings with 3+ photos and detailed titles get 4× more views than vague titles.
+            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">1</div><div><h3 style="font-weight:700;color:#1e293b;">Add your first property</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">Click <strong>Add Property</strong>. Then verify via Mobile Money.</p></div></div>
+            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">2</div><div><h3 style="font-weight:700;color:#1e293b;">Send 5,000 UGX via Mobile Money</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">You'll see payment instructions. Admin approves within 24h.</p></div></div>
+            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">3</div><div><h3 style="font-weight:700;color:#1e293b;">Receive leads</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">SMS + email alert. 🎁 Your first lead is FREE.</p></div></div>
+            <div style="display:flex;gap:1rem;align-items:flex-start;"><div style="flex-shrink:0;width:2.5rem;height:2.5rem;border-radius:50%;background:#e0e7ff;color:#4338ca;font-weight:700;display:flex;align-items:center;justify-content:center;">4</div><div><h3 style="font-weight:700;color:#1e293b;">Unlock serious leads</h3><p style="font-size:.875rem;color:#475569;margin-top:.25rem;">Pay from wallet to see contact details.</p></div></div>
           </div>
           <div style="margin-top:2rem;display:flex;flex-direction:column;gap:.75rem;">
             <button id="onboardingDoneBtn" style="background:#4f46e5;color:#fff;padding:.75rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Got it — take me to my dashboard →</button>
@@ -419,21 +411,11 @@
       </div>
     </section>
 
-    <!-- DASHBOARD VIEW -->
     <section id="dashboardView" class="view view-hidden" data-nosnippet>
       <div style="max-width:64rem;margin:0 auto;padding:2rem 1rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
-          <h2 style="font-size:1.25rem;font-weight:700;">📋 My Properties</h2>
-          <button id="logoutBtn" style="font-size:.875rem;color:#ef4444;background:none;border:none;cursor:pointer;">Sign Out</button>
-        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;"><h2 style="font-size:1.25rem;font-weight:700;">📋 My Properties</h2><button id="logoutBtn" style="font-size:.875rem;color:#ef4444;background:none;border:none;cursor:pointer;">Sign Out</button></div>
         <div class="dashboard-toolbar" id="dashboardToolbar">
-          <div class="wallet-pill">
-            <span class="wallet-label">Wallet</span>
-            <i class="fas fa-wallet"></i>
-            <span class="balance" id="walletBalanceDisplay">0</span>
-            <span class="wallet-currency">UGX</span>
-            <button id="topupBtn" style="margin-left:.25rem;font-size:.75rem;background:#10b981;color:#fff;padding:.125rem .75rem;border-radius:9999px;border:none;cursor:pointer;">+ Top Up</button>
-          </div>
+          <div class="wallet-pill"><span class="wallet-label">Wallet</span><i class="fas fa-wallet"></i><span class="balance" id="walletBalanceDisplay">0</span><span class="wallet-currency">UGX</span><button id="topupBtn" style="margin-left:.25rem;font-size:.75rem;background:#10b981;color:#fff;padding:.125rem .75rem;border-radius:9999px;border:none;cursor:pointer;">+ Top Up</button></div>
           <div class="toolbar-actions">
             <button id="refreshWalletBtn" class="toolbar-btn toolbar-btn-dark" title="Refresh wallet"><i class="fas fa-sync-alt"></i><span class="btn-label">Refresh</span></button>
             <button id="dashboardEditProfileBtn" class="toolbar-btn" title="Edit profile"><i class="fas fa-user-edit"></i><span class="btn-label">Edit Profile</span></button>
@@ -443,7 +425,6 @@
             <button id="dashboardHelpBtn" class="toolbar-btn toolbar-btn-dark" title="How to use"><i class="fas fa-question-circle"></i><span class="btn-label">Help</span></button>
           </div>
         </div>
-
         <div id="profileFormContainer" class="profile-form-container">
           <h4 style="font-weight:600;margin-bottom:.75rem;">⚙️ Edit Profile</h4>
           <form id="profileSettingsForm" style="display:grid;grid-template-columns:1fr;gap:1rem;">
@@ -453,7 +434,6 @@
           </form>
           <div id="profileStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
         </div>
-
         <div id="addPropertyContainer" class="add-property-container">
           <h4 style="font-weight:600;margin-bottom:.75rem;">➕ Add Property</h4>
           <form id="addPropertyForm" style="display:grid;grid-template-columns:1fr;gap:1rem;">
@@ -461,27 +441,22 @@
             <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Price (UGX) *</label><input type="number" id="propPrice" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
             <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Property Type *</label><select id="propType" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div>
             <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Address *</label><input type="text" id="propAddress" required placeholder="e.g. Naalya, Kampala" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div>
+            <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Description</label><textarea id="propDescription" rows="3" placeholder="Tell renters what makes this property great…" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;"></textarea></div>
             <div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Images</label><input type="file" id="propImage" accept="image/*" multiple style="width:100%;font-size:.875rem;" /></div>
-            <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:.75rem;padding:.75rem;font-size:.875rem;color:#92400e;"><strong>Verification required.</strong> A 5,000 UGX fee is deducted from your wallet.</div>
-            <div><button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Add &amp; Submit for Verification</button></div>
+            <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:.75rem;padding:.75rem;font-size:.875rem;color:#92400e;"><strong>Verification required.</strong> After adding, you'll verify via Mobile Money (5,000 UGX). Property won't go live until verified.</div>
+            <div><button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Add Property</button></div>
           </form>
           <div id="uploadStatus" style="margin-top:.75rem;font-size:.875rem;"></div>
         </div>
-
         <div id="propertyVerificationContainer" class="verification-form-container">
           <h4 style="font-weight:600;margin-bottom:1rem;">🛡️ Verification</h4>
           <div id="propertyVerificationList"><p style="color:#64748b;font-size:.875rem;">Loading...</p></div>
         </div>
-
         <div id="leadsContainer" class="verification-form-container">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-            <h4 style="font-weight:600;">📨 My Leads</h4>
-            <button id="refreshLeadsBtn" style="font-size:.75rem;background:#e2e8f0;padding:.25rem .75rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-sync-alt"></i> Refresh</button>
-          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h4 style="font-weight:600;">📨 My Leads</h4><button id="refreshLeadsBtn" style="font-size:.75rem;background:#e2e8f0;padding:.25rem .75rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-sync-alt"></i> Refresh</button></div>
           <div id="leadsList"><p style="color:#64748b;font-size:.875rem;">Loading...</p></div>
           <div id="noLeads" class="hidden" style="text-align:center;padding:2rem 0;font-size:.875rem;">No leads yet.</div>
         </div>
-
         <div id="myPropertiesList" style="display:grid;grid-template-columns:1fr;gap:1rem;"></div>
         <div id="myPropertiesEmpty" style="text-align:center;padding:4rem 0;" class="hidden">No properties yet.</div>
       </div>
@@ -490,49 +465,40 @@
 
   <footer style="background:#0f172a;color:#cbd5e1;margin-top:3rem;">
     <div style="max-width:80rem;margin:0 auto;padding:2.5rem 1rem;display:grid;grid-template-columns:1fr;gap:2rem;font-size:.875rem;">
-      <div>
-        <h4 style="color:#fff;font-weight:700;font-size:1.125rem;margin-bottom:.75rem;">🏠 Property Hub Uganda</h4>
-        <p style="color:#94a3b8;">Connecting property seekers with verified brokers across Uganda.</p>
-      </div>
-      <div>
-        <h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Featured Guides</h4>
-        <ul style="display:flex;flex-direction:column;gap:.25rem;list-style:none;">
-          <li><a href="/guides/single-rooms-near-makerere/" style="color:#94a3b8;">Single rooms near Makerere</a></li>
-          <li><a href="/guides/apartments-naalya/" style="color:#94a3b8;">Apartments in Naalya</a></li>
-          <li><a href="/guides/kololo/" style="color:#94a3b8;">Houses in Kololo</a></li>
-          <li><a href="/guides/nakasero/" style="color:#94a3b8;">Apartments in Nakasero</a></li>
-          <li><a href="/guides/" style="color:#94a3b8;">All guides →</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Areas We Cover</h4>
-        <p style="color:#94a3b8;">Kampala · Wakiso · Entebbe · Mukono · Kira · Naalya · Ntinda · Bukoto · Jinja</p>
-      </div>
+      <div><h4 style="color:#fff;font-weight:700;font-size:1.125rem;margin-bottom:.75rem;">🏠 Property Hub Uganda</h4><p style="color:#94a3b8;">Connecting property seekers with verified brokers across Uganda.</p></div>
+      <div><h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Featured Guides</h4><ul style="display:flex;flex-direction:column;gap:.25rem;list-style:none;"><li><a href="/guides/single-rooms-near-makerere/" style="color:#94a3b8;">Single rooms near Makerere</a></li><li><a href="/guides/apartments-naalya/" style="color:#94a3b8;">Apartments in Naalya</a></li><li><a href="/guides/kololo/" style="color:#94a3b8;">Houses in Kololo</a></li><li><a href="/guides/nakasero/" style="color:#94a3b8;">Apartments in Nakasero</a></li><li><a href="/guides/" style="color:#94a3b8;">All guides →</a></li></ul></div>
+      <div><h4 style="color:#fff;font-weight:700;margin-bottom:.75rem;">Areas We Cover</h4><p style="color:#94a3b8;">Kampala · Wakiso · Entebbe · Mukono · Kira · Naalya · Ntinda · Bukoto · Jinja</p></div>
     </div>
-    <div style="border-top:1px solid #1e293b;padding:1.25rem 1rem;text-align:center;font-size:.75rem;color:#64748b;">
-      © 2025 Property Hub Uganda. All rights reserved.
-    </div>
+    <div style="border-top:1px solid #1e293b;text-align:center;padding:1rem;font-size:.75rem;color:#64748b;">© 2026 Property Hub Uganda · <a href="/about.html" style="color:#94a3b8;">About</a> · <a href="/contact.html" style="color:#94a3b8;">Contact</a> · <a href="/privacy.html" style="color:#94a3b8;">Privacy</a> · <a href="/terms.html" style="color:#94a3b8;">Terms</a> · <a href="/brokers/" style="color:#fbbf24;font-weight:600;">🏠 List Your Property</a> · <a href="/services/" style="color:#94a3b8;">Services</a></div>
   </footer>
 </div>
 
-  
-  <!-- ========== RESTORED + CLEAN VERSION ========== -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- MODALS (after footer, hidden from crawlers) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="reviewModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true"><div class="modal-content"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;color:#1e293b;">⭐ Reviews</h2><button id="closeReviewModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;"><span style="font-size:.875rem;color:#64748b;">What others say</span><button id="toggleWriteReview" class="write-review-toggle"><i class="fas fa-pen"></i> Write a Review</button></div><div id="reviewFormContainer" class="hidden" style="margin-bottom:1rem;padding:1rem;background:#f8fafc;border-radius:.75rem;border:1px solid #e2e8f0;"><form id="reviewForm"><input type="hidden" id="reviewBrokerId" /><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Name *</label><input type="text" id="reviewClientName" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Email *</label><input type="email" id="reviewClientEmail" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Rating</label><div id="starSelector" class="star-rating" style="display:flex;gap:.25rem;"><span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span></div><input type="hidden" id="reviewRating" value="5" /></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Review</label><textarea id="reviewComment" rows="3" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;"></textarea></div><button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Review</button></form></div><div id="reviewsList" style="max-height:16rem;overflow-y:auto;"></div><div id="noReviewsMessage" class="hidden" style="color:#64748b;font-size:.875rem;text-align:center;padding:1rem;">No reviews yet. Be the first to review!</div></div></div>
 
+<div id="editModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true"><div class="modal-content"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">✏️ Edit Property</h2><button id="closeEditModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div><form id="editPropertyForm" style="display:flex;flex-direction:column;gap:1rem;"><input type="hidden" id="editPropertyId" /><div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Title *</label><input type="text" id="editTitle" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div><div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Price (UGX) *</label><input type="number" id="editPrice" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div><div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Property Type *</label><select id="editType" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;"><option value="Rentals">Rentals</option><option value="Properties">Properties</option><option value="Guesthouses">Guesthouses</option></select></div><div><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Address *</label><input type="text" id="editAddress" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div><button type="submit" style="background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Update Property</button></form></div></div>
+
+<div id="propertyVerificationModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true"><div class="modal-content"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">📋 Verify Your Property</h2><button id="closeVerificationModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div><div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:.75rem;padding:1rem;margin-bottom:1rem;font-size:.85rem;color:#92400e;"><p style="font-weight:700;margin-bottom:.5rem;">📱 Step 1: Send <strong id="verifFeeDisplay">5,000 UGX</strong> via Mobile Money</p><p style="margin-bottom:.4rem;"><strong>MTN MoMo:</strong> <code style="background:#fff;padding:.15rem .4rem;border-radius:.25rem;" id="mtnNumber">0700123456</code> — <span id="mtnName">Property Hub Uganda</span></p><p style="margin-bottom:.5rem;"><strong>Airtel Money:</strong> <code style="background:#fff;padding:.15rem .4rem;border-radius:.25rem;" id="airtelNumber">0750123456</code> — <span id="airtelName">Property Hub Uganda</span></p><p style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #fbbf24;">After sending, you'll get an SMS with a <strong>transaction reference</strong>. Enter it below.</p></div><form id="propertyVerificationForm" style="display:flex;flex-direction:column;gap:1rem;"><input type="hidden" id="verifPropertyId" /><input type="hidden" id="verifPropertyType" /><div style="padding:.75rem;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;color:#065f46;">💳 Payment Reference *</label><input type="text" data-verif-field="paymentReference" required placeholder="e.g. MP12345678" style="width:100%;padding:.5rem 1rem;border:1px solid #a7f3d0;border-radius:.75rem;font-size:.875rem;" /></div><p style="font-weight:700;color:#1e293b;font-size:.9rem;">📋 Step 2: Property details</p><div id="verifDynamicFields"></div><button type="submit" style="background:#4f46e5;color:#fff;padding:.75rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit for Approval</button></form><div id="verifStatus" style="margin-top:.75rem;font-size:.875rem;"></div></div></div>
+
+<div id="quizModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true"><div class="modal-content"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">📞 Connect with Broker</h2><button id="closeQuizModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div><form id="quizForm"><input type="hidden" id="quizPropertyId" /><div id="quizStep1"><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Your Full Name *</label><input type="text" id="quizName" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">Email Address *</label><input type="email" id="quizEmail" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">WhatsApp Number *</label><input type="text" id="quizWhatsapp" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" /></div><button type="button" id="quizNextBtn" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Next: Quiz Questions →</button></div><div id="quizStep2" class="hidden"><div class="quiz-question"><p class="q-title">1. When do you plan to move in or buy?</p><label class="quiz-option"><input type="radio" name="q1" value="1" required /> 6+ months</label><label class="quiz-option"><input type="radio" name="q1" value="2" /> 1–6 months</label><label class="quiz-option"><input type="radio" name="q1" value="3" /> ASAP</label></div><div class="quiz-question"><p class="q-title">2. How does your budget compare?</p><label class="quiz-option"><input type="radio" name="q2" value="1" required /> Below asking</label><label class="quiz-option"><input type="radio" name="q2" value="2" /> Matches asking</label></div><div class="quiz-question"><p class="q-title">3. Ready to view within 7 days?</p><label class="quiz-option"><input type="radio" name="q3" value="1" required /> Not yet</label><label class="quiz-option"><input type="radio" name="q3" value="2" /> Maybe</label><label class="quiz-option"><input type="radio" name="q3" value="3" /> Yes</label></div><div class="quiz-question"><p class="q-title">4. How serious?</p><label class="quiz-option"><input type="radio" name="q4" value="1" required /> Browsing</label><label class="quiz-option"><input type="radio" name="q4" value="2" /> Comparing</label><label class="quiz-option"><input type="radio" name="q4" value="3" /> Top choice</label></div><button type="submit" style="width:100%;background:#4f46e5;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;margin-top:1rem;">Submit Request</button></div></form></div></div>
+
+<div id="topupModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true"><div class="modal-content" style="max-width:400px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">💰 Top Up Wallet</h2><button id="closeTopupModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div><div style="padding:1rem;background:#fef3c7;border:1px solid #fbbf24;border-radius:.75rem;font-size:.875rem;color:#92400e;"><p style="font-weight:700;margin-bottom:.5rem;">Coming soon</p><p>Online top-up via Mobile Money will launch soon. For now, contact admin to add funds to your wallet.</p><p style="margin-top:.5rem;">📱 WhatsApp: <a href="https://wa.me/256700000000" style="color:#92400e;font-weight:600;">+256 700 000 000</a></p></div><div id="topupStatus" style="margin-top:.75rem;font-size:.875rem;"></div></div></div>
+
+<div id="reportModal" class="modal-backdrop hidden" data-nosnippet aria-hidden="true"><div class="modal-content" style="max-width:480px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h2 style="font-size:1.25rem;font-weight:700;">🚨 Report Broker</h2><button id="closeReportModal" style="color:#94a3b8;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button></div><p style="color:#64748b;font-size:.875rem;margin-bottom:.75rem;">Your report is anonymous to the broker.</p><form id="reportForm"><input type="hidden" id="reportBrokerId" /><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Name (optional)</label><input type="text" id="reportName" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Your Email (optional)</label><input type="email" id="reportEmail" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Reason *</label><select id="reportReason" style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;" required><option value="">Select a reason</option><option value="fraud">Fraud / Scam</option><option value="fake_listing">Fake Listing</option><option value="harassment">Harassment</option><option value="spam">Spam</option><option value="misleading">Misleading Information</option><option value="other">Other</option></select></div><div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:.25rem;">Description *</label><textarea id="reportDescription" required style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" rows="4"></textarea></div><button type="submit" style="width:100%;background:#ef4444;color:#fff;padding:.625rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;">Submit Report</button></form><div id="reportStatus" style="margin-top:.75rem;font-size:.875rem;"></div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
 (function() {
   'use strict';
   console.log('🚀 Property Hub initializing…');
 
-  // ══════════════════════════════════════════════════════════════
-  // CONFIG
-  // ══════════════════════════════════════════════════════════════
   const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
   const WEB3FORMS_KEY = '8f68385b-75dc-45ad-9938-b1b0d64571f6';
   const SITE_URL = 'https://propertyhub.dpdns.org';
 
-  // ⚠️ UPDATE THESE WITH YOUR REAL MOBILE MONEY NUMBERS
   const PAYMENT_CONFIG = {
     mtn_name:      'Property Hub Uganda',
     mtn_number:    '0700123456',      // ← REPLACE
@@ -541,7 +507,6 @@
     amount:        5000
   };
 
-  // ── PRICING (overridden by platform_settings) ──
   let VERIFICATION_FEE = PAYMENT_CONFIG.amount;
   let LEAD_RATE_PER_150K = { hot: 5000, warm: 3250, cold: 1750 };
   let GUESTHOUSE_LEAD_PERCENT = 0.04;
@@ -549,7 +514,6 @@
   let WALLET_MIN_TOPUP = 1000;
 
   let supabase = null;
-
   const state = {
     allProperties: [], filteredProperties: [], myProperties: [],
     currentFilter: 'all', searchQuery: '', currentBrokerId: null,
@@ -558,9 +522,6 @@
     activationMode: false, firstLeadFree: false
   };
 
-  // ══════════════════════════════════════════════════════════════
-  // HELPERS
-  // ══════════════════════════════════════════════════════════════
   function $(s) { return document.querySelector(s); }
   function $$(s) { return document.querySelectorAll(s); }
   function formatPrice(a) { return Number(a || 0).toLocaleString('en-UG') + ' UGX'; }
@@ -613,6 +574,17 @@
       return title + ' — ' + price + ' UGX on Property Hub Uganda';
     }
     return title + ' in ' + (locality || 'Uganda') + ', Uganda — ' + price + ' UGX on Property Hub';
+  }
+
+  function buildDescription(property) {
+    if (property.description && String(property.description).trim().length > 10) {
+      return String(property.description).trim();
+    }
+    const title = titleCase(property.title || 'Property');
+    const locality = (property.address || 'Kampala').split(',')[0].trim();
+    const price = Number(property.price_amount || 0).toLocaleString();
+    const typeLong = property.property_type === 'rental' ? 'rental property' : property.property_type === 'guesthouse' ? 'guesthouse' : 'property for sale';
+    return title + ' — a verified ' + typeLong + ' in ' + locality + ', Uganda. Listed at ' + price + ' UGX on Property Hub.';
   }
 
   function renderStars(r) { let h = ''; for (let i = 0; i < 5; i++) h += i < r ? '★' : '☆'; return h; }
@@ -690,18 +662,12 @@
   async function isFirstLeadFreeForBroker() {
     if (!state.currentUser) return false;
     try {
-      const r = await supabase.from('lead_requests')
-        .select('id')
-        .eq('broker_id', state.currentUser.id)
-        .eq('status', 'approved')
-        .limit(1);
+      const r = await supabase.from('lead_requests').select('id').eq('broker_id', state.currentUser.id).eq('status', 'approved').limit(1);
       return !r.data || r.data.length === 0;
     } catch (_) { return false; }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // NAVIGATION
-  // ══════════════════════════════════════════════════════════════
+  // ── NAVIGATION ──
   function navigateTo(url, replace) {
     if (replace) history.replaceState(null, '', url);
     else history.pushState(null, '', url);
@@ -727,15 +693,9 @@
     try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (_) {}
     ['discoveryView', 'brokerView', 'authView', 'dashboardView', 'onboardingView'].forEach(function(id) {
       const el = document.getElementById(id);
-      if (el) {
-        el.classList.remove('view-visible');
-        el.classList.add('view-hidden');
-      }
+      if (el) { el.classList.remove('view-visible'); el.classList.add('view-hidden'); }
     });
-    if (view) {
-      view.classList.remove('view-hidden');
-      view.classList.add('view-visible');
-    }
+    if (view) { view.classList.remove('view-hidden'); view.classList.add('view-visible'); }
   }
 
   function setAuthMode(signUpMode) {
@@ -776,6 +736,7 @@
       const schema = {
         "@context": "https://schema.org", "@type": "RealEstateListing", "name": titleCase(property.title || 'Property'),
         "url": SITE_URL + '/property/' + property.id, "image": getImageArray(property).slice(0, 3),
+        "description": buildDescription(property),
         "address": { "@type": "PostalAddress", "streetAddress": streetAddress, "addressLocality": locality, "addressCountry": "UG" },
         "offers": { "@type": "Offer", "price": property.price_amount, "priceCurrency": "UGX" }
       };
@@ -789,9 +750,7 @@
     } catch (_) {}
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // NOTIFICATIONS
-  // ══════════════════════════════════════════════════════════════
+  // ── NOTIFICATIONS ──
   async function sendSMS(phone, message) {
     if (!phone) return false;
     try {
@@ -830,20 +789,12 @@
       '  • Ready to view: ' + pickAnswer(answers.q3, ['Not yet', 'Maybe', 'Within 7 days']),
       '  • Seriousness: ' + pickAnswer(answers.q4, ['Browsing', 'Comparing', 'Top choice'])
     ].join('\n');
-    return (
-      'Hello ' + (broker.business_name || 'Broker') + ',\n\n' +
+    return 'Hello ' + (broker.business_name || 'Broker') + ',\n\n' +
       ltEmoji + ' NEW ' + lt.toUpperCase() + ' LEAD — ' + (prop.title || 'Property') + '\n' +
       '────────────────────────────────────────\n\n' +
-      '🏠 ' + (prop.title || '—') + '\n' +
-      '📍 ' + (prop.address || '—') + '\n' +
-      '💰 ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n' +
-      '🔥 ' + lt.toUpperCase() + ' (score ' + (lead.total_score || 0) + '/12)\n\n' +
-      '👤 Visitor: ' + firstName + ' ***\n' +
-      '🔒 Contact hidden until unlocked\n\n' +
-      '📝 WHY THEY SCORED\n' + scoreLines + '\n\n' +
-      '👉 Unlock: ' + SITE_URL + '/dashboard\n\n' +
-      '— Property Hub'
-    );
+      '🏠 ' + (prop.title || '—') + '\n📍 ' + (prop.address || '—') + '\n💰 ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n🔥 ' + lt.toUpperCase() + ' (score ' + (lead.total_score || 0) + '/12)\n\n' +
+      '👤 Visitor: ' + firstName + ' ***\n🔒 Contact hidden until unlocked\n\n📝 WHY THEY SCORED\n' + scoreLines + '\n\n' +
+      '👉 Unlock: ' + SITE_URL + '/dashboard\n\n— Property Hub';
   }
 
   async function buildVisitorApprovedEmail(lead, prop, broker) {
@@ -866,41 +817,21 @@
     const brokerPhone = broker.phone || '';
     let waLink = '';
     if (brokerPhone) { let p = String(brokerPhone).replace(/\D/g, ''); if (p.startsWith('0')) p = '256' + p.slice(1); if (!p.startsWith('256')) p = '256' + p; waLink = 'https://wa.me/' + p; }
-    return (
-      'Hello ' + (lead.visitor_name || 'there') + ',\n\n' +
-      '🎉 APPROVED — your request was accepted\n' +
-      '────────────────────────────────────────\n\n' +
-      '🏠 ' + (prop.title || '—') + '\n' +
-      '📍 ' + (prop.address || '—') + '\n' +
-      '💰 ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n\n' +
-      '👤 Broker: ' + (broker.business_name || '—') + '\n' +
-      '📱 WhatsApp: ' + (brokerPhone || '—') + '\n\n' +
+    return 'Hello ' + (lead.visitor_name || 'there') + ',\n\n' +
+      '🎉 APPROVED — your request was accepted\n────────────────────────────────────────\n\n' +
+      '🏠 ' + (prop.title || '—') + '\n📍 ' + (prop.address || '—') + '\n💰 ' + Number(prop.price_amount || 0).toLocaleString() + ' UGX\n\n' +
+      '👤 Broker: ' + (broker.business_name || '—') + '\n📱 WhatsApp: ' + (brokerPhone || '—') + '\n\n' +
       (waLink ? '🔗 ' + waLink + '\n\n' : '') +
-      '✅ NEXT STEPS\n' +
-      '1. WhatsApp the broker now\n' +
-      '2. Agree a viewing time\n' +
-      '3. Never pay before viewing in person\n' +
-      '4. Bring a friend to the viewing\n\n' +
+      '✅ NEXT STEPS\n1. WhatsApp the broker now\n2. Agree a viewing time\n3. Never pay before viewing in person\n4. Bring a friend to the viewing\n\n' +
       '⚠️ If they ask for money before viewing, stop — that is a scam.\n' +
-      servicesBlock + '\n' +
-      'We will check in with you in 3 days.\n\n— Property Hub'
-    );
+      servicesBlock + '\nWe will check in with you in 3 days.\n\n— Property Hub';
   }
 
   function buildVisitorRejectedEmail(lead, prop) {
     const locality = (prop.address || 'Kampala').split(',')[0].trim();
-    return (
-      'Hello ' + (lead.visitor_name || 'there') + ',\n\n' +
-      'Sorry — the broker could not take your request for:\n\n' +
-      '🏠 ' + (prop.title || 'the property') + '\n\n' +
-      'Try similar properties in ' + locality + ':\n' +
-      'https://propertyhub.dpdns.org/?search=' + encodeURIComponent(locality) + '\n\n— Property Hub'
-    );
+    return 'Hello ' + (lead.visitor_name || 'there') + ',\n\nSorry — the broker could not take your request for:\n\n🏠 ' + (prop.title || 'the property') + '\n\nTry similar properties in ' + locality + ':\nhttps://propertyhub.dpdns.org/?search=' + encodeURIComponent(locality) + '\n\n— Property Hub';
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // WALLET / RANKING
-  // ══════════════════════════════════════════════════════════════
   async function loadWallet() {
     if (!state.currentUser) return;
     try {
@@ -910,7 +841,7 @@
     } catch (e) { console.error(e); }
   }
 
-  function isTrustedBroker(b) { return b && b.average_rating >= 4 && b.review_count >= 10 && b.lead_score >= 20 && (b.report_count || 0) < 3; }
+  function isTrustedBrokerObj(b) { return b && b.average_rating >= 4 && b.review_count >= 10 && b.lead_score >= 20 && (b.report_count || 0) < 3; }
 
   function calculateRankScore(property, broker, reportCount) {
     reportCount = reportCount || 0;
@@ -921,7 +852,7 @@
     if (broker) {
       score += (broker.average_rating || 0) * 10;
       score += Math.min(broker.review_count || 0, 50) * 0.5;
-      if (isTrustedBroker(broker)) score += 25;
+      if (isTrustedBrokerObj(broker)) score += 25;
       score += (broker.lead_score || 0) / 2;
       score -= (reportCount || 0) * 8;
     }
@@ -933,14 +864,13 @@
   }
 
   // ══════════════════════════════════════════════════════════════
-  // PROPERTY CARD
+  // FIXED: createPropertyCard — isBrokerTrusted (not isTrusted)
   // ══════════════════════════════════════════════════════════════
   function createPropertyCard(property, broker, showBrokerLink, showEdit) {
     showBrokerLink = showBrokerLink !== false;
     showEdit = showEdit === true;
     const article = document.createElement('article');
     article.className = 'property-card';
-    article.style.cssText = 'background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid #e2e8f0;display:flex;flex-direction:column;';
     article.id = 'property-' + property.id;
 
     const imageUrl = getImageUrl(property);
@@ -950,13 +880,13 @@
     const isOwner = state.currentUser && broker && state.currentUser.id === broker.id;
     const vStatus = property.verification_status || 'pending';
     const isVerified = vStatus === 'approved';
-    const isTrusted = broker ? isTrustedBroker(broker) : false;
+    const isBrokerTrusted = broker ? isTrustedBrokerObj(broker) : false;
 
     let badgeHtml = '';
     if (isVerified) badgeHtml = '<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>';
     else if (vStatus === 'pending') badgeHtml = '<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>';
     else if (vStatus === 'rejected') badgeHtml = '<span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>';
-    const trustedHtml = isTrusted ? '<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>' : '';
+    const trustedHtml = isBrokerTrusted ? '<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>' : '';
 
     let actionsHtml = '';
     if (showEdit) actionsHtml += '<button class="edit-btn" data-id="' + property.id + '" style="font-size:.75rem;color:#4f46e5;font-weight:500;background:none;border:none;cursor:pointer;"><i class="fas fa-edit"></i> Edit</button>';
@@ -971,34 +901,36 @@
       pauseHtml = '<button class="pause-btn" data-property-id="' + property.id + '" style="font-size:.75rem;color:#3b82f6;font-weight:500;margin-left:.5rem;background:none;border:none;cursor:pointer;"><i class="fas ' + pi + '"></i> ' + pt + '</button>';
     }
     let connectHtml = '';
-    if (!showEdit) connectHtml = '<button class="connect-btn" data-property-id="' + property.id + '" style="background:#4f46e5;color:#fff;font-size:.65rem;font-weight:600;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-handshake"></i> Connect</button>';
+    if (!showEdit) connectHtml = '<button class="connect-btn" data-property-id="' + property.id + '"><i class="fas fa-handshake"></i> Connect</button>';
 
     const brokerName = (broker && broker.business_name) || 'Property Hub';
     const displayTitle = titleCase(property.title || 'Property');
     const typeLabel = formatPropertyType(property.property_type);
     const altText = buildAltText(property);
+    const descText = buildDescription(property);
 
     article.innerHTML =
-      '<div style="position:relative;aspect-ratio:4/3;background:#e2e8f0;overflow:hidden;">' +
-        '<img src="' + imageUrl + '" alt="' + altText.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.onerror=null;this.src=\'/og-cover.jpg\';"/>' +
-        '<span style="position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px;">' + typeLabel + '</span>' +
+      '<div class="property-card__image">' +
+        '<img src="' + imageUrl + '" alt="' + altText.replace(/"/g, '&quot;') + '" loading="lazy" width="600" height="450" onerror="this.onerror=null;this.src=\'/og-cover.jpg\';"/>' +
+        '<span class="property-card__type">' + typeLabel + '</span>' +
         (!showEdit && isVerified ? '<span style="position:absolute;top:.75rem;right:.75rem;background:#10b981;color:#fff;font-size:.5rem;font-weight:700;padding:.25rem .5rem;border-radius:9999px;">✓ VERIFIED</span>' : '') +
       '</div>' +
-      '<div style="padding:1rem;display:flex;flex-direction:column;flex:1;">' +
+      '<div class="property-card__body">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.25rem;">' +
-          '<h3 style="font-weight:600;color:#1e293b;font-size:1rem;">' + displayTitle + '</h3>' +
-          '<div style="display:flex;align-items:center;gap:.25rem;">' + (!showEdit ? badgeHtml : '') + ' ' + (!showEdit && isTrusted ? trustedHtml : '') + '</div>' +
+          '<h3 class="property-card__title">' + displayTitle + '</h3>' +
+          '<div style="display:flex;align-items:center;gap:.25rem;">' + (!showEdit ? badgeHtml : '') + ' ' + (!showEdit && isBrokerTrusted ? trustedHtml : '') + '</div>' +
         '</div>' +
-        '<p style="color:#4338ca;font-weight:700;font-size:.875rem;margin-top:.125rem;">' + formatPrice(property.price_amount) + '</p>' +
-        '<p style="color:#64748b;font-size:.75rem;display:flex;align-items:center;gap:.25rem;margin-top:.125rem;"><i class="fas fa-map-pin" style="color:#94a3b8;"></i>' + (property.address || 'Location not specified') + '</p>' +
+        '<p class="property-card__price">' + formatPrice(property.price_amount) + '</p>' +
+        '<p class="property-card__location"><i class="fas fa-map-pin" style="color:#94a3b8;"></i> ' + (property.address || 'Location not specified') + '</p>' +
+        '<p class="property-card__desc">' + descText + '</p>' +
         '<div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;font-size:.75rem;">' +
           '<span class="stars">' + renderStars(rating) + '</span>' +
           '<span style="color:#64748b;">(' + reviewCount + ')</span>' +
           '<span class="badge-lead">⚡ ' + leadScore + '</span>' +
         '</div>' +
-        '<div style="margin-top:.75rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border-top:1px solid #e2e8f0;padding-top:.75rem;flex-wrap:wrap;">' +
+        '<div class="property-card__footer">' +
           (showBrokerLink
-            ? '<button class="broker-name-link" data-broker-id="' + ((broker && broker.id) || '') + '" style="font-size:.75rem;font-weight:500;color:#4f46e5;display:flex;align-items:center;gap:.25rem;background:none;border:none;cursor:pointer;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ' + brokerName + '</button>'
+            ? '<button class="broker-name-link property-card__broker" data-broker-id="' + ((broker && broker.id) || '') + '"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ' + brokerName + '</button>'
             : '<span style="font-size:.75rem;color:#64748b;display:flex;align-items:center;gap:.25rem;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ' + brokerName + '</span>') +
           '<div style="display:flex;gap:.5rem;">' + actionsHtml + boostHtml + pauseHtml + rateHtml + connectHtml + '</div>' +
         '</div>' +
@@ -1034,9 +966,6 @@
     } catch (e) { alert('Error: ' + e.message); }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // LISTINGS RENDER
-  // ══════════════════════════════════════════════════════════════
   function renderListings(list) {
     const grid = $('#listingsGrid');
     const emptyState = $('#emptyState');
@@ -1060,7 +989,6 @@
     const list = $('#myPropertiesList');
     if (!list) return;
     list.innerHTML = '';
-
     const existingBanner = document.getElementById('activationBanner');
     if (existingBanner) existingBanner.remove();
 
@@ -1073,9 +1001,7 @@
         const successBanner = document.createElement('div');
         successBanner.id = 'activationBanner';
         successBanner.style.cssText = 'background:#ecfdf5;border:2px solid #10b981;border-radius:1rem;padding:1.25rem;margin-bottom:1.5rem;text-align:center;';
-        successBanner.innerHTML = '<div style="font-size:2.5rem;margin-bottom:.5rem;">🎉</div>' +
-          '<h3 style="font-size:1.25rem;font-weight:800;color:#065f46;margin-bottom:.35rem;">Your account is activated!</h3>' +
-          '<p style="font-size:.9rem;color:#047857;">You now have full access to Property Hub.</p>';
+        successBanner.innerHTML = '<div style="font-size:2.5rem;margin-bottom:.5rem;">🎉</div><h3 style="font-size:1.25rem;font-weight:800;color:#065f46;margin-bottom:.35rem;">Your account is activated!</h3><p style="font-size:.9rem;color:#047857;">You now have full access to Property Hub.</p>';
         list.parentElement.insertBefore(successBanner, list);
         setTimeout(() => { successBanner.style.transition = 'opacity .5s'; successBanner.style.opacity = '0'; setTimeout(() => successBanner.remove(), 500); }, 5000);
       } else {
@@ -1083,16 +1009,8 @@
         activationBanner.id = 'activationBanner';
         activationBanner.style.cssText = 'background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #4f46e5;border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;';
         activationBanner.innerHTML =
-          '<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">' +
-            '<div style="flex-shrink:0;width:3rem;height:3rem;border-radius:50%;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;">' + count + '/2</div>' +
-            '<div style="flex:1;min-width:200px;">' +
-              '<h3 style="font-size:1.1rem;font-weight:800;color:#312e81;margin-bottom:.25rem;">Activate your account</h3>' +
-              '<p style="font-size:.875rem;color:#4338ca;">You need <strong>' + needed + ' more propert' + (needed === 1 ? 'y' : 'ies') + '</strong> to unlock your full dashboard.</p>' +
-            '</div>' +
-          '</div>' +
-          '<div style="margin-top:1rem;">' +
-            '<button onclick="document.getElementById(\'dashboardAddPropertyBtn\').click()" style="background:#4f46e5;color:#fff;padding:.75rem 1.5rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;font-size:.9rem;"><i class="fas fa-plus-circle"></i> Add Property Now</button>' +
-          '</div>';
+          '<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;"><div style="flex-shrink:0;width:3rem;height:3rem;border-radius:50%;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;">' + count + '/2</div><div style="flex:1;min-width:200px;"><h3 style="font-size:1.1rem;font-weight:800;color:#312e81;margin-bottom:.25rem;">Activate your account</h3><p style="font-size:.875rem;color:#4338ca;">You need <strong>' + needed + ' more propert' + (needed === 1 ? 'y' : 'ies') + '</strong> to unlock your full dashboard.</p></div></div>' +
+          '<div style="margin-top:1rem;"><button onclick="document.getElementById(\'dashboardAddPropertyBtn\').click()" style="background:#4f46e5;color:#fff;padding:.75rem 1.5rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;font-size:.9rem;"><i class="fas fa-plus-circle"></i> Add Property Now</button></div>';
         list.parentElement.insertBefore(activationBanner, list);
       }
     }
@@ -1123,9 +1041,6 @@
     });
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // FETCH ALL DATA
-  // ══════════════════════════════════════════════════════════════
   async function fetchAllData() {
     const grid = $('#listingsGrid');
     if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;color:#64748b;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">Loading listings…</h2></div>';
@@ -1134,7 +1049,7 @@
       let joinSucceeded = false;
       try {
         const jr = await supabase.from('properties').select(`
-          id, title, price_amount, property_type, address, media_urls, is_paused, verification_status, is_verified, created_at, owner_id,
+          id, title, price_amount, property_type, address, media_urls, is_paused, verification_status, is_verified, created_at, owner_id, description,
           broker:profiles!owner_id(id, business_name, average_rating, review_count, lead_score, is_verified, is_blocked, phone)
         `).order('created_at', { ascending: false });
         if (!jr.error && jr.data) {
@@ -1160,10 +1075,7 @@
 
       const raw = allRows.filter(p => p.is_paused !== true);
       console.log('✅ Loaded ' + allRows.length + ' properties, ' + raw.length + ' active');
-
-      raw.forEach(p => {
-        if (!p.broker && p.owner_id && state.profilesMap[p.owner_id]) p.broker = state.profilesMap[p.owner_id];
-      });
+      raw.forEach(p => { if (!p.broker && p.owner_id && state.profilesMap[p.owner_id]) p.broker = state.profilesMap[p.owner_id]; });
 
       try {
         const repR = await supabase.from('reports').select('broker_id, status').eq('status', 'pending');
@@ -1228,9 +1140,6 @@
     if (clearBtn) clearBtn.classList.toggle('hidden', !state.searchQuery.trim());
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // QUIZ / CONNECT
-  // ══════════════════════════════════════════════════════════════
   function openQuizModal(pid) {
     const el = $('#quizPropertyId'); if (!el) return;
     el.value = pid;
@@ -1268,11 +1177,7 @@
       if (!pd || !pd.owner_id) throw new Error('Property has no owner.');
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
       const dupCheck = await supabase.from('lead_requests').select('id').eq('property_id', pid).eq('visitor_email', email).gte('created_at', oneHourAgo).limit(1);
-      if (dupCheck.data && dupCheck.data.length > 0) {
-        alert('⏳ You already requested this property recently.');
-        $('#quizModal').classList.add('hidden');
-        return;
-      }
+      if (dupCheck.data && dupCheck.data.length > 0) { alert('⏳ You already requested this property recently.'); $('#quizModal').classList.add('hidden'); return; }
       const cost = calculateLeadCost(pd.price_amount || 0, lt, pd.property_type);
       const leadR = await supabase.from('lead_requests').insert({
         property_id: pid, broker_id: pd.owner_id, visitor_name: name, visitor_email: email, visitor_whatsapp: wa,
@@ -1297,17 +1202,12 @@
     } catch (e) { console.error(e); alert('Error: ' + e.message); }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // LEADS
-  // ══════════════════════════════════════════════════════════════
   async function loadLeads() {
     if (!state.currentUser) return;
     try {
       const r = await supabase.rpc('get_my_broker_leads', {});
       if (r.error) throw r.error;
       const leads = r.data || [];
-
-      // Check first-lead-free eligibility once
       const firstFree = await isFirstLeadFreeForBroker();
       state.firstLeadFree = firstFree;
 
@@ -1344,48 +1244,29 @@
           '<div class="property-title">' + (prop.title || 'Unknown') + (l.lead_type === 'hot' ? ' 🔥' : '') + ' <span style="font-size:.75rem;color:#94a3b8;">(' + l.lead_type + ')</span> ' + followUpBadge + '</div>' +
           '<div><span class="property-status ' + sc + '">' + sl + '</span></div>' +
           '<div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">' +
-            (isP ? '<button class="unlock-lead-btn" data-lead-id="' + l.id + '" style="background:' + unlockBg + ';color:#fff;font-size:.75rem;font-weight:600;padding:.375rem .85rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-' + unlockIcon + '"></i> ' + unlockLabel + '</button>' +
-                   '<button class="reject-lead-btn" data-lead-id="' + l.id + '" style="font-size:.75rem;background:#ef4444;color:#fff;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;">Reject</button>' : '') +
-            (isA ? '<button class="view-lead-details" data-lead-id="' + l.id + '" style="font-size:.75rem;color:#3b82f6;background:none;border:none;cursor:pointer;">View Contact</button>' +
-                   '<button class="remove-lead-btn" data-lead-id="' + l.id + '" style="font-size:.75rem;color:#ef4444;background:none;border:none;cursor:pointer;"><i class="fas fa-trash"></i></button>' : '') +
+            (isP ? '<button class="unlock-lead-btn" data-lead-id="' + l.id + '" style="background:' + unlockBg + ';color:#fff;font-size:.75rem;font-weight:600;padding:.375rem .85rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-' + unlockIcon + '"></i> ' + unlockLabel + '</button><button class="reject-lead-btn" data-lead-id="' + l.id + '" style="font-size:.75rem;background:#ef4444;color:#fff;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;">Reject</button>' : '') +
+            (isA ? '<button class="view-lead-details" data-lead-id="' + l.id + '" style="font-size:.75rem;color:#3b82f6;background:none;border:none;cursor:pointer;">View Contact</button><button class="remove-lead-btn" data-lead-id="' + l.id + '" style="font-size:.75rem;color:#ef4444;background:none;border:none;cursor:pointer;"><i class="fas fa-trash"></i></button>' : '') +
           '</div></div>';
       });
       list.innerHTML = html;
 
       list.querySelectorAll('.unlock-lead-btn').forEach(function(b) {
         b.addEventListener('click', async function() {
-          const confirmMsg = firstFree ? '🎁 Unlock your FIRST LEAD FREE?' : 'Unlock this lead?';
-          if (!confirm(confirmMsg)) return;
+          if (!confirm(firstFree ? '🎁 Unlock your FIRST LEAD FREE?' : 'Unlock this lead?')) return;
           try {
-            const priorApproved = await supabase.from('lead_requests')
-              .select('id')
-              .eq('broker_id', state.currentUser.id)
-              .eq('status', 'approved')
-              .neq('id', b.dataset.leadId)
-              .limit(1);
+            const priorApproved = await supabase.from('lead_requests').select('id').eq('broker_id', state.currentUser.id).eq('status', 'approved').neq('id', b.dataset.leadId).limit(1);
             const isFirst = !priorApproved.data || priorApproved.data.length === 0;
-
-            const uR = await supabase.from('lead_requests').update({
-              status: 'approved', unlocked_at: new Date().toISOString(), approved_at: new Date().toISOString(), follow_up_sent: false
-            }).eq('id', b.dataset.leadId).select('visitor_name, visitor_email, visitor_whatsapp, property_id, cost').single();
+            const uR = await supabase.from('lead_requests').update({ status: 'approved', unlocked_at: new Date().toISOString(), approved_at: new Date().toISOString(), follow_up_sent: false }).eq('id', b.dataset.leadId).select('visitor_name, visitor_email, visitor_whatsapp, property_id, cost').single();
             if (uR.error) throw uR.error;
             const u = uR.data;
-
             if (u.cost && !isFirst) {
               const wR = await supabase.rpc('deduct_wallet', { p_user_id: state.currentUser.id, p_amount: u.cost, p_type: 'lead_unlock', p_reference: b.dataset.leadId, p_description: 'Lead unlock' });
-              if (wR.error) {
-                await supabase.from('lead_requests').update({ status: 'pending', approved_at: null, unlocked_at: null }).eq('id', b.dataset.leadId);
-                throw new Error(wR.error.message);
-              }
+              if (wR.error) { await supabase.from('lead_requests').update({ status: 'pending', approved_at: null, unlocked_at: null }).eq('id', b.dataset.leadId); throw new Error(wR.error.message); }
               await loadWallet();
             }
-
             const pdR = await supabase.from('properties').select('title, address, price_amount, property_type').eq('id', u.property_id).single();
             const bpR = await supabase.from('profiles').select('business_name, phone, email').eq('id', state.currentUser.id).single();
-            if (u.visitor_email) {
-              const body = await buildVisitorApprovedEmail(u, pdR.data || {}, bpR.data || {});
-              await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', body);
-            }
+            if (u.visitor_email) { const body = await buildVisitorApprovedEmail(u, pdR.data || {}, bpR.data || {}); await sendNotificationEmail(u.visitor_email, u.visitor_name, '🎉 Your Request Was Approved', body); }
             if (u.visitor_whatsapp) {
               const brokerPhone = (bpR.data && bpR.data.phone) || '';
               const brokerName = (bpR.data && bpR.data.business_name) || 'Broker';
@@ -1433,28 +1314,22 @@
     } catch (e) { console.error(e); }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // VERIFICATION (MANUAL MOMO)
-  // ══════════════════════════════════════════════════════════════
   const VERIF_FIELDS = {
     property: [
       { id: 'landlordName', label: 'Registered Owner Name', required: true },
       { id: 'landlordPhone', label: 'Owner Phone', required: true },
-      { id: 'lc1Name', label: 'LC1 Chairperson Name & Contact', required: true },
-      { id: 'landTitle', label: 'Land Title / Plot Number', required: false },
-      { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
+      { id: 'lc1Name', label: 'LC1 Chairperson', required: true },
+      { id: 'landTitle', label: 'Land Title / Plot Number', required: false }
     ],
     rental: [
       { id: 'landlordName', label: 'Landlord Name', required: true },
       { id: 'landlordPhone', label: 'Landlord Phone', required: true },
-      { id: 'units', label: 'Number of Units', required: false },
-      { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
+      { id: 'units', label: 'Number of Units', required: false }
     ],
     guesthouse: [
       { id: 'managerName', label: 'Manager Name', required: true },
       { id: 'managerPhone', label: 'Manager Phone', required: true },
-      { id: 'licenseNumber', label: 'Tourism License Number', required: false },
-      { id: 'notes', label: 'Additional Notes', required: false, textarea: true }
+      { id: 'licenseNumber', label: 'Tourism License Number', required: false }
     ]
   };
 
@@ -1462,10 +1337,7 @@
     const c = $('#verifDynamicFields'); if (!c) return;
     const f = VERIF_FIELDS[type] || VERIF_FIELDS.rental;
     c.innerHTML = f.map(function(x) {
-      const input = x.textarea
-        ? '<textarea data-verif-field="' + x.id + '" rows="3" ' + (x.required ? 'required' : '') + ' style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;"></textarea>'
-        : '<input type="text" data-verif-field="' + x.id + '" ' + (x.required ? 'required' : '') + ' style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" />';
-      return '<div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">' + x.label + (x.required ? ' *' : '') + '</label>' + input + '</div>';
+      return '<div style="margin-bottom:.75rem;"><label style="display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;">' + x.label + (x.required ? ' *' : '') + '</label><input type="text" data-verif-field="' + x.id + '" ' + (x.required ? 'required' : '') + ' style="width:100%;padding:.5rem 1rem;border:1px solid #e2e8f0;border-radius:.75rem;font-size:.875rem;" /></div>';
     }).join('');
   }
 
@@ -1505,9 +1377,6 @@
     } catch (e) { console.error(e); }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // BROKER PROFILE
-  // ══════════════════════════════════════════════════════════════
   async function loadBrokerProfile(id) {
     const grid = $('#brokerListingsGrid'); if (!grid) return;
     showView($('#brokerView'));
@@ -1517,7 +1386,7 @@
       if (bR.error) throw bR.error;
       const b = bR.data;
       $('#brokerBusinessName').textContent = b.business_name || 'Broker';
-      $('#brokerTrustedBadge').classList.toggle('hidden', !isTrustedBroker(b));
+      $('#brokerTrustedBadge').classList.toggle('hidden', !isTrustedBrokerObj(b));
       const r = b.average_rating || 0, rc = b.review_count || 0;
       $('#brokerStars').innerHTML = renderStars(r);
       $('#brokerReviewCount').textContent = '(' + rc + ' reviews)';
@@ -1539,20 +1408,7 @@
 
   function goToDiscovery() { state.currentBrokerId = null; state.currentSeoSlug = null; navigateTo('/'); }
 
-  // ══════════════════════════════════════════════════════════════
-  // REVIEWS
-  // ══════════════════════════════════════════════════════════════
-  function openReviewModal(id) {
-    $('#reviewBrokerId').value = id;
-    $('#reviewRating').value = 5;
-    $('#reviewComment').value = '';
-    $('#reviewClientName').value = '';
-    $('#reviewClientEmail').value = '';
-    updateStarUI(5);
-    $('#reviewFormContainer').classList.remove('hidden');
-    $('#reviewModal').classList.remove('hidden');
-    loadReviewsForModal(id);
-  }
+  function openReviewModal(id) { $('#reviewBrokerId').value = id; $('#reviewRating').value = 5; $('#reviewComment').value = ''; $('#reviewClientName').value = ''; $('#reviewClientEmail').value = ''; updateStarUI(5); $('#reviewFormContainer').classList.remove('hidden'); $('#reviewModal').classList.remove('hidden'); loadReviewsForModal(id); }
   function openViewReviewsModal(id) { $('#reviewBrokerId').value = id; $('#reviewFormContainer').classList.add('hidden'); $('#reviewModal').classList.remove('hidden'); loadReviewsForModal(id); }
   async function loadReviewsForModal(id) {
     const list = $('#reviewsList'); if (!list) return;
@@ -1571,75 +1427,34 @@
   }
   function updateStarUI(active) { const s = $('#starSelector'); if (!s) return; s.querySelectorAll('.star').forEach(function(el) { el.classList.toggle('active', parseInt(el.dataset.value) <= active); }); }
 
-  // ══════════════════════════════════════════════════════════════
-  // DASHBOARD FORMS
-  // ══════════════════════════════════════════════════════════════
-  function toggleProfileForm() {
-    $('#profileFormContainer').classList.toggle('visible');
-    $('#addPropertyContainer').classList.remove('visible');
-    $('#propertyVerificationContainer').classList.remove('visible');
-    $('#leadsContainer').classList.remove('visible');
-  }
-  function toggleAddPropertyForm() {
-    $('#addPropertyContainer').classList.toggle('visible');
-    $('#profileFormContainer').classList.remove('visible');
-    $('#propertyVerificationContainer').classList.remove('visible');
-    $('#leadsContainer').classList.remove('visible');
-  }
-  function togglePropertyVerificationForm() {
-    $('#propertyVerificationContainer').classList.toggle('visible');
-    $('#profileFormContainer').classList.remove('visible');
-    $('#addPropertyContainer').classList.remove('visible');
-    $('#leadsContainer').classList.remove('visible');
-    loadPropertyVerificationList();
-  }
-  function toggleLeadsPanel() {
-    $('#leadsContainer').classList.toggle('visible');
-    $('#profileFormContainer').classList.remove('visible');
-    $('#addPropertyContainer').classList.remove('visible');
-    $('#propertyVerificationContainer').classList.remove('visible');
-    loadLeads();
-  }
+  function toggleProfileForm() { $('#profileFormContainer').classList.toggle('visible'); $('#addPropertyContainer').classList.remove('visible'); $('#propertyVerificationContainer').classList.remove('visible'); $('#leadsContainer').classList.remove('visible'); }
+  function toggleAddPropertyForm() { $('#addPropertyContainer').classList.toggle('visible'); $('#profileFormContainer').classList.remove('visible'); $('#propertyVerificationContainer').classList.remove('visible'); $('#leadsContainer').classList.remove('visible'); }
+  function togglePropertyVerificationForm() { $('#propertyVerificationContainer').classList.toggle('visible'); $('#profileFormContainer').classList.remove('visible'); $('#addPropertyContainer').classList.remove('visible'); $('#leadsContainer').classList.remove('visible'); loadPropertyVerificationList(); }
+  function toggleLeadsPanel() { $('#leadsContainer').classList.toggle('visible'); $('#profileFormContainer').classList.remove('visible'); $('#addPropertyContainer').classList.remove('visible'); $('#propertyVerificationContainer').classList.remove('visible'); loadLeads(); }
 
   function openEditModal(pid) {
     try {
       const prop = state.myProperties.find(function(p) { return p.id === pid; });
-      if (!prop) { console.warn('Property not found:', pid); return; }
-      const idInput = $('#editPropertyId');
-      const titleInput = $('#editTitle');
-      const priceInput = $('#editPrice');
-      const typeInput = $('#editType');
-      const addrInput = $('#editAddress');
-      if (!idInput || !titleInput || !priceInput || !typeInput || !addrInput) {
-        alert('Edit form unavailable. Please refresh the page.');
-        return;
-      }
-      idInput.value = pid;
-      titleInput.value = prop.title || '';
-      priceInput.value = prop.price_amount || '';
+      if (!prop) return;
+      $('#editPropertyId').value = pid;
+      $('#editTitle').value = prop.title || '';
+      $('#editPrice').value = prop.price_amount || '';
       const dbType = prop.property_type || '';
       let ft = 'Rentals';
       if (dbType === 'property') ft = 'Properties';
       else if (dbType === 'guesthouse') ft = 'Guesthouses';
-      typeInput.value = ft;
-      addrInput.value = prop.address || '';
+      $('#editType').value = ft;
+      $('#editAddress').value = prop.address || '';
       $('#editModal').classList.remove('hidden');
     } catch (e) { alert('Could not open editor: ' + e.message); }
   }
 
   function openReportModal(id) {
-    $('#reportBrokerId').value = id;
-    $('#reportReason').value = '';
-    $('#reportDescription').value = '';
-    $('#reportName').value = '';
-    $('#reportEmail').value = '';
-    $('#reportStatus').textContent = '';
+    $('#reportBrokerId').value = id; $('#reportReason').value = ''; $('#reportDescription').value = '';
+    $('#reportName').value = ''; $('#reportEmail').value = ''; $('#reportStatus').textContent = '';
     $('#reportModal').classList.remove('hidden');
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // AUTH
-  // ══════════════════════════════════════════════════════════════
   async function handleAuthSubmit(e) {
     e.preventDefault();
     const email = $('#emailInput').value.trim();
@@ -1652,7 +1467,7 @@
       try {
         const r = await supabase.auth.signUp({ email: email, password: pw, options: { data: { business_name: bn, account_type: at, phone: ph }, emailRedirectTo: SITE_URL + '/auth' } });
         if (r.error) throw r.error;
-        alert('✅ Account created! Check your email to confirm before signing in.');
+        alert('✅ Account created! Check your email to confirm.');
         setAuthMode(false);
         $('#authForm').reset();
       } catch (e) { alert('Signup failed: ' + e.message); }
@@ -1695,9 +1510,6 @@
     } catch (e) { console.error(e); }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // ROUTER
-  // ══════════════════════════════════════════════════════════════
   async function handleRoute() {
     const route = parseRoute();
     switch (route.view) {
@@ -1705,13 +1517,8 @@
       case 'auth': showView($('#authView')); setAuthMode(false); break;
       case 'onboarding': if (state.currentUser) showView($('#onboardingView')); else navigateTo('/auth', true); break;
       case 'dashboard':
-        if (state.currentUser) {
-          checkActivationMode();
-          showView($('#dashboardView'));
-          await loadMyProperties();
-          await loadWallet();
-          loadLeads();
-        } else navigateTo('/auth', true);
+        if (state.currentUser) { checkActivationMode(); showView($('#dashboardView')); await loadMyProperties(); await loadWallet(); loadLeads(); }
+        else navigateTo('/auth', true);
         break;
       case 'seo': showView($('#discoveryView')); await loadSeoPage(route.slug); break;
       case 'property': showView($('#discoveryView')); applyFiltersAndSearch(); break;
@@ -1742,21 +1549,18 @@
       '<p style="color:#64748b;margin-bottom:.5rem;">' + page.meta_description + '</p>';
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // CHATBOT
-  // ══════════════════════════════════════════════════════════════
   const CHAT_KB_VISITOR = [
     { keywords: ['find','search','browse','looking','apartment','house','room'], reply: 'Type an area or price in the search bar. Try <strong>"Naalya"</strong>, <strong>"under 500k"</strong>, or <strong>"2 bedroom"</strong>.', quick: ['Show me listings in Ntinda','How do I contact a broker?','Is this site safe?'] },
     { keywords: ['contact','broker','reach','connect'], reply: 'Find a listing you like, then click <strong>Connect</strong>. Fill a short quiz. The broker approves you — then you get their WhatsApp.', quick: ['How much does it cost?','Is this site safe?'] },
     { keywords: ['safe','scam','trust','verified','legit'], reply: 'Three safety layers:<br>• <strong>Verified</strong> badge = reviewed by our team<br>• <strong>Trusted</strong> badge = 4★+ from 10+ reviews<br>• <strong>Never pay before viewing</strong>', quick: ['Is this site safe?','How do I contact a broker?'] },
-    { keywords: ['price','cost','fee','pay','free'], reply: 'Browsing is <strong>100% free</strong>. If a broker asks for a viewing fee, that\'s a scam — report them.', quick: ['Is this site safe?'] },
+    { keywords: ['price','cost','fee','pay','free'], reply: 'Browsing is <strong>100% free</strong>.', quick: ['Is this site safe?'] },
     { keywords: ['hi','hello','hey','help'], reply: 'Hi! I can help you find a place, contact a broker, or explain how the site works.', quick: ['Show me listings in Ntinda','Is this site safe?'] }
   ];
   const CHAT_KB_BROKER = [
-    { keywords: ['add','property','list','new'], reply: 'Click <strong>Add Property</strong> in your dashboard. After adding, verify via Mobile Money (5,000 UGX).', quick: ['How do I verify?','First lead free?'] },
-    { keywords: ['verif','verified','pay','payment','momo','mtn','airtel'], reply: 'Send <strong>5,000 UGX</strong> to our MTN/Airtel number. Then in Verification panel, click "Verify now" and paste your transaction reference from the SMS.', quick: ['First lead free?','How do leads work?'] },
-    { keywords: ['lead','unlock','approve','free'], reply: 'When a visitor is interested, you get masked info by SMS + email. Unlock to see contact. 🎁 <strong>Your first lead is FREE!</strong>', quick: ['How do I verify?','How does pricing work?'] },
-    { keywords: ['price','cost','fee','wallet'], reply: 'Verification: 5,000 UGX one-time. Lead unlocks: 1,750–5,000+ UGX. 🎁 <strong>First lead FREE.</strong>', quick: ['How do I verify?','First lead free?'] },
+    { keywords: ['add','property','list','new'], reply: 'Click <strong>Add Property</strong>. Then verify via Mobile Money (5,000 UGX).', quick: ['How do I verify?','First lead free?'] },
+    { keywords: ['verif','verified','pay','payment','momo','mtn','airtel'], reply: 'Send <strong>5,000 UGX</strong> via MTN/Airtel. Paste transaction reference in Verification panel.', quick: ['First lead free?','How do leads work?'] },
+    { keywords: ['lead','unlock','approve','free'], reply: 'When a visitor is interested, you get masked info by SMS + email. 🎁 <strong>First lead is FREE!</strong>', quick: ['How do I verify?','How does pricing work?'] },
+    { keywords: ['price','cost','fee','wallet'], reply: 'Verification: 5,000 UGX. Lead unlocks: 1,750–5,000+ UGX. 🎁 <strong>First lead FREE.</strong>', quick: ['How do I verify?','First lead free?'] },
     { keywords: ['help','hi','hello'], reply: 'Ask me about adding properties, verification, or leads.', quick: ['How do I verify?','First lead free?'] }
   ];
   const CHAT_LOCATIONS = ['kikoni','katanga','wandegeya','mulago','makerere','naalya','ntinda','bukoto','kisaasi','naguru','kololo','muyenga','kira','entebbe','mukono','jinja','kampala','wakiso','gayaza','kyanja'];
@@ -1780,11 +1584,10 @@
     if (!$('#chatMessages').dataset.initialized) { chatReset(); $('#chatMessages').dataset.initialized = '1'; }
   }
   function chatClose() { $('#chatPanel').classList.remove('open'); $('#chatBubble').style.display = 'flex'; }
-
   function chatReset() {
     const msgs = $('#chatMessages'); msgs.innerHTML = '';
-    chatAddMessage('bot', state.chatContext === 'broker' ? 'Welcome! I can help with adding properties, verification, or leads.' : 'Hi! I can help you find a place, contact a broker, or explain how the site works.');
-    chatShowQuickReplies(state.chatContext === 'broker' ? ['How do I verify?','How do leads work?','First lead free?'] : ['Show me listings in Ntinda','Rooms in Kikoni','Is this site safe?']);
+    chatAddMessage('bot', state.chatContext === 'broker' ? 'Welcome! I can help with verification, leads, or adding properties.' : 'Hi! I can help you find a place, contact a broker, or explain how the site works.');
+    chatShowQuickReplies(state.chatContext === 'broker' ? ['How do I verify?','First lead free?'] : ['Show me listings in Ntinda','Is this site safe?']);
   }
   function chatAddMessage(who, html) {
     const msgs = $('#chatMessages');
@@ -1858,9 +1661,6 @@
     }
   }
 
-  // ══════════════════════════════════════════════════════════════
-  // INIT
-  // ══════════════════════════════════════════════════════════════
   async function init() {
     if (!window.supabase) {
       console.error('❌ Supabase SDK failed to load');
@@ -1872,7 +1672,6 @@
     await loadPlatformSettings();
     setTimeout(function() { const lo = $('#loadingOverlay'); if (lo) lo.classList.add('hidden'); }, 400);
 
-    // Auth listeners
     const authForm = $('#authForm'); if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
     $('#toggleSignIn') && $('#toggleSignIn').addEventListener('click', function() { setAuthMode(false); });
     $('#toggleSignUp') && $('#toggleSignUp').addEventListener('click', function() { setAuthMode(true); });
@@ -1886,7 +1685,6 @@
       goToDiscovery();
     });
 
-    // Quiz
     $('#quizNextBtn') && $('#quizNextBtn').addEventListener('click', function() {
       const n = $('#quizName').value.trim(), e = $('#quizEmail').value.trim(), w = $('#quizWhatsapp').value.trim();
       if (!n || !e || !w) { alert('Fill contact fields.'); return; }
@@ -1894,14 +1692,12 @@
     });
     $('#closeQuizModal') && $('#closeQuizModal').addEventListener('click', function() { $('#quizModal').classList.add('hidden'); });
 
-    // Trust banner
     const tb = $('#trustBanner'), hk = 'ph_trust_hidden';
     let hidden = false;
     try { hidden = localStorage.getItem(hk) === '1'; } catch (_) {}
     if (hidden && tb) { tb.style.display = 'none'; }
     $('#hideTrustBanner') && $('#hideTrustBanner').addEventListener('click', function() { tb.style.display = 'none'; try { localStorage.setItem(hk, '1'); } catch (_) {} });
 
-    // Search
     let _sd;
     $('#searchInput') && $('#searchInput').addEventListener('input', function(e) { state.searchQuery = e.target.value; clearTimeout(_sd); _sd = setTimeout(applyFiltersAndSearch, 250); });
     $('#clearSearchBtn') && $('#clearSearchBtn').addEventListener('click', function() { $('#searchInput').value = ''; state.searchQuery = ''; applyFiltersAndSearch(); $('#searchInput').focus(); });
@@ -1912,11 +1708,9 @@
       applyFiltersAndSearch();
     }); });
 
-    // Portal
     $('#brokerPortalBtn') && $('#brokerPortalBtn').addEventListener('click', function() { if (state.currentUser) navigateTo('/dashboard'); else navigateTo('/auth'); });
     $('#backToDiscovery') && $('#backToDiscovery').addEventListener('click', goToDiscovery);
 
-    // Notifications & scroll
     setTimeout(function() { const sn = $('#securityNotification'); if (sn) sn.style.display = 'block'; }, 3000);
     $('#closeSecurityNotification') && $('#closeSecurityNotification').addEventListener('click', function() { $('#securityNotification').style.display = 'none'; });
 
@@ -1926,7 +1720,6 @@
       st.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     }
 
-    // Dashboard buttons
     $('#dashboardEditProfileBtn') && $('#dashboardEditProfileBtn').addEventListener('click', toggleProfileForm);
     $('#dashboardAddPropertyBtn') && $('#dashboardAddPropertyBtn').addEventListener('click', toggleAddPropertyForm);
     $('#dashboardPropertyVerificationBtn') && $('#dashboardPropertyVerificationBtn').addEventListener('click', togglePropertyVerificationForm);
@@ -1938,15 +1731,11 @@
     $('#refreshWalletBtn') && $('#refreshWalletBtn').addEventListener('click', loadWallet);
     $('#refreshLeadsBtn') && $('#refreshLeadsBtn').addEventListener('click', loadLeads);
 
-    // Chatbot listeners
     $('#chatBubble') && $('#chatBubble').addEventListener('click', chatOpen);
     $('#chatClose') && $('#chatClose').addEventListener('click', chatClose);
     $('#chatSend') && $('#chatSend').addEventListener('click', function() { const v = $('#chatInput').value.trim(); if (!v) return; $('#chatInput').value = ''; chatAsk(v); });
-    $('#chatInput') && $('#chatInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); const v = $('#chatInput').value.trim(); if (!v) return; $('#chatInput').value = ''; chatAsk(v); }
-    });
+    $('#chatInput') && $('#chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); const v = $('#chatInput').value.trim(); if (!v) return; $('#chatInput').value = ''; chatAsk(v); } });
 
-    // Profile form
     $('#profileSettingsForm') && $('#profileSettingsForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!state.currentUser) return;
@@ -1958,7 +1747,6 @@
       } catch (e) { $('#profileStatus').textContent = '❌ ' + e.message; }
     });
 
-    // Add property (NEW: no wallet check, uses manual verification)
     $('#addPropertyForm') && $('#addPropertyForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!state.currentUser) { alert('Sign in first.'); return; }
@@ -1966,9 +1754,9 @@
       const price = parseFloat($('#propPrice').value);
       const type = $('#propType').value;
       const addr = $('#propAddress').value.trim();
+      const desc = $('#propDescription') ? $('#propDescription').value.trim() : '';
       const files = $('#propImage').files;
       if (!title || !price || !addr) { alert('Fill required fields.'); return; }
-
       const urls = [];
       if (files && files.length > 0) {
         $('#uploadStatus').textContent = 'Compressing images…';
@@ -1996,16 +1784,16 @@
       }
       const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
       try {
-        const insR = await supabase.from('properties').insert({
+        const insertData = {
           title, price_amount: price, property_type: dbType, address: addr,
           media_urls: urls, is_verified: false,
           verification_status: 'unverified',
           owner_id: state.currentUser.id, is_paused: false
-        }).select().single();
+        };
+        if (desc) insertData.description = desc;
+        const insR = await supabase.from('properties').insert(insertData).select().single();
         if (insR.error) throw insR.error;
-
         alert('✅ Property added!\n\n⚠️ NEXT STEP — Verify it to go live:\n\n1. Open the Verification panel\n2. Click "Verify now" on your property\n3. Follow the Mobile Money payment steps');
-
         $('#addPropertyForm').reset();
         $('#uploadStatus').textContent = '';
         await loadMyProperties();
@@ -2020,7 +1808,6 @@
       } catch (e) { alert('Failed: ' + e.message); }
     });
 
-    // Edit property
     $('#editPropertyForm') && $('#editPropertyForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const id = $('#editPropertyId').value;
@@ -2042,46 +1829,31 @@
     });
     $('#closeEditModal') && $('#closeEditModal').addEventListener('click', function() { $('#editModal').classList.add('hidden'); });
 
-    // Verification form (manual MoMo)
     $('#closeVerificationModal') && $('#closeVerificationModal').addEventListener('click', function() { $('#propertyVerificationModal').classList.add('hidden'); });
     $('#propertyVerificationForm') && $('#propertyVerificationForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const pid = $('#verifPropertyId').value;
       if (!pid) return;
       const data = {};
-      document.querySelectorAll('[data-verif-field]').forEach(function(el) {
-        if (el.dataset.verifField) data[el.dataset.verifField] = el.value.trim();
-      });
-      if (!data.paymentReference) {
-        $('#verifStatus').textContent = '❌ Please enter the payment reference from your MoMo SMS.';
-        $('#verifStatus').style.color = '#ef4444';
-        return;
-      }
+      document.querySelectorAll('[data-verif-field]').forEach(function(el) { if (el.dataset.verifField) data[el.dataset.verifField] = el.value.trim(); });
+      if (!data.paymentReference) { $('#verifStatus').textContent = '❌ Please enter the payment reference.'; $('#verifStatus').style.color = '#ef4444'; return; }
       $('#verifStatus').textContent = 'Submitting…';
       $('#verifStatus').style.color = '#4f46e5';
       try {
         const reqR = await supabase.from('property_verification_requests').insert({
-          property_id: pid,
-          broker_id: state.currentUser.id,
-          submitted_data: data,
-          fee_amount: PAYMENT_CONFIG.amount,
-          fee_paid: false,
-          status: 'pending'
+          property_id: pid, broker_id: state.currentUser.id, submitted_data: data,
+          fee_amount: PAYMENT_CONFIG.amount, fee_paid: false, status: 'pending'
         }).select().single();
         if (reqR.error) throw reqR.error;
         await supabase.from('properties').update({ verification_status: 'pending' }).eq('id', pid);
         await loadPropertyVerificationList();
         await loadMyProperties();
-        $('#verifStatus').textContent = '✅ Submitted! Admin will review and verify within 24 hours.';
+        $('#verifStatus').textContent = '✅ Submitted! Admin will review within 24h.';
         $('#verifStatus').style.color = '#10b981';
         setTimeout(function() { $('#propertyVerificationModal').classList.add('hidden'); }, 3500);
-      } catch (e) {
-        $('#verifStatus').textContent = '❌ ' + e.message;
-        $('#verifStatus').style.color = '#ef4444';
-      }
+      } catch (e) { $('#verifStatus').textContent = '❌ ' + e.message; $('#verifStatus').style.color = '#ef4444'; }
     });
 
-    // Reviews
     $('#reviewForm') && $('#reviewForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const bid = $('#reviewBrokerId').value;
@@ -2109,7 +1881,6 @@
     const starSel = $('#starSelector');
     if (starSel) starSel.querySelectorAll('.star').forEach(function(st) { st.addEventListener('click', function() { const v = parseInt(st.dataset.value); $('#reviewRating').value = v; updateStarUI(v); }); });
 
-    // Reports
     $('#reportForm') && $('#reportForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const bid = $('#reportBrokerId').value;
@@ -2128,14 +1899,11 @@
     });
     $('#closeReportModal') && $('#closeReportModal').addEventListener('click', function() { $('#reportModal').classList.add('hidden'); });
 
-    // Topup (informational for now)
-    $('#topupBtn') && $('#topupBtn').addEventListener('click', function() { $('#topupStatus').textContent = '💡 Coming soon — for now, contact admin to top up your wallet.'; $('#topupModal').classList.remove('hidden'); });
+    $('#topupBtn') && $('#topupBtn').addEventListener('click', function() { $('#topupStatus').textContent = ''; $('#topupModal').classList.remove('hidden'); });
     $('#closeTopupModal') && $('#closeTopupModal').addEventListener('click', function() { $('#topupModal').classList.add('hidden'); });
 
-    // Popstate
     window.addEventListener('popstate', function() { handleRoute(); });
 
-    // Session restore
     try {
       const s = await supabase.auth.getSession();
       if (s.data && s.data.session && s.data.session.user) {
@@ -2146,7 +1914,6 @@
       }
     } catch (_) {}
 
-    // Search param
     const qp = new URLSearchParams(window.location.search);
     const sp = qp.get('search');
     if (sp) { const si = $('#searchInput'); if (si) si.value = sp; state.searchQuery = sp; history.replaceState(null, '', '/'); }
