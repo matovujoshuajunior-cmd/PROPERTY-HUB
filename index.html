@@ -515,994 +515,786 @@
   </footer>
 </div>
 
-<!-- ===================== MAIN APPLICATION SCRIPT ===================== -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* ============================================================
-   PROPERTY HUB – COMPLETE CLEAN WORKING SCRIPT
-   ============================================================ */
 
-const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
- const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
-const SITE_URL = 'https://propertyhub.dpdns.org';
 
-let supabase = null;
+  <!-- Load Supabase safely -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
-const state = {
-  currentUser: null,
-  allProperties: [],
-  filteredProperties: [],
-  myProperties: [],
-  profilesMap: {},
-  currentFilter: 'all',
-  searchQuery: '',
-  currentBrokerId: null,
-  currentSeoSlug: null,
-  activationMode: false,
-  isSignUpMode: false,
-  chatContext: 'visitor'
-};
+  <script>
+  // ============================================================
+  // PROPERTY HUB – CLEAN WORKING SCRIPT
+  // ============================================================
 
-// ---------- Helpers ----------
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => document.querySelectorAll(sel);
+  const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
+   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+  const SITE_URL = 'https://propertyhub.dpdns.org';
 
-function titleCase(str) {
-  return (str || '').replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase());
-}
-function formatPrice(amount) {
-  if (amount == null) return 'Price on request';
-  return Number(amount).toLocaleString('en-UG') + ' UGX';
-}
-function formatPropertyType(t) {
-  const map = { rental: 'Rental', property: 'Property', guesthouse: 'Guesthouse' };
-  return map[t] || t || 'Property';
-}
-function getImageUrl(p) {
-  if (p.media_urls && p.media_urls.length) return p.media_urls[0];
-  return '/og-cover.jpg';
-}
-function buildAltText(p) {
-  return (p.title || 'Property') + ' in ' + (p.address || 'Uganda');
-}
-function renderStars(rating) {
-  const full = Math.floor(rating || 0);
-  const half = (rating || 0) % 1 >= 0.5;
-  let html = '';
-  for (let i = 0; i < 5; i++) {
-    if (i < full) html += '<i class="fas fa-star"></i>';
-    else if (i === full && half) html += '<i class="fas fa-star-half-alt"></i>';
-    else html += '<i class="far fa-star"></i>';
+  let supabaseClient = null;
+
+  const state = {
+    currentUser: null,
+    allProperties: [],
+    filteredProperties: [],
+    myProperties: [],
+    profilesMap: {},
+    currentFilter: 'all',
+    searchQuery: '',
+    currentBrokerId: null,
+    currentSeoSlug: null,
+    activationMode: false,
+    isSignUpMode: false,
+    chatContext: 'visitor'
+  };
+
+  // ---------- Helpers ----------
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  function titleCase(str) {
+    return (str || '').replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase());
   }
-  return html;
-}
-function isTrustedBroker(b) {
-  return b && (b.average_rating || 0) >= 4 && (b.review_count || 0) >= 10;
-}
-function calculateRankScore(prop, broker, reportCount = 0) {
-  let score = 0;
-  if (prop.verification_status === 'approved') score += 50;
-  if (broker) {
-    score += (broker.average_rating || 0) * 10;
-    score += Math.min(broker.review_count || 0, 20);
-    score += (broker.lead_score || 0) * 0.5;
+  function formatPrice(amount) {
+    if (amount == null) return 'Price on request';
+    return Number(amount).toLocaleString('en-UG') + ' UGX';
   }
-  score -= (reportCount || 0) * 15;
-  if (prop.is_paused) score = -999;
-  return score;
-}
-function parseSearchQuery(q) {
-  q = (q || '').trim().toLowerCase();
-  if (!q) return { type: 'text', q: '' };
-  const range = q.match(/(\d+(?:\.\d+)?)\s*[-–to]+\s*(\d+(?:\.\d+)?)\s*([km]?)/i);
-  if (range) {
-    let min = parseFloat(range[1]), max = parseFloat(range[2]);
-    const unit = (range[3] || '').toLowerCase();
-    if (unit === 'k') { min *= 1000; max *= 1000; }
-    if (unit === 'm') { min *= 1e6; max *= 1e6; }
-    return { type: 'range', min, max };
+  function formatPropertyType(t) {
+    const map = { rental: 'Rental', property: 'Property', guesthouse: 'Guesthouse' };
+    return map[t] || t || 'Property';
   }
-  const under = q.match(/(?:under|below|less than|<)\s*(\d+(?:\.\d+)?)\s*([km]?)/i);
-  if (under) {
-    let v = parseFloat(under[1]);
-    if ((under[2] || '').toLowerCase() === 'k') v *= 1000;
-    if ((under[2] || '').toLowerCase() === 'm') v *= 1e6;
-    return { type: 'max', max: v };
+  function getImageUrl(p) {
+    if (p.media_urls && p.media_urls.length) return p.media_urls[0];
+    return '/og-cover.jpg';
   }
-  const over = q.match(/(?:over|above|more than|>)\s*(\d+(?:\.\d+)?)\s*([km]?)/i);
-  if (over) {
-    let v = parseFloat(over[1]);
-    if ((over[2] || '').toLowerCase() === 'k') v *= 1000;
-    if ((over[2] || '').toLowerCase() === 'm') v *= 1e6;
-    return { type: 'min', min: v };
+  function buildAltText(p) {
+    return (p.title || 'Property') + ' in ' + (p.address || 'Uganda');
   }
-  return { type: 'text', q };
-}
-function setSEO({ title, description, canonical }) {
-  if (title) document.title = title;
-  const desc = document.querySelector('meta[name="description"]');
-  if (desc && description) desc.setAttribute('content', description);
-  let link = document.querySelector('link[rel="canonical"]');
-  if (!link) {
-    link = document.createElement('link');
-    link.rel = 'canonical';
-    document.head.appendChild(link);
+  function renderStars(rating) {
+    const full = Math.floor(rating || 0);
+    const half = (rating || 0) % 1 >= 0.5;
+    let html = '';
+    for (let i = 0; i < 5; i++) {
+      if (i < full) html += '<i class="fas fa-star"></i>';
+      else if (i === full && half) html += '<i class="fas fa-star-half-alt"></i>';
+      else html += '<i class="far fa-star"></i>';
+    }
+    return html;
   }
-  if (canonical) link.href = canonical;
-}
-function showView(el) {
-  $$('.view').forEach(v => {
-    v.classList.remove('view-visible');
-    v.classList.add('view-hidden');
-  });
-  if (el) {
-    el.classList.remove('view-hidden');
-    el.classList.add('view-visible');
+  function isTrustedBroker(b) {
+    return b && (b.average_rating || 0) >= 4 && (b.review_count || 0) >= 10;
   }
-}
-function navigateTo(path, replace = false) {
-  if (replace) history.replaceState(null, '', path);
-  else history.pushState(null, '', path);
-  handleRoute();
-}
-function parseRoute() {
-  const path = window.location.pathname.replace(/\/+$/, '') || '/';
-  if (path === '/') return { view: 'home' };
-  if (path === '/auth') return { view: 'auth' };
-  if (path === '/dashboard') return { view: 'dashboard' };
-  if (path === '/onboarding') return { view: 'onboarding' };
-  const broker = path.match(/^\/broker\/(.+)/);
-  if (broker) return { view: 'broker', id: decodeURIComponent(broker[1]) };
-  const seo = path.match(/^\/seo\/(.+)/);
-  if (seo) return { view: 'seo', slug: decodeURIComponent(seo[1]) };
-  const prop = path.match(/^\/property\/(.+)/);
-  if (prop) return { view: 'property', id: decodeURIComponent(prop[1]) };
-  return { view: 'home' };
-}
+  function calculateRankScore(prop, broker, reportCount = 0) {
+    let score = 0;
+    if (prop.verification_status === 'approved') score += 50;
+    if (broker) {
+      score += (broker.average_rating || 0) * 10;
+      score += Math.min(broker.review_count || 0, 20);
+      score += (broker.lead_score || 0) * 0.5;
+    }
+    score -= (reportCount || 0) * 15;
+    if (prop.is_paused) score = -999;
+    return score;
+  }
+  function parseSearchQuery(q) {
+    q = (q || '').trim().toLowerCase();
+    if (!q) return { type: 'text', q: '' };
+    const range = q.match(/(\d+(?:\.\d+)?)\s*[-–to]+\s*(\d+(?:\.\d+)?)\s*([km]?)/i);
+    if (range) {
+      let min = parseFloat(range[1]), max = parseFloat(range[2]);
+      const unit = (range[3] || '').toLowerCase();
+      if (unit === 'k') { min *= 1000; max *= 1000; }
+      if (unit === 'm') { min *= 1e6; max *= 1e6; }
+      return { type: 'range', min, max };
+    }
+    const under = q.match(/(?:under|below|less than|<)\s*(\d+(?:\.\d+)?)\s*([km]?)/i);
+    if (under) {
+      let v = parseFloat(under[1]);
+      if ((under[2] || '').toLowerCase() === 'k') v *= 1000;
+      if ((under[2] || '').toLowerCase() === 'm') v *= 1e6;
+      return { type: 'max', max: v };
+    }
+    const over = q.match(/(?:over|above|more than|>)\s*(\d+(?:\.\d+)?)\s*([km]?)/i);
+    if (over) {
+      let v = parseFloat(over[1]);
+      if ((over[2] || '').toLowerCase() === 'k') v *= 1000;
+      if ((over[2] || '').toLowerCase() === 'm') v *= 1e6;
+      return { type: 'min', min: v };
+    }
+    return { type: 'text', q };
+  }
+  function setSEO({ title, description, canonical }) {
+    if (title) document.title = title;
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc && description) desc.setAttribute('content', description);
+    let link = document.querySelector('link[rel="canonical"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'canonical';
+      document.head.appendChild(link);
+    }
+    if (canonical) link.href = canonical;
+  }
+  function showView(el) {
+    $$('.view').forEach(v => {
+      v.classList.remove('view-visible');
+      v.classList.add('view-hidden');
+    });
+    if (el) {
+      el.classList.remove('view-hidden');
+      el.classList.add('view-visible');
+    }
+  }
+  function navigateTo(path, replace = false) {
+    if (replace) history.replaceState(null, '', path);
+    else history.pushState(null, '', path);
+    handleRoute();
+  }
+  function parseRoute() {
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    if (path === '/') return { view: 'home' };
+    if (path === '/auth') return { view: 'auth' };
+    if (path === '/dashboard') return { view: 'dashboard' };
+    if (path === '/onboarding') return { view: 'onboarding' };
+    const broker = path.match(/^\/broker\/(.+)/);
+    if (broker) return { view: 'broker', id: decodeURIComponent(broker[1]) };
+    const seo = path.match(/^\/seo\/(.+)/);
+    if (seo) return { view: 'seo', slug: decodeURIComponent(seo[1]) };
+    const prop = path.match(/^\/property\/(.+)/);
+    if (prop) return { view: 'property', id: decodeURIComponent(prop[1]) };
+    return { view: 'home' };
+  }
 
-// ---------- Property Card ----------
-function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
-  const article = document.createElement('article');
-  article.className = 'property-card';
-  article.style.cssText = 'background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid #e2e8f0;display:flex;flex-direction:column;';
-  article.id = 'property-' + property.id;
+  // ---------- Property Card ----------
+  function createPropertyCard(property, broker, showBrokerLink = true, showEdit = false) {
+    const article = document.createElement('article');
+    article.className = 'property-card';
+    article.style.cssText = 'background:#fff;border-radius:1rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid #e2e8f0;display:flex;flex-direction:column;';
+    article.id = 'property-' + property.id;
 
-  const imageUrl = getImageUrl(property);
-  const rating = (broker && broker.average_rating) || 0;
-  const reviewCount = (broker && broker.review_count) || 0;
-  const leadScore = (broker && broker.lead_score) || 0;
-  const isOwner = state.currentUser && broker && state.currentUser.id === broker.id;
-  const vStatus = property.verification_status || 'pending';
-  const isVerified = vStatus === 'approved';
-  const isTrusted = broker ? isTrustedBroker(broker) : false;
+    const imageUrl = getImageUrl(property);
+    const rating = (broker && broker.average_rating) || 0;
+    const reviewCount = (broker && broker.review_count) || 0;
+    const leadScore = (broker && broker.lead_score) || 0;
+    const isOwner = state.currentUser && broker && state.currentUser.id === broker.id;
+    const vStatus = property.verification_status || 'pending';
+    const isVerified = vStatus === 'approved';
+    const isTrusted = broker ? isTrustedBroker(broker) : false;
 
-  let badgeHtml = '';
-  if (isVerified) badgeHtml = '<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>';
-  else if (vStatus === 'pending') badgeHtml = '<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>';
-  else if (vStatus === 'rejected') badgeHtml = '<span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>';
-  const trustedHtml = isTrusted ? '<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>' : '';
+    let badgeHtml = '';
+    if (isVerified) badgeHtml = '<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>';
+    else if (vStatus === 'pending') badgeHtml = '<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>';
+    else if (vStatus === 'rejected') badgeHtml = '<span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>';
+    const trustedHtml = isTrusted ? '<span class="badge-trusted"><i class="fas fa-star"></i> Trusted</span>' : '';
 
-  let actionsHtml = '';
-  if (showEdit) actionsHtml += `<button class="edit-btn" data-id="${property.id}" style="font-size:.75rem;color:#4f46e5;font-weight:500;background:none;border:none;cursor:pointer;"><i class="fas fa-edit"></i> Edit</button>`;
-  let boostHtml = '';
-  if (showEdit && state.currentUser) boostHtml = `<button class="boost-btn" data-broker-id="${state.currentUser.id}" style="font-size:.75rem;color:#10b981;font-weight:500;margin-left:.5rem;background:none;border:none;cursor:pointer;"><i class="fas fa-rocket"></i> Boost</button>`;
-  let rateHtml = '';
-  if (!showEdit && state.currentUser && broker && !isOwner) rateHtml = `<button class="rate-btn" data-broker-id="${broker.id}" style="font-size:.75rem;color:#ca8a04;font-weight:500;background:none;border:none;cursor:pointer;"><i class="fas fa-star"></i> Rate</button>`;
-  let pauseHtml = '';
-  if (showEdit) {
-    const pt = property.is_paused ? 'Resume' : 'Pause';
-    const pi = property.is_paused ? 'fa-play' : 'fa-pause';
-    pauseHtml = `<button class="pause-btn" data-property-id="${property.id}" style="font-size:.75rem;color:#3b82f6;font-weight:500;margin-left:.5rem;background:none;border:none;cursor:pointer;"><i class="fas ${pi}"></i> ${pt}</button>`;
-  }
-  let connectHtml = '';
-  if (!showEdit) connectHtml = `<button class="connect-btn" data-property-id="${property.id}" style="background:#4f46e5;color:#fff;font-size:.65rem;font-weight:600;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-handshake"></i> Connect</button>`;
+    let actionsHtml = '';
+    if (showEdit) actionsHtml += `<button class="edit-btn" data-id="${property.id}" style="font-size:.75rem;color:#4f46e5;font-weight:500;background:none;border:none;cursor:pointer;"><i class="fas fa-edit"></i> Edit</button>`;
+    let boostHtml = '';
+    if (showEdit && state.currentUser) boostHtml = `<button class="boost-btn" data-broker-id="${state.currentUser.id}" style="font-size:.75rem;color:#10b981;font-weight:500;margin-left:.5rem;background:none;border:none;cursor:pointer;"><i class="fas fa-rocket"></i> Boost</button>`;
+    let rateHtml = '';
+    if (!showEdit && state.currentUser && broker && !isOwner) rateHtml = `<button class="rate-btn" data-broker-id="${broker.id}" style="font-size:.75rem;color:#ca8a04;font-weight:500;background:none;border:none;cursor:pointer;"><i class="fas fa-star"></i> Rate</button>`;
+    let pauseHtml = '';
+    if (showEdit) {
+      const pt = property.is_paused ? 'Resume' : 'Pause';
+      const pi = property.is_paused ? 'fa-play' : 'fa-pause';
+      pauseHtml = `<button class="pause-btn" data-property-id="${property.id}" style="font-size:.75rem;color:#3b82f6;font-weight:500;margin-left:.5rem;background:none;border:none;cursor:pointer;"><i class="fas ${pi}"></i> ${pt}</button>`;
+    }
+    let connectHtml = '';
+    if (!showEdit) connectHtml = `<button class="connect-btn" data-property-id="${property.id}" style="background:#4f46e5;color:#fff;font-size:.65rem;font-weight:600;padding:.375rem .75rem;border-radius:9999px;border:none;cursor:pointer;"><i class="fas fa-handshake"></i> Connect</button>`;
 
-  const brokerName = (broker && broker.business_name) || 'Property Hub';
-  const displayTitle = titleCase(property.title || 'Property');
-  const typeLabel = formatPropertyType(property.property_type);
-  const altText = buildAltText(property);
+    const brokerName = (broker && broker.business_name) || 'Property Hub';
+    const displayTitle = titleCase(property.title || 'Property');
+    const typeLabel = formatPropertyType(property.property_type);
+    const altText = buildAltText(property);
 
-  article.innerHTML = `
-    <div style="position:relative;aspect-ratio:4/3;background:#e2e8f0;overflow:hidden;">
-      <img src="${imageUrl}" alt="${altText.replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.onerror=null;this.src='/og-cover.jpg'"/>
-      <span style="position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px;">${typeLabel}</span>
-      ${!showEdit && isVerified ? '<span style="position:absolute;top:.75rem;right:.75rem;background:#10b981;color:#fff;font-size:.5rem;font-weight:700;padding:.25rem .5rem;border-radius:9999px;">✓ VERIFIED</span>' : ''}
-    </div>
-    <div style="padding:1rem;display:flex;flex-direction:column;flex:1;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.25rem;">
-        <h3 style="font-weight:600;color:#1e293b;font-size:1rem;">${displayTitle}</h3>
-        <div style="display:flex;align-items:center;gap:.25rem;">${!showEdit ? badgeHtml : ''} ${!showEdit && isTrusted ? trustedHtml : ''}</div>
+    article.innerHTML = `
+      <div style="position:relative;aspect-ratio:4/3;background:#e2e8f0;overflow:hidden;">
+        <img src="${imageUrl}" alt="${altText.replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.onerror=null;this.src='/og-cover.jpg'"/>
+        <span style="position:absolute;bottom:.75rem;right:.75rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.25rem .75rem;border-radius:9999px;">${typeLabel}</span>
+        ${!showEdit && isVerified ? '<span style="position:absolute;top:.75rem;right:.75rem;background:#10b981;color:#fff;font-size:.5rem;font-weight:700;padding:.25rem .5rem;border-radius:9999px;">✓ VERIFIED</span>' : ''}
       </div>
-      <p style="color:#4338ca;font-weight:700;font-size:.875rem;margin-top:.125rem;">${formatPrice(property.price_amount)}</p>
-      <p style="color:#64748b;font-size:.75rem;display:flex;align-items:center;gap:.25rem;margin-top:.125rem;"><i class="fas fa-map-pin" style="color:#94a3b8;"></i>${property.address || 'Location not specified'}</p>
-      <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;font-size:.75rem;">
-        <span class="stars">${renderStars(rating)}</span>
-        <span style="color:#64748b;">(${reviewCount})</span>
-        <span class="badge-lead">⚡ ${leadScore}</span>
-      </div>
-      <div style="margin-top:.75rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border-top:1px solid #e2e8f0;padding-top:.75rem;flex-wrap:wrap;">
-        ${showBrokerLink
-          ? `<button class="broker-name-link" data-broker-id="${(broker && broker.id) || ''}" style="font-size:.75rem;font-weight:500;color:#4f46e5;display:flex;align-items:center;gap:.25rem;background:none;border:none;cursor:pointer;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ${brokerName}</button>`
-          : `<span style="font-size:.75rem;color:#64748b;display:flex;align-items:center;gap:.25rem;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ${brokerName}</span>`}
-        <div style="display:flex;gap:.5rem;">${actionsHtml}${boostHtml}${pauseHtml}${rateHtml}${connectHtml}</div>
-      </div>
-    </div>`;
-
-  // Event listeners
-  article.querySelector('.edit-btn')?.addEventListener('click', e => { e.stopPropagation(); openEditModal(property.id); });
-  article.querySelector('.boost-btn')?.addEventListener('click', async e => {
-    e.stopPropagation();
-    try {
-      await supabase.rpc('increment_lead_score', { broker_id: e.currentTarget.dataset.brokerId, amount: 5 });
-      alert('Boosted!');
-      await fetchAllData();
-    } catch (err) { alert('Error: ' + err.message); }
-  });
-  article.querySelector('.rate-btn')?.addEventListener('click', e => { e.stopPropagation(); openReviewModal(broker.id); });
-  article.querySelector('.broker-name-link')?.addEventListener('click', e => {
-    e.stopPropagation();
-    if (broker?.id) navigateToBroker(broker.id);
-  });
-  article.querySelector('.connect-btn')?.addEventListener('click', e => { e.stopPropagation(); openQuizModal(property.id); });
-  article.querySelector('.pause-btn')?.addEventListener('click', e => { e.stopPropagation(); togglePropertyPause(property.id, property.is_paused); });
-
-  return article;
-}
-
-function navigateToBroker(id) {
-  if (!id) return;
-  state.currentBrokerId = id;
-  navigateTo('/broker/' + encodeURIComponent(id));
-}
-
-async function togglePropertyPause(pid, paused) {
-  try {
-    const r = await supabase.from('properties').update({ is_paused: !paused }).eq('id', pid);
-    if (r.error) throw r.error;
-    alert(!paused ? 'Property paused.' : 'Property resumed.');
-    await loadMyProperties();
-    await fetchAllData();
-  } catch (e) { alert('Error: ' + e.message); }
-}
-
-// ---------- Rendering ----------
-function renderListings(list) {
-  const grid = $('#listingsGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  if (!list || list.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;color:#64748b;font-size:.9rem;padding:2rem 0;text-align:center;">
-      <h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">No properties match your search</h2>
-      <p>Try searching for <strong>cheap houses for rent in Kampala</strong>, <strong>apartments in Naalya</strong>, or <strong>land for sale in Wakiso</strong>.</p>
-    </div>`;
-    const pc = $('#propertyCount'); if (pc) pc.textContent = '0 listings';
-    return;
-  }
-  const pc = $('#propertyCount'); if (pc) pc.textContent = list.length + ' listing' + (list.length > 1 ? 's' : '');
-  grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
-  list.forEach(p => {
-    const broker = p.broker || (p.owner_id && state.profilesMap[p.owner_id]) || null;
-    grid.appendChild(createPropertyCard(p, broker, true, false));
-  });
-}
-
-function renderMyProperties() {
-  const list = $('#myPropertiesList');
-  if (!list) return;
-  list.innerHTML = '';
-
-  const existingBanner = document.getElementById('activationBanner');
-  if (existingBanner) existingBanner.remove();
-
-  if (state.activationMode && state.currentUser) {
-    const count = state.myProperties.length;
-    const needed = 2 - count;
-    if (count >= 2) {
-      try { localStorage.removeItem('ph_broker_activation_' + state.currentUser.id); } catch (_) {}
-      state.activationMode = false;
-      const successBanner = document.createElement('div');
-      successBanner.id = 'activationBanner';
-      successBanner.style.cssText = 'background:#ecfdf5;border:2px solid #10b981;border-radius:1rem;padding:1.25rem;margin-bottom:1.5rem;text-align:center;';
-      successBanner.innerHTML = `<div style="font-size:2.5rem;margin-bottom:.5rem;">🎉</div>
-        <h3 style="font-size:1.25rem;font-weight:800;color:#065f46;margin-bottom:.35rem;">Your account is activated!</h3>
-        <p style="font-size:.9rem;color:#047857;">You now have full access to Property Hub.</p>`;
-      list.parentElement.insertBefore(successBanner, list);
-      setTimeout(() => {
-        successBanner.style.transition = 'opacity .5s';
-        successBanner.style.opacity = '0';
-        setTimeout(() => successBanner.remove(), 500);
-      }, 5000);
-    } else {
-      const activationBanner = document.createElement('div');
-      activationBanner.id = 'activationBanner';
-      activationBanner.style.cssText = 'background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:2px solid #4f46e5;border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;';
-      activationBanner.innerHTML = `
-        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-          <div style="flex-shrink:0;width:3rem;height:3rem;border-radius:50%;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;">${count}/2</div>
-          <div style="flex:1;min-width:200px;">
-            <h3 style="font-size:1.1rem;font-weight:800;color:#312e81;margin-bottom:.25rem;">Activate your account</h3>
-            <p style="font-size:.875rem;color:#4338ca;">You need <strong>${needed} more propert${needed === 1 ? 'y' : 'ies'}</strong> to unlock your full dashboard.</p>
-          </div>
+      <div style="padding:1rem;display:flex;flex-direction:column;flex:1;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.25rem;">
+          <h3 style="font-weight:600;color:#1e293b;font-size:1rem;">${displayTitle}</h3>
+          <div style="display:flex;align-items:center;gap:.25rem;">${!showEdit ? badgeHtml : ''} ${!showEdit && isTrusted ? trustedHtml : ''}</div>
         </div>
-        <div style="margin-top:1rem;">
-          <button onclick="document.getElementById('dashboardAddPropertyBtn').click()" style="background:#4f46e5;color:#fff;padding:.75rem 1.5rem;border-radius:.75rem;border:none;cursor:pointer;font-weight:600;font-size:.9rem;">
-            <i class="fas fa-plus-circle"></i> Add Property Now
-          </button>
-        </div>`;
-      list.parentElement.insertBefore(activationBanner, list);
-    }
-  }
+        <p style="color:#4338ca;font-weight:700;font-size:.875rem;margin-top:.125rem;">${formatPrice(property.price_amount)}</p>
+        <p style="color:#64748b;font-size:.75rem;display:flex;align-items:center;gap:.25rem;margin-top:.125rem;"><i class="fas fa-map-pin" style="color:#94a3b8;"></i>${property.address || 'Location not specified'}</p>
+        <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;font-size:.75rem;">
+          <span class="stars">${renderStars(rating)}</span>
+          <span style="color:#64748b;">(${reviewCount})</span>
+          <span class="badge-lead">⚡ ${leadScore}</span>
+        </div>
+        <div style="margin-top:.75rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border-top:1px solid #e2e8f0;padding-top:.75rem;flex-wrap:wrap;">
+          ${showBrokerLink
+            ? `<button class="broker-name-link" data-broker-id="${(broker && broker.id) || ''}" style="font-size:.75rem;font-weight:500;color:#4f46e5;display:flex;align-items:center;gap:.25rem;background:none;border:none;cursor:pointer;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ${brokerName}</button>`
+            : `<span style="font-size:.75rem;color:#64748b;display:flex;align-items:center;gap:.25rem;"><i class="fas fa-user-circle" style="color:#94a3b8;"></i> ${brokerName}</span>`}
+          <div style="display:flex;gap:.5rem;">${actionsHtml}${boostHtml}${pauseHtml}${rateHtml}${connectHtml}</div>
+        </div>
+      </div>`;
 
-  if (state.myProperties.length === 0) {
-    const me = $('#myPropertiesEmpty');
-    if (me) me.classList.remove('hidden');
-    return;
-  }
-  const me = $('#myPropertiesEmpty');
-  if (me) me.classList.add('hidden');
-  list.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
-  state.myProperties.forEach(prop => {
-    const card = createPropertyCard(prop, state.currentUser, false, true);
-    const del = document.createElement('button');
-    del.style.cssText = 'margin-top:.5rem;font-size:.75rem;color:#ef4444;font-weight:500;background:none;border:none;cursor:pointer;';
-    del.innerHTML = '<i class="fas fa-trash"></i> Remove';
-    del.addEventListener('click', async () => {
-      if (confirm('Delete this property?')) {
-        await supabase.from('properties').delete().eq('id', prop.id);
-        state.myProperties = state.myProperties.filter(p => p.id !== prop.id);
-        renderMyProperties();
+    // Events
+    article.querySelector('.edit-btn')?.addEventListener('click', e => { e.stopPropagation(); openEditModal(property.id); });
+    article.querySelector('.boost-btn')?.addEventListener('click', async e => {
+      e.stopPropagation();
+      try {
+        await supabaseClient.rpc('increment_lead_score', { broker_id: e.currentTarget.dataset.brokerId, amount: 5 });
+        alert('Boosted!');
         await fetchAllData();
-      }
+      } catch (err) { alert('Error: ' + err.message); }
     });
-    card.lastElementChild.appendChild(del);
-    list.appendChild(card);
-  });
-}
+    article.querySelector('.rate-btn')?.addEventListener('click', e => { e.stopPropagation(); openReviewModal(broker.id); });
+    article.querySelector('.broker-name-link')?.addEventListener('click', e => {
+      e.stopPropagation();
+      if (broker?.id) navigateToBroker(broker.id);
+    });
+    article.querySelector('.connect-btn')?.addEventListener('click', e => { e.stopPropagation(); openQuizModal(property.id); });
+    article.querySelector('.pause-btn')?.addEventListener('click', e => { e.stopPropagation(); togglePropertyPause(property.id, property.is_paused); });
 
-// ---------- Data ----------
-async function fetchAllData() {
-  const grid = $('#listingsGrid');
-  if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;color:#64748b;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">Loading listings…</h2></div>';
-  try {
-    let allRows = [];
-    let joinSucceeded = false;
+    return article;
+  }
+
+  function navigateToBroker(id) {
+    if (!id) return;
+    state.currentBrokerId = id;
+    navigateTo('/broker/' + encodeURIComponent(id));
+  }
+
+  async function togglePropertyPause(pid, paused) {
     try {
-      const jr = await supabase.from('properties').select(`
-        id, title, price_amount, property_type, address, media_urls, is_paused, verification_status, is_verified, created_at, owner_id,
-        broker:profiles!owner_id(id, business_name, average_rating, review_count, lead_score, is_verified, is_blocked, phone)
-      `).order('created_at', { ascending: false });
-      if (!jr.error && jr.data) {
-        allRows = jr.data;
-        joinSucceeded = true;
-        state.profilesMap = {};
-        allRows.forEach(p => { if (p.broker?.id) state.profilesMap[p.broker.id] = p.broker; });
-      }
-    } catch (joinErr) {
-      console.warn('Join query failed, using fallback');
-    }
-
-    if (!joinSucceeded) {
-      const r = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+      const r = await supabaseClient.from('properties').update({ is_paused: !paused }).eq('id', pid);
       if (r.error) throw r.error;
-      allRows = r.data || [];
-      const ownerIds = [...new Set(allRows.map(p => p.owner_id).filter(Boolean))];
-      if (ownerIds.length) {
-        const pr = await supabase.from('profiles').select('id, business_name, average_rating, review_count, lead_score, is_verified, is_blocked, phone').in('id', ownerIds);
-        state.profilesMap = {};
-        (pr.data || []).forEach(p => { state.profilesMap[p.id] = p; });
-      }
-    }
-
-    const raw = allRows.filter(p => p.is_paused !== true);
-    raw.forEach(p => {
-      if (!p.broker && p.owner_id && state.profilesMap[p.owner_id]) {
-        p.broker = state.profilesMap[p.owner_id];
-      }
-    });
-
-    const enriched = raw.map(prop => {
-      const broker = prop.broker || state.profilesMap[prop.owner_id] || null;
-      return Object.assign({}, prop, { broker, rankScore: calculateRankScore(prop, broker) });
-    });
-    enriched.sort((a, b) => b.rankScore - a.rankScore);
-    state.allProperties = enriched;
-    state.filteredProperties = enriched.slice();
-    if (!state.currentSeoSlug) {
-      setSEO({
-        title: 'Houses for Rent, Apartments & Land for Sale in Uganda | Property Hub',
-        description: 'Browse ' + enriched.length + ' verified properties across Uganda.',
-        canonical: SITE_URL + '/'
-      });
-    }
-    applyFiltersAndSearch();
-  } catch (e) {
-    console.error('Fetch error:', e);
-    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#ef4444;margin-bottom:.5rem;">Could not load listings</h2><p style="color:#64748b;">Please refresh the page.</p></div>';
+      alert(!paused ? 'Property paused.' : 'Property resumed.');
+      await loadMyProperties();
+      await fetchAllData();
+    } catch (e) { alert('Error: ' + e.message); }
   }
-}
 
-async function loadMyProperties() {
-  if (!state.currentUser) return;
-  try {
-    const r = await supabase.from('properties').select('*').eq('owner_id', state.currentUser.id).order('created_at', { ascending: false });
-    if (r.error) throw r.error;
-    state.myProperties = r.data || [];
-    renderMyProperties();
-  } catch (e) { console.error(e); }
-}
-
-function applyFiltersAndSearch() {
-  const f = state.currentFilter;
-  const parsed = parseSearchQuery(state.searchQuery);
-  let r = state.allProperties.slice();
-  if (f !== 'all') r = r.filter(p => (p.property_type || '').toLowerCase() === f);
-  if (parsed.type === 'text' && parsed.q) {
-    const q = parsed.q;
-    r = r.filter(p => {
-      const a = (p.address || '').toLowerCase();
-      const t = (p.title || '').toLowerCase();
-      const b = (p.broker?.business_name || '').toLowerCase();
-      return a.includes(q) || t.includes(q) || b.includes(q);
+  // ---------- Rendering ----------
+  function renderListings(list) {
+    const grid = $('#listingsGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (!list || list.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1;color:#64748b;font-size:.9rem;padding:2rem 0;text-align:center;">
+        <h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">No properties match your search</h2>
+        <p>Try searching for <strong>cheap houses for rent in Kampala</strong>, <strong>apartments in Naalya</strong>, or <strong>land for sale in Wakiso</strong>.</p>
+      </div>`;
+      const pc = $('#propertyCount'); if (pc) pc.textContent = '0 listings';
+      return;
+    }
+    const pc = $('#propertyCount'); if (pc) pc.textContent = list.length + ' listing' + (list.length > 1 ? 's' : '');
+    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+    list.forEach(p => {
+      const broker = p.broker || (p.owner_id && state.profilesMap[p.owner_id]) || null;
+      grid.appendChild(createPropertyCard(p, broker, true, false));
     });
-  } else if (parsed.type === 'range') {
-    r = r.filter(p => {
-      const price = Number(p.price_amount || 0);
-      return price >= parsed.min && price <= parsed.max;
-    });
-  } else if (parsed.type === 'min') {
-    r = r.filter(p => Number(p.price_amount || 0) >= parsed.min);
-  } else if (parsed.type === 'max') {
-    r = r.filter(p => Number(p.price_amount || 0) <= parsed.max);
   }
-  state.filteredProperties = r;
-  renderListings(r);
-  const clearBtn = $('#clearSearchBtn');
-  if (clearBtn) clearBtn.classList.toggle('hidden', !state.searchQuery.trim());
-}
 
-// ---------- Auth ----------
-function setAuthMode(isSignUp) {
-  state.isSignUpMode = isSignUp;
-  const signUpFields = $('#signUpFields');
-  const formTitle = $('#formTitle');
-  const submitBtn = $('#submitAuthBtn');
-  const toggleSignIn = $('#toggleSignIn');
-  const toggleSignUp = $('#toggleSignUp');
-  if (signUpFields) signUpFields.classList.toggle('hidden', !isSignUp);
-  if (formTitle) formTitle.textContent = isSignUp ? 'Create Account' : 'Welcome Back';
-  if (submitBtn) submitBtn.textContent = isSignUp ? 'Create Account' : 'Access Dashboard';
-  if (toggleSignIn) toggleSignIn.classList.toggle('active', !isSignUp);
-  if (toggleSignUp) toggleSignUp.classList.toggle('active', isSignUp);
-}
+  function renderMyProperties() {
+    const list = $('#myPropertiesList');
+    if (!list) return;
+    list.innerHTML = '';
 
-async function handleAuthSubmit(e) {
-  e.preventDefault();
-  const email = $('#emailInput').value.trim();
-  const pw = $('#passwordInput').value;
-  if (state.isSignUpMode) {
-    const bn = $('#bizNameInput').value.trim();
-    const at = $('#accTypeSelect').value;
-    const ph = $('#phoneInput').value.trim();
-    if (!bn) { alert('Enter Business Name.'); return; }
-    try {
-      const r = await supabase.auth.signUp({
-        email,
-        password: pw,
-        options: {
-          data: { business_name: bn, account_type: at, phone: ph },
-          emailRedirectTo: SITE_URL + '/auth'
+    if (state.myProperties.length === 0) {
+      const me = $('#myPropertiesEmpty');
+      if (me) me.classList.remove('hidden');
+      return;
+    }
+    const me = $('#myPropertiesEmpty');
+    if (me) me.classList.add('hidden');
+    list.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
+    state.myProperties.forEach(prop => {
+      const card = createPropertyCard(prop, state.currentUser, false, true);
+      const del = document.createElement('button');
+      del.style.cssText = 'margin-top ex:.5rem;font-size:.75rem;color:#ef4444;font-weight:500;background:none;border:none;cursor:pointer;';
+      del.innerHTML = '<i class="fas fa-trash"></i> Remove';
+      del.addEventListener('click', async () => {
+        if (confirm('Delete this property?')) {
+          await supabaseClient.from('properties').delete().eq('id', prop.id);
+          state.myProperties = state.myProperties.filter(p => p.id !== prop.id);
+          renderMyProperties();
+          await fetchAllData();
         }
       });
-      if (r.error) throw r.error;
-      alert('✅ Account created! Check your email to confirm before signing in.');
-      setAuthMode(false);
-      $('#authForm').reset();
-    } catch (err) {
-      alert('Signup failed: ' + err.message);
-    }
-  } else {
+      card.lastElementChild.appendChild(del);
+      list.appendChild(card);
+    });
+  }
+
+  // ---------- Data ----------
+  async function fetchAllData() {
+    const grid = $('#listingsGrid');
+    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;color:#64748b;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">Loading listings…</h2></div>';
     try {
-      const r = await supabase.auth.signInWithPassword({ email, password: pw });
-      if (r.error) throw r.error;
-      state.currentUser = r.data.user;
-      alert('✅ Signed in!');
-      $('#portalBtnLabel').textContent = 'Dashboard';
-      await loadProfileSettings();
-      await loadMyProperties();
-      await loadWallet();
-      await fetchAllData();
-      loadLeads();
-      let seenOnboarding = null;
-      try { seenOnboarding = localStorage.getItem('ph_onboarding_seen_' + r.data.user.id); } catch (_) {}
-      if (!seenOnboarding) navigateTo('/onboarding');
-      else navigateTo('/dashboard');
-    } catch (err) {
-      alert('Signin failed: ' + err.message);
+      let allRows = [];
+      let joinSucceeded = false;
+
+      try {
+        const jr = await supabaseClient.from('properties').select(`
+          id, title, price_amount, property_type, address, media_urls, is_paused, verification_status, is_verified, created_at, owner_id,
+          broker:profiles!owner_id(id, business_name, average_rating, review_count, lead_score, is_verified, is_blocked, phone)
+        `).order('created_at', { ascending: false });
+        if (!jr.error && jr.data) {
+          allRows = jr.data;
+          joinSucceeded = true;
+          state.profilesMap = {};
+          allRows.forEach(p => { if (p.broker?.id) state.profilesMap[p.broker.id] = p.broker; });
+        }
+      } catch (e) {
+        console.warn('Join failed, using fallback');
+      }
+
+      if (!joinSucceeded) {
+        const r = await supabaseClient.from('properties').select('*').order('created_at', { ascending: false });
+        if (r.error) throw r.error;
+        allRows = r.data || [];
+        const ownerIds = [...new Set(allRows.map(p => p.owner_id).filter(Boolean))];
+        if (ownerIds.length) {
+          const pr = await supabaseClient.from('profiles').select('id, business_name, average_rating, review_count, lead_score, is_verified, is_blocked, phone').in('id', ownerIds);
+          state.profilesMap = {};
+          (pr.data || []).forEach(p => { state.profilesMap[p.id] = p; });
+        }
+      }
+
+      const raw = allRows.filter(p => p.is_paused !== true);
+      raw.forEach(p => {
+        if (!p.broker && p.owner_id && state.profilesMap[p.owner_id]) {
+          p.broker = state.profilesMap[p.owner_id];
+        }
+      });
+
+      const enriched = raw.map(prop => {
+        const broker = prop.broker || state.profilesMap[prop.owner_id] || null;
+        return Object.assign({}, prop, { broker, rankScore: calculateRankScore(prop, broker) });
+      });
+      enriched.sort((a, b) => b.rankScore - a.rankScore);
+      state.allProperties = enriched;
+      state.filteredProperties = enriched.slice();
+      applyFiltersAndSearch();
+    } catch (e) {
+      console.error('Fetch error:', e);
+      if (grid) grid.innerHTML = '<div style="grid-column:1/-1;padding:1rem 0;text-align:center;"><h2 style="font-size:1.1rem;font-weight:700;color:#ef4444;margin-bottom:.5rem;">Could not load listings</h2><p style="color:#64748b;">Please refresh the page.</p></div>';
     }
   }
-}
 
-async function handlePasswordReset() {
-  const email = $('#emailInput').value.trim();
-  if (!email) { alert('Enter your email above first.'); return; }
-  try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL + '/auth' });
-    if (error) throw error;
-    alert('✅ Password reset email sent to ' + email);
-  } catch (e) {
-    alert('Failed: ' + e.message);
+  async function loadMyProperties() {
+    if (!state.currentUser) return;
+    try {
+      const r = await supabaseClient.from('properties').select('*').eq('owner_id', state.currentUser.id).order('created_at', { ascending: false });
+      if (r.error) throw r.error;
+      state.myProperties = r.data || [];
+      renderMyProperties();
+    } catch (e) { console.error(e); }
   }
-}
 
-async function loadProfileSettings() {
-  if (!state.currentUser) return;
-  try {
-    const r = await supabase.from('profiles').select('business_name, phone').eq('id', state.currentUser.id).single();
-    if (r.error) throw r.error;
-    $('#settingsBusinessName').value = r.data.business_name || '';
-    $('#settingsPhone').value = r.data.phone || '';
-  } catch (e) { console.error(e); }
-}
+  function applyFiltersAndSearch() {
+    const f = state.currentFilter;
+    const parsed = parseSearchQuery(state.searchQuery);
+    let r = state.allProperties.slice();
+    if (f !== 'all') r = r.filter(p => (p.property_type || '').toLowerCase() === f);
+    if (parsed.type === 'text' && parsed.q) {
+      const q = parsed.q;
+      r = r.filter(p => {
+        const a = (p.address || '').toLowerCase();
+        const t = (p.title || '').toLowerCase();
+        const b = (p.broker?.business_name || '').toLowerCase();
+        return a.includes(q) || t.includes(q) || b.includes(q);
+      });
+    } else if (parsed.type === 'range') {
+      r = r.filter(p => {
+        const price = Number(p.price_amount || 0);
+        return price >= parsed.min && price <= parsed.max;
+      });
+    } else if (parsed.type === 'min') {
+      r = r.filter(p => Number(p.price_amount || 0) >= parsed.min);
+    } else if (parsed.type === 'max') {
+      r = r.filter(p => Number(p.price_amount || 0) <= parsed.max);
+    }
+    state.filteredProperties = r;
+    renderListings(r);
+    const clearBtn = $('#clearSearchBtn');
+    if (clearBtn) clearBtn.classList.toggle('hidden', !state.searchQuery.trim());
+  }
 
-// ---------- Routing ----------
-async function handleRoute() {
-  const route = parseRoute();
-  switch (route.view) {
-    case 'broker':
-      if (route.id) await loadBrokerProfile(route.id);
-      else navigateTo('/', true);
-      break;
-    case 'auth':
-      showView($('#authView'));
-      setAuthMode(false);
-      break;
-    case 'onboarding':
-      if (state.currentUser) showView($('#onboardingView'));
-      else navigateTo('/auth', true);
-      break;
-    case 'dashboard':
-      if (state.currentUser) {
-        checkActivationMode();
-        showView($('#dashboardView'));
+  // ---------- Auth ----------
+  function setAuthMode(isSignUp) {
+    state.isSignUpMode = isSignUp;
+    $('#signUpFields')?.classList.toggle('hidden', !isSignUp);
+    $('#formTitle').textContent = isSignUp ? 'Create Account' : 'Welcome Back';
+    $('#submitAuthBtn').textContent = isSignUp ? 'Create Account' : 'Access Dashboard';
+    $('#toggleSignIn')?.classList.toggle('active', !isSignUp);
+    $('#toggleSignUp')?.classList.toggle('active', isSignUp);
+  }
+
+  async function handleAuthSubmit(e) {
+    e.preventDefault();
+    const email = $('#emailInput').value.trim();
+    const pw = $('#passwordInput').value;
+
+    if (state.isSignUpMode) {
+      const bn = $('#bizNameInput').value.trim();
+      const at = $('#accTypeSelect').value;
+      const ph = $('#phoneInput').value.trim();
+      if (!bn) { alert('Enter Business Name.'); return; }
+      try {
+        const r = await supabaseClient.auth.signUp({
+          email,
+          password: pw,
+          options: {
+            data: { business_name: bn, account_type: at, phone: ph },
+            emailRedirectTo: SITE_URL + '/auth'
+          }
+        });
+        if (r.error) throw r.error;
+        alert('✅ Account created! Check your email to confirm before signing in.');
+        setAuthMode(false);
+        $('#authForm').reset();
+      } catch (err) {
+        alert('Signup failed: ' + err.message);
+      }
+    } else {
+      try {
+        const r = await supabaseClient.auth.signInWithPassword({ email, password: pw });
+        if (r.error) throw r.error;
+        state.currentUser = r.data.user;
+        alert('✅ Signed in!');
+        $('#portalBtnLabel').textContent = 'Dashboard';
+        await loadProfileSettings();
         await loadMyProperties();
-        await loadWallet();
-        loadLeads();
-      } else navigateTo('/auth', true);
-      break;
-    case 'seo':
-      showView($('#discoveryView'));
-      await loadSeoPage(route.slug);
-      break;
-    case 'property':
-    case 'home':
-    default:
-      showView($('#discoveryView'));
-      applyFiltersAndSearch();
-      break;
+        await fetchAllData();
+        navigateTo('/dashboard');
+      } catch (err) {
+        alert('Signin failed: ' + err.message);
+      }
+    }
   }
-  updateChatContext();
-}
 
-async function loadSeoPage(slug) {
-  try {
-    const r = await supabase.from('seo_pages').select('*').eq('slug', slug).eq('is_active', true).maybeSingle();
-    if (r.error || !r.data) {
+  async function handlePasswordReset() {
+    const email = $('#emailInput').value.trim();
+    if (!email) { alert('Enter your email above first.'); return; }
+    try {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL + '/auth' });
+      if (error) throw error;
+      alert('✅ Password reset email sent to ' + email);
+    } catch (e) {
+      alert('Failed: ' + e.message);
+    }
+  }
+
+  async function loadProfileSettings() {
+    if (!state.currentUser) return;
+    try {
+      const r = await supabaseClient.from('profiles').select('business_name, phone').eq('id', state.currentUser.id).single();
+      if (r.error) throw r.error;
+      $('#settingsBusinessName').value = r.data.business_name || '';
+      $('#settingsPhone').value = r.data.phone || '';
+    } catch (e) { console.error(e); }
+  }
+
+  // ---------- Routing ----------
+  async function handleRoute() {
+    const route = parseRoute();
+    switch (route.view) {
+      case 'broker':
+        if (route.id) await loadBrokerProfile(route.id);
+        else navigateTo('/', true);
+        break;
+      case 'auth':
+        showView($('#authView'));
+        setAuthMode(false);
+        break;
+      case 'onboarding':
+        if (state.currentUser) showView($('#onboardingView'));
+        else navigateTo('/auth', true);
+        break;
+      case 'dashboard':
+        if (state.currentUser) {
+          showView($('#dashboardView'));
+          await loadMyProperties();
+        } else navigateTo('/auth', true);
+        break;
+      case 'seo':
+        showView($('#discoveryView'));
+        await loadSeoPage(route.slug);
+        break;
+      default:
+        showView($('#discoveryView'));
+        applyFiltersAndSearch();
+        break;
+    }
+    updateChatContext();
+  }
+
+  async function loadSeoPage(slug) {
+    try {
+      const r = await supabaseClient.from('seo_pages').select('*').eq('slug', slug).eq('is_active', true).maybeSingle();
+      if (r.error || !r.data) {
+        renderSeoHeader(null);
+        applyFiltersAndSearch();
+        return;
+      }
+      const data = r.data;
+      state.currentSeoSlug = slug;
+      setSEO({ title: data.title, description: data.meta_description, canonical: SITE_URL + '/seo/' + encodeURIComponent(slug) });
+      renderSeoHeader(data);
+      if (data.page_type === 'location') {
+        state.currentFilter = 'all';
+        state.searchQuery = data.location || '';
+      }
+      applyFiltersAndSearch();
+    } catch (_) {
       renderSeoHeader(null);
       applyFiltersAndSearch();
+    }
+  }
+
+  function renderSeoHeader(page) {
+    const box = $('#seoHeader');
+    if (!box) return;
+    if (!page) { box.innerHTML = ''; return; }
+    box.innerHTML = `
+      <nav style="font-size:.75rem;color:#64748b;margin-bottom:.75rem;">
+        <a href="/" style="color:#4f46e5;">Home</a> › <span>${page.h1 || page.title}</span>
+      </nav>
+      <h1 style="font-size:1.75rem;font-weight:800;color:#1e293b;margin-bottom:.5rem;">${page.h1 || page.title}</h1>
+      <p style="color:#64748b;margin-bottom:.5rem;">${page.meta_description}</p>`;
+  }
+
+  function updateChatContext() {
+    const dashboardVisible = $('#dashboardView')?.classList.contains('view-visible');
+    state.chatContext = dashboardVisible ? 'broker' : 'visitor';
+    const subEl = $('#chatContext');
+    if (subEl) subEl.textContent = state.chatContext === 'broker' ? 'Here to help you get leads' : 'Here to help you find a place';
+  }
+
+  // ---------- Safe stubs ----------
+  function openQuizModal(pid) { alert('Connect feature for property ' + pid); }
+  function openEditModal(pid) { alert('Edit property ' + pid); }
+  function openReviewModal(id) { alert('Rate broker ' + id); }
+  function openViewReviewsModal(id) { alert('View reviews'); }
+  function openReportModal(id) { alert('Report broker'); }
+  function openVerificationModal(pid) { alert('Verification for ' + pid); }
+  async function loadBrokerProfile(id) {
+    const grid = $('#brokerListingsGrid');
+    if (!grid) return;
+    showView($('#brokerView'));
+    grid.innerHTML = '<div style="text-align:center;padding:3rem 0;">Loading...</div>';
+    try {
+      const bR = await supabaseClient.from('profiles').select('*').eq('id', id).single();
+      if (bR.error) throw bR.error;
+      const b = bR.data;
+      $('#brokerBusinessName').textContent = b.business_name || 'Broker';
+      $('#brokerTrustedBadge')?.classList.toggle('hidden', !isTrustedBroker(b));
+      $('#brokerStars').innerHTML = renderStars(b.average_rating || 0);
+      $('#brokerReviewCount').textContent = `(${b.review_count || 0} reviews)`;
+      $('#brokerLeadScore').textContent = '⚡ ' + (b.lead_score || 0);
+
+      const prR = await supabaseClient.from('properties').select('*').eq('owner_id', id).order('created_at', { ascending: false });
+      grid.innerHTML = '';
+      const active = (prR.data || []).filter(p => p.is_paused !== true);
+      if (active.length === 0) {
+        $('#brokerEmptyState')?.classList.remove('hidden');
+        return;
+      }
+      $('#brokerEmptyState')?.classList.add('hidden');
+      grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+      active.forEach(p => grid.appendChild(createPropertyCard(p, b, false, false)));
+    } catch (e) {
+      grid.innerHTML = '<div style="text-align:center;padding:3rem 0;color:#ef4444;">Error loading profile.</div>';
+    }
+  }
+  function goToDiscovery() {
+    state.currentBrokerId = null;
+    state.currentSeoSlug = null;
+    navigateTo('/');
+  }
+  function toggleProfileForm() {
+    $('#profileFormContainer')?.classList.toggle('visible');
+    $('#addPropertyContainer')?.classList.remove('visible');
+    $('#propertyVerificationContainer')?.classList.remove('visible');
+    $('#leadsContainer')?.classList.remove('visible');
+  }
+  function toggleAddPropertyForm() {
+    $('#addPropertyContainer')?.classList.toggle('visible');
+    $('#profileFormContainer')?.classList.remove('visible');
+    $('#propertyVerificationContainer')?.classList.remove('visible');
+    $('#leadsContainer')?.classList.remove('visible');
+  }
+  function togglePropertyVerificationForm() {
+    $('#propertyVerificationContainer')?.classList.toggle('visible');
+    $('#profileFormContainer')?.classList.remove('visible');
+    $('#addPropertyContainer')?.classList.remove('visible');
+    $('#leadsContainer')?.classList.remove('visible');
+  }
+  function toggleLeadsPanel() {
+    $('#leadsContainer')?.classList.toggle('visible');
+    $('#profileFormContainer')?.classList.remove('visible');
+    $('#addPropertyContainer')?.classList.remove('visible');
+    $('#propertyVerificationContainer')?.classList.remove('visible');
+  }
+
+  // ---------- INIT ----------
+  async function init() {
+    if (!window.supabase) {
+      console.error('Supabase SDK failed to load');
       return;
     }
-    const data = r.data;
-    state.currentSeoSlug = slug;
-    setSEO({
-      title: data.title,
-      description: data.meta_description,
-      canonical: SITE_URL + '/seo/' + encodeURIComponent(slug)
+
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    setTimeout(() => {
+      const lo = $('#loadingOverlay');
+      if (lo) lo.classList.add('hidden');
+    }, 400);
+
+    // Auth listeners
+    $('#authForm')?.addEventListener('submit', handleAuthSubmit);
+    $('#toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
+    $('#toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
+    $('#backToSearchBtn')?.addEventListener('click', goToDiscovery);
+    $('#forgotPasswordBtn')?.addEventListener('click', handlePasswordReset);
+    $('#logoutBtn')?.addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      state.currentUser = null;
+      $('#portalBtnLabel').textContent = 'Broker Portal';
+      goToDiscovery();
     });
-    renderSeoHeader(data);
-    if (data.page_type === 'location') {
-      state.currentFilter = 'all';
-      state.searchQuery = data.location || '';
-    }
-    applyFiltersAndSearch();
-  } catch (_) {
-    renderSeoHeader(null);
-    applyFiltersAndSearch();
-  }
-}
 
-function renderSeoHeader(page) {
-  const box = $('#seoHeader');
-  if (!box) return;
-  if (!page) { box.innerHTML = ''; return; }
-  box.innerHTML = `
-    <nav style="font-size:.75rem;color:#64748b;margin-bottom:.75rem;">
-      <a href="/" style="color:#4f46e5;">Home</a> › <span>${page.h1 || page.title}</span>
-    </nav>
-    <h1 style="font-size:1.75rem;font-weight:800;color:#1e293b;margin-bottom:.5rem;">${page.h1 || page.title}</h1>
-    <p style="color:#64748b;margin-bottom:.5rem;">${page.meta_description}</p>`;
-}
-
-function updateChatContext() {
-  const dashboardVisible = $('#dashboardView')?.classList.contains('view-visible');
-  state.chatContext = dashboardVisible ? 'broker' : 'visitor';
-  const subEl = $('#chatContext');
-  if (subEl) subEl.textContent = state.chatContext === 'broker' ? 'Here to help you get leads' : 'Here to help you find a place';
-}
-
-// ---------- Stubs for advanced features (safe no-ops so the site works) ----------
-async function loadWallet() {
-  const el = $('#walletBalanceDisplay');
-  if (el) el.textContent = '0';
-}
-async function loadLeads() {
-  const list = $('#leadsList');
-  const noMsg = $('#noLeads');
-  if (list) list.innerHTML = '';
-  if (noMsg) noMsg.classList.remove('hidden');
-}
-function checkActivationMode() {
-  // simple check – can be expanded later
-  if (state.currentUser && state.myProperties.length < 2) {
-    state.activationMode = true;
-  }
-}
-function openQuizModal(pid) {
-  alert('Connect feature – quiz modal will open here for property ' + pid);
-}
-function openEditModal(pid) {
-  alert('Edit property ' + pid + ' (modal coming soon)');
-}
-function openReviewModal(id) {
-  alert('Rate broker ' + id);
-}
-function openViewReviewsModal(id) {
-  alert('View reviews for ' + id);
-}
-function openReportModal(id) {
-  alert('Report broker ' + id);
-}
-function openVerificationModal(pid, ptype) {
-  alert('Verification modal for property ' + pid);
-}
-async function loadBrokerProfile(id) {
-  const grid = $('#brokerListingsGrid');
-  if (!grid) return;
-  showView($('#brokerView'));
-  grid.innerHTML = '<div style="text-align:center;padding:3rem 0;">Loading...</div>';
-  try {
-    const bR = await supabase.from('profiles').select('*').eq('id', id).single();
-    if (bR.error) throw bR.error;
-    const b = bR.data;
-    $('#brokerBusinessName').textContent = b.business_name || 'Broker';
-    $('#brokerTrustedBadge')?.classList.toggle('hidden', !isTrustedBroker(b));
-    $('#brokerStars').innerHTML = renderStars(b.average_rating || 0);
-    $('#brokerReviewCount').textContent = `(${b.review_count || 0} reviews)`;
-    $('#brokerLeadScore').textContent = '⚡ ' + (b.lead_score || 0);
-
-    const prR = await supabase.from('properties').select('*').eq('owner_id', id).order('created_at', { ascending: false });
-    grid.innerHTML = '';
-    const active = (prR.data || []).filter(p => p.is_paused !== true);
-    if (active.length === 0) {
-      $('#brokerEmptyState')?.classList.remove('hidden');
-      return;
-    }
-    $('#brokerEmptyState')?.classList.add('hidden');
-    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
-    active.forEach(p => {
-      grid.appendChild(createPropertyCard(p, b, false, false));
+    // Search
+    let _sd;
+    $('#searchInput')?.addEventListener('input', e => {
+      state.searchQuery = e.target.value;
+      clearTimeout(_sd);
+      _sd = setTimeout(applyFiltersAndSearch, 250);
     });
-  } catch (e) {
-    grid.innerHTML = '<div style="text-align:center;padding:3rem 0;color:#ef4444;">Error loading profile.</div>';
-  }
-}
-async function loadPropertyVerificationList() {
-  const list = $('#propertyVerificationList');
-  if (list) list.innerHTML = '<p style="color:#64748b;font-size:.875rem;">No verification requests yet.</p>';
-}
-function goToDiscovery() {
-  state.currentBrokerId = null;
-  state.currentSeoSlug = null;
-  navigateTo('/');
-}
-function toggleProfileForm() {
-  $('#profileFormContainer')?.classList.toggle('visible');
-  $('#addPropertyContainer')?.classList.remove('visible');
-  $('#propertyVerificationContainer')?.classList.remove('visible');
-  $('#leadsContainer')?.classList.remove('visible');
-}
-function toggleAddPropertyForm() {
-  $('#addPropertyContainer')?.classList.toggle('visible');
-  $('#profileFormContainer')?.classList.remove('visible');
-  $('#propertyVerificationContainer')?.classList.remove('visible');
-  $('#leadsContainer')?.classList.remove('visible');
-}
-function togglePropertyVerificationForm() {
-  $('#propertyVerificationContainer')?.classList.toggle('visible');
-  $('#profileFormContainer')?.classList.remove('visible');
-  $('#addPropertyContainer')?.classList.remove('visible');
-  $('#leadsContainer')?.classList.remove('visible');
-  loadPropertyVerificationList();
-}
-function toggleLeadsPanel() {
-  $('#leadsContainer')?.classList.toggle('visible');
-  $('#profileFormContainer')?.classList.remove('visible');
-  $('#addPropertyContainer')?.classList.remove('visible');
-  $('#propertyVerificationContainer')?.classList.remove('visible');
-  loadLeads();
-}
-
-// ---------- INIT ----------
-async function init() {
-  if (!window.supabase) {
-    console.error('Supabase SDK failed to load');
-    const lo = document.getElementById('loadingOverlay');
-    if (lo) {
-      lo.innerHTML = '<div style="padding:2rem;text-align:center;font-family:system-ui,sans-serif"><h2 style="color:#ef4444;margin-bottom:.5rem">Could not load Supabase</h2><p style="color:#64748b">Please check your internet and refresh the page.</p></div>';
-    }
-    return;
-  }
-
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  setTimeout(() => {
-    const lo = $('#loadingOverlay');
-    if (lo) lo.classList.add('hidden');
-  }, 400);
-
-  // Auth
-  const authForm = $('#authForm');
-  if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
-  $('#toggleSignIn')?.addEventListener('click', () => setAuthMode(false));
-  $('#toggleSignUp')?.addEventListener('click', () => setAuthMode(true));
-  $('#backToSearchBtn')?.addEventListener('click', goToDiscovery);
-  $('#forgotPasswordBtn')?.addEventListener('click', handlePasswordReset);
-  $('#logoutBtn')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    state.currentUser = null;
-    state.activationMode = false;
-    $('#portalBtnLabel').textContent = 'Broker Portal';
-    goToDiscovery();
-  });
-
-  // Search & filters
-  let _sd;
-  $('#searchInput')?.addEventListener('input', e => {
-    state.searchQuery = e.target.value;
-    clearTimeout(_sd);
-    _sd = setTimeout(applyFiltersAndSearch, 250);
-  });
-  $('#clearSearchBtn')?.addEventListener('click', () => {
-    $('#searchInput').value = '';
-    state.searchQuery = '';
-    applyFiltersAndSearch();
-    $('#searchInput').focus();
-  });
-  $$('.filter-pill').forEach(p => {
-    p.addEventListener('click', () => {
-      $$('.filter-pill').forEach(x => x.classList.remove('active'));
-      p.classList.add('active');
-      state.currentFilter = p.dataset.filter;
+    $('#clearSearchBtn')?.addEventListener('click', () => {
+      $('#searchInput').value = '';
+      state.searchQuery = '';
       applyFiltersAndSearch();
     });
-  });
+    $$('.filter-pill').forEach(p => {
+      p.addEventListener('click', () => {
+        $$('.filter-pill').forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+        state.currentFilter = p.dataset.filter;
+        applyFiltersAndSearch();
+      });
+    });
 
-  // Navigation
-  $('#brokerPortalBtn')?.addEventListener('click', () => {
-    if (state.currentUser) navigateTo('/dashboard');
-    else navigateTo('/auth');
-  });
-  $('#backToDiscovery')?.addEventListener('click', goToDiscovery);
+    // Navigation
+    $('#brokerPortalBtn')?.addEventListener('click', () => {
+      if (state.currentUser) navigateTo('/dashboard');
+      else navigateTo('/auth');
+    });
+    $('#backToDiscovery')?.addEventListener('click', goToDiscovery);
 
-  // Dashboard
-  $('#dashboardEditProfileBtn')?.addEventListener('click', toggleProfileForm);
-  $('#dashboardAddPropertyBtn')?.addEventListener('click', toggleAddPropertyForm);
-  $('#dashboardPropertyVerificationBtn')?.addEventListener('click', togglePropertyVerificationForm);
-  $('#dashboardLeadsBtn')?.addEventListener('click', toggleLeadsPanel);
-  $('#dashboardHelpBtn')?.addEventListener('click', () => navigateTo('/onboarding'));
-  $('#onboardingDoneBtn')?.addEventListener('click', () => {
-    if (state.currentUser) {
-      try { localStorage.setItem('ph_onboarding_seen_' + state.currentUser.id, '1'); } catch (_) {}
-    }
-    navigateTo('/dashboard');
-  });
-  $('#onboardingSkipBtn')?.addEventListener('click', () => {
-    if (state.currentUser) {
-      try { localStorage.setItem('ph_onboarding_seen_' + state.currentUser.id, '1'); } catch (_) {}
-    }
-    navigateTo('/dashboard');
-  });
-  $('#cancelProfileEditBtn')?.addEventListener('click', () => {
-    $('#profileFormContainer')?.classList.remove('visible');
-  });
-  $('#refreshWalletBtn')?.addEventListener('click', loadWallet);
-  $('#refreshLeadsBtn')?.addEventListener('click', loadLeads);
+    // Dashboard buttons
+    $('#dashboardEditProfileBtn')?.addEventListener('click', toggleProfileForm);
+    $('#dashboardAddPropertyBtn')?.addEventListener('click', toggleAddPropertyForm);
+    $('#dashboardPropertyVerificationBtn')?.addEventListener('click', togglePropertyVerificationForm);
+    $('#dashboardLeadsBtn')?.addEventListener('click', toggleLeadsPanel);
+    $('#dashboardHelpBtn')?.addEventListener('click', () => navigateTo('/onboarding'));
+    $('#onboardingDoneBtn')?.addEventListener('click', () => navigateTo('/dashboard'));
+    $('#onboardingSkipBtn')?.addEventListener('click', () => navigateTo('/dashboard'));
+    $('#cancelProfileEditBtn')?.addEventListener('click', () => {
+      $('#profileFormContainer')?.classList.remove('visible');
+    });
 
-  // Profile form
-  $('#profileSettingsForm')?.addEventListener('submit', async e => {
-    e.preventDefault();
-    if (!state.currentUser) return;
-    const bn = $('#settingsBusinessName').value.trim();
-    const ph = $('#settingsPhone').value.trim();
-    try {
-      const r = await supabase.from('profiles').update({ business_name: bn, phone: ph }).eq('id', state.currentUser.id);
-      if (r.error) throw r.error;
-      $('#profileStatus').textContent = '✅ Profile updated!';
-    } catch (err) {
-      $('#profileStatus').textContent = '❌ ' + err.message;
-    }
-  });
-
-  // Add Property form
-  $('#addPropertyForm')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    if (!state.currentUser) {
-      alert('Sign in first.');
-      return;
-    }
-    const title = $('#propTitle').value.trim();
-    const price = parseFloat($('#propPrice').value);
-    const type = $('#propType').value;
-    const addr = $('#propAddress').value.trim();
-    const files = $('#propImage').files;
-    if (!title || !price || !addr) {
-      alert('Fill required fields.');
-      return;
-    }
-
-    const urls = [];
-    if (files && files.length > 0) {
-      $('#uploadStatus').textContent = 'Compressing images…';
-      if (typeof window.imageCompression !== 'function') {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js';
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
+    // Profile form
+    $('#profileSettingsForm')?.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const bn = $('#settingsBusinessName').value.trim();
+      const ph = $('#settingsPhone').value.trim();
+      try {
+        const r = await supabaseClient.from('profiles').update({ business_name: bn, phone: ph }).eq('id', state.currentUser.id);
+        if (r.error) throw r.error;
+        $('#profileStatus').textContent = '✅ Profile updated!';
+      } catch (err) {
+        $('#profileStatus').textContent = '❌ ' + err.message;
       }
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (!file.type.startsWith('image/')) continue;
-        try {
-          const cf = await window.imageCompression(file, {
-            maxSizeMB: 0.25,
-            maxWidthOrHeight: 1600,
-            useWebWorker: true,
-            fileType: 'image/jpeg',
-            initialQuality: 0.8
-          });
-          $('#uploadStatus').textContent = `Uploading ${i + 1}/${files.length}…`;
-          const name = Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg';
-          const path = state.currentUser.id + '/' + name;
-          const uR = await supabase.storage.from('property-media').upload(path, cf, {
-            contentType: 'image/jpeg',
-            cacheControl: '31536000',
-            upsert: false
-          });
-          if (uR.error) {
-            alert('Upload failed: ' + uR.error.message);
-            return;
-          }
-          urls.push(supabase.storage.from('property-media').getPublicUrl(path).data.publicUrl);
-        } catch (err) {
-          alert('Image failed: ' + err.message);
-          return;
-        }
+    });
+
+    // Add Property
+    $('#addPropertyForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!state.currentUser) {
+        alert('Sign in first.');
+        return;
       }
-    }
-
-    const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
-    try {
-      const insR = await supabase.from('properties').insert({
-        title,
-        price_amount: price,
-        property_type: dbType,
-        address: addr,
-        media_urls: urls,
-        is_verified: false,
-        verification_status: 'unverified',
-        owner_id: state.currentUser.id,
-        is_paused: false
-      }).select().single();
-      if (insR.error) throw insR.error;
-
-      alert('✅ Property added!\n\n⚠️ NEXT STEP — Verify it to go live:\n\n1. Open the Verification panel\n2. Click "Verify now" on your property\n3. Follow the Mobile Money payment steps');
-
-      $('#addPropertyForm').reset();
-      $('#uploadStatus').textContent = '';
-      await loadMyProperties();
-      await fetchAllData();
-      $('#addPropertyContainer')?.classList.remove('visible');
-
-      if (state.currentUser && state.myProperties.length >= 2 && state.activationMode) {
-        try { localStorage.removeItem('ph_broker_activation_' + state.currentUser.id); } catch (_) {}
-        state.activationMode = false;
+      const title = $('#propTitle').value.trim();
+      const price = parseFloat($('#propPrice').value);
+      const type = $('#propType').value;
+      const addr = $('#propAddress').value.trim();
+      if (!title || !price || !addr) {
+        alert('Fill required fields.');
+        return;
       }
-      renderMyProperties();
-      setTimeout(() => togglePropertyVerificationForm(), 300);
-    } catch (err) {
-      alert('Failed: ' + err.message);
-    }
-  });
 
-  // Other UI
-  $('#hideTrustBanner')?.addEventListener('click', () => {
-    const tb = $('#trustBanner');
-    if (tb) tb.style.display = 'none';
-    try { localStorage.setItem('ph_trust_hidden', '1'); } catch (_) {}
-  });
-  try {
-    if (localStorage.getItem('ph_trust_hidden') === '1') {
+      const dbType = { Rentals: 'rental', Properties: 'property', Guesthouses: 'guesthouse' }[type] || type;
+      try {
+        const insR = await supabaseClient.from('properties').insert({
+          title,
+          price_amount: price,
+          property_type: dbType,
+          address: addr,
+          media_urls: [],
+          is_verified: false,
+          verification_status: 'unverified',
+          owner_id: state.currentUser.id,
+          is_paused: false
+        }).select().single();
+        if (insR.error) throw insR.error;
+
+        alert('✅ Property added! Please verify it from the Verification panel.');
+        $('#addPropertyForm').reset();
+        await loadMyProperties();
+        await fetchAllData();
+        $('#addPropertyContainer')?.classList.remove('visible');
+      } catch (err) {
+        alert('Failed: ' + err.message);
+      }
+    });
+
+    // UI extras
+    $('#hideTrustBanner')?.addEventListener('click', () => {
       const tb = $('#trustBanner');
       if (tb) tb.style.display = 'none';
-    }
-  } catch (_) {}
-
-  const st = $('#scrollTopBtn');
-  if (st) {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) st.classList.add('show');
-      else st.classList.remove('show');
+      try { localStorage.setItem('ph_trust_hidden', '1'); } catch (_) {}
     });
-    st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  }
 
-  setTimeout(() => {
-    const sn = $('#securityNotification');
-    if (sn) sn.style.display = 'block';
-  }, 3000);
-  $('#closeSecurityNotification')?.addEventListener('click', () => {
-    $('#securityNotification').style.display = 'none';
-  });
-
-  // Chat (simple)
-  $('#chatBubble')?.addEventListener('click', () => {
-    $('#chatPanel')?.classList.add('open');
-    $('#chatBubble').style.display = 'none';
-  });
-  $('#chatClose')?.addEventListener('click', () => {
-    $('#chatPanel')?.classList.remove('open');
-    $('#chatBubble').style.display = 'flex';
-  });
-
-  window.addEventListener('popstate', () => handleRoute());
-
-  // Session restore
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) {
-      console.error('Session error:', error.message);
-    } else if (data?.session?.user) {
-      state.currentUser = data.session.user;
-      const portalLabel = $('#portalBtnLabel');
-      if (portalLabel) portalLabel.textContent = 'Dashboard';
-      await Promise.all([loadProfileSettings(), loadWallet()]);
+    const st = $('#scrollTopBtn');
+    if (st) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) st.classList.add('show');
+        else st.classList.remove('show');
+      });
+      st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     }
 
-    const qp = new URLSearchParams(window.location.search);
-    const sp = qp.get('search');
-    if (sp) {
-      const si = $('#searchInput');
-      if (si) si.value = sp;
-      state.searchQuery = sp;
-      history.replaceState(null, '', '/');
+    window.addEventListener('popstate', () => handleRoute());
+
+    // Session
+    try {
+      const { data } = await supabaseClient.auth.getSession();
+      if (data?.session?.user) {
+        state.currentUser = data.session.user;
+        $('#portalBtnLabel').textContent = 'Dashboard';
+        await loadProfileSettings();
+      }
+      await fetchAllData();
+      await handleRoute();
+      console.log('✅ Property Hub ready');
+    } catch (err) {
+      console.error('Init error:', err);
     }
-
-    await fetchAllData();
-    await handleRoute();
-    console.log('✅ Property Hub ready');
-  } catch (err) {
-    console.error('❌ Property Hub initialization failed:', err);
   }
-}
 
-// Bootstrap
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-</script>
+  // Start
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  </script>
 </body>
 </html>
