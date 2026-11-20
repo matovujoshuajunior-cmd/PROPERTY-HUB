@@ -1,20 +1,99 @@
-name: Build and Deploy
+name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Rebuild every 6 hours to pick up new/removed listings automatically
+    - cron: '0 */6 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: npm install @supabase/supabase-js
-      - name: Prerender homepage
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase SDK
+        run: npm install @supabase/supabase-js
+
+      - name: Verify secrets are set
+        env:
+          SUPA_URL: ${{ secrets.SUPABASE_URL }}
+          SUPA_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPA_URL" ]; then
+            echo "❌ FATAL: SUPABASE_URL secret is missing"
+            echo "   Fix: Repo → Settings → Secrets and variables → Actions → New repository secret"
+            echo "   Name: SUPABASE_URL   Value: https://ubkgovgoifgpazkapaxi.supabase.co"
+            exit 1
+          fi
+          if [ -z "$SUPA_KEY" ]; then
+            echo "❌ FATAL: SUPABASE_ANON_KEY secret is missing"
+            echo "   Fix: Repo → Settings → Secrets and variables → Actions → New repository secret"
+            echo "   Name: SUPABASE_ANON_KEY   Value: eyJhbGci..."
+            exit 1
+          fi
+          echo "✅ Both secrets present"
+          echo "   SUPABASE_URL starts with: ${SUPA_URL:0:30}..."
+          echo "   SUPABASE_ANON_KEY length: ${#SUPA_KEY} chars"
+
+      - name: Verify markers exist in index.html
+        run: |
+          if ! grep -q "PRERENDERED_LISTINGS_START" index.html; then
+            echo "❌ FATAL: index.html is missing <!-- PRERENDERED_LISTINGS_START --> marker"
+            exit 1
+          fi
+          if ! grep -q "PRERENDERED_LISTINGS_END" index.html; then
+            echo "❌ FATAL: index.html is missing <!-- PRERENDERED_LISTINGS_END --> marker"
+            exit 1
+          fi
+          echo "✅ Markers found in index.html"
+
+      - name: Prerender listings
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        run: node scripts/prerender-homepage.mjs
-      - uses: actions/upload-pages-artifact@v3
-        with: { path: '.' }
-      - uses: actions/deploy-pages@v4
+        run: node scripts/prerender.mjs
+
+      - name: Confirm prerender worked
+        run: |
+          COUNT=$(grep -c "property-card__title" index.html || echo "0")
+          echo "Found $COUNT property cards in the generated HTML"
+          if [ "$COUNT" -lt "1" ]; then
+            echo "⚠️ WARNING: No property cards found in generated HTML"
+            echo "   This usually means RLS is blocking anonymous reads on public.properties"
+            echo "   The site will still deploy with static fallback cards"
+          else
+            echo "✅ $COUNT property cards baked into HTML"
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
