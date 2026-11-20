@@ -5,7 +5,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'   # rebuild every 6 hours so DB changes propagate
+    - cron: '0 */6 * * *'
 
 permissions:
   contents: read
@@ -41,40 +41,38 @@ jobs:
         run: |
           if [ -z "$SUPA_URL" ]; then
             echo "❌ FATAL: SUPABASE_URL secret missing"
-            echo "Add at: Settings → Secrets and variables → Actions → New repository secret"
             exit 1
           fi
           if [ -z "$SUPA_KEY" ]; then
             echo "❌ FATAL: SUPABASE_ANON_KEY secret missing"
             exit 1
           fi
-          echo "✅ Secrets present (URL: ${SUPA_URL:0:40}..., key: ${#SUPA_KEY} chars)"
+          echo "✅ Secrets present"
 
       - name: Verify script exists
         run: |
-          if [ ! -f "scripts/prerender.mjs" ]; then
-            echo "❌ FATAL: scripts/prerender.mjs not found"
-            echo "Available files in scripts/:"
-            ls -la scripts/ 2>/dev/null || echo "   (scripts folder missing)"
+          if [ ! -f "scripts/prerender-homepage.mjs" ]; then
+            echo "❌ FATAL: scripts/prerender-homepage.mjs not found"
+            echo "Files in scripts/:"
+            ls -la scripts/ 2>/dev/null || echo "(scripts folder missing)"
             exit 1
           fi
-          echo "✅ scripts/prerender.mjs exists"
+          echo "✅ Script found"
 
       - name: Prerender listings
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        run: node scripts/prerender.mjs
+        run: node scripts/prerender-homepage.mjs
 
       - name: Verify output
         run: |
           COUNT=$(grep -c "property-card__title" index.html 2>/dev/null || echo "0")
           echo "Property cards in generated HTML: $COUNT"
-          echo "PRERENDERED_LISTINGS_START markers: $(grep -c 'PRERENDERED_LISTINGS_START' index.html 2>/dev/null || echo 0)"
           if [ "$COUNT" -lt "1" ]; then
-            echo "⚠️ WARNING: No property cards found — deploying with empty-state fallback."
-            echo "   This means RLS is likely blocking anon reads on public.properties."
-            echo "   Fix RLS in Supabase and re-run this workflow."
+            echo "⚠️ WARNING: No property cards — deploying with empty state"
+            echo "   Fix RLS if this is unexpected:"
+            echo "   CREATE POLICY \"Anon can read properties\" ON public.properties FOR SELECT TO anon USING (true);"
           fi
 
       - name: Setup Pages
@@ -85,6 +83,6 @@ jobs:
         with:
           path: '.'
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
