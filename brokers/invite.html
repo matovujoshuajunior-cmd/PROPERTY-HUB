@@ -105,8 +105,8 @@
     }
 
     .typewriter-box {
-      min-height: 155px;
-      font-size: 16px;
+      min-height: 210px;
+      font-size: 15.5px;
       line-height: 1.75;
       color: #f3f4f6;
       margin-bottom: 24px;
@@ -169,8 +169,8 @@
       margin-bottom: 10px;
     }
 
-    .area-input, .lead-input {
-      width: 100%;
+    .area-input {
+      flex: 1;
       background: #0d1320;
       border: 1px solid #374151;
       color: var(--text-main);
@@ -180,7 +180,7 @@
       outline: none;
     }
 
-    .area-input:focus, .lead-input:focus {
+    .area-input:focus {
       border-color: var(--accent);
     }
 
@@ -229,7 +229,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .keyword-link {
@@ -257,38 +257,47 @@
     }
 
     .proof-note {
-      font-size: 13.5px;
-      color: var(--text-soft);
+      font-size: 13px;
+      color: var(--text-muted);
       margin-bottom: 0;
     }
 
-    /* New Lead Capture Box */
-    .claim-box {
-      background: #151e30;
-      border: 1px solid rgba(245, 158, 11, 0.35);
+    .deal-box {
+      background: rgba(245, 158, 11, 0.06);
+      border: 1px solid rgba(245, 158, 11, 0.28);
       border-radius: 12px;
       padding: 18px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
-    .claim-title {
-      font-size: 16px;
+    .deal-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent);
       font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
 
-    .claim-sub {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
-
-    .lead-form-fields {
+    .deal-list {
+      list-style: none;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 14px;
+      font-size: 14.5px;
+      color: #e5e7eb;
+    }
+
+    .deal-list li {
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .deal-list li span.check {
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: bold;
     }
 
     .cta-btn {
@@ -297,14 +306,13 @@
       text-align: center;
       background: var(--accent);
       color: #090d16;
-      border: none;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 15.5px;
       padding: 16px 18px;
       border-radius: 10px;
       text-decoration: none;
-      cursor: pointer;
       transition: background 0.2s ease, transform 0.2s ease;
+      margin-bottom: 10px;
     }
 
     .cta-btn:hover {
@@ -314,10 +322,9 @@
 
     .terms-micro {
       text-align: center;
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--text-muted);
-      margin-top: 10px;
-      margin-bottom: 0;
+      margin-bottom: 16px;
     }
 
     .terms-micro a {
@@ -337,7 +344,7 @@
       margin-top: 8px;
       display: flex;
       justify-content: center;
-      gap: 18px;
+      gap: 16px;
     }
 
     .direct-links a {
@@ -375,23 +382,21 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- STAGE 1: THE BASKET OF BREAD (UNCHANGED)   -->
+    <!-- STAGE 1: THE BASKET OF BREAD               -->
     <!-- ========================================== -->
     <div id="stage-1" class="fade-in">
-      <h1>Welcome to the Property Hub Uganda break-bread room.</h1>
-      <p>What do you think about the site <strong>propertyhub.dpdns.org</strong>?</p>
+      <h1>Welcome to my Property Hub Uganda.</h1>
+      <p>What do you think about <strong>propertyhub.dpdns.org</strong>?</p>
 
       <div class="options-group">
         <button class="choice-btn" onclick="enterStage2('unchecked')">
-          <span>Did not check</span>
+          <span>Did not check it out</span>
           <span class="arrow">→</span>
         </button>
-
         <button class="choice-btn" onclick="enterStage2('cards')">
           <span>I saw it has property cards and their locations</span>
           <span class="arrow">→</span>
         </button>
-
         <button class="choice-btn" onclick="enterStage2('purpose')">
           <span>Saw it, but what is its purpose?</span>
           <span class="arrow">→</span>
@@ -399,8 +404,8 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- STAGE 2: EMPOWERING VALUE PITCH            -->
+       <!-- ========================================== -->
+    <!-- STAGE 2: SURRENDER + SELECTIVE HONESTY     -->
     <!-- ========================================== -->
     <div id="stage-2" class="hidden">
       <div id="context-reply" class="context-reply"></div>
@@ -411,82 +416,69 @@
 
       <div id="stage-2-options" class="options-group hidden">
         <button class="choice-btn" onclick="enterStage3()">
-          <span>See how many tenants are searching in my area</span>
+          <span>Are you interested we move to what you can do now to generate the leads?</span>
           <span class="arrow">→</span>
         </button>
         <button class="choice-btn" onclick="enterStage3()">
-          <span>Show me how to claim my 1st free client lead</span>
+          <span>Fair enough — show me the free founding deal</span>
           <span class="arrow">→</span>
         </button>
       </div>
     </div>
+
     <!-- ========================================== -->
-    <!-- STAGE 3: GOOGLE PROOF & DIRECT LEAD CAPTURE-->
+    <!-- STAGE 3: THE SWEET DEAL & ACCOUNT REDIRECT -->
     <!-- ========================================== -->
     <div id="stage-3" class="hidden">
-      <h2>Check the demand in your area.</h2>
-      <p>Enter your operating neighborhood below (e.g. <strong>Kikoni</strong>, <strong>Ntinda</strong>, or <strong>Najjera</strong>) to see the live Google searches tenants make every day:</p>
+      <h2>Then let’s shake on it.</h2>
+      <p>You bring real properties to the table. We take all the risk to bring serious buyers straight to your phone.</p>
 
-      <div class="area-input-row">
-        <input type="text" id="area-input" class="area-input" placeholder="Type your area (e.g. Kikoni)..." autocomplete="off" />
-        <button type="button" id="verify-btn" class="verify-btn">Check Demand</button>
+      <div class="deal-box">
+        <div class="deal-title">Your Founding Broker Deal (100% Free)</div>
+        <ul class="deal-list">
+          <li>
+            <span class="check">✓</span>
+            <strong>0 UGX Verification Fee:</strong> We removed our verification charges so your properties go live completely free.
+          </li>
+          <li>
+            <span class="check">✓</span>
+            <strong>0 UGX Lead Unlocking:</strong> Receive buyer contacts completely free while we build and grow together.
+          </li>
+          <li>
+            <span class="check">✓</span>
+            <strong>Simple Start:</strong> Create your account today and upload at least <strong>2 starting properties</strong> to begin receiving leads.
+          </li>
+        </ul>
       </div>
-      <div id="input-error" class="input-error hidden">Please enter your neighborhood or area first.</div>
 
-      <div id="proof-box" class="proof-box hidden">
-        <div class="proof-label">Live Tenant Searches in <span id="active-area-label"></span></div>
-        <div id="keyword-chips" class="keyword-chips"></div>
-        <p class="proof-note">
-          We capture these active searches and route verified tenants directly to one trusted broker in <strong id="active-area-inline"></strong>.
-        </p>
-      </div>
-
-      <div id="claim-box" class="claim-box">
-        <div class="claim-title">Claim Your 1st Verified Lead — 100% Free</div>
-        <p class="claim-sub">No upfront fees. Test our lead quality first—pay only after you close.</p>
-
-        <form id="lead-form" onsubmit="handleLeadSubmit(event)">
-          <div class="lead-form-fields">
-            <input type="text" id="broker-name" class="lead-input" placeholder="Your Full Name or Agency" required />
-            <input type="tel" id="broker-phone" class="lead-input" placeholder="WhatsApp Phone (e.g. 0772 000 000)" required />
-            <select id="property-focus" class="lead-input" required>
-              <option value="" disabled selected>Main property type you handle...</option>
-              <option value="Rentals & Apartments">Rentals & Apartments</option>
-              <option value="Student Hostels & Rooms">Student Hostels & Rooms</option>
-              <option value="Houses & Land for Sale">Houses & Land for Sale</option>
-              <option value="Commercial Spaces">Commercial Spaces</option>
-            </select>
-          </div>
-
-          <button type="submit" class="cta-btn">
-            Create Account & Unlock Free Lead →
-          </button>
-        </form>
-
-        <p class="terms-micro">
-          By continuing, you agree to our <a href="https://dpdns.org" target="_blank" rel="noopener">Broker Terms</a>.
-        </p>
+      <a href="https://dpdns.org" class="cta-btn">
+        Create Broker Account & Upload 2 Properties →
+      </a>
+      <div class="terms-micro">
+        By creating an account, you agree to our <a href="https://dpdns.org" target="_blank" rel="noopener">Terms of Service</a>.
       </div>
 
       <div class="direct-negotiation">
-        Have urgent listings or prefer to talk first?
+        Prefer to negotiate directly first?
         <div class="direct-links">
           <a href="tel:+256700000000">📞 Call Direct</a>
-          <a id="wa-direct-link" href="https://wa.me." target="_blank" rel="noopener">💬 WhatsApp Direct</a>
+          <a href="https://wa.me." target="_blank" rel="noopener">💬 WhatsApp Direct</a>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const valuePitchScript =
-      "You already have good properties and you know your area well. " +
-      "The real challenge is that serious tenants now search online first—and middlemen are taking deals that belong to you. " +
-      "We capture ready-to-pay clients searching in your exact neighborhood and send them straight to your phone. " +
-      "To prove it works, your first verified client lead is 100% free.";
+    // Stage 2 Script: Diagnoses their pain + applies Surrender & Selective Honesty
+    const bluffScript =
+      "You are a broker who has appeared to have revenue returning properties, " +
+      "but you link everywhere, inconspicuous, and you accept bad deals due to limited options. " +
+      "You need potential leads. " +
+      "And to be completely honest with you—we are still growing our site too, and we want to improve it with real listings. " +
+      "So we are removing our verification and lead unlocking fees first, making it completely free for you. " +
+      "We will generate the needed leads for you using our site marketing and online domination.";
 
     let isTyping = false;
-    let selectedArea = "";
 
     function enterStage2(selection) {
       if (isTyping) return;
@@ -500,15 +492,15 @@
 
       const replyBox = document.getElementById("context-reply");
       if (selection === "unchecked") {
-        replyBox.textContent = "No problem at all. Here is why we invited you to this room:";
+        replyBox.textContent = "Fair enough. Read every word carefully:";
       } else if (selection === "cards") {
-        replyBox.textContent = "Good eye. Those property cards are how we attract ready tenants for brokers like you:";
+        replyBox.textContent = "Those property cards are only the start. Read this honestly:";
       } else {
-        replyBox.textContent = "Fair question. Here is how our platform helps you close more deals:";
+        replyBox.textContent = "Here is the honest truth behind why we invited you:";
       }
 
       isTyping = true;
-      typeText(valuePitchScript, 0);
+      typeText(bluffScript, 0);
     }
 
     function typeText(text, index) {
@@ -518,18 +510,18 @@
         const currentChar = text.charAt(index);
         output.textContent += currentChar;
 
-        let speed = 28;
-        if (currentChar === ".") {
-          speed = 400;
-        } else if (currentChar === "—" || currentChar === ",") {
-          speed = 200;
+        // Slower, deliberate pacing so the reader analyzes every word
+        let speed = 48;
+        if (currentChar === "." || currentChar === "—") {
+          speed = 650;
+        } else if (currentChar === ",") {
+          speed = 320;
         }
 
         setTimeout(() => typeText(text, index + 1), speed);
       } else {
         isTyping = false;
         document.getElementById("typewriter-cursor").style.display = "none";
-
         const options = document.getElementById("stage-2-options");
         options.classList.remove("hidden");
         options.classList.add("fade-in");
@@ -543,96 +535,9 @@
       const stage3 = document.getElementById("stage-3");
       stage3.classList.remove("hidden");
       stage3.classList.add("fade-in");
-
-      setTimeout(() => {
-        document.getElementById("area-input").focus();
-      }, 300);
     }
-
-    function generateProofKeywords() {
-      const inputEl = document.getElementById("area-input");
-      const errorEl = document.getElementById("input-error");
-      const proofBox = document.getElementById("proof-box");
-      const rawValue = inputEl.value.trim();
-
-      if (!rawValue) {
-        errorEl.classList.remove("hidden");
-        proofBox.classList.add("hidden");
-        inputEl.focus();
-        return;
-      }
-
-      errorEl.classList.add("hidden");
-
-      selectedArea = rawValue
-        .split(/\s+/)
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(" ");
-
-      document.getElementById("active-area-label").textContent = selectedArea;
-      document.getElementById("active-area-inline").textContent = selectedArea;
-
-      const keywords = [
-        `rentals in ${selectedArea} Kampala`,
-        `apartments for rent in ${selectedArea}`,
-        `single rooms in ${selectedArea}`,
-        `houses for rent in ${selectedArea}`
-      ];
-
-      const container = document.getElementById("keyword-chips");
-      container.innerHTML = "";
-
-      keywords.forEach((phrase) => {
-        const googleUrl = `https://google.com{encodeURIComponent(phrase)}`;
-        const link = document.createElement("a");
-        link.href = googleUrl;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.className = "keyword-link";
-        link.innerHTML = `"${phrase}" <span>View on Google ↗</span>`;
-        container.appendChild(link);
-      });
-
-      const waDirect = document.getElementById("wa-direct-link");
-      const prefilledWaMsg = `Hello Property Hub Uganda, I am a broker operating in ${selectedArea} and I would like to discuss claiming my free lead.`;
-      waDirect.href = `https://wa.me{encodeURIComponent(prefilledWaMsg)}`;
-
-      proofBox.classList.remove("hidden");
-      proofBox.classList.add("fade-in");
-    }
-
-    function handleLeadSubmit(event) {
-      event.preventDefault();
-
-      const name = document.getElementById("broker-name").value.trim();
-      const phone = document.getElementById("broker-phone").value.trim();
-      const focus = document.getElementById("property-focus").value;
-      const area = selectedArea || document.getElementById("area-input").value.trim() || "Kampala";
-
-      const signupUrl = new URL("https://dpdns.org");
-      signupUrl.searchParams.set("name", name);
-      signupUrl.searchParams.set("phone", phone);
-      signupUrl.searchParams.set("area", area);
-      signupUrl.searchParams.set("focus", focus);
-
-      window.location.href = signupUrl.toString();
-
-      /* 
-      // Alternative WhatsApp-only submission (uncomment below & comment out window.location.href above if signup page isn't live yet):
-      const businessNumber = "256700000000";
-      const message = `*New Broker Lead Claim*\nName: ${name}\nPhone: ${phone}\nArea: ${area}\nFocus: ${focus}\n\nI want to create my account and claim my 1st free lead.`;
-      window.open(`https://wa.me{businessNumber}?text=${encodeURIComponent(message)}`, "_blank");
-      */
-    }
-
-    document.getElementById("verify-btn").addEventListener("click", generateProofKeywords);
-    document.getElementById("area-input").addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        generateProofKeywords();
-      }
-    });
   </script>
+
 </body>
 </html>
 
