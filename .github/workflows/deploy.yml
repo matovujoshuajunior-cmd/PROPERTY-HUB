@@ -1,0 +1,20 @@
+name: Build and Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm install @supabase/supabase-js
+      - name: Prerender homepage
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/prerender-homepage.mjs
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: '.' }
+      - uses: actions/deploy-pages@v4
