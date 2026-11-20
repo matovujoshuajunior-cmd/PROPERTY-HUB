@@ -29,6 +29,8 @@ a{color:#4f46e5;text-decoration:none}
 a:hover{text-decoration:underline}
 img{max-width:100%;display:block}
 .hidden{display:none!important}
+
+/* HEADER */
 .header{background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:50;padding:.75rem 1rem}
 .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .logo{font-size:1.5rem;font-weight:700;color:#1e293b;text-decoration:none}
@@ -36,27 +38,36 @@ img{max-width:100%;display:block}
 .header-right{display:flex;align-items:center;gap:.75rem}
 .count-badge{background:#f1f5f9;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;color:#475569}
 .portal-btn{background:#4f46e5;color:#fff;padding:.5rem 1.25rem;border-radius:.75rem;font-size:.875rem;border:none;cursor:pointer;font-family:inherit;font-weight:500}
-.hero{background:linear-gradient(135deg,#1e1b4b 0%,#4f46e5 60%,#f97316 100%);color:#fff;padding:4rem 1rem 3rem;text-align:center;position:relative}
-.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.7) 0%,rgba(15,23,42,.3) 100%);pointer-events:none}
-.hero-inner{max-width:720px;margin:0 auto;position:relative}
+.portal-btn:hover{background:#4338ca}
+
+/* HERO — background uses /hero.svg with gradient fallback */
+.hero{position:relative;overflow:hidden;color:#fff;padding:4rem 1rem 3rem;text-align:center;background:#1e1b4b}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;z-index:1}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(30,27,75,.85) 0%,rgba(79,70,229,.7) 60%,rgba(249,115,22,.6) 100%);z-index:2}
+.hero-inner{position:relative;z-index:3;max-width:720px;margin:0 auto}
 .hero h1{font-size:2.5rem;font-weight:800;line-height:1.1;margin-bottom:.75rem}
 @media(min-width:768px){.hero h1{font-size:3rem}}
 .hero p{color:#e2e8f0;font-size:1.125rem;margin-bottom:1.5rem}
 .search-wrap{position:relative;max-width:520px;margin:0 auto}
-.search-input{width:100%;padding:.875rem 1rem .875rem 2.75rem;border-radius:.75rem;border:none;color:#1e293b;font-size:1rem;font-family:inherit}
-.search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none}
+.search-input{width:100%;padding:.875rem 1rem;border-radius:.75rem;border:none;color:#1e293b;font-size:1rem;font-family:inherit}
 .trust-chips{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1.25rem}
 .trust-chips span{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#e2e8f0;padding:.35rem .85rem;border-radius:9999px;font-size:.75rem;font-weight:500}
+
+/* TRUST BANNER */
 .trust-banner{max-width:1200px;margin:1.5rem auto;padding:1.25rem 1.5rem;background:linear-gradient(135deg,#ecfdf5,#f0f9ff);border:1px solid #a7f3d0;border-radius:1rem}
 .trust-banner h3{font-size:1rem;font-weight:700;color:#065f46;margin-bottom:.75rem}
 .trust-banner ul{list-style:none;display:grid;grid-template-columns:1fr;gap:.5rem}
 @media(min-width:768px){.trust-banner ul{grid-template-columns:1fr 1fr}}
 .trust-banner li{font-size:.85rem;color:#334155;display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
 .trust-banner li strong{color:#065f46}
+
+/* FILTERS */
 .filters{max-width:1200px;margin:1.5rem auto;padding:0 1rem;display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem}
 .filter-pill{padding:.5rem 1.25rem;border-radius:9999px;background:#fff;font-size:.875rem;border:1px solid #e2e8f0;cursor:pointer;font-family:inherit;color:#334155;white-space:nowrap;transition:all .15s}
 .filter-pill:hover{background:#e2e8f0}
 .filter-pill.active{background:#1e293b;color:#fff;border-color:#1e293b}
+
+/* LISTINGS */
 .grid-section{max-width:1200px;margin:0 auto;padding:0 1rem 2rem}
 .listings-grid{display:grid;grid-template-columns:1fr;gap:1.5rem}
 @media(min-width:640px){.listings-grid{grid-template-columns:repeat(2,1fr)}}
@@ -70,13 +81,14 @@ img{max-width:100%;display:block}
 .property-card__body{padding:1rem;display:flex;flex-direction:column;flex:1}
 .property-card__title{font-size:1rem;font-weight:600;color:#1e293b;line-height:1.3;margin-bottom:.25rem}
 .property-card__title a{color:inherit}
-.property-card__title a:hover{color:#4f46e5;text-decoration:none}
 .property-card__price{color:#4338ca;font-weight:700;font-size:.95rem}
 .property-card__location{color:#64748b;font-size:.8rem;margin-top:.25rem}
 .property-card__desc{color:#64748b;font-size:.8rem;margin-top:.5rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .property-card__footer{margin-top:auto;padding-top:.75rem;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
 .property-card__broker{font-size:.75rem;color:#64748b}
 .property-card__cta{background:#4f46e5;color:#fff;font-size:.7rem;font-weight:600;padding:.4rem .85rem;border-radius:9999px;text-decoration:none}
+
+/* GUIDES */
 .guides-section{max-width:1200px;margin:3rem auto;padding:0 1rem}
 .guides-section h2{font-size:1.5rem;font-weight:800;color:#1e293b;margin-bottom:.35rem}
 .guides-section .sub{color:#64748b;font-size:.9rem;margin-bottom:1.5rem}
@@ -87,10 +99,14 @@ img{max-width:100%;display:block}
 .guide-group h3{font-size:.85rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid #e2e8f0}
 .guide-group ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
 .guide-group a{font-size:.875rem;color:#4f46e5;display:block;padding:.35rem 0;line-height:1.4}
+
+/* BROKER CTA */
 .broker-cta{max-width:1200px;margin:2rem auto;padding:1.75rem;background:linear-gradient(135deg,#4f46e5,#4338ca);border-radius:1.25rem;color:#fff;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
 .broker-cta h3{font-size:1.25rem;font-weight:800;margin-bottom:.25rem}
 .broker-cta p{color:#c7d2fe;font-size:.9rem}
 .broker-cta a{background:#fff;color:#4f46e5;padding:.75rem 1.5rem;border-radius:.75rem;font-weight:700;text-decoration:none;white-space:nowrap}
+
+/* FOOTER */
 .footer{background:#0f172a;color:#cbd5e1;padding:2.5rem 1rem;margin-top:3rem}
 .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:2rem;font-size:.875rem}
 @media(min-width:768px){.footer-inner{grid-template-columns:repeat(3,1fr)}}
@@ -98,6 +114,8 @@ img{max-width:100%;display:block}
 .footer ul{list-style:none;display:flex;flex-direction:column;gap:.35rem}
 .footer a{color:#94a3b8}
 .footer-bottom{border-top:1px solid #1e293b;text-align:center;padding:1rem;font-size:.75rem;color:#64748b;max-width:1200px;margin:0 auto}
+
+/* MODAL */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
 .modal-backdrop.hidden{display:none}
 .modal-content{background:#fff;border-radius:1.5rem;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:2rem;position:relative}
@@ -122,11 +140,13 @@ img{max-width:100%;display:block}
 
 <main>
   <section class="hero">
+    <img src="/hero.svg" alt="" class="hero-bg" onerror="this.style.display='none'" aria-hidden="true">
+    <div class="hero-overlay"></div>
     <div class="hero-inner">
       <h1>Houses &amp; Apartments for Rent in Uganda</h1>
       <p>Verified rentals, guesthouses, and land for sale across Kampala, Wakiso, and Entebbe — from trusted brokers.</p>
       <div class="search-wrap">
-        <input id="searchInput" class="search-input" type="text" placeholder="Search by area, price, or broker…" style="padding-left:1rem" />
+        <input id="searchInput" class="search-input" type="text" placeholder="Search by area, price, or broker…" />
       </div>
       <div class="trust-chips">
         <span>✓ Verified brokers</span>
@@ -153,10 +173,6 @@ img{max-width:100%;display:block}
     <button class="filter-pill" data-filter="guesthouse">Guesthouses</button>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════ -->
-  <!-- LISTINGS GRID — content injected by prerender script on deploy -->
-  <!-- DO NOT put content between these markers — the script will replace -->
-  <!-- ═══════════════════════════════════════════════════════════════ -->
   <section class="grid-section">
     <div class="listings-grid" id="listingsGrid">
 <!-- PRERENDERED_LISTINGS_START -->
@@ -164,7 +180,6 @@ img{max-width:100%;display:block}
     </div>
   </section>
 
-  <!-- Noscript fallback for crawlers that block JS -->
   <noscript id="listings-noscript">
     <div style="padding:1rem;background:#fff;border-radius:1rem;border:1px solid #e2e8f0;max-width:1200px;margin:1rem auto;">
       <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">Browse Listings</h2>
@@ -250,7 +265,7 @@ img{max-width:100%;display:block}
 
 <div id="quizModal" class="modal-backdrop hidden">
   <div class="modal-content">
-    <button class="modal-close" onclick="document.getElementById('quizModal').classList.add('hidden')">&times;</button>
+    <button class="modal-close" id="closeQuizModal">&times;</button>
     <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:#1e293b">📞 Connect with Broker</h2>
     <form id="quizForm">
       <input type="hidden" id="quizPropertyId" />
@@ -264,126 +279,221 @@ img{max-width:100%;display:block}
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
+// ============================================================
+// DEFENSIVE INIT — all element access is null-safe
+// ============================================================
 (function() {
   'use strict';
+  console.log('🚀 Property Hub initializing');
+
   const SUPABASE_URL = 'https://ubkgovgoifgpazkapaxi.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVia2dvdmdvaWZncGF6a2FwYXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MTExOTEsImV4cCI6MjEwMzI4NzE5MX0.upcDE6ucde7lsrPfPssWhoK54PNRDW701tkt2H4hP0A';
+
   let supabase = null;
   let allProperties = [];
 
   function $(s) { return document.querySelector(s); }
+  function safeAdd(el, event, fn) { if (el) el.addEventListener(event, fn); }
 
-  async function enhanceWithLiveData() {
-    if (!window.supabase) { setTimeout(enhanceWithLiveData, 200); return; }
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    try {
-      const r = await supabase.from('properties').select('*').order('created_at', { ascending: false });
-      if (r.error) throw r.error;
-      const active = (r.data || []).filter(p => p.is_paused !== true);
-      const grid = $('listingsGrid');
-      const pc = $('propertyCount');
-
-      // Only override static content if DB has MORE listings
-      const staticCount = grid.querySelectorAll('.property-card').length;
-      if (active.length === 0) {
-        pc.textContent = staticCount + ' listing' + (staticCount === 1 ? '' : 's');
-        console.log('ℹ️ No live listings — keeping static content');
-        return;
-      }
-
-      allProperties = active;
-      renderListings(allProperties);
-      pc.textContent = active.length + ' listing' + (active.length > 1 ? 's' : '');
-      console.log('✅ Enhanced with ' + active.length + ' live listings');
-    } catch (e) {
-      console.warn('⚠️ Live fetch failed — static content remains:', e.message);
-      const staticCount = document.querySelectorAll('#listingsGrid .property-card').length;
-      if (staticCount > 0) $('propertyCount').textContent = staticCount + ' listings';
-    }
-  }
-
-  function renderListings(list) {
-    const grid = $('listingsGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    list.forEach(p => grid.appendChild(buildCard(p)));
-  }
-
+  // ── Render a card ──
   function buildCard(p) {
     const imgUrl = (p.media_urls && p.media_urls[0]) || '/og-cover.jpg';
     const typeLabel = p.property_type === 'rental' ? 'For Rent' : p.property_type === 'property' ? 'For Sale' : 'Guesthouse';
     const verified = p.verification_status === 'approved';
     const price = Number(p.price_amount || 0).toLocaleString() + ' UGX';
-    const desc = (p.description && p.description.length > 20) ? p.description.substring(0, 160) + '…' : (p.title || 'Property') + ' in ' + (p.address || 'Kampala') + '.';
+    const desc = (p.description && p.description.length > 20)
+      ? p.description.substring(0, 160) + '…'
+      : (p.title || 'Property') + ' in ' + (p.address || 'Kampala') + '.';
     const brokerName = (p.broker && p.broker.business_name) || 'Property Hub';
+
     const article = document.createElement('article');
     article.className = 'property-card';
-    article.innerHTML = '<div class="property-card__image"><img src="' + imgUrl + '" alt="' + ((p.title || 'Property').replace(/"/g,'') + ' — ' + (p.address || 'Uganda')) + '" loading="lazy" /><span class="property-card__type">' + typeLabel + '</span>' + (verified ? '<span class="property-card__verified">✓ VERIFIED</span>' : '') + '</div>' +
-      '<div class="property-card__body"><h3 class="property-card__title"><a href="/property/' + p.id + '">' + (p.title || 'Property') + '</a></h3><p class="property-card__price">' + price + '</p><p class="property-card__location">📍 ' + (p.address || 'Location not specified') + '</p><p class="property-card__desc">' + desc + '</p><div class="property-card__footer"><span class="property-card__broker">🏢 ' + brokerName + '</span><a href="/property/' + p.id + '" class="property-card__cta">View Details →</a></div></div>';
+    article.innerHTML =
+      '<div class="property-card__image">' +
+        '<img src="' + imgUrl + '" alt="' + ((p.title || 'Property').replace(/"/g, '') + ' — ' + (p.address || 'Uganda')) + '" loading="lazy" onerror="this.src=\'/og-cover.jpg\'" />' +
+        '<span class="property-card__type">' + typeLabel + '</span>' +
+        (verified ? '<span class="property-card__verified">✓ VERIFIED</span>' : '') +
+      '</div>' +
+      '<div class="property-card__body">' +
+        '<h3 class="property-card__title"><a href="/property/' + p.id + '">' + (p.title || 'Property') + '</a></h3>' +
+        '<p class="property-card__price">' + price + '</p>' +
+        '<p class="property-card__location">📍 ' + (p.address || 'Location not specified') + '</p>' +
+        '<p class="property-card__desc">' + desc + '</p>' +
+        '<div class="property-card__footer">' +
+          '<span class="property-card__broker">🏢 ' + brokerName + '</span>' +
+          '<a href="/property/' + p.id + '" class="property-card__cta">View Details →</a>' +
+        '</div>' +
+      '</div>';
     return article;
   }
 
-  document.querySelectorAll('.filter-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const f = btn.dataset.filter;
-      if (allProperties.length === 0) return;
-      const filtered = f === 'all' ? allProperties : allProperties.filter(p => p.property_type === f);
-      renderListings(filtered);
-    });
-  });
-
-  const searchInput = $('searchInput');
-  if (searchInput) {
-    let t;
-    searchInput.addEventListener('input', e => {
-      clearTimeout(t);
-      t = setTimeout(() => {
-        const q = e.target.value.toLowerCase().trim();
-        if (allProperties.length === 0) return;
-        const filtered = q ? allProperties.filter(p => ((p.title || '') + ' ' + (p.address || '')).toLowerCase().includes(q)) : allProperties;
-        renderListings(filtered);
-      }, 250);
-    });
+  function renderListings(list) {
+    const grid = $('#listingsGrid');
+    if (!grid) { console.warn('listingsGrid missing'); return; }
+    grid.innerHTML = '';
+    if (list.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;background:#fff;border:1px solid #e2e8f0;border-radius:1rem;">' +
+        '<h3 style="font-size:1.15rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">New listings coming soon</h3>' +
+        '<p style="color:#64748b;margin-bottom:1rem;">We are onboarding verified brokers across Kampala.</p>' +
+        '<a href="/brokers/" style="display:inline-block;background:#4f46e5;color:#fff;padding:.65rem 1.25rem;border-radius:.65rem;font-weight:600;text-decoration:none;font-size:.85rem;">List your property →</a>' +
+        '</div>';
+      return;
+    }
+    list.forEach(p => grid.appendChild(buildCard(p)));
   }
 
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('.connect-btn');
-    if (!btn) return;
-    e.preventDefault();
-    const pid = btn.dataset.propertyId;
-    if (!pid) { alert('Use View Details to contact the broker.'); return; }
-    $('quizPropertyId').value = pid;
-    $('quizForm').reset();
-    $('quizModal').classList.remove('hidden');
-  });
+  // ── Fetch live data and enhance ──
+  async function enhanceWithLiveData() {
+    if (!window.supabase) {
+      console.warn('⏳ Supabase not loaded yet, retrying in 300ms…');
+      setTimeout(enhanceWithLiveData, 300);
+      return;
+    }
+    if (!supabase) {
+      try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+      catch (e) { console.error('Supabase client failed:', e); return; }
+    }
 
-  document.addEventListener('submit', async e => {
-    if (e.target.id !== 'quizForm') return;
-    e.preventDefault();
-    if (!supabase) { alert('Service not ready.'); return; }
-    const pid = $('quizPropertyId').value;
-    const name = $('quizName').value.trim();
-    const email = $('quizEmail').value.trim();
-    const wa = $('quizWhatsapp').value.trim();
-    if (!/^\d{9,13}$/.test(wa.replace(/\D/g, ''))) { alert('Enter valid phone.'); return; }
+    console.log('📡 Fetching properties…');
     try {
-      const pdR = await supabase.from('properties').select('owner_id, title, address, price_amount, property_type').eq('id', pid).single();
-      if (pdR.error) throw pdR.error;
-      const pd = pdR.data;
-      const cost = Math.round((pd.price_amount || 0) / 150000) * 3250 || 3250;
-      const leadR = await supabase.from('lead_requests').insert({ property_id: pid, broker_id: pd.owner_id, visitor_name: name, visitor_email: email, visitor_whatsapp: wa, quiz_answers: {}, total_score: 6, lead_type: 'warm', status: 'pending', cost: cost, expires_at: new Date(Date.now() + 24*60*60*1000).toISOString() }).select().single();
-      if (leadR.error) throw leadR.error;
-      $('quizModal').classList.add('hidden');
-      alert('✅ Request sent! The broker will be in touch.');
-    } catch (err) { alert('Error: ' + err.message); }
-  });
+      const r = await supabase.from('properties').select('*').order('created_at', { ascending: false });
 
-  $('brokerPortalBtn').addEventListener('click', () => { window.location.href = '/auth'; });
+      if (r.error) {
+        console.error('❌ Supabase error:', r.error.message, r.error.code);
+        if (r.error.code === '42501' || /permission|policy|RLS/i.test(r.error.message)) {
+          console.error('→ RLS is blocking anon reads. Run this in Supabase SQL Editor:');
+          console.error('   CREATE POLICY "Anon can read properties" ON public.properties FOR SELECT TO anon USING (true);');
+        }
+        const pc = $('#propertyCount');
+        if (pc) pc.textContent = '0 listings';
+        return;
+      }
 
-  enhanceWithLiveData();
-  console.log('✅ Property Hub ready');
+      const rows = r.data || [];
+      console.log('📦 Raw rows from Supabase:', rows.length);
+
+      const active = rows.filter(p => p.is_paused !== true);
+      console.log('✅ Active (not paused):', active.length);
+
+      // Fetch broker profiles
+      const ownerIds = Array.from(new Set(active.map(p => p.owner_id).filter(Boolean)));
+      let profiles = {};
+      if (ownerIds.length) {
+        try {
+          const pr = await supabase.from('profiles').select('id, business_name').in('id', ownerIds);
+          (pr.data || []).forEach(p => { profiles[p.id] = p; });
+        } catch (_) {}
+      }
+
+      allProperties = active.map(p => ({ ...p, broker: profiles[p.owner_id] || null }));
+      renderListings(allProperties);
+
+      const pc = $('#propertyCount');
+      if (pc) pc.textContent = active.length + ' listing' + (active.length === 1 ? '' : 's');
+      console.log('✅ Rendered ' + active.length + ' listings');
+    } catch (e) {
+      console.error('❌ Fetch failed:', e.message);
+      const pc = $('#propertyCount');
+      if (pc) pc.textContent = '0 listings';
+    }
+  }
+
+  // ── Main init (runs when DOM ready) ──
+  function init() {
+    console.log('🔧 DOM ready — attaching handlers');
+
+    // Filters
+    document.querySelectorAll('.filter-pill').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-pill').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+        if (allProperties.length === 0) return;
+        const filtered = f === 'all' ? allProperties : allProperties.filter(function(p) { return p.property_type === f; });
+        renderListings(filtered);
+      });
+    });
+
+    // Search
+    const searchInput = $('#searchInput');
+    if (searchInput) {
+      let t;
+      searchInput.addEventListener('input', function(e) {
+        clearTimeout(t);
+        t = setTimeout(function() {
+          const q = e.target.value.toLowerCase().trim();
+          if (allProperties.length === 0) return;
+          const filtered = q ? allProperties.filter(function(p) {
+            return ((p.title || '') + ' ' + (p.address || '')).toLowerCase().indexOf(q) !== -1;
+          }) : allProperties;
+          renderListings(filtered);
+        }, 250);
+      });
+    }
+
+    // Broker Portal button — null-safe
+    const portalBtn = $('#brokerPortalBtn');
+    if (portalBtn) {
+      portalBtn.addEventListener('click', function() { window.location.href = '/auth'; });
+    } else {
+      console.warn('⚠️ brokerPortalBtn not found — skipping listener');
+    }
+
+    // Close modal
+    const closeModal = $('#closeQuizModal');
+    if (closeModal) {
+      closeModal.addEventListener('click', function() { $('#quizModal').classList.add('hidden'); });
+    }
+
+    // Modal backdrop click
+    const quizModal = $('#quizModal');
+    if (quizModal) {
+      quizModal.addEventListener('click', function(e) {
+        if (e.target === quizModal) quizModal.classList.add('hidden');
+      });
+    }
+
+    // Quiz form submit
+    const quizForm = $('#quizForm');
+    if (quizForm) {
+      quizForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (!supabase) { alert('Service not ready. Refresh the page.'); return; }
+        const pid = $('#quizPropertyId') ? $('#quizPropertyId').value : '';
+        const name = $('#quizName') ? $('#quizName').value.trim() : '';
+        const email = $('#quizEmail') ? $('#quizEmail').value.trim() : '';
+        const wa = $('#quizWhatsapp') ? $('#quizWhatsapp').value.trim() : '';
+        if (!name || !email || !wa) { alert('Fill all fields.'); return; }
+        if (!/^\d{9,13}$/.test(wa.replace(/\D/g, ''))) { alert('Enter a valid phone number.'); return; }
+        try {
+          const pdR = await supabase.from('properties').select('owner_id, title, address, price_amount, property_type').eq('id', pid).single();
+          if (pdR.error) throw pdR.error;
+          const pd = pdR.data;
+          const cost = Math.round((pd.price_amount || 0) / 150000) * 3250 || 3250;
+          const leadR = await supabase.from('lead_requests').insert({
+            property_id: pid, broker_id: pd.owner_id,
+            visitor_name: name, visitor_email: email, visitor_whatsapp: wa,
+            quiz_answers: {}, total_score: 6, lead_type: 'warm', status: 'pending', cost: cost,
+            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+          }).select().single();
+          if (leadR.error) throw leadR.error;
+          $('#quizModal').classList.add('hidden');
+          alert('✅ Request sent! The broker will be in touch.');
+        } catch (err) { alert('Error: ' + err.message); }
+      });
+    }
+
+    // Start live enhancement
+    enhanceWithLiveData();
+    console.log('✅ Property Hub ready');
+  }
+
+  // Wait for DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 </script>
 </body>
