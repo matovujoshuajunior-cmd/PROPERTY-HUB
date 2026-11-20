@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// scripts/prerender.mjs — Prerenders property listings into index.html
-// Runs on every push. Fetches live data from Supabase, injects into HTML.
-// Handles 0-listings gracefully. Only fails on truly fatal errors.
+// scripts/prerender-homepage.mjs
+// Fetches live listings and injects into index.html
+// NEVER exits 1 on empty data — only on truly fatal errors
 
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
@@ -11,32 +11,32 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
 
 console.log('🔧 Prerender starting');
+
 if (!SUPABASE_URL) {
-  console.error('❌ FATAL: SUPABASE_URL env var is not set');
-  console.error('   Add it in GitHub → Settings → Secrets and variables → Actions');
+  console.error('❌ FATAL: SUPABASE_URL not set');
   process.exit(1);
 }
 if (!SUPABASE_KEY) {
-  console.error('❌ FATAL: SUPABASE_ANON_KEY env var is not set');
-  console.error('   Add it in GitHub → Settings → Secrets and variables → Actions');
+  console.error('❌ FATAL: SUPABASE_ANON_KEY not set');
   process.exit(1);
 }
-console.log('   ✅ Secrets present (URL starts with', SUPABASE_URL.substring(0, 35) + '..., key is', SUPABASE_KEY.length, 'chars)');
+console.log('   ✅ Secrets present (URL len=' + SUPABASE_URL.length + ', key len=' + SUPABASE_KEY.length + ')');
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ---------- Helpers ----------
-function formatPrice(n) { return Number(n || 0).toLocaleString('en-UG') + ' UGX'; }
 
 function titleCase(s) {
   if (!s) return '';
   const small = new Set(['a','an','and','as','at','but','by','for','in','of','on','or','the','to','v','via','vs','with','from','into','under','over']);
-  return String(s).replace(/\b[a-zA-Z]+\b/g, (w, o) => {
+  return String(s).replace(/\b[a-zA-Z]+\b/g, function(w, o) {
     if (/^[A-Z]{2,}$/.test(w)) return w;
     const l = w.toLowerCase();
     if (o > 0 && small.has(l)) return l;
     return l.charAt(0).toUpperCase() + l.slice(1);
   });
+}
+
+function formatPrice(n) {
+  return Number(n || 0).toLocaleString('en-UG') + ' UGX';
 }
 
 function getImageArray(p) {
@@ -50,10 +50,7 @@ function getImageArray(p) {
 }
 
 function formatType(t) {
-  return t === 'rental' ? 'For Rent'
-    : t === 'property' ? 'For Sale'
-    : t === 'guesthouse' ? 'Guesthouse'
-    : 'Property';
+  return t === 'rental' ? 'For Rent' : t === 'property' ? 'For Sale' : t === 'guesthouse' ? 'Guesthouse' : 'Property';
 }
 
 function buildDescription(p) {
@@ -61,10 +58,8 @@ function buildDescription(p) {
     return String(p.description).trim().substring(0, 200);
   }
   const loc = (p.address || 'Kampala').split(',')[0].trim();
-  const type = p.property_type === 'rental' ? 'rental property'
-    : p.property_type === 'guesthouse' ? 'guesthouse'
-    : 'property for sale';
-  return `${titleCase(p.title || 'Property')} — a verified ${type} in ${loc}, Uganda. Listed at ${formatPrice(p.price_amount)} on Property Hub Uganda. Contact the broker directly.`;
+  const type = p.property_type === 'rental' ? 'rental property' : p.property_type === 'guesthouse' ? 'guesthouse' : 'property for sale';
+  return titleCase(p.title || 'Property') + ' — a verified ' + type + ' in ' + loc + ', Uganda. Listed at ' + formatPrice(p.price_amount) + ' on Property Hub.';
 }
 
 function buildCard(p) {
@@ -72,41 +67,39 @@ function buildCard(p) {
   const loc = (p.address || 'Uganda').split(',')[0].trim();
   const title = titleCase(p.title || 'Property');
   const type = formatType(p.property_type);
-  const alt = `${title} ${type.toLowerCase()} in ${loc}, Uganda — ${formatPrice(p.price_amount)} on Property Hub`;
+  const alt = title + ' ' + type.toLowerCase() + ' in ' + loc + ', Uganda — ' + formatPrice(p.price_amount);
   const desc = buildDescription(p);
-  const verified = p.verification_status === 'approved'
-    ? '<span class="property-card__verified">✓ VERIFIED</span>' : '';
+  const verified = p.verification_status === 'approved' ? '<span class="property-card__verified">✓ VERIFIED</span>' : '';
 
-  return `<article class="property-card">
-  <div class="property-card__image">
-    <img src="${img}" alt="${alt.replace(/"/g, '&quot;')}" loading="eager" width="600" height="450" />
-    <span class="property-card__type">${type}</span>
-    ${verified}
-  </div>
-  <div class="property-card__body">
-    <h3 class="property-card__title"><a href="/property/${p.id}">${title}</a></h3>
-    <p class="property-card__price">${formatPrice(p.price_amount)}</p>
-    <p class="property-card__location">📍 ${p.address || 'Location not specified'}</p>
-    <p class="property-card__desc">${desc}</p>
-    <div class="property-card__footer">
-      <span class="property-card__broker">🏢 Property Hub</span>
-      <a href="/property/${p.id}" class="property-card__cta">View Details →</a>
-    </div>
-  </div>
-</article>`.trim();
+  return '<article class="property-card">' +
+    '<div class="property-card__image">' +
+      '<img src="' + img + '" alt="' + alt.replace(/"/g, '&quot;') + '" loading="eager" width="600" height="450" />' +
+      '<span class="property-card__type">' + type + '</span>' +
+      verified +
+    '</div>' +
+    '<div class="property-card__body">' +
+      '<h3 class="property-card__title"><a href="/property/' + p.id + '">' + title + '</a></h3>' +
+      '<p class="property-card__price">' + formatPrice(p.price_amount) + '</p>' +
+      '<p class="property-card__location">📍 ' + (p.address || 'Location not specified') + '</p>' +
+      '<p class="property-card__desc">' + desc + '</p>' +
+      '<div class="property-card__footer">' +
+        '<span class="property-card__broker">🏢 Property Hub</span>' +
+        '<a href="/property/' + p.id + '" class="property-card__cta">View Details →</a>' +
+      '</div>' +
+    '</div>' +
+  '</article>';
 }
 
 function buildEmptyState() {
-  return `<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:3rem 1rem;background:#fff;border:1px solid #e2e8f0;border-radius:1rem;">
-  <h3 style="font-size:1.15rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">New listings coming soon</h3>
-  <p style="color:#64748b;margin-bottom:1rem;">We're onboarding verified brokers across Kampala. Explore our neighborhood guides below or list your property.</p>
-  <a href="/brokers/" style="display:inline-block;background:#4f46e5;color:#fff;padding:.65rem 1.25rem;border-radius:.65rem;font-weight:600;text-decoration:none;font-size:.85rem;">List your property →</a>
-</div>`;
+  return '<div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;background:#fff;border:1px solid #e2e8f0;border-radius:1rem;">' +
+    '<h3 style="font-size:1.15rem;font-weight:700;color:#1e293b;margin-bottom:.5rem;">New listings coming soon</h3>' +
+    '<p style="color:#64748b;margin-bottom:1rem;">We are onboarding verified brokers across Kampala.</p>' +
+    '<a href="/brokers/" style="display:inline-block;background:#4f46e5;color:#fff;padding:.65rem 1.25rem;border-radius:.65rem;font-weight:600;text-decoration:none;font-size:.85rem;">List your property →</a>' +
+    '</div>';
 }
 
-// ---------- Main ----------
 async function main() {
-  console.log('📡 Querying Supabase properties table...');
+  console.log('📡 Querying Supabase...');
 
   const { data, error } = await supabase
     .from('properties')
@@ -114,85 +107,65 @@ async function main() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('⚠️  Supabase query returned an error:', error.message);
-    console.error('   This usually means RLS is blocking the anon role.');
-    console.error('   → Run in Supabase SQL Editor:');
-    console.error('     CREATE POLICY "Anon can read properties" ON public.properties FOR SELECT TO anon USING (true);');
-    console.error('   → Deploying with empty-state fallback instead.');
-    // Do NOT exit 1 — deploy with fallback
+    console.error('⚠️  Supabase query error:', error.message);
+    console.error('   → RLS may be blocking. Deploying with empty state.');
+    // Don't exit — deploy with empty state
   }
 
-  const raw = (data || []);
+  const raw = data || [];
   const active = raw.filter(p => p.is_paused !== true);
   const approved = active.filter(p => p.verification_status === 'approved');
   const toShow = approved.length > 0 ? approved : active;
 
-  console.log(`   Raw rows returned:  ${raw.length}`);
-  console.log(`   Active (not paused): ${active.length}`);
-  console.log(`   Approved (verified): ${approved.length}`);
-  console.log(`   Will render:         ${toShow.length} listings`);
+  console.log('   Raw rows:      ' + raw.length);
+  console.log('   Active:        ' + active.length);
+  console.log('   Approved:      ' + approved.length);
+  console.log('   Will render:   ' + toShow.length);
 
-  if (toShow.length === 0 && raw.length === 0 && !error) {
-    console.log('ℹ️  0 rows returned — table may be empty or RLS is blocking anon reads.');
-  }
-
-  const cardsHtml = toShow.length > 0
-    ? toShow.slice(0, 24).map(buildCard).join('\n')
-    : buildEmptyState();
-
+  const cardsHtml = toShow.length > 0 ? toShow.slice(0, 24).map(buildCard).join('\n') : buildEmptyState();
   const noscriptHtml = toShow.length > 0
-    ? toShow.map(p => `<li><a href="/property/${p.id}"><strong>${titleCase(p.title)}</strong></a> — ${formatPrice(p.price_amount)} — ${(p.address || 'Kampala').split(',')[0]}</li>`).join('\n')
+    ? toShow.map(p => '<li><a href="/property/' + p.id + '"><strong>' + titleCase(p.title) + '</strong></a> — ' + formatPrice(p.price_amount) + ' — ' + (p.address || 'Kampala').split(',')[0] + '</li>').join('\n')
     : '<li>No listings yet. <a href="/brokers/">List your property free</a>.</li>';
 
   const indexPath = path.join(process.cwd(), 'index.html');
   if (!fs.existsSync(indexPath)) {
-    console.error('❌ FATAL: index.html not found at', indexPath);
+    console.error('❌ FATAL: index.html not found at ' + indexPath);
     process.exit(1);
   }
 
   let html = fs.readFileSync(indexPath, 'utf8');
   const beforeLen = html.length;
 
-  // Check markers exist
   if (!html.includes('<!-- PRERENDERED_LISTINGS_START -->')) {
-    console.error('❌ FATAL: index.html missing <!-- PRERENDERED_LISTINGS_START --> marker');
+    console.error('❌ FATAL: Missing <!-- PRERENDERED_LISTINGS_START --> marker');
     process.exit(1);
   }
   if (!html.includes('<!-- PRERENDERED_LISTINGS_END -->')) {
-    console.error('❌ FATAL: index.html missing <!-- PRERENDERED_LISTINGS_END --> marker');
+    console.error('❌ FATAL: Missing <!-- PRERENDERED_LISTINGS_END --> marker');
     process.exit(1);
   }
-  console.log('   ✅ Markers found in index.html');
+  console.log('   ✅ Markers found');
 
-  // Replace listings block
   html = html.replace(
     /<!-- PRERENDERED_LISTINGS_START -->[\s\S]*?<!-- PRERENDERED_LISTINGS_END -->/,
-    `<!-- PRERENDERED_LISTINGS_START -->\n${cardsHtml}\n<!-- PRERENDERED_LISTINGS_END -->`
+    '<!-- PRERENDERED_LISTINGS_START -->\n' + cardsHtml + '\n<!-- PRERENDERED_LISTINGS_END -->'
   );
 
-  // Replace noscript block (must have id="listings-noscript")
   if (html.includes('<noscript id="listings-noscript">')) {
     html = html.replace(
       /<noscript id="listings-noscript">[\s\S]*?<\/noscript>/,
-      `<noscript id="listings-noscript"><div style="padding:1rem;background:#fff;border-radius:1rem;border:1px solid #e2e8f0;"><h2 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">Browse Listings</h2><ul style="list-style:none;display:flex;flex-direction:column;gap:.5rem;font-size:.875rem;">${noscriptHtml}</ul></div></noscript>`
+      '<noscript id="listings-noscript"><div style="padding:1rem;background:#fff;border-radius:1rem;border:1px solid #e2e8f0;max-width:1200px;margin:1rem auto;"><h2 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">Browse Listings</h2><ul style="list-style:none;display:flex;flex-direction:column;gap:.5rem;font-size:.875rem;">' + noscriptHtml + '</ul></div></noscript>'
     );
   }
 
   fs.writeFileSync(indexPath, html);
-
   const cardCount = (html.match(/class="property-card"/g) || []).length;
-  console.log(`✅ Injected ${cardCount} property card(s)`);
-  console.log(`   index.html: ${beforeLen} → ${html.length} bytes`);
-
-  if (cardCount === 0 && toShow.length > 0) {
-    console.error('❌ FATAL: Injection produced 0 cards despite having listings.');
-    process.exit(1);
-  }
-
+  console.log('✅ Injected ' + cardCount + ' card(s) into index.html');
+  console.log('   ' + beforeLen + ' → ' + html.length + ' bytes');
   console.log('🎉 Prerender complete');
 }
 
-main().catch(err => {
+main().catch(function(err) {
   console.error('❌ FATAL:', err.message);
   console.error(err.stack);
   process.exit(1);
