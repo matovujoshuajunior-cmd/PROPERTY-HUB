@@ -14,15 +14,15 @@
 <meta name="google-site-verification" content="PASTE_YOUR_GOOGLE_VERIFICATION_CODE_HERE" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Property Hub Uganda" />
-<meta property="og:title" content="Find Your Perfect Space | Property Hub Uganda" />
-<meta property="og:description" content="Verified rentals, apartments, guesthouses, and titled land across Uganda." />
+<meta property="og:title" content="Houses for Rent, Apartments & Land for Sale in Uganda | Property Hub" />
+<meta property="og:description" content="Browse verified houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land for sale in Wakiso." />
 <meta property="og:url" content="https://propertyhub.dpdns.org/" />
 <meta property="og:locale" content="en_UG" />
 <meta property="og:image" content="https://propertyhub.dpdns.org/og-cover.jpg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Find Your Perfect Space | Property Hub Uganda" />
+<meta name="twitter:title" content="Houses for Rent, Apartments & Land for Sale in Uganda | Property Hub" />
 <meta name="twitter:description" content="Verified rentals, apartments, guesthouses, and land across Uganda." />
 <meta name="twitter:image" content="https://propertyhub.dpdns.org/og-cover.jpg" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
@@ -177,6 +177,9 @@ body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans
 .seo-breadcrumb a { color: #4f46e5; text-decoration: none; }
 .pre-render-fallback { color: #64748b; font-size: 0.9rem; padding: 1rem 0; }
 .pre-render-fallback h2 { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+.pre-render-fallback ul { margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.5rem; list-style: none; padding: 0; }
+.pre-render-fallback ul li a { color: #4f46e5; text-decoration: none; font-size: 0.85rem; }
+.pre-render-fallback ul li a:hover { text-decoration: underline; }
 .hero-trust-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
 .hero-trust-chips span { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; backdrop-filter: blur(4px); }
 .hero-trust-chips i { color: #34d399; font-size: 0.75rem; }
@@ -213,14 +216,17 @@ body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans
 <body>
 <noscript>
 <div style="max-width:900px;margin:2rem auto;padding:1rem;font-family:system-ui,sans-serif;line-height:1.6">
-<h1>Find Your Perfect Space — Property Hub Uganda</h1>
+<h1>Houses for Rent, Apartments & Land for Sale in Uganda — Property Hub</h1>
 <p>Browse verified houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land for sale in Wakiso.</p>
-<ul>
+<ul style="list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.5rem;padding:0;">
 <li><a href="/guides/single-rooms-near-makerere/">Single rooms near Makerere University</a></li>
 <li><a href="/guides/hostels-near-mulago/">Hostels near Mulago Hospital</a></li>
 <li><a href="/guides/cheap-rooms-kikoni/">Cheap rooms for rent in Kikoni</a></li>
+<li><a href="/guides/apartments-naalya/">2 bedroom apartments in Naalya</a></li>
+<li><a href="/guides/apartments-ntinda/">Apartments for rent in Ntinda</a></li>
+<li><a href="/guides/rentals-bukoto/">Houses & apartments in Bukoto</a></li>
 </ul>
-<p>Please enable JavaScript to browse live listings.</p>
+<p style="margin-top:1rem;color:#64748b;">Please enable JavaScript to browse live listings and contact brokers directly.</p>
 </div>
 </noscript>
 <div id="loadingOverlay"><div class="loader"></div><p class="text-slate-600 text-sm">Loading Property Hub…</p></div>
@@ -391,8 +397,8 @@ width="1400" height="800" fetchpriority="high" decoding="async" />
 <div class="absolute inset-0 hero-gradient"></div>
 <div class="relative max-w-7xl mx-auto px-4 py-16 md:py-20">
 <div class="max-w-2xl">
-<h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Find Your Perfect Space</h1>
-<p class="mt-3 text-slate-200 text-base md:text-lg">Rentals, apartments, guesthouses, and land across Kampala, Wakiso, and Entebbe — from verified brokers.</p>
+<h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Houses for Rent, Apartments & Land for Sale in Uganda</h1>
+<p class="mt-3 text-slate-200 text-base md:text-lg">Browse verified houses for rent in Kampala, apartments in Naalya, guesthouses in Entebbe, and titled land for sale in Wakiso. Direct broker contact, no scams.</p>
 <div class="mt-6 relative">
 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
 <input id="searchInput" type="text" placeholder="Search by area, price, or broker…" class="w-full pl-12 pr-12 py-3 rounded-xl text-slate-800" />
@@ -431,8 +437,18 @@ width="1400" height="800" fetchpriority="high" decoding="async" />
 <div id="listingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 <!-- PRERENDERED_LISTINGS_START -->
 <div id="crawlerFallback" class="md:col-span-2 lg:col-span-3 pre-render-fallback">
-<h2>Live Ugandan Property Listings — Loading</h2>
+<h2>Verified Property Listings in Uganda</h2>
 <p>Discover verified rentals, apartments, guesthouses, and land for sale across <strong>Kampala, Wakiso, Kira, Naalya, Ntinda, Kololo, Naguru, Muyenga, Bukoto, Entebbe, Mukono, and Jinja</strong> on Property Hub Uganda.</p>
+<ul>
+<li><a href="/guides/single-rooms-near-makerere/">Single rooms near Makerere University</a></li>
+<li><a href="/guides/hostels-near-mulago/">Hostels near Mulago Hospital</a></li>
+<li><a href="/guides/cheap-rooms-kikoni/">Cheap rooms for rent in Kikoni</a></li>
+<li><a href="/guides/apartments-naalya/">2 bedroom apartments in Naalya</a></li>
+<li><a href="/guides/apartments-ntinda/">Apartments for rent in Ntinda</a></li>
+<li><a href="/guides/rentals-bukoto/">Houses & apartments in Bukoto</a></li>
+<li><a href="/guides/kololo/">Luxury houses in Kololo</a></li>
+<li><a href="/guides/guesthouses-entebbe-airport/">Guesthouses near Entebbe Airport</a></li>
+</ul>
 </div>
 <!-- PRERENDERED_LISTINGS_END -->
 </div>
@@ -1691,6 +1707,7 @@ const r = await supabase.auth.signInWithPassword({ email: email, password: pw })
 if (r.error) throw r.error;
 state.currentUser = r.data.user;
 alert('✅ Signed in!');
+$('#portalBtnLabel').textContent = 'Dashboard';
 await loadProfileSettings();
 await loadMyProperties();
 await loadWallet();
@@ -1713,7 +1730,6 @@ alert('✅ Password reset email sent to ' + email);
 async function loadProfileSettings() {
 if (!state.currentUser) return;
 try {
-// FIXED: Use .maybeSingle() so it doesn't crash if the user hasn't created a profile yet
 const r = await supabase.from('profiles').select('business_name, phone, is_admin').eq('id', state.currentUser.id).maybeSingle();
 if (r.error && r.error.code !== 'PGRST116') {
 console.warn('Profile load warning:', r.error.message);
@@ -1939,7 +1955,6 @@ return;
 }
 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// FIXED: Added robust Auth State Listener to ensure button labels and data update reliably
 supabase.auth.onAuthStateChange((event, session) => {
 state.currentUser = session?.user || null;
 const label = $('#portalBtnLabel');
