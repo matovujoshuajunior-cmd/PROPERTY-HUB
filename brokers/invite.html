@@ -75,7 +75,7 @@
 
     .progress-fill {
       height: 100%;
-      width: 33.33%;
+      width: 25%;
       background: var(--accent);
       transition: width 0.5s ease;
     }
@@ -94,6 +94,10 @@
       margin-bottom: 20px;
     }
 
+    .highlight-location {
+      color: var(--accent);
+    }
+
     .context-reply {
       font-size: 13.5px;
       color: var(--accent);
@@ -105,7 +109,7 @@
     }
 
     .typewriter-box {
-      min-height: 210px;
+      min-height: 250px;
       font-size: 15.5px;
       line-height: 1.75;
       color: #f3f4f6;
@@ -131,7 +135,7 @@
     .options-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
     }
 
     .choice-btn {
@@ -140,7 +144,7 @@
       background: #182032;
       color: var(--text-main);
       border: 1px solid #2d3748;
-      padding: 15px 18px;
+      padding: 14px 18px;
       border-radius: 10px;
       font-size: 14.5px;
       font-weight: 500;
@@ -163,114 +167,22 @@
       margin-left: 10px;
     }
 
-    .area-input-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .area-input {
-      flex: 1;
-      background: #0d1320;
-      border: 1px solid #374151;
-      color: var(--text-main);
-      padding: 13px 14px;
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .area-input:focus {
-      border-color: var(--accent);
-    }
-
-    .verify-btn {
-      background: var(--accent);
-      color: #090d16;
-      border: none;
-      padding: 0 18px;
-      border-radius: 10px;
+    .question-prompt {
+      font-size: 17px;
       font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s ease;
-    }
-
-    .verify-btn:hover {
-      background: var(--accent-hover);
-    }
-
-    .input-error {
-      color: #f87171;
-      font-size: 13px;
-      margin-bottom: 14px;
-    }
-
-    .proof-box {
-      background: #0d1320;
-      border: 1px solid #1f2937;
-      border-radius: 10px;
-      padding: 16px;
-      margin-top: 14px;
-      margin-bottom: 20px;
-    }
-
-    .proof-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
       color: var(--accent);
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-
-    .keyword-chips {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
       margin-bottom: 12px;
     }
 
-    .keyword-link {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #151e30;
-      border: 1px solid #263147;
-      padding: 10px 14px;
-      border-radius: 8px;
-      color: #f3f4f6;
-      text-decoration: none;
-      font-size: 14px;
-      transition: border-color 0.2s;
-    }
-
-    .keyword-link:hover {
-      border-color: var(--accent);
-    }
-
-    .keyword-link span {
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .proof-note {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 0;
-    }
-
-    .deal-box {
-      background: rgba(245, 158, 11, 0.06);
-      border: 1px solid rgba(245, 158, 11, 0.28);
+    .terms-box {
+      background: #0d1320;
+      border: 1px solid #1f2937;
       border-radius: 12px;
       padding: 18px;
       margin-bottom: 20px;
     }
 
-    .deal-title {
+    .terms-section-title {
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1.2px;
@@ -279,25 +191,31 @@
       margin-bottom: 10px;
     }
 
-    .deal-list {
+    .terms-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       font-size: 14.5px;
       color: #e5e7eb;
     }
 
-    .deal-list li {
-      padding-left: 20px;
+    .terms-list li {
+      padding-left: 22px;
       position: relative;
+      line-height: 1.55;
     }
 
-    .deal-list li span.check {
+    .terms-list li span.bullet {
       position: absolute;
       left: 0;
       color: var(--accent);
       font-weight: bold;
+    }
+
+    .honesty-divider {
+      border-top: 1px solid #1f2937;
+      margin: 14px 0;
     }
 
     .cta-btn {
@@ -382,159 +300,223 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- STAGE 1: THE BASKET OF BREAD               -->
+    <!-- STAGE 1: LOCATION QUALIFICATION            -->
     <!-- ========================================== -->
     <div id="stage-1" class="fade-in">
-      <h1>Welcome to my Property Hub Uganda.</h1>
-      <p>What do you think about <strong>propertyhub.dpdns.org</strong>?</p>
+      <h1>Welcome to the break-bread room.</h1>
+      <p>First, confirm your area of operation. Do you operate from any of these locations?</p>
 
       <div class="options-group">
-        <button class="choice-btn" onclick="enterStage2('unchecked')">
-          <span>Did not check it out</span>
+        <button class="choice-btn" onclick="selectLocation('Mulago')">
+          <span>Mulago</span>
           <span class="arrow">→</span>
         </button>
-        <button class="choice-btn" onclick="enterStage2('cards')">
-          <span>I saw it has property cards and their locations</span>
+        <button class="choice-btn" onclick="selectLocation('Wandegeya')">
+          <span>Wandegeya</span>
           <span class="arrow">→</span>
         </button>
-        <button class="choice-btn" onclick="enterStage2('purpose')">
-          <span>Saw it, but what is its purpose?</span>
+        <button class="choice-btn" onclick="selectLocation('Kikoni')">
+          <span>Kikoni</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="choice-btn" onclick="selectLocation('Makerere')">
+          <span>Makerere</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="choice-btn" onclick="selectLocation('Kanyanya')">
+          <span>Kanyanya</span>
           <span class="arrow">→</span>
         </button>
       </div>
     </div>
 
-       <!-- ========================================== -->
-    <!-- STAGE 2: SURRENDER + SELECTIVE HONESTY     -->
+    <!-- ========================================== -->
+    <!-- STAGE 2: LOCATION GREETING & SITE CHECK    -->
     <!-- ========================================== -->
     <div id="stage-2" class="hidden">
+      <h2>Finally, a broker from <span id="picked-location-heading" class="highlight-location"></span>.</h2>
+      <p>Did you take a look at <strong>propertyhub.dpdns.org</strong>? What did you observe in it?</p>
+
+      <div class="options-group">
+        <button class="choice-btn" onclick="enterStage3('unchecked')">
+          <span>Did not check it yet</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="choice-btn" onclick="enterStage3('cards')">
+          <span>I saw property cards, rentals, and local guides</span>
+          <span class="arrow">→</span>
+        </button>
+        <button class="choice-btn" onclick="enterStage3('purpose')">
+          <span>I saw it, but I want to know how it brings me clients</span>
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- STAGE 3: TYPEWRITER PITCH & "ARE YOU IN?"  -->
+    <!-- ========================================== -->
+    <div id="stage-3" class="hidden">
       <div id="context-reply" class="context-reply"></div>
 
       <div class="typewriter-box">
         <span id="typewriter-output"></span><span id="typewriter-cursor" class="cursor"></span>
       </div>
 
-      <div id="stage-2-options" class="options-group hidden">
-        <button class="choice-btn" onclick="enterStage3()">
-          <span>Are you interested we move to what you can do now to generate the leads?</span>
-          <span class="arrow">→</span>
-        </button>
-        <button class="choice-btn" onclick="enterStage3()">
-          <span>Fair enough — show me the free founding deal</span>
-          <span class="arrow">→</span>
-        </button>
+      <div id="stage-3-options" class="hidden">
+        <div class="question-prompt">Are you in?</div>
+        <div class="options-group">
+          <button class="choice-btn" onclick="enterStage4()">
+            <span>Yes, I’m in — show me the terms</span>
+            <span class="arrow">→</span>
+          </button>
+          <button class="choice-btn" onclick="enterStage4()">
+            <span>Tell me the exact terms first</span>
+            <span class="arrow">→</span>
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- STAGE 3: THE SWEET DEAL & ACCOUNT REDIRECT -->
+    <!-- STAGE 4: TYPEWRITER TERMS & SIGN-UP        -->
     <!-- ========================================== -->
-    <div id="stage-3" class="hidden">
-      <h2>Then let’s shake on it.</h2>
-      <p>You bring real properties to the table. We take all the risk to bring serious buyers straight to your phone.</p>
+    <div id="stage-4" class="hidden">
+      <h2>Here is the truth right away.</h2>
 
-      <div class="deal-box">
-        <div class="deal-title">Your Founding Broker Deal (100% Free)</div>
-        <ul class="deal-list">
-          <li>
-            <span class="check">✓</span>
-            <strong>0 UGX Verification Fee:</strong> We removed our verification charges so your properties go live completely free.
-          </li>
-          <li>
-            <span class="check">✓</span>
-            <strong>0 UGX Lead Unlocking:</strong> Receive buyer contacts completely free while we build and grow together.
-          </li>
-          <li>
-            <span class="check">✓</span>
-            <strong>Simple Start:</strong> Create your account today and upload at least <strong>2 starting properties</strong> to begin receiving leads.
-          </li>
-        </ul>
+      <div class="typewriter-box" style="min-height: 190px;">
+        <span id="stage4-typewriter-output"></span><span id="stage4-typewriter-cursor" class="cursor"></span>
       </div>
 
-      <a href="https://dpdns.org" class="cta-btn">
-        Create Broker Account & Upload 2 Properties →
-      </a>
-      <div class="terms-micro">
-        By creating an account, you agree to our <a href="https://dpdns.org" target="_blank" rel="noopener">Terms of Service</a>.
-      </div>
+      <div id="stage-4-actions" class="hidden">
+        <a href="https://dpdns.org" class="cta-btn">
+          Sign Up & Upload 2 Free Rentals →
+        </a>
+        <div class="terms-micro">
+          Review full details in our <a href="https://propertyhub.dpdns.org/terms" target="_blank" rel="noopener">Terms of Service</a>.
+        </div>
 
-      <div class="direct-negotiation">
-        Prefer to negotiate directly first?
-        <div class="direct-links">
-          <a href="tel:+256700000000">📞 Call Direct</a>
-          <a href="https://wa.me." target="_blank" rel="noopener">💬 WhatsApp Direct</a>
+        <div class="direct-negotiation">
+          Want to discuss anything directly before signing up?
+          <div class="direct-links">
+            <a href="tel:+256766960262">📞 Call Direct</a>
+            <a id="whatsapp-link" href="https://wa.me." target="_blank" rel="noopener">💬 WhatsApp Direct</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Stage 2 Script: Diagnoses their pain + applies Surrender & Selective Honesty
-    const bluffScript =
-      "You are a broker who has appeared to have revenue returning properties, " +
-      "but you link everywhere, inconspicuous, and you accept bad deals due to limited options. " +
-      "You need potential leads. " +
-      "And to be completely honest with you—we are still growing our site too, and we want to improve it with real listings. " +
-      "So we are removing our verification and lead unlocking fees first, making it completely free for you. " +
-      "We will generate the needed leads for you using our site marketing and online domination.";
-
+    let selectedLocation = "";
     let isTyping = false;
 
-    function enterStage2(selection) {
-      if (isTyping) return;
+    function selectLocation(location) {
+      selectedLocation = location;
 
-      document.getElementById("progress-fill").style.width = "66.66%";
+      document.getElementById("progress-fill").style.width = "50%";
+      document.getElementById("picked-location-heading").textContent = selectedLocation;
+
+      const waText = encodeURIComponent(
+        `Hello Property Hub Uganda, I am a broker operating in ${selectedLocation} from your break-bread invite.`
+      );
+      document.getElementById("whatsapp-link").href = `https://wa.me{waText}`;
+
       document.getElementById("stage-1").classList.add("hidden");
-
       const stage2 = document.getElementById("stage-2");
       stage2.classList.remove("hidden");
       stage2.classList.add("fade-in");
-
-      const replyBox = document.getElementById("context-reply");
-      if (selection === "unchecked") {
-        replyBox.textContent = "Fair enough. Read every word carefully:";
-      } else if (selection === "cards") {
-        replyBox.textContent = "Those property cards are only the start. Read this honestly:";
-      } else {
-        replyBox.textContent = "Here is the honest truth behind why we invited you:";
-      }
-
-      isTyping = true;
-      typeText(bluffScript, 0);
     }
 
-    function typeText(text, index) {
-      const output = document.getElementById("typewriter-output");
+    function enterStage3(observation) {
+      if (isTyping) return;
 
-      if (index < text.length) {
-        const currentChar = text.charAt(index);
-        output.textContent += currentChar;
-
-        // Slower, deliberate pacing so the reader analyzes every word
-        let speed = 48;
-        if (currentChar === "." || currentChar === "—") {
-          speed = 650;
-        } else if (currentChar === ",") {
-          speed = 320;
-        }
-
-        setTimeout(() => typeText(text, index + 1), speed);
-      } else {
-        isTyping = false;
-        document.getElementById("typewriter-cursor").style.display = "none";
-        const options = document.getElementById("stage-2-options");
-        options.classList.remove("hidden");
-        options.classList.add("fade-in");
-      }
-    }
-
-    function enterStage3() {
-      document.getElementById("progress-fill").style.width = "100%";
+      document.getElementById("progress-fill").style.width = "75%";
       document.getElementById("stage-2").classList.add("hidden");
 
       const stage3 = document.getElementById("stage-3");
       stage3.classList.remove("hidden");
       stage3.classList.add("fade-in");
+
+      const replyBox = document.getElementById("context-reply");
+      if (observation === "unchecked") {
+        replyBox.textContent = "Fair enough. Read every word of what we are building:";
+      } else if (observation === "cards") {
+        replyBox.textContent = "Good eye. Here is what sits behind those property cards:";
+      } else {
+        replyBox.textContent = "Here is the exact truth about how we bring you clients:";
+      }
+
+      const pitchScript =
+        "That is our real estate marketplace. " +
+        "We use that to get converting leads to brokers, and you do want leads to make a fortune in real estate. " +
+        "Honestly, this site is an ambitious marketplace that wants to compete on online marketing. " +
+        `Now we are focused on rentals from ${selectedLocation} and those specific surrounding areas. ` +
+        "Now, we have the site—we market it and put in place strategies to get those leads for you. " +
+        "And you have the rentals and properties. " +
+        "Together we can win in this; divided, maybe not. " +
+        "We are ambitious and we admire working with genuine people like you.";
+
+      runTypewriter(
+        pitchScript,
+        "typewriter-output",
+        "typewriter-cursor",
+        "stage-3-options"
+      );
+    }
+
+    function enterStage4() {
+      if (isTyping) return;
+
+      document.getElementById("progress-fill").style.width = "100%";
+      document.getElementById("stage-3").classList.add("hidden");
+
+      const stage4 = document.getElementById("stage-4");
+      stage4.classList.remove("hidden");
+      stage4.classList.add("fade-in");
+
+      const termsScript =
+        `Sign up today and upload 2 rentals in ${selectedLocation}—they are completely free for a new account. ` +
+        "After they are converted into revenue, we will go to the real business: " +
+        "a membership or entrance fee, a verification fee for every property, and then a lead unlocking fee. " +
+        "We tell you the truth right away so we build on honesty.";
+
+      runTypewriter(
+        termsScript,
+        "stage4-typewriter-output",
+        "stage4-typewriter-cursor",
+        "stage-4-actions"
+      );
+    }
+
+    function runTypewriter(text, outputId, cursorId, revealId) {
+      isTyping = true;
+      const output = document.getElementById(outputId);
+      const cursor = document.getElementById(cursorId);
+      const revealBlock = document.getElementById(revealId);
+
+      function step(index) {
+        if (index < text.length) {
+          const currentChar = text.charAt(index);
+          output.textContent += currentChar;
+
+          let speed = 48;
+          if (currentChar === "." || currentChar === "—") {
+            speed = 650;
+          } else if (currentChar === "," || currentChar === ";" || currentChar === ":") {
+            speed = 320;
+          }
+
+          setTimeout(() => step(index + 1), speed);
+        } else {
+          isTyping = false;
+          cursor.style.display = "none";
+          revealBlock.classList.remove("hidden");
+          revealBlock.classList.add("fade-in");
+        }
+      }
+
+      step(0);
     }
   </script>
 
