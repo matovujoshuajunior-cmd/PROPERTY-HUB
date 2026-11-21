@@ -37,10 +37,10 @@ img{max-width:100%;display:block}
 .logo span{color:#4f46e5}
 .header-right{display:flex;align-items:center;gap:.75rem}
 .count-badge{background:#f1f5f9;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;color:#475569}
-.portal-btn{background:#4f46e5;color:#fff;padding:.5rem 1.25rem;border-radius:.75rem;font-size:.875rem;border:none;cursor:pointer;font-family:inherit;font-weight:500}
+.portal-btn{background:#4f46e5;color:#fff;padding:.5rem 1.25rem;border-radius:.75rem;font-size:.875rem;border:none;cursor:pointer;font-family:inherit;font-weight:500;transition:background .2s}
 .portal-btn:hover{background:#4338ca}
 
-/* HERO — background uses /hero.svg with gradient fallback */
+/* HERO */
 .hero{position:relative;overflow:hidden;color:#fff;padding:4rem 1rem 3rem;text-align:center;background:#1e1b4b}
 .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;z-index:1}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(30,27,75,.85) 0%,rgba(79,70,229,.7) 60%,rgba(249,115,22,.6) 100%);z-index:2}
@@ -86,7 +86,8 @@ img{max-width:100%;display:block}
 .property-card__desc{color:#64748b;font-size:.8rem;margin-top:.5rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .property-card__footer{margin-top:auto;padding-top:.75rem;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
 .property-card__broker{font-size:.75rem;color:#64748b}
-.property-card__cta{background:#4f46e5;color:#fff;font-size:.7rem;font-weight:600;padding:.4rem .85rem;border-radius:9999px;text-decoration:none}
+.property-card__cta{background:#4f46e5;color:#fff;font-size:.7rem;font-weight:600;padding:.4rem .85rem;border-radius:9999px;text-decoration:none;border:none;cursor:pointer;font-family:inherit}
+.property-card__cta:hover{background:#4338ca}
 
 /* GUIDES */
 .guides-section{max-width:1200px;margin:3rem auto;padding:0 1rem}
@@ -116,14 +117,17 @@ img{max-width:100%;display:block}
 .footer-bottom{border-top:1px solid #1e293b;text-align:center;padding:1rem;font-size:.75rem;color:#64748b;max-width:1200px;margin:0 auto}
 
 /* MODAL */
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(2px)}
 .modal-backdrop.hidden{display:none}
-.modal-content{background:#fff;border-radius:1.5rem;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:2rem;position:relative}
-.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;line-height:1}
+.modal-content{background:#fff;border-radius:1.5rem;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:2rem;position:relative;box-shadow:0 20px 25px -5px rgba(0,0,0,.1)}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;line-height:1;transition:color .2s}
+.modal-close:hover{color:#1e293b}
 .field{margin-bottom:.75rem}
 .field label{display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;color:#475569}
-.field input{width:100%;padding:.65rem 1rem;border:1px solid #e2e8f0;border-radius:.65rem;font-size:.9rem;font-family:inherit}
-.btn-primary{width:100%;padding:.75rem;background:#4f46e5;color:#fff;border:none;border-radius:.65rem;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit}
+.field input{width:100%;padding:.65rem 1rem;border:1px solid #e2e8f0;border-radius:.65rem;font-size:.9rem;font-family:inherit;transition:border-color .2s}
+.field input:focus{outline:none;border-color:#4f46e5}
+.btn-primary{width:100%;padding:.75rem;background:#4f46e5;color:#fff;border:none;border-radius:.65rem;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit;transition:background .2s}
+.btn-primary:hover{background:#4338ca}
 </style>
 </head>
 <body>
@@ -131,9 +135,9 @@ img{max-width:100%;display:block}
 <header class="header">
   <div class="header-inner">
     <a href="/" class="logo">🏠 Property<span>Hub</span></a>
-    <div class="header-right">
+    <div class="header-right" id="authContainer">
       <span class="count-badge" id="propertyCount">Loading…</span>
-      <button class="portal-btn" id="brokerPortalBtn">Broker Portal</button>
+      <button class="portal-btn" id="loginBtn">Login / Sign Up</button>
     </div>
   </div>
 </header>
@@ -263,24 +267,58 @@ img{max-width:100%;display:block}
   </div>
 </footer>
 
-<div id="quizModal" class="modal-backdrop hidden">
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal-backdrop hidden">
   <div class="modal-content">
-    <button class="modal-close" id="closeQuizModal">&times;</button>
+    <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+    <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:#1e293b">🔐 Broker Login / Sign Up</h2>
+    <form id="authForm">
+      <div class="field"><label>Email *</label><input type="email" id="authEmail" required /></div>
+      <div class="field"><label>Password *</label><input type="password" id="authPassword" required minlength="6" /></div>
+      <div style="display:flex;gap:.5rem;margin-top:1rem;">
+        <button type="submit" class="btn-primary" id="authSubmitBtn">Login</button>
+        <button type="button" class="btn-primary" id="authToggleBtn" style="background:#e2e8f0;color:#334155;">Need an account? Sign Up</button>
+      </div>
+    </form>
+    <p id="authMessage" style="margin-top:1rem;font-size:.85rem;text-align:center;"></p>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal-backdrop hidden">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
+    <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:#1e293b">👤 My Profile</h2>
+    <form id="profileForm">
+      <div class="field"><label>Business Name</label><input type="text" id="profileBusinessName" placeholder="e.g., Kampala Real Estate" /></div>
+      <div class="field"><label>Phone / WhatsApp</label><input type="tel" id="profilePhone" placeholder="0771234567" /></div>
+      <div class="field"><label>Bio</label><input type="text" id="profileBio" placeholder="Brief description of your services" /></div>
+      <button type="submit" class="btn-primary">Save Profile</button>
+    </form>
+    <p id="profileMessage" style="margin-top:1rem;font-size:.85rem;text-align:center;"></p>
+  </div>
+</div>
+
+<!-- LEAD REQUEST MODAL -->
+<div id="leadModal" class="modal-backdrop hidden">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('leadModal')">&times;</button>
     <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:#1e293b">📞 Connect with Broker</h2>
-    <form id="quizForm">
-      <input type="hidden" id="quizPropertyId" />
-      <div class="field"><label>Your Name *</label><input type="text" id="quizName" required /></div>
-      <div class="field"><label>Email *</label><input type="email" id="quizEmail" required /></div>
-      <div class="field"><label>WhatsApp Number *</label><input type="tel" id="quizWhatsapp" required placeholder="0771234567" /></div>
+    <form id="leadForm">
+      <input type="hidden" id="leadPropertyId" />
+      <div class="field"><label>Your Name *</label><input type="text" id="leadName" required /></div>
+      <div class="field"><label>Email *</label><input type="email" id="leadEmail" required /></div>
+      <div class="field"><label>WhatsApp Number *</label><input type="tel" id="leadWhatsapp" required placeholder="0771234567" /></div>
       <button type="submit" class="btn-primary">Send Request</button>
     </form>
+    <p id="leadMessage" style="margin-top:1rem;font-size:.85rem;text-align:center;"></p>
   </div>
 </div>
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
 // ============================================================
-// DEFENSIVE INIT — all element access is null-safe
+// DEFENSIVE INIT & SUPABASE SETUP
 // ============================================================
 (function() {
   'use strict';
@@ -291,13 +329,218 @@ img{max-width:100%;display:block}
 
   let supabase = null;
   let allProperties = [];
+  let currentUser = null;
+  let isSignUp = false;
 
   function $(s) { return document.querySelector(s); }
   function safeAdd(el, event, fn) { if (el) el.addEventListener(event, fn); }
 
+  // Global modal helpers for inline HTML onclick handlers
+  window.closeModal = function(id) {
+    const modal = $(`#${id}`);
+    if (modal) modal.classList.add('hidden');
+  };
+  window.openModal = function(id) {
+    const modal = $(`#${id}`);
+    if (modal) modal.classList.remove('hidden');
+  };
+
+  function updatePropertyCount(count) {
+    const pc = $('#propertyCount');
+    if (pc) {
+      const num = count !== undefined ? count : allProperties.length;
+      pc.textContent = num + ' listing' + (num === 1 ? '' : 's');
+    }
+  }
+
+  // Initialize Supabase
+  function initSupabase() {
+    if (!window.supabase) {
+      console.warn('⏳ Supabase not loaded yet, retrying in 300ms…');
+      setTimeout(initSupabase, 300);
+      return;
+    }
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true
+        }
+      });
+
+      // Listen to auth state changes
+      supabase.auth.onAuthStateChange((event, session) => {
+        currentUser = session?.user || null;
+        updateAuthUI();
+        if (event === 'SIGNED_IN') {
+          fetchUserProfile();
+        } else if (event === 'SIGNED_OUT') {
+          currentUser = null;
+          updateAuthUI();
+        }
+      });
+
+      // Check initial session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        currentUser = session?.user || null;
+        updateAuthUI();
+        if (currentUser) fetchUserProfile();
+      });
+
+      console.log('✅ Supabase client initialized');
+      enhanceWithLiveData();
+    } catch (e) {
+      console.error('Supabase client failed:', e);
+    }
+  }
+
+  function updateAuthUI() {
+    const authContainer = $('#authContainer');
+    if (!authContainer) return;
+
+    if (currentUser) {
+      authContainer.innerHTML = `
+        <span class="count-badge" id="propertyCount">Loading…</span>
+        <button class="portal-btn" id="profileBtn" style="background:#10b981;">My Profile</button>
+        <button class="portal-btn" id="logoutBtn" style="background:#ef4444;">Logout</button>
+      `;
+      safeAdd($('#profileBtn'), 'click', () => {
+        fetchUserProfile();
+        window.openModal('profileModal');
+      });
+      safeAdd($('#logoutBtn'), 'click', async () => {
+        await supabase.auth.signOut();
+        alert('Logged out successfully');
+      });
+    } else {
+      authContainer.innerHTML = `
+        <span class="count-badge" id="propertyCount">Loading…</span>
+        <button class="portal-btn" id="loginBtn">Login / Sign Up</button>
+      `;
+      safeAdd($('#loginBtn'), 'click', () => window.openModal('authModal'));
+    }
+    updatePropertyCount();
+  }
+
+  // ── Auth Form Handling ──
+  const authForm = $('#authForm');
+  if (authForm) {
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = $('#authEmail').value.trim();
+      const password = $('#authPassword').value;
+      const msg = $('#authMessage');
+      msg.style.color = '#4f46e5';
+      msg.textContent = 'Processing...';
+
+      try {
+        if (isSignUp) {
+          const { error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
+          msg.style.color = '#10b981';
+          msg.textContent = 'Sign up successful! Please check your email to confirm.';
+        } else {
+          const { error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          msg.style.color = '#10b981';
+          msg.textContent = 'Login successful!';
+          setTimeout(() => {
+            window.closeModal('authModal');
+            msg.textContent = '';
+          }, 1000);
+        }
+      } catch (err) {
+        msg.style.color = '#ef4444';
+        msg.textContent = err.message;
+      }
+    });
+
+    $('#authToggleBtn').addEventListener('click', () => {
+      isSignUp = !isSignUp;
+      $('#authSubmitBtn').textContent = isSignUp ? 'Sign Up' : 'Login';
+      $('#authToggleBtn').textContent = isSignUp ? 'Already have an account? Login' : 'Need an account? Sign Up';
+      $('#authMessage').textContent = '';
+    });
+  }
+
+  // ── Profile Fetching ──
+  async function fetchUserProfile() {
+    if (!currentUser || !supabase) return;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('business_name, phone, bio')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found", which is fine
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      if (data) {
+        if ($('#profileBusinessName')) $('#profileBusinessName').value = data.business_name || '';
+        if ($('#profilePhone')) $('#profilePhone').value = data.phone || '';
+        if ($('#profileBio')) $('#profileBio').value = data.bio || '';
+      }
+    } catch (err) {
+      console.error('Profile fetch failed:', err);
+    }
+  }
+
+  // ── Profile Saving ──
+  const profileForm = $('#profileForm');
+  if (profileForm) {
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const msg = $('#profileMessage');
+      msg.style.color = '#4f46e5';
+      msg.textContent = 'Saving...';
+
+      const updates = {
+        id: currentUser.id,
+        business_name: $('#profileBusinessName').value.trim(),
+        phone: $('#profilePhone').value.trim(),
+        bio: $('#profileBio').value.trim(),
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .upsert(updates, { onConflict: 'id' });
+
+        if (error) throw error;
+        msg.style.color = '#10b981';
+        msg.textContent = 'Profile saved successfully!';
+        setTimeout(() => { msg.textContent = ''; }, 3000);
+      } catch (err) {
+        msg.style.color = '#ef4444';
+        msg.textContent = 'Error: ' + err.message;
+      }
+    });
+  }
+
+  // ── Helper: Safely get first image ──
+  function getFirstImage(mediaUrls) {
+    if (!mediaUrls) return '/og-cover.jpg';
+    if (Array.isArray(mediaUrls) && mediaUrls.length > 0) return mediaUrls[0];
+    if (typeof mediaUrls === 'string') {
+      try {
+        const parsed = JSON.parse(mediaUrls);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+      } catch (e) {
+        return mediaUrls; // fallback to string if it's a direct URL
+      }
+    }
+    return '/og-cover.jpg';
+  }
+
   // ── Render a card ──
   function buildCard(p) {
-    const imgUrl = (p.media_urls && p.media_urls[0]) || '/og-cover.jpg';
+    const imgUrl = getFirstImage(p.media_urls);
     const typeLabel = p.property_type === 'rental' ? 'For Rent' : p.property_type === 'property' ? 'For Sale' : 'Guesthouse';
     const verified = p.verification_status === 'approved';
     const price = Number(p.price_amount || 0).toLocaleString() + ' UGX';
@@ -321,9 +564,19 @@ img{max-width:100%;display:block}
         '<p class="property-card__desc">' + desc + '</p>' +
         '<div class="property-card__footer">' +
           '<span class="property-card__broker">🏢 ' + brokerName + '</span>' +
-          '<a href="/property/' + p.id + '" class="property-card__cta">View Details →</a>' +
+          '<button class="property-card__cta contact-broker-btn" data-pid="' + p.id + '">Contact Broker →</button>' +
         '</div>' +
       '</div>';
+
+    // Attach event listener to the new button
+    const btn = article.querySelector('.contact-broker-btn');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openLeadModal(p.id);
+      });
+    }
+
     return article;
   }
 
@@ -342,59 +595,78 @@ img{max-width:100%;display:block}
     list.forEach(p => grid.appendChild(buildCard(p)));
   }
 
+  function openLeadModal(propertyId) {
+    const modal = $('#leadModal');
+    if (modal) {
+      const pidInput = $('#leadPropertyId');
+      if (pidInput) pidInput.value = propertyId;
+      // Reset form and message
+      const form = $('#leadForm');
+      if (form) form.reset();
+      const msg = $('#leadMessage');
+      if (msg) msg.textContent = '';
+      window.openModal('leadModal');
+    }
+  }
+
   // ── Fetch live data and enhance ──
   async function enhanceWithLiveData() {
-    if (!window.supabase) {
-      console.warn('⏳ Supabase not loaded yet, retrying in 300ms…');
+    if (!supabase) {
+      console.warn('⏳ Supabase not ready, retrying in 300ms…');
       setTimeout(enhanceWithLiveData, 300);
       return;
-    }
-    if (!supabase) {
-      try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
-      catch (e) { console.error('Supabase client failed:', e); return; }
     }
 
     console.log('📡 Fetching properties…');
     try {
-      const r = await supabase.from('properties').select('*').order('created_at', { ascending: false });
+      const { data: rows, error } = await supabase
+        .from('properties')
+        .select('id, title, address, price_amount, property_type, description, verification_status, media_urls, owner_id, is_paused, created_at')
+        .eq('is_paused', false)
+        .order('created_at', { ascending: false });
 
-      if (r.error) {
-        console.error('❌ Supabase error:', r.error.message, r.error.code);
-        if (r.error.code === '42501' || /permission|policy|RLS/i.test(r.error.message)) {
+      if (error) {
+        console.error('❌ Supabase error:', error.message, error.code);
+        if (error.code === '42501' || /permission|policy|RLS/i.test(error.message)) {
           console.error('→ RLS is blocking anon reads. Run this in Supabase SQL Editor:');
           console.error('   CREATE POLICY "Anon can read properties" ON public.properties FOR SELECT TO anon USING (true);');
         }
-        const pc = $('#propertyCount');
-        if (pc) pc.textContent = '0 listings';
+        updatePropertyCount(0);
         return;
       }
 
-      const rows = r.data || [];
-      console.log('📦 Raw rows from Supabase:', rows.length);
+      const active = rows || [];
+      console.log('✅ Active properties:', active.length);
 
-      const active = rows.filter(p => p.is_paused !== true);
-      console.log('✅ Active (not paused):', active.length);
-
-      // Fetch broker profiles
+      // Fetch broker profiles efficiently (chunked to avoid URL length limits)
       const ownerIds = Array.from(new Set(active.map(p => p.owner_id).filter(Boolean)));
       let profiles = {};
-      if (ownerIds.length) {
+      if (ownerIds.length > 0) {
         try {
-          const pr = await supabase.from('profiles').select('id, business_name').in('id', ownerIds);
-          (pr.data || []).forEach(p => { profiles[p.id] = p; });
-        } catch (_) {}
+          const chunkSize = 100;
+          for (let i = 0; i < ownerIds.length; i += chunkSize) {
+            const chunk = ownerIds.slice(i, i + chunkSize);
+            const { data: prData, error: prError } = await supabase
+              .from('profiles')
+              .select('id, business_name')
+              .in('id', chunk);
+
+            if (!prError && prData) {
+              prData.forEach(p => { profiles[p.id] = p; });
+            }
+          }
+        } catch (_) {
+          console.warn('Could not fetch some profiles');
+        }
       }
 
       allProperties = active.map(p => ({ ...p, broker: profiles[p.owner_id] || null }));
       renderListings(allProperties);
-
-      const pc = $('#propertyCount');
-      if (pc) pc.textContent = active.length + ' listing' + (active.length === 1 ? '' : 's');
-      console.log('✅ Rendered ' + active.length + ' listings');
+      updatePropertyCount(allProperties.length);
+      console.log('✅ Rendered ' + allProperties.length + ' listings');
     } catch (e) {
       console.error('❌ Fetch failed:', e.message);
-      const pc = $('#propertyCount');
-      if (pc) pc.textContent = '0 listings';
+      updatePropertyCount(0);
     }
   }
 
@@ -424,67 +696,84 @@ img{max-width:100%;display:block}
           const q = e.target.value.toLowerCase().trim();
           if (allProperties.length === 0) return;
           const filtered = q ? allProperties.filter(function(p) {
-            return ((p.title || '') + ' ' + (p.address || '')).toLowerCase().indexOf(q) !== -1;
+            return ((p.title || '') + ' ' + (p.address || '') + ' ' + (p.broker?.business_name || '')).toLowerCase().indexOf(q) !== -1;
           }) : allProperties;
           renderListings(filtered);
         }, 250);
       });
     }
 
-    // Broker Portal button — null-safe
-    const portalBtn = $('#brokerPortalBtn');
-    if (portalBtn) {
-      portalBtn.addEventListener('click', function() { window.location.href = '/auth'; });
-    } else {
-      console.warn('⚠️ brokerPortalBtn not found — skipping listener');
-    }
-
-    // Close modal
-    const closeModal = $('#closeQuizModal');
-    if (closeModal) {
-      closeModal.addEventListener('click', function() { $('#quizModal').classList.add('hidden'); });
-    }
-
-    // Modal backdrop click
-    const quizModal = $('#quizModal');
-    if (quizModal) {
-      quizModal.addEventListener('click', function(e) {
-        if (e.target === quizModal) quizModal.classList.add('hidden');
-      });
-    }
-
-    // Quiz form submit
-    const quizForm = $('#quizForm');
-    if (quizForm) {
-      quizForm.addEventListener('submit', async function(e) {
+    // Lead form submit
+    const leadForm = $('#leadForm');
+    if (leadForm) {
+      leadForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         if (!supabase) { alert('Service not ready. Refresh the page.'); return; }
-        const pid = $('#quizPropertyId') ? $('#quizPropertyId').value : '';
-        const name = $('#quizName') ? $('#quizName').value.trim() : '';
-        const email = $('#quizEmail') ? $('#quizEmail').value.trim() : '';
-        const wa = $('#quizWhatsapp') ? $('#quizWhatsapp').value.trim() : '';
-        if (!name || !email || !wa) { alert('Fill all fields.'); return; }
-        if (!/^\d{9,13}$/.test(wa.replace(/\D/g, ''))) { alert('Enter a valid phone number.'); return; }
+
+        const pid = $('#leadPropertyId') ? $('#leadPropertyId').value : '';
+        const name = $('#leadName') ? $('#leadName').value.trim() : '';
+        const email = $('#leadEmail') ? $('#leadEmail').value.trim() : '';
+        const wa = $('#leadWhatsapp') ? $('#leadWhatsapp').value.trim() : '';
+        const msg = $('#leadMessage');
+
+        if (!pid) { alert('Property ID is missing.'); return; }
+        if (!name || !email || !wa) { alert('Please fill all fields.'); return; }
+        if (!/^\d{9,13}$/.test(wa.replace(/\D/g, ''))) { alert('Enter a valid phone number (9-13 digits).'); return; }
+
+        msg.style.color = '#4f46e5';
+        msg.textContent = 'Sending request...';
+
         try {
-          const pdR = await supabase.from('properties').select('owner_id, title, address, price_amount, property_type').eq('id', pid).single();
-          if (pdR.error) throw pdR.error;
-          const pd = pdR.data;
+          // Fetch property details to get owner_id and calculate cost
+          const { data: pd, error: pdError } = await supabase
+            .from('properties')
+            .select('owner_id, title, address, price_amount, property_type')
+            .eq('id', pid)
+            .single();
+
+          if (pdError) throw pdError;
+          if (!pd) throw new Error('Property not found');
+
           const cost = Math.round((pd.price_amount || 0) / 150000) * 3250 || 3250;
-          const leadR = await supabase.from('lead_requests').insert({
-            property_id: pid, broker_id: pd.owner_id,
-            visitor_name: name, visitor_email: email, visitor_whatsapp: wa,
-            quiz_answers: {}, total_score: 6, lead_type: 'warm', status: 'pending', cost: cost,
-            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-          }).select().single();
-          if (leadR.error) throw leadR.error;
-          $('#quizModal').classList.add('hidden');
-          alert('✅ Request sent! The broker will be in touch.');
-        } catch (err) { alert('Error: ' + err.message); }
+
+          const { data: leadData, error: leadError } = await supabase
+            .from('lead_requests')
+            .insert({
+              property_id: pid,
+              broker_id: pd.owner_id,
+              visitor_name: name,
+              visitor_email: email,
+              visitor_whatsapp: wa,
+              quiz_answers: {},
+              total_score: 6,
+              lead_type: 'warm',
+              status: 'pending',
+              cost: cost,
+              expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+            })
+            .select()
+            .single();
+
+          if (leadError) throw leadError;
+
+          msg.style.color = '#10b981';
+          msg.textContent = '✅ Request sent! The broker will be in touch.';
+          leadForm.reset();
+          setTimeout(() => {
+            window.closeModal('leadModal');
+            msg.textContent = '';
+          }, 2000);
+
+        } catch (err) {
+          msg.style.color = '#ef4444';
+          msg.textContent = 'Error: ' + err.message;
+          console.error('Lead submission error:', err);
+        }
       });
     }
 
     // Start live enhancement
-    enhanceWithLiveData();
+    initSupabase();
     console.log('✅ Property Hub ready');
   }
 
