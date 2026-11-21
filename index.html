@@ -135,9 +135,9 @@ img{max-width:100%;display:block}
 <header class="header">
   <div class="header-inner">
     <a href="/" class="logo">🏠 Property<span>Hub</span></a>
-    <div class="header-right">
+    <div class="header-right" id="headerRight">
       <span class="count-badge" id="propertyCount">Loading…</span>
-      <button class="portal-btn" id="brokerPortalBtn">Broker Portal / Login</button>
+      <button class="portal-btn" id="brokerPortalBtn">Broker Portal</button>
     </div>
   </div>
 </header>
@@ -184,6 +184,15 @@ img{max-width:100%;display:block}
     </div>
   </section>
 
+  <noscript id="listings-noscript">
+    <div style="padding:1rem;background:#fff;border-radius:1rem;border:1px solid #e2e8f0;max-width:1200px;margin:1rem auto;">
+      <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">Browse Listings</h2>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:.5rem;font-size:.875rem;">
+        <li>No listings yet. <a href="/brokers/">List your property free</a>.</li>
+      </ul>
+    </div>
+  </noscript>
+
   <section class="guides-section">
     <h2>Property Guides for Kampala</h2>
     <p class="sub">In-depth neighborhood guides covering 2026 prices, safety tips, and verified listings.</p>
@@ -193,6 +202,8 @@ img{max-width:100%;display:block}
         <ul>
           <li><a href="/guides/single-rooms-near-makerere/">Single Rooms Near Makerere University</a></li>
           <li><a href="/guides/hostels-near-mulago/">Hostels Near Mulago Hospital</a></li>
+          <li><a href="/guides/cheap-rooms-kikoni/">Cheap Rooms in Kikoni</a></li>
+          <li><a href="/guides/rooms-wandegeya/">Rooms in Wandegeya</a></li>
         </ul>
       </div>
       <div class="guide-group">
@@ -200,6 +211,8 @@ img{max-width:100%;display:block}
         <ul>
           <li><a href="/guides/apartments-naalya/">2 Bedroom Apartments in Naalya</a></li>
           <li><a href="/guides/apartments-ntinda/">Apartments in Ntinda</a></li>
+          <li><a href="/guides/rentals-bukoto/">Houses &amp; Apartments in Bukoto</a></li>
+          <li><a href="/guides/kamwokya/">Houses in Kamwokya</a></li>
         </ul>
       </div>
       <div class="guide-group">
@@ -207,6 +220,8 @@ img{max-width:100%;display:block}
         <ul>
           <li><a href="/guides/kololo/">Luxury Houses in Kololo</a></li>
           <li><a href="/guides/nakasero/">Apartments in Nakasero</a></li>
+          <li><a href="/guides/bungalows-kisaasi/">Bungalows for Sale in Kisaasi</a></li>
+          <li><a href="/guides/guesthouses-entebbe-airport/">Guesthouses Near Entebbe Airport</a></li>
         </ul>
       </div>
     </div>
@@ -228,12 +243,21 @@ img{max-width:100%;display:block}
       <p style="color:#94a3b8">Connecting property seekers with verified brokers across Uganda.</p>
     </div>
     <div>
+      <h4>Featured Guides</h4>
+      <ul>
+        <li><a href="/guides/single-rooms-near-makerere/">Single rooms near Makerere</a></li>
+        <li><a href="/guides/apartments-naalya/">Apartments in Naalya</a></li>
+        <li><a href="/guides/kololo/">Houses in Kololo</a></li>
+        <li><a href="/brokers/">List your property →</a></li>
+      </ul>
+    </div>
+    <div>
       <h4>Areas Covered</h4>
       <p style="color:#94a3b8">Kampala · Wakiso · Entebbe · Mukono · Kira · Naalya · Ntinda · Bukoto · Jinja</p>
     </div>
   </div>
   <div class="footer-bottom">
-    © 2026 Property Hub Uganda · <a href="/about.html" style="color:#94a3b8">About</a> · <a href="/privacy.html" style="color:#94a3b8">Privacy</a> · <a href="/terms.html" style="color:#94a3b8">Terms</a>
+    © 2026 Property Hub Uganda · <a href="/about.html" style="color:#94a3b8">About</a> · <a href="/contact.html" style="color:#94a3b8">Contact</a> · <a href="/privacy.html" style="color:#94a3b8">Privacy</a> · <a href="/terms.html" style="color:#94a3b8">Terms</a>
   </div>
 </footer>
 
@@ -242,7 +266,7 @@ img{max-width:100%;display:block}
 <!-- AUTH MODAL -->
 <div id="authModal" class="modal-backdrop hidden">
   <div class="modal-content">
-    <button class="modal-close" onclick="window.closeModal('authModal')">&times;</button>
+    <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
     <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:#1e293b">🔐 Broker Login / Sign Up</h2>
     <form id="authForm">
       <div class="field"><label>Email *</label><input type="email" id="authEmail" required /></div>
@@ -259,7 +283,7 @@ img{max-width:100%;display:block}
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="modal-backdrop hidden">
   <div class="modal-content">
-    <button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button>
+    <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
     <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:#1e293b">👤 My Profile</h2>
     <form id="profileForm">
       <div class="field"><label>Business Name</label><input type="text" id="profileBusinessName" placeholder="e.g., Kampala Real Estate" /></div>
@@ -267,23 +291,22 @@ img{max-width:100%;display:block}
       <div class="field"><label>Bio</label><input type="text" id="profileBio" placeholder="Brief description of your services" /></div>
       <button type="submit" class="btn-primary">Save Profile</button>
     </form>
-    <p id="profileMessage" style="margin-top:1rem;font-size:.85rem;text-align:center;"></p>
   </div>
 </div>
 
-<!-- LEAD REQUEST MODAL -->
-<div id="leadModal" class="modal-backdrop hidden">
+<!-- LEAD / QUIZ MODAL -->
+<div id="quizModal" class="modal-backdrop hidden">
   <div class="modal-content">
-    <button class="modal-close" onclick="window.closeModal('leadModal')">&times;</button>
+    <button class="modal-close" onclick="closeModal('quizModal')">&times;</button>
     <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:#1e293b">📞 Connect with Broker</h2>
-    <form id="leadForm">
-      <input type="hidden" id="leadPropertyId" />
-      <div class="field"><label>Your Name *</label><input type="text" id="leadName" required /></div>
-      <div class="field"><label>Email *</label><input type="email" id="leadEmail" required /></div>
-      <div class="field"><label>WhatsApp Number *</label><input type="tel" id="leadWhatsapp" required placeholder="0771234567" /></div>
+    <form id="quizForm">
+      <input type="hidden" id="quizPropertyId" />
+      <div class="field"><label>Your Name *</label><input type="text" id="quizName" required /></div>
+      <div class="field"><label>Email *</label><input type="email" id="quizEmail" required /></div>
+      <div class="field"><label>WhatsApp Number *</label><input type="tel" id="quizWhatsapp" required placeholder="0771234567" /></div>
       <button type="submit" class="btn-primary">Send Request</button>
     </form>
-    <p id="leadMessage" style="margin-top:1rem;font-size:.85rem;text-align:center;"></p>
+    <p id="quizMessage" style="margin-top:1rem;font-size:.85rem;text-align:center;"></p>
   </div>
 </div>
 
@@ -302,24 +325,16 @@ img{max-width:100%;display:block}
   let isSignUp = false;
 
   function $(s) { return document.querySelector(s); }
-  
+
   // Global modal helpers
   window.closeModal = function(id) {
     const modal = document.getElementById(id);
-    if (modal) {
-      modal.classList.add('hidden');
-      console.log(`Closed modal: ${id}`);
-    }
+    if (modal) modal.classList.add('hidden');
   };
   
   window.openModal = function(id) {
     const modal = document.getElementById(id);
-    if (modal) {
-      modal.classList.remove('hidden');
-      console.log(`Opened modal: ${id}`);
-    } else {
-      console.error(`Modal with id "${id}" not found in DOM!`);
-    }
+    if (modal) modal.classList.remove('hidden');
   };
 
   function updatePropertyCount(count) {
@@ -344,9 +359,7 @@ img{max-width:100%;display:block}
       supabase.auth.onAuthStateChange((event, session) => {
         currentUser = session?.user || null;
         updateAuthUI();
-        if (event === 'SIGNED_IN') {
-          fetchUserProfile();
-        }
+        if (event === 'SIGNED_IN') fetchUserProfile();
       });
 
       supabase.auth.getSession().then(({ data: { session } }) => {
@@ -362,65 +375,50 @@ img{max-width:100%;display:block}
     }
   }
 
-  // 2. Dynamic Auth UI (Replaces the header button safely)
+  // 2. Dynamic Auth UI (Swaps Broker Portal button safely)
   function updateAuthUI() {
-    const headerRight = document.querySelector('.header-right');
-    if (!headerRight) {
-      console.warn('⚠️ .header-right not found in DOM');
-      return;
-    }
-
-    const countBadge = document.getElementById('propertyCount') || document.createElement('span');
-    countBadge.className = 'count-badge';
-    countBadge.id = 'propertyCount';
-    updatePropertyCount();
-
+    const headerRight = document.getElementById('headerRight');
+    if (!headerRight) return;
+    
+    const countBadge = document.getElementById('propertyCount');
     headerRight.innerHTML = '';
-    headerRight.appendChild(countBadge);
+    if (countBadge) headerRight.appendChild(countBadge);
 
     if (currentUser) {
+      // Logged in
       const profileBtn = document.createElement('button');
       profileBtn.className = 'portal-btn';
-      profileBtn.style.background = '#10b981';
+      profileBtn.style.backgroundColor = '#10b981';
       profileBtn.textContent = 'My Profile';
-      profileBtn.onclick = () => {
-        fetchUserProfile();
-        window.openModal('profileModal');
-      };
-      
+      profileBtn.onclick = () => { fetchUserProfile(); window.openModal('profileModal'); };
+      headerRight.appendChild(profileBtn);
+
       const logoutBtn = document.createElement('button');
       logoutBtn.className = 'portal-btn';
-      logoutBtn.style.background = '#ef4444';
+      logoutBtn.style.backgroundColor = '#ef4444';
       logoutBtn.style.marginLeft = '0.5rem';
       logoutBtn.textContent = 'Logout';
       logoutBtn.onclick = async () => {
         await supabase.auth.signOut();
-        alert('Logged out successfully');
         updateAuthUI();
       };
-
-      headerRight.appendChild(profileBtn);
       headerRight.appendChild(logoutBtn);
-      console.log('✅ Auth UI updated: Logged in as', currentUser.email);
     } else {
-      const loginBtn = document.createElement('button');
-      loginBtn.className = 'portal-btn';
-      loginBtn.id = 'brokerPortalBtn';
-      loginBtn.textContent = 'Broker Portal / Login';
-      loginBtn.onclick = () => {
-        console.log('🔓 Opening auth modal');
-        window.openModal('authModal');
-      };
-      
-      headerRight.appendChild(loginBtn);
-      console.log('✅ Auth UI updated: Logged out');
+      // Logged out
+      const portalBtn = document.createElement('button');
+      portalBtn.className = 'portal-btn';
+      portalBtn.id = 'brokerPortalBtn';
+      portalBtn.textContent = 'Broker Portal';
+      portalBtn.onclick = () => window.openModal('authModal');
+      headerRight.appendChild(portalBtn);
     }
+    updatePropertyCount();
   }
 
   // 3. Auth Form Handling
   const authForm = document.getElementById('authForm');
   if (authForm) {
-    authForm.addEventListener('submit', async (e) => {
+    authForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       const email = document.getElementById('authEmail').value.trim();
       const password = document.getElementById('authPassword').value;
@@ -430,62 +428,52 @@ img{max-width:100%;display:block}
 
       try {
         if (isSignUp) {
-          const { data, error } = await supabase.auth.signUp({ email, password });
+          const { error } = await supabase.auth.signUp({ email, password });
           if (error) throw error;
           msg.style.color = '#10b981';
-          msg.textContent = 'Sign up successful! Please check your email to confirm.';
-          if (data.user) {
-             setTimeout(() => { window.closeModal('authModal'); msg.textContent = ''; }, 1500);
-          }
+          msg.textContent = 'Sign up successful! Please check your email.';
         } else {
           const { error } = await supabase.auth.signInWithPassword({ email, password });
           if (error) throw error;
           msg.style.color = '#10b981';
           msg.textContent = 'Login successful!';
-          setTimeout(() => { window.closeModal('authModal'); msg.textContent = ''; }, 1000);
+          setTimeout(() => window.closeModal('authModal'), 1000);
         }
       } catch (err) {
         msg.style.color = '#ef4444';
         msg.textContent = 'Error: ' + err.message;
-        console.error('Auth error:', err);
       }
     });
 
-    document.getElementById('authToggleBtn').addEventListener('click', () => {
+    document.getElementById('authToggleBtn').addEventListener('click', function() {
       isSignUp = !isSignUp;
       document.getElementById('authSubmitBtn').textContent = isSignUp ? 'Sign Up' : 'Login';
-      document.getElementById('authToggleBtn').textContent = isSignUp ? 'Already have an account? Login' : 'Need an account? Sign Up';
+      this.textContent = isSignUp ? 'Already have an account? Login' : 'Need an account? Sign Up';
       document.getElementById('authMessage').textContent = '';
     });
   }
 
   // 4. Profile Fetching (Uses maybeSingle to prevent crashes if profile doesn't exist yet)
   async function fetchUserProfile() {
-    if (!currentUser || !supabase) {
-      console.warn('Cannot fetch profile: no user or supabase');
-      return;
-    }
-    console.log('Fetching profile for:', currentUser.id);
+    if (!currentUser || !supabase) return;
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('business_name, phone, bio')
         .eq('id', currentUser.id)
-        .maybeSingle();
+        .maybeSingle(); // Crucial: prevents error if profile row doesn't exist yet
 
-      if (error) {
-        console.warn('Profile fetch warning (might not exist yet):', error.message);
+      if (error && error.code !== 'PGRST116') {
+        console.warn('Profile fetch warning:', error.message);
       }
 
       const bn = document.getElementById('profileBusinessName');
       const ph = document.getElementById('profilePhone');
       const bio = document.getElementById('profileBio');
-
+      
       if (bn) bn.value = data?.business_name || '';
       if (ph) ph.value = data?.phone || '';
       if (bio) bio.value = data?.bio || '';
-      
-      console.log('Profile data loaded into form');
     } catch (err) {
       console.error('Profile fetch failed:', err);
     }
@@ -494,13 +482,10 @@ img{max-width:100%;display:block}
   // 5. Profile Saving
   const profileForm = document.getElementById('profileForm');
   if (profileForm) {
-    profileForm.addEventListener('submit', async (e) => {
+    profileForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      if (!currentUser) return;
-      const msg = document.getElementById('profileMessage');
-      msg.style.color = '#4f46e5';
-      msg.textContent = 'Saving...';
-
+      if (!supabase || !currentUser) return;
+      
       const updates = {
         id: currentUser.id,
         business_name: document.getElementById('profileBusinessName').value.trim(),
@@ -510,23 +495,17 @@ img{max-width:100%;display:block}
       };
 
       try {
-        const { error } = await supabase
-          .from('profiles')
-          .upsert(updates, { onConflict: 'id' });
-
+        const { error } = await supabase.from('profiles').upsert(updates, { onConflict: 'id' });
         if (error) throw error;
-        msg.style.color = '#10b981';
-        msg.textContent = 'Profile saved successfully!';
-        setTimeout(() => { msg.textContent = ''; }, 3000);
+        alert('✅ Profile saved successfully!');
+        window.closeModal('profileModal');
       } catch (err) {
-        msg.style.color = '#ef4444';
-        msg.textContent = 'Error: ' + err.message;
-        console.error('Profile save error:', err);
+        alert('Error saving profile: ' + err.message);
       }
     });
   }
 
-  // 6. Helper: Safely get first image
+  // 6. Helper: Safely get first image (handles array or stringified JSON)
   function getFirstImage(mediaUrls) {
     if (!mediaUrls) return '/og-cover.jpg';
     if (Array.isArray(mediaUrls) && mediaUrls.length > 0) return mediaUrls[0];
@@ -535,7 +514,7 @@ img{max-width:100%;display:block}
         const parsed = JSON.parse(mediaUrls);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
       } catch (e) {
-        return mediaUrls;
+        return mediaUrls; // Fallback to string if it's a direct URL
       }
     }
     return '/og-cover.jpg';
@@ -590,34 +569,32 @@ img{max-width:100%;display:block}
     if (btn) {
       e.preventDefault();
       const pid = btn.getAttribute('data-pid');
-      if (pid) {
-        const modal = document.getElementById('leadModal');
-        const pidInput = document.getElementById('leadPropertyId');
-        const form = document.getElementById('leadForm');
-        const msg = document.getElementById('leadMessage');
-        
-        if (pidInput) pidInput.value = pid;
+      const modal = document.getElementById('quizModal');
+      const pidInput = document.getElementById('quizPropertyId');
+      const form = document.getElementById('quizForm');
+      const msg = document.getElementById('quizMessage');
+      
+      if (modal && pidInput) {
+        pidInput.value = pid;
         if (form) form.reset();
         if (msg) msg.textContent = '';
-        window.openModal('leadModal');
-      } else {
-        console.warn('Contact button missing data-pid');
+        window.openModal('quizModal');
       }
     }
   });
 
-  // 9. Lead Form Submit
-  const leadForm = document.getElementById('leadForm');
-  if (leadForm) {
-    leadForm.addEventListener('submit', async function(e) {
+  // 9. Quiz / Lead Form Submit
+  const quizForm = document.getElementById('quizForm');
+  if (quizForm) {
+    quizForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!supabase) { alert('Service not ready. Refresh the page.'); return; }
-
-      const pid = document.getElementById('leadPropertyId') ? document.getElementById('leadPropertyId').value : '';
-      const name = document.getElementById('leadName') ? document.getElementById('leadName').value.trim() : '';
-      const email = document.getElementById('leadEmail') ? document.getElementById('leadEmail').value.trim() : '';
-      const wa = document.getElementById('leadWhatsapp') ? document.getElementById('leadWhatsapp').value.trim() : '';
-      const msg = document.getElementById('leadMessage');
+      
+      const pid = document.getElementById('quizPropertyId').value;
+      const name = document.getElementById('quizName').value.trim();
+      const email = document.getElementById('quizEmail').value.trim();
+      const wa = document.getElementById('quizWhatsapp').value.trim();
+      const msg = document.getElementById('quizMessage');
 
       if (!pid) { alert('Property ID is missing.'); return; }
       if (!name || !email || !wa) { alert('Please fill all fields.'); return; }
@@ -629,38 +606,34 @@ img{max-width:100%;display:block}
       try {
         const { data: pd, error: pdError } = await supabase
           .from('properties')
-          .select('owner_id, title, address, price_amount, property_type')
+          .select('owner_id, price_amount')
           .eq('id', pid)
           .single();
-
+          
         if (pdError) throw pdError;
-        if (!pd) throw new Error('Property not found');
-
+        
         const cost = Math.round((pd.price_amount || 0) / 150000) * 3250 || 3250;
-
-        const { error: leadError } = await supabase
-          .from('lead_requests')
-          .insert({
-            property_id: pid,
-            broker_id: pd.owner_id,
-            visitor_name: name,
-            visitor_email: email,
-            visitor_whatsapp: wa,
-            quiz_answers: {},
-            total_score: 6,
-            lead_type: 'warm',
-            status: 'pending',
-            cost: cost,
-            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-          });
-
+        
+        const { error: leadError } = await supabase.from('lead_requests').insert({
+          property_id: pid,
+          broker_id: pd.owner_id,
+          visitor_name: name,
+          visitor_email: email,
+          visitor_whatsapp: wa,
+          quiz_answers: {},
+          total_score: 6,
+          lead_type: 'warm',
+          status: 'pending',
+          cost: cost,
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        });
+        
         if (leadError) throw leadError;
-
+        
         msg.style.color = '#10b981';
         msg.textContent = '✅ Request sent! The broker will be in touch.';
-        leadForm.reset();
-        setTimeout(() => { window.closeModal('leadModal'); msg.textContent = ''; }, 2000);
-
+        quizForm.reset();
+        setTimeout(() => window.closeModal('quizModal'), 2000);
       } catch (err) {
         msg.style.color = '#ef4444';
         msg.textContent = 'Error: ' + err.message;
@@ -693,6 +666,7 @@ img{max-width:100%;display:block}
       const active = rows || [];
       console.log('✅ Active properties:', active.length);
 
+      // Fetch broker profiles in chunks to avoid URL length limits
       const ownerIds = Array.from(new Set(active.map(p => p.owner_id).filter(Boolean)));
       let profiles = {};
       if (ownerIds.length > 0) {
@@ -756,6 +730,13 @@ img{max-width:100%;display:block}
         }, 250);
       });
     }
+
+    // Close modal on backdrop click
+    document.querySelectorAll('.modal-backdrop').forEach(modal => {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.classList.add('hidden');
+      });
+    });
 
     initSupabase();
     console.log('✅ Property Hub ready');
